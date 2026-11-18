@@ -1,0 +1,10 @@
+[package]
+name = "factory-core"
+description = "Domain types, effects and events, the pure engine, policy and config types"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true

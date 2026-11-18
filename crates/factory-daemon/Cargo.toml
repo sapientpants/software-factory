@@ -1,0 +1,10 @@
+[package]
+name = "factory-daemon"
+description = "Supervisor, scheduler, reconciler, effect executors and control API"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true

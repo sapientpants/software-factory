@@ -1,0 +1,10 @@
+[package]
+name = "factory-github"
+description = "The GitHub trait, octocrab adapter, gateway, GraphQL documents and outbound encoder"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true

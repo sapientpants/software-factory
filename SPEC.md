@@ -1436,6 +1436,7 @@ Decided by the operator on 2026-11-18:
 | D-12 | The factory stops at merge. Releases and deployments stay human actions. |
 | D-13 | The factory works only on issues the operator wrote (SEC-2). |
 | D-16 | M0 and M1 are built by Claude Code sessions on the operator's Mac, one pull request per issue, each merged by the operator (BOOT-1). The server is reached only from the operator's home, so every step on it is the operator's; Linux-only code is developed in a local VM (DEV-3). Every check runs before each commit through one command (DEV-1). |
+| D-17 | The factory's repository, code and documents alike, is licensed `MIT OR Apache-2.0`, copyright Marc Tremblay. Every crate inherits the licence from the workspace, and the structural test (19.1) checks it. Source files carry no per-file licence header. |
 
 Still open:
 

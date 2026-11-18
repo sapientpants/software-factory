@@ -1,5 +1,6 @@
 //! The structural test of SPEC 19.1: the workspace holds exactly the crates in
-//! the spec's table, and each one's dependencies stay within its row.
+//! the spec's table, each one's dependencies stay within its row, and each one
+//! carries the repository's licence (D-17).
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::Path;
@@ -65,13 +66,16 @@ const CORE_FORBIDDEN: &[&str] = &[
     "rusqlite",
 ];
 
+/// The licence of every workspace crate (SPEC D-17).
+const LICENSE: &str = "MIT OR Apache-2.0";
+
 struct Dependency {
     name: String,
     dev: bool,
 }
 
-/// Workspace members and their declared dependencies, from `cargo metadata`.
-fn workspace() -> BTreeMap<String, Vec<Dependency>> {
+/// The output of `cargo metadata` for the workspace, without dependencies.
+fn metadata() -> Value {
     let cargo = std::env::var("CARGO").unwrap_or_else(|_| "cargo".into());
     let manifest = Path::new(env!("CARGO_MANIFEST_DIR")).join("../Cargo.toml");
     let output = Command::new(cargo)
@@ -90,8 +94,12 @@ fn workspace() -> BTreeMap<String, Vec<Dependency>> {
         "cargo metadata failed: {}",
         String::from_utf8_lossy(&output.stderr)
     );
-    let metadata: Value = serde_json::from_slice(&output.stdout).expect("parse cargo metadata");
+    serde_json::from_slice(&output.stdout).expect("parse cargo metadata")
+}
 
+/// Workspace members and their declared dependencies, from `cargo metadata`.
+fn workspace() -> BTreeMap<String, Vec<Dependency>> {
+    let metadata = metadata();
     let mut members = BTreeMap::new();
     for package in metadata["packages"].as_array().expect("packages array") {
         let name = package["name"].as_str().expect("package name").to_owned();
@@ -157,4 +165,20 @@ fn core_has_no_io_crates() {
         .filter(|name| CORE_FORBIDDEN.contains(name))
         .collect();
     assert!(io.is_empty(), "factory-core depends on I/O crates: {io:?}");
+}
+
+#[test]
+fn every_crate_carries_the_licence() {
+    let metadata = metadata();
+    let unlicensed: Vec<&str> = metadata["packages"]
+        .as_array()
+        .expect("packages array")
+        .iter()
+        .filter(|package| package["license"].as_str() != Some(LICENSE))
+        .map(|package| package["name"].as_str().expect("package name"))
+        .collect();
+    assert!(
+        unlicensed.is_empty(),
+        "crates without the licence {LICENSE} (SPEC D-17): {unlicensed:?}"
+    );
 }

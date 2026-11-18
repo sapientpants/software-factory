@@ -1,0 +1,6 @@
+# SPEC 19.3. `allow-invalid` keeps the tokio entry quiet in crates that do not
+# depend on tokio.
+disallowed-methods = [
+    { path = "tokio::spawn", reason = "spawn through the supervisor (SPEC 19.3)", allow-invalid = true },
+    { path = "std::process::Command::new", reason = "spawn processes through factory-proc (SPEC 19.3)" },
+]

@@ -1,0 +1,22 @@
+# One virtual workspace (SPEC 19.1). The crate table there is the source of
+# truth for what each crate owns and may depend on; xtask/tests/structure.rs
+# enforces it.
+[workspace]
+resolver = "3"
+members = ["crates/*", "xtask"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.100"
+publish = false
+
+[workspace.dependencies]
+serde_json = "1"
+
+# SPEC 19.3. The disallowed methods are listed in clippy.toml.
+[workspace.lints.clippy]
+unwrap_used = "deny"
+expect_used = "deny"
+await_holding_lock = "deny"
+disallowed_methods = "deny"

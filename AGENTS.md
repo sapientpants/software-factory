@@ -4,11 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) and other coding age
 
 ## State of the repository
 
-Specification stage. The repository holds a spec and its evidence, and no code yet.
+Start of milestone M0. The repository holds a spec, its evidence and a Cargo workspace of empty crates (SPEC 19.1).
 
 - `SPEC.md` is the single source of truth for the design. Its status row says which draft it is and whether that draft was reviewed.
 - `docs/research/NN-*.md` are the sourced evidence behind the spec. They are records: add new ones, leave existing ones as written.
-- Build, lint and test commands arrive with the Cargo workspace in milestone M0 (SPEC 19.5 names the intended set). Add them here when they exist. Until then the only tooling is `mise install`, which provides the pinned Rust toolchain.
+- Checks, each of which must pass before a change is done: `cargo fmt --all --check`; `cargo clippy --workspace --all-targets --locked -- -D warnings`; `cargo test --workspace --locked`. The rest of the SPEC 19.5 set (nextest, `cargo deny`, the unused-dependency check, the CI workflow) is still M0 work; add each here when it exists.
+- `xtask/tests/structure.rs` holds the crate table of SPEC 19.1 as data. Adding a crate or a dependency between crates means changing the spec's table and that test together.
 
 ## The system in one paragraph
 

@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | Draft 2. Draft 1 was reviewed by four adversarial reviewers; this draft addresses their 59 findings (`docs/research/09-spec-review.md`). |
+| Status | Draft 4. Drafts 1 and 2 were reviewed (`docs/research/09-spec-review.md`, `10-spec-recheck.md`) and draft 3 addressed the findings. Draft 4 applies the operator's requirement decisions (23.1) and has not been reviewed. |
 | Date | 2026-11-18 |
 | Implementation language | Rust (toolchain 1.100, edition 2024) |
 | System of record | git on GitHub for code, GitHub Issues for work items |
@@ -25,15 +25,19 @@ Humans steer the factory by writing issues and specs, approving work, and review
 - **G3.** Make wrong or malicious output hard to merge: the agent that builds a change never judges it, never holds a GitHub credential, and cannot alter the checks that gate it.
 - **G4.** Make cost and quality visible per issue and per merged pull request.
 - **G5.** Build the factory with itself from milestone M1 (attended) and M2 (unattended) onward (section 21).
+- **G6.** Reach lights-out operation by evidence. Every class of work starts with the operator reviewing each pull request, and is promoted to merging without review only on its measured record (13.6). The operator always approves each issue.
 
 ### 1.2 Non-goals
 
 - A second issue tracker, or any store that holds work items GitHub does not.
 - A general workflow engine. The pipeline is fixed in code; only stage settings are data.
-- A multi-tenant service. One operator (or one small team) runs one daemon on one host.
+- A multi-user or hosted service. This is a personal factory: one person runs one daemon on their own machine, signed in to the agent CLI with their own account. The factory never handles anyone else's model credentials.
 - Several agents writing to one branch. Parallelism comes from independent issues.
-- Removing human review by default. Auto-merge is a narrow, measured opt-in (section 13.6).
+- Merging without review before it is earned (G6, 13.6).
 - Opening issues or pull requests on repositories the operator has not added to the factory.
+- Working on issues written by anyone but the operator (SEC-2).
+- Releasing or deploying. The factory's job ends at merge; it never holds a publishing or deployment credential.
+- Running on macOS or Windows. The host is a Linux server (4.4).
 
 ### 1.3 Design principles
 
@@ -56,14 +60,14 @@ These come from the practice of teams that run such systems (report 01) and each
 |---|---|
 | **Operator** | The person who installs and runs the factory and owns its credentials. |
 | **Authorised actor** | A GitHub account of type User whose permission on the repository is write, maintain or admin when checked (SEC-1). |
-| **Approver** | The authorised actor who applied `state:ready` to an issue (for a plan sub-issue: the plan approver, SEC-1a). |
+| **Approver** | The authorised actor who applied `state:ready` to an issue. With one human, this is the operator. |
 | **Control plane** | The trusted `sf` daemon process. Holds all credentials and performs all external writes. Also called the host. |
 | **Worker** | The untrusted side: an agent process or build command and everything it spawns, inside a sandbox. |
 | **Work item** | An open GitHub issue carrying exactly one `state:*` label. |
 | **Run** | The factory's handling of one work item from claim to a terminal state. Identified by a run id (UUIDv7). Terminal states: `done` (pull request merged, or for a tier 2 parent all children closed as completed) and `cancelled` (issue closed without a merged pull request, issue moved to `state:triage` by a human, or `sf cancel`). A run in `needs-human` is not terminal. |
 | **Attempt** | One pass of a run that starts from a fresh branch off the default branch. A run has one attempt unless it is reset (7.6). |
 | **Stage** | One step of the internal pipeline (7.3). |
-| **Stage execution** | One execution of a stage: one agent session, or one setup, capture or verify command sequence. Each gets its own sandbox instance. |
+| **Stage execution** | One execution of a stage: one agent session, one capture, or one verify command sequence, together with the `setup` commands that precede it (WS-4). Each gets its own sandbox instance. |
 | **Round** | One trip back to the implement stage after a failed gate. |
 | **Workspace** | The directory tree in which the implementer works. It lives for one attempt, or until a base update rebuilds it (12.4). |
 | **Candidate** | A commit the host builds from the workspace (9.4). Gates run on candidates; only candidates are pushed. |
@@ -93,7 +97,7 @@ These come from the practice of teams that run such systems (report 01) and each
 ┌───────────────▼──────────────────────────────────────────────────────┐
 │ WORKER (untrusted, one sandbox instance per stage execution)         │
 │  agent CLI ─ shell, build, tests ─ workspace or candidate export     │
-│  no GitHub credential · no model key · default-deny network          │
+│  no GitHub credential · scrubbed environment · default-deny network  │
 └──────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -104,14 +108,14 @@ These hold in every mode and milestone. A change that breaks one is a defect.
 - **INV-1.** No GitHub credential ever enters a worker, and none appears in the arguments, environment or files of any child process.
 - **INV-2.** The control plane never executes anything from a workspace and never reads configuration from one: no hooks, no workspace `.git/config`, no agent settings, no `.cargo/config.toml` or `rust-toolchain.toml`. It does not open paths inside a workspace. Its only access is an `lstat`-only walk and git commands run inside a sandbox (9.4).
 - **INV-3.** Every command that builds or runs repository code, and every git command whose work tree is a workspace, runs inside a sandbox.
-- **INV-4.** A run starts only on an action by an authorised actor whose permission was checked through the GitHub API at that moment, or on a plan sub-issue that inherits a human plan approval under SEC-1a.
+- **INV-4.** A run starts only on an action by an authorised actor whose permission was checked through the GitHub API at that moment. There is no exception: every issue the factory works on was approved individually.
 - **INV-5.** The factory identity never approves a pull request and never bypasses a repository rule.
 - **INV-6.** At most one non-terminal run exists per (repository, issue), and at most one stage execution per run at a time.
 - **INV-7.** All external side effects are idempotent and keyed (8.5). Repeating any step after a crash produces no duplicate branch, pull request, comment, check run or issue.
 - **INV-8.** The local store is a rebuildable cache. If it disagrees with GitHub, GitHub wins.
 - **INV-9.** Text from issues, pull requests, comments, logs and agents is data. It is never interpolated into a shell command or a control-plane decision, and it is encoded before being written back to GitHub (GH-5a).
 - **INV-10.** The policy and agent instructions that govern a run are read from a default-branch commit, never from the workspace or the work branch.
-- **INV-11.** `verify` and `review` never see the workspace. They run on a clean export of the candidate commit, in a fresh sandbox instance with a fresh home directory. Nothing one stage execution writes is visible to a later one except the workspace (implementer rounds only), the candidate commit and the structured result.
+- **INV-11.** `verify` and `review` never see the workspace. They run on a clean export of the candidate commit, in a fresh sandbox instance with a fresh home directory. Nothing one stage execution writes is visible to a later one except the workspace and the implementer target directory (both visible to implementer rounds only), the candidate commit and the structured result.
 
 ---
 
@@ -128,15 +132,12 @@ GitHub rulesets are what stop a faulty or compromised control plane from pushing
 
 - **DEP-1.** The mode MUST be shown in `sf status`, in the status comment and in every pull request body.
 - **DEP-2.** In `factory-enforced` mode the factory MUST itself verify, immediately before merging, every condition the ruleset would have enforced (12.3), and autonomy is capped at A2 (13.6).
-- **DEP-3.** `enforced` mode requires a public repository, or a private repository on GitHub Pro, Team or Enterprise. The spec recommends `enforced` for any repository the factory runs on unattended.
-- **DEP-4.** The App has no Administration permission, so it cannot read a ruleset's bypass list. `sf repo check` reads it once with the operator's own credential (not stored) and records the result; it repeats when the ruleset's `updated_at` changes. Until then the mode is shown as `enforced (bypass list unverified)`. The accepted bypass list is fixed by 20.3; the factory App is never on it.
+- **DEP-3.** `enforced` mode requires a public repository, or a private repository on GitHub Pro, Team or Enterprise. The spec recommends `enforced` for any repository the factory runs on unattended. The operator's repositories are public (decision D-1), so they run in `enforced` mode, which auto-merge requires (13.6).
+- **DEP-4.** The App has no Administration permission, so it cannot read a ruleset's bypass list. `sf repo check` reads it once with the operator's own credential (not stored) and records the result; it repeats when the ruleset's `updated_at` changes. Until then the mode is shown as `enforced (bypass list unverified)`. The accepted bypass list is fixed by 20.3; the factory App is never on it. If the list read is not the one 20.3 fixes, or contains the factory App, the mode is `factory-enforced` until a later `sf repo check` passes. At every mode detection the daemon reads `updated_at` of each contributing ruleset (ids come from the branch-rules response); when it changes, the mode reverts to `enforced (bypass list unverified)` until the operator runs `sf repo check` again. If probe P-14 shows `current_user_can_bypass` is populated for installation tokens, any value other than `never` on a contributing ruleset makes the mode `factory-enforced`.
 
-### 4.2 Profile
+### 4.2 Approval
 
-- `solo`: one human. The approver of an issue MAY also approve its pull request.
-- `team`: the pull request MUST be approved by an authorised actor other than the issue's approver.
-
-Profile and `reviewers` (the accounts review is requested from; each must have write permission) are operator configuration per repository. Default profile: `solo`, with the approver as reviewer. In `team`, an empty reviewer list after removing the approver is a configuration error.
+The factory has one human. The approver of an issue also reviews and approves its pull request, and review is requested from that approver. There is no separation between approving the work and approving the code (23.3).
 
 ### 4.3 Capability probe
 
@@ -144,10 +145,12 @@ At startup and daily, the factory probes each repository and records what is ava
 
 ### 4.4 Host requirements
 
-- macOS on Apple silicon through M3. Linux is added in M4 (decision D-3).
-- `git` ≥ 2.42 on the host. A case-sensitive volume for the data directory is recommended, on its own volume if possible.
+- A Linux server on the operator's own hardware (x86-64 or arm64) with KVM available to the factory's user. macOS and Windows are not supported hosts. The workspace still compiles on macOS for development, with the sandbox backends compiled out; there only sandbox level `none` with the fake agent works.
+- Unprivileged user namespaces enabled, and `bubblewrap` installed.
+- `git` ≥ 2.42. The data directory on its own volume if possible.
 - An agent CLI inside a tested version range (v1: Claude Code; 10.3).
-- A sandbox backend that satisfies the repository's required isolation level (13.3). A run does not start when the backend is unavailable.
+- The daemon runs as a dedicated system user under systemd. The operator controls it through GitHub and through `sf` over SSH; there is no remote client.
+- A run does not start when the sandbox backend for its required level is unavailable (13.3).
 
 ---
 
@@ -197,7 +200,7 @@ Any closed issue is terminal: closed as completed, as not planned, or as duplica
 | `tier:0|1|2` | Work tier (6.1). No tier label means tier 1. |
 | `risk:low|medium|high` | Risk. No risk label means `risk:medium`. |
 | `priority:p0`–`p3` | Dispatch order. |
-| `type:ci`, `type:spec-delta` | Change classes that relax specific integrity rules (11.3). |
+| `type:ci`, `type:spec-delta` | Change classes with their own integrity handling (11.3): `type:spec-delta` permits changes under `docs/specs/**`; `type:ci` turns a workflow change into a patch for a human to commit. |
 
 **Factory-set labels:** `needs:clarification`, `needs:decision`, `factory:origin` (on factory pull requests and factory-filed issues), `factory:protected-change` (11.3). These are indicators only and are never read back as authority (SEC-1b).
 
@@ -236,11 +239,11 @@ Each run has exactly one status comment on its issue, authored by the factory's 
 -->
 ```
 
-This field list is normative for `v1`. `escalation` is `{"category","seq"}` while the run is in `needs-human`. `children` (tier 2 parents only) is a list of `{"issue","body_sha256"}`. `head_sha` is written on the transition from `publish` to `ci`.
+This field list is normative for `v1`. `escalation` is `{"category","seq"}` while the run is in `needs-human`. `children` (tier 2 parents only) is the list of sub-issue numbers. `head_sha` is written on the transition from `publish` to `ci`.
 
-- **GH-4.** The marker is written only on stage transitions and escalations. Heartbeats and deadlines MUST NOT be written to GitHub.
-- **GH-5.** The status comment is the comment whose id is in the journal or, on rebuild, the earliest App-authored comment whose body starts with the marker block. A marker anywhere else, including other App-authored comments, issue bodies and pull request bodies, is ignored. Dedupe markers (8.5) are recognised only as the first line of a comment or issue body authored by the App.
-- **GH-5a.** All text that originates from an agent, an issue, a review or a log and is written to GitHub passes through one outbound encoder. It caps length, renders the text inside a fenced block labelled as agent output, and neutralises `<!--`, `-->`, @mentions, issue references and closing keywords. Agent text never starts a body. Commit subjects have no markup to escape, so a subject containing an issue reference, an issue URL, a closing keyword or a skip token (9.4) is rejected instead.
+- **GH-4.** The marker is written only on stage transitions, on escalations and when the run reaches a terminal state (`"stage":"done"` or `"cancelled"`). Heartbeats and deadlines MUST NOT be written to GitHub.
+- **GH-5.** The status comment is the comment whose id is in the journal or, on rebuild, the most recently created App-authored comment whose body starts with the marker block; earlier ones belong to terminal runs of the same issue. A marker whose stage is `done` or `cancelled` reconstructs no run. A marker anywhere else, including other App-authored comments, issue bodies and pull request bodies, is ignored. Dedupe markers (8.5) are recognised only as the first line of a comment or issue body authored by the App.
+- **GH-5a.** All text that originates from an agent, an issue, a review or a log and is written to GitHub passes through one outbound encoder. It caps length, renders the text inside a fenced block labelled as agent output (except sub-issue bodies, PLAN-5), and neutralises `<!--`, `-->`, @mentions, issue references and closing keywords. Agent text never starts a body. Commit subjects have no markup to escape, so a subject containing an issue reference (`#<digits>`, `GH-<digits>`, `owner/repo#<digits>`), an issue URL or a skip token (9.4) is rejected instead. A closing keyword with no reference closes nothing and is allowed, so a subject such as `fix: handle empty input` passes.
 - **GH-5b.** On recovery and rebuild, `policy_sha` and `base_sha` must be ancestors of the default-branch head; counters and spend from a marker are lower bounds; the resumed stage is the earlier of the marker's stage and what GitHub evidence supports (8.4).
 - **GH-6.** Readers MUST preserve unknown fields. The `v1` version tag changes only on incompatible changes.
 - **GH-7.** Apart from the status comment, a run may create a bounded number of comments (default 6 *(tunable)*): the plan, one per escalation, and one when work completes. Progress never goes into new comments.
@@ -256,7 +259,7 @@ The factory reports three check runs on every head SHA it publishes, with `exter
 | `factory/review` | Per-criterion verdict of the reviewer agent (11.5). |
 
 - **GH-8.** Conclusions: gate passed → `success`; integrity `flag` → `neutral` with the flagged rules in the summary; stage disabled by policy, not applicable to the tier, or not yet implemented → `skipped` with the reason; gate failed → `failure`. GitHub treats `success`, `neutral` and `skipped` as satisfying a required check, and so does 12.3.
-- **GH-9.** A factory check is reported for a SHA only when the gate ran on exactly that commit's tree.
+- **GH-9.** A factory check is reported for a SHA only when the gate ran on exactly that commit's tree. 12.3 and 8.4 accept a factory check only when its `external_id` is the run id.
 - **GH-10.** In `enforced` mode the ruleset requires the three factory checks, bound to the factory App as their source, plus the repository's CI checks. Because required checks apply to every pull request, the handling of human-authored pull requests is defined in 20.3.
 
 Repository CI reports its own checks through GitHub Actions (11.4).
@@ -300,7 +303,7 @@ All GitHub traffic passes through one in-process gateway.
 
 ### 5.9 Event intake
 
-- **GH-18.** The source of truth for change detection is a level-triggered poll: `GET /repos/{o}/{r}/issues?state=all&sort=updated&since=<watermark>` with an ETag, every 30 s *(tunable)*, refreshing only the items that changed. Open pull requests of active runs are polled for reviews and check results on the same tick.
+- **GH-18.** The source of truth for change detection is a level-triggered poll: `GET /repos/{o}/{r}/issues?state=all&sort=updated&since=<watermark>` with an ETag, every 30 s *(tunable)*, refreshing only the items that changed. Open pull requests of active runs are polled for reviews and check results on the same tick. The default-branch commit produced by a factory merge is polled for its check results as well (12.3).
 - **GH-19.** A full resync of all open work items runs every hour to catch anything the watermark missed.
 - **GH-20.** The factory needs no inbound network endpoint. Webhooks are out of scope for v1; if added later they only enqueue "reconcile issue n now".
 
@@ -314,9 +317,9 @@ All GitHub traffic passes through one in-process gateway.
 |---|---|---|---|
 | 0 | Chore: dependency bump, typo, formatting | Outcome and at least one acceptance criterion | No |
 | 1 | Task or bug with one verifiable outcome | Full issue form (6.2) | Only if `risk:high` |
-| 2 | Feature spanning several issues | A parent issue describing the feature | Always |
+| 2 | Feature spanning several issues | A parent issue describing the feature | No: each proposed sub-issue is approved on its own |
 
-A tier 2 parent is never implemented directly. It follows the parent pipeline (7.4): its plan proposes sub-issues, and after plan approval the factory creates them.
+A tier 2 parent is never implemented directly. It follows the parent pipeline (7.4): its plan proposes sub-issues, which the factory creates in `state:triage` for the operator to approve or close one by one.
 
 ### 6.2 Issue form
 
@@ -350,7 +353,7 @@ A lint failure creates no run. The factory moves the issue to `state:needs-human
 
 ### 6.5 Discovered work
 
-An agent MUST NOT widen its issue. It reports out-of-scope findings in the `follow_ups` field of its result (10.5). The control plane files each as a new issue in `state:triage` with `factory:origin`, linked to the source issue, up to 3 per run *(tunable)*. Factory-filed issues are never auto-approved; the only issues the factory creates in `state:ready` are sub-issues of a human-approved tier 2 plan, under SEC-1a.
+An agent MUST NOT widen its issue. It reports out-of-scope findings in the `follow_ups` field of its result (10.5). The control plane files each as a new issue in `state:triage` with `factory:origin`, linked to the source issue, up to 3 per run *(tunable)*. Factory-filed issues are never auto-approved: the factory never applies `state:ready` to any issue.
 
 ---
 
@@ -391,14 +394,14 @@ claim → plan → [plan gate] → [author_tests] → implement → capture → 
 |---|---|---|---|---|
 | `claim` | host | — | Snapshot, run row, branch ref, label, status comment (8.2) | No run is created |
 | `plan` | agent, read-only | sandbox | Return a plan: approach, files, test strategy, risks, questions (10.5). Skipped for tier 0. | Agent failure (8.6) |
-| plan gate | wait | GitHub | Required for tier 2 and `risk:high`; otherwise skipped (7.4) | — |
+| plan gate | wait | GitHub | Required for `risk:high`; otherwise skipped (7.4) | — |
 | `author_tests` | agent | sandbox | Optional (M3). A separate session writes failing acceptance tests from the criteria; their paths are then locked for `implement`. | Escalate |
 | `implement` | agent, sole writer | sandbox | Change the workspace to satisfy the criteria; emit a result (10.5). | Agent failure (8.6) |
 | `capture` | host + sandboxed git | sandbox | Build the candidate commit from the workspace and journal its SHA (9.4). | Rejected paths → `implement`, verify round +1 |
 | `integrity` | deterministic | host | Diff policy on the candidate (11.3). | `fail` → `implement`, verify round +1; `flag` → continue, mark the pull request |
 | `verify` | deterministic | sandbox | Run the policy's commands on a clean export of the candidate (11.2). | → `implement`, verify round +1 |
 | `publish` | host | — | Push the journalled candidate; upsert the draft pull request; report the factory checks. | Transient retry; foreign commit → escalate |
-| `ci` | wait | GitHub | Wait for the required CI checks on the head SHA (11.4). | → `implement` with the failing log excerpt, CI round +1 |
+| `ci` | wait | GitHub | Wait for the required CI checks on the head SHA (11.4). | Red check → `implement` with the failing log excerpt, CI round +1. Required check missing at the timeout → escalate with `infrastructure` (VAL-8). |
 | `review` | agent, read-only | sandbox | Clean-context reviewer returns a verdict (11.5). | Blocking findings → `implement`, review round +1 |
 | `ready` | host | — | Evidence manifest written; pull request marked ready; label `state:in-review`; review requested (4.2). | Cannot fail: its preconditions are checked at the end of `implement` and `review` |
 | `human_review` | wait | GitHub | Wait for a submitted review (12.2). | Changes requested → `implement`, human round +1 |
@@ -409,25 +412,28 @@ After any return to `implement`, the pipeline re-runs every later stage in order
 
 **Round caps** *(tunable)*: plan 2, verify 3, CI 2, review 2, human 3, merge-conflict 2. Exceeding a cap escalates, except the merge-conflict cap, which triggers one automatic reset (7.6) if the run has not been reset before.
 
-**Slots.** A run holds a concurrency slot from `claim` through `review`, including `ci`. It releases the slot in `human_review`, at the plan gate, in `await_children`, in `needs-human` and on hold, and re-acquires one before any return to an agent stage.
+**Slots.** A run holds a concurrency slot from `claim` through `review`, including `ci`. It releases the slot in `human_review`, at the plan gate, in `await_children`, in `needs-human` and on hold, and re-acquires one before any return to a stage that runs in a sandbox (an agent stage, `capture` or `verify`), including re-entry at `integrity` after a base update (12.4). The run waits in its current stage until a slot is free.
 
 ### 7.4 Plan gate and tier 2 parents
 
-**Plan gate.** When the gate applies, the factory posts the plan as one comment, records `plan_sha256` in the marker, removes any `factory:plan-approved` label, and moves the item to `state:needs-human` with category `plan-approval`.
+**Plan gate.** It applies to `risk:high` issues. The factory posts the plan as one comment, records `plan_sha256` in the marker, removes any `factory:plan-approved` label, and moves the item to `state:needs-human` with category `plan-approval`.
 
-- **PLAN-1.** The plan comment is rendered by the host from the planner's result in a fixed, parseable layout: the plan text, then for tier 2 every proposed sub-issue (key, title, risk, blocked-by edges, full body). `plan_sha256` is the SHA-256 of the comment body as posted. A plan that does not fit one comment (60,000 characters) is a planner failure with a request to reduce.
-- **PLAN-2.** An authorised actor approves by applying `factory:plan-approved` and then `state:ready`. The approval is valid only if its `labeled` event is later than the last edit of the plan comment and of the issue body, and the comment's current SHA-256 equals `plan_sha256`. The factory removes the label when it consumes an approval.
+- **PLAN-1.** The plan comment is rendered by the host from the planner's result, with agent text encoded (GH-5a). `plan_sha256` is the SHA-256 of the comment body as posted. A plan that does not fit one comment (60,000 characters) is a planner failure with a request to reduce.
+- **PLAN-2.** An authorised actor approves by applying `factory:plan-approved` and then `state:ready`. The approval is valid only if its `labeled` event is later than the last edit of the plan comment and of the issue body, and the comment's current SHA-256 equals `plan_sha256`. When it consumes a valid approval the factory writes `plan_approved_by` to the marker and then removes the label; validity is evaluated once, at consumption.
 - **PLAN-3.** `state:ready` without a valid approval is a revision request: `plan` runs again with the updated snapshot (plan round +1).
-- **PLAN-4.** A plan proposes at most 10 sub-issues *(tunable)*. Each proposed body must pass the tier 1 readiness lint before the plan is posted.
 
-**Tier 2 parent pipeline:** `claim → plan → plan gate → decompose → await_children → done`.
+**Tier 2 parent pipeline:** `claim → plan → decompose → await_children → done`. A parent has no plan gate. The operator approves or closes each proposed sub-issue instead, so nothing the factory proposes is worked on without its own approval (INV-4).
 
 | Stage | Kind | Summary | On failure |
 |---|---|---|---|
-| `decompose` | host | Re-read the approved plan comment from GitHub, check its hash, and create the sub-issues and blocked-by links by parsing it, never from agent output or a local copy. Record `children` in the marker. | Transient retry; otherwise escalate `infrastructure` |
-| `await_children` | wait | Holds no slot. All children closed as completed → close the parent as completed. A child closed otherwise → escalate with `clarification`. | — |
+| `decompose` | host | Create the proposed sub-issues from the planner's result (PLAN-4, PLAN-5) in `state:triage`, link them as sub-issues of the parent, create the blocked-by links, record `children` in the marker, and post one comment on the parent listing them. | Transient retry; otherwise escalate `infrastructure` |
+| `await_children` | wait | Holds no slot. When every child is closed: if all were completed, close the parent as completed; otherwise escalate with `clarification`, so the operator can close the parent or open a new one with a revised scope. | — |
 
-The parent has a fence ref with no commits and no pull request; the ref is deleted when the parent's run ends. `factory:restart` on a parent in `await_children` is rejected with a comment.
+- **PLAN-4.** A plan proposes at most 10 sub-issues *(tunable)*. Each proposed body must pass the tier 1 readiness lint before any sub-issue is created. When the feature changes a spec, exactly one sub-issue is the spec-delta issue (6.3).
+- **PLAN-5.** Sub-issue titles and bodies are the one place where agent-proposed text becomes an unfenced issue body, because the operator reads and approves exactly that text. The host builds each one once: the planner's text with the neutralisations of GH-5a applied but no fencing, capped at the 32 KiB lint limit (a longer body is a planner failure). PLAN-4 lints exactly these bytes. The issue body is the first-line `factory:subissue` marker (8.5), a newline, then those bytes, so the section parser (WI-1) and the readiness lint apply as they do to a human-written issue.
+- **PLAN-6.** The factory applies `factory:origin`, the plan's proposed `risk:*` label and, on the spec-delta issue, `type:spec-delta` when it creates a sub-issue. Labels the factory applied at creation to an issue it authored are covered by the operator's approval: they are honoured once an authorised actor applies `state:ready` to that issue, as long as they have not changed since creation. The operator can change them before approving, under SEC-1.
+
+The parent has a fence ref with no commits and no pull request; the ref is deleted when the parent's run ends. `factory:restart` on a parent in `decompose` or `await_children` is rejected with a comment.
 
 ### 7.5 Escalation
 
@@ -442,21 +448,23 @@ An agent may also stop on its own with status `needs_human` (a stop condition wa
 
 A human applying `state:needs-human` to an active run is an escalation with category `human-request`.
 
-While a run is in `needs-human`, the reconciler rows of 7.7 are not evaluated for it, except issue closure, hold and stop. They are evaluated once at resume.
+While a run is in `needs-human`, only these rows of 7.7 are evaluated on every tick: the run's pull request is merged (the run enters `done`); issue closed and the pull request is not merged; `state:triage` applied by a human (the run is cancelled); `factory:hold`. The stop of 13.7 also applies. All other rows are evaluated once, at resume (7.5.1).
 
 #### 7.5.1 Resume
 
 A human resumes by answering (editing the issue or commenting) and applying `state:ready`. When the reconciler sees `state:ready` on an issue whose run is in `needs-human`, it does not run the claim. It:
 
 1. Validates the label under SEC-1. If invalid, it removes `state:ready` and leaves `state:needs-human`.
-2. Re-evaluates readiness rules 2–4 and 6 of 5.3 and waits for a slot. The issue keeps `state:ready` while it waits.
-3. Adds `state:in-progress` (or `state:in-review` if the recorded stage is `human_review` or `merge`) and removes the other state labels.
-4. Takes a new snapshot.
-5. Sets the round counter of the gate that escalated to 0. For category `budget` it grants one more issue-budget increment (section 14) and counts it in `budget_grants`.
-6. Chooses the re-entry stage:
+2. Re-evaluates readiness rules 2–4 and 6 of 5.3. Hold or an open blocker: the issue keeps `state:ready` and the resume waits. Lint failure: the factory removes `state:ready`, leaves `state:needs-human`, sets the category to `clarification` and posts the lint comment of 6.4. Rule 6 failure (title or body edited after the resuming `labeled` event): the factory removes `state:ready`, leaves `state:needs-human` and says so once. On a resume the factory never sets `state:triage`.
+3. Chooses the re-entry stage:
    - Title and body unchanged (`title_body_sha256` matches): the recorded stage. A new trusted comment alone never forces a re-plan.
    - Title or body changed, and every edit since the last snapshot is by an authorised actor: `plan`, and any plan approval is void. If the recorded stage is `human_review` or `merge`, the change is noted and the run resumes at the recorded stage.
-   - An edit by anyone else, or by an editor that cannot be identified: no resume. `state:ready` is removed and the run stays in `needs-human` with category `spec-changed`.
+   - An edit by anyone else, or by an editor that cannot be identified: no resume. `state:ready` is removed, the run stays in `needs-human` with category `spec-changed`, and the remaining steps are not performed.
+   - If a valid `factory:restart` is also present, the re-entry is a reset (7.6) instead. Without `state:ready`, `factory:restart` on a run in `needs-human` has no effect.
+4. Waits for a slot unless the re-entry stage is `human_review` or `merge`. The issue keeps `state:ready` while it waits.
+5. Adds `state:in-progress` (or `state:in-review` if the re-entry stage is `human_review` or `merge`) and removes the other state labels.
+6. Takes a new snapshot.
+7. Sets the round counter of the gate that escalated to 0 and restarts that stage's deadline. For category `budget` it grants one more issue-budget increment (section 14) and counts it in `budget_grants`. For category `plan-approval` the plan counter is not zeroed: it counts revision requests (PLAN-3). When it exceeds the plan cap the factory does not re-plan; it escalates with `clarification`, and resuming from that escalation sets the plan counter to 0.
 
 ### 7.6 Rework and reset
 
@@ -472,15 +480,16 @@ On every tick the reconciler compares each active run with GitHub. Rows are eval
 | Observation | Action |
 |---|---|
 | The run's pull request is merged | Enter `done`, whatever the merge strategy and whoever merged. If the issue is still open, close it as completed. If the merged head is not one the factory pushed, record `foreign-merge` in the final status comment and on the dashboard. |
-| Issue closed and the pull request is not merged | Cancel: run → `cancelled`; close the pull request; delete the branch per 18.2. |
+| Issue closed and the pull request is not merged | Cancel: run → `cancelled`; write the terminal stage to the marker; close the pull request; delete the branch per 18.2. |
 | `state:triage` applied by a human | Cancel as above, leaving the issue open. |
 | `state:needs-human` applied by a human | Escalate with `human-request`. |
 | `state:ready` applied while the run is `in-progress` or `in-review` | Remove it and ignore it. |
 | `factory:hold` applied | Interrupt and freeze. |
+| `factory:restart` applied | If valid under SEC-1: reset (7.6) and remove the label; if the attempt cap is reached, escalate instead. If the public state was `in-review`, set `state:in-progress`. If invalid: remove the label and ignore it. A tier 2 parent in `decompose` or `await_children` rejects it (7.4). |
 | `tier:*`, `risk:*` or `type:*` changed after claim | Escalate with `spec-changed`. |
-| Title or body changed by an authorised actor before the `ready` stage | Interrupt, take a new snapshot, restart from `plan` in place. Not counted as a failure. |
+| Title or body changed by an authorised actor before the `ready` stage (tier 2 parent: before `decompose`) | Interrupt, take a new snapshot, restart from `plan` in place. Not counted as a failure. |
 | Title or body changed by anyone else, or the editor cannot be identified | Escalate with `spec-changed`. |
-| Title or body changed after the pull request is ready | Note it in the status comment; no automatic action. |
+| Title or body changed after the pull request is ready, or on a tier 2 parent in `decompose` or `await_children` | Note it in the status comment; no automatic action. |
 | Pull request closed by a human without merging | Escalate with `review`. |
 | Branch head differs from every SHA the factory pushed | Foreign commit: escalate with `policy-denial`; never push over it. |
 
@@ -497,10 +506,10 @@ On every tick the reconciler compares each active run with GitHub. Rows are eval
 | Class | Examples | Rule |
 |---|---|---|
 | External write | GitHub call, push | Stored in the outbox with an effect id; delivered at least once, in FIFO order per run. Completion is one transaction that marks the row done and appends the result event carrying the effect id. `step` ignores a result whose effect id it has already applied. |
-| Activity | Agent session, setup, capture, verify | Never in the outbox. Recorded as an activity row (id, sandbox record, process data, state). After a restart it is killed and marked abandoned; the engine receives `ActivityAbandoned` and requests a new one with a new id. |
+| Activity | Agent session, capture, verify (each including its setup commands) | Never in the outbox. Recorded as an activity row (id, sandbox record, process data, state). After a restart it is killed and marked abandoned; the engine receives `ActivityAbandoned` and requests a new one with a new id. |
 | Timer | Stage deadlines, backoff, poll | Stored as a deadline on the run row and re-armed from the store at startup. |
 
-- **ORCH-4.** The engine receives only coarse activity events: `ActivityStarted`, `UsageBatch` (all per-model-call usage records since the last batch, at most once per 5 s and always before the end event), `LimitReached(kind)`, `LoopDetected`, `Stalled`, `ActivityEnded(outcome, chain_digest)`. Idle, loop and per-session limits are evaluated in the supervisor from limits passed in the session spec. Raw and normalised agent events go only to `events.jsonl`, which the supervisor hash-chains. The supervisor's stdout reader never blocks on the engine channel.
+- **ORCH-4.** The engine receives only coarse activity events: `ActivityStarted`, `UsageBatch` (all per-model-call usage records since the last batch, at most once per 5 s and always before the end event), `LimitReached(kind)`, `LoopDetected`, `Stalled`, `ActivityEnded(outcome, chain_digest)`. In `gateway` mode the usage records in `UsageBatch`, and the spend the supervisor compares with the session's dollar limit, come from the model gateway's meter for the run's token; the CLI's own usage events are written to `events.jsonl` and used only to report a discrepancy. In `subscription` and `direct_key` modes the CLI's usage events are the only source (13.5, section 14). Idle, loop and per-session limits are evaluated in the supervisor from limits passed in the session spec. Raw and normalised agent events go only to `events.jsonl`, which the supervisor hash-chains. The supervisor's stdout reader never blocks on the engine channel.
 - **ORCH-5.** `step` runs under `catch_unwind` per run; a panic moves that run to `needs-human` with `infrastructure`. A panic or I/O error in the store writer stops the daemon with a non-zero exit; restart recovery (8.4) is the handling.
 
 ### 8.2 Claim
@@ -510,7 +519,7 @@ The daemon is the only dispatcher for a store, enforced by an exclusive file loc
 1. One GraphQL read of the issue: check SEC-1 on the `state:ready` label and rule 6 of 5.3; capture the snapshot; record tier, risk and type under SEC-1. Read the default-branch head once: it is both `base_sha` and `policy_sha`. Refuse a base tree that contains a submodule entry. Run the readiness lint on the snapshot.
 2. Insert the run row carrying all of the above. A unique index on (repository, issue) for non-terminal runs makes this the authoritative local claim.
 3. Create `refs/heads/factory/issue-<n>` at `base_sha` through the API. An existing ref whose SHA equals the journalled `base_sha` of this run counts as created. A ref left by a `cancelled` run of this store is force-updated. Any other existing ref aborts the claim: the run row is closed as `cancelled` and the issue goes to `state:needs-human` with category `policy-denial`.
-4. Add `state:in-progress`, then remove `state:ready`.
+4. Add `state:in-progress`, then remove `state:ready` and every other `state:*` label (`state:triage`, or `state:needs-human` left by a lint failure), and remove `needs:clarification` if present.
 5. Create the status comment with the complete marker.
 
 Running two daemons against one repository from different hosts is unsupported. The branch-ref step is a best-effort fence against that mistake, not a distributed lock.
@@ -520,7 +529,7 @@ Running two daemons against one repository from different hosts is unsupported. 
 | Stage kind | Deadline |
 |---|---|
 | Agent | Idle: no agent event for 300 s while no tool call is outstanding. Tool call: a single tool call outstanding for more than `tool_call_timeout_secs` (policy, default 1800). Wall clock and budget: section 14. |
-| Deterministic (setup, capture, verify) | The command timeout only. |
+| Deterministic (capture, verify, and the setup step of any activity) | The command timeout only. |
 | Wait: `ci` | `ci.timeout_secs` from the push of the head SHA (default 3600). |
 | Wait: `human_review`, plan gate, `await_children` | None; one nudge (PR-3). |
 
@@ -539,8 +548,9 @@ Each tick, in order: reconcile active runs (7.7); validate policy (16.3) and the
 | Free space on the data volume | No dispatch below `min_free_bytes` (operator) |
 | Run directory size | Per-run quota, checked at stage boundaries and every 5 minutes; exceeding it escalates with `budget` |
 | Spend (section 14) | per stage, per issue, per day |
+| Dispatch schedule | Optional hours in which new stages may start (operator), to leave plan capacity for the operator's own interactive use |
 
-When the review-queue limit is reached, no new `implement` stage starts in that repository; runs already past `implement` continue. Dispatch also pauses on provider rate-limit events, on the GitHub write budget (GH-16), and when a circuit breaker is open (8.6).
+When the review-queue limit is reached, no new `implement` stage starts in that repository; runs already past `implement` continue. Dispatch also pauses on provider rate-limit events (in `subscription` mode: until the plan limit's reported reset time; running sessions are interrupted and their stages restart afterwards without a round or failure being counted), on the GitHub write budget (GH-16), and when a circuit breaker is open (8.6).
 
 ### 8.4 Restart recovery
 
@@ -552,22 +562,23 @@ On startup the daemon, before dispatching anything:
 4. If the store is missing or corrupt, `sf rebuild` reconstructs runs from status-comment markers, branches and pull requests, under GH-5b:
    - The approver is re-read from the latest `labeled` event for `state:ready`.
    - A branch head that differs from the marker's `head_sha` is accepted only if it carries a `factory/integrity` check run from the factory App with this run id; otherwise it is a foreign commit.
-   - A run whose marker stage is `ci`, `ready`, `human_review` or `merge` keeps that stage. A run rebuilt in an agent or deterministic stage restarts at `plan` with a workspace created from `head_sha`, because its handoff files are gone.
+   - A run whose marker stage is `ci`, `ready`, `human_review`, `merge` or `await_children`, or that is waiting at the plan gate, keeps that stage; a plan approved after a rebuild is re-read from the plan comment after its hash is checked against `plan_sha256`. A run rebuilt in `decompose` re-runs it; the sub-issue markers of 8.5 make that idempotent. A run rebuilt in any other stage restarts at `plan` with a workspace created from `head_sha` (from `base_sha` when nothing was published), because its handoff files are gone.
+   - A marker that carries an `escalation` rebuilds the run in `needs-human`; these rules apply to its recorded stage at resume (7.5.1).
 
 ### 8.5 Idempotency keys
 
 | Side effect | Key and replay rule |
 |---|---|
 | Branch | `base_sha` is journalled before the ref is created; an existing ref equal to it counts as created (8.2). |
-| Candidate commit | Tree, parent, dates and message are journalled with the candidate SHA before any push. Recovery uses the journalled SHA and never rebuilds a journalled candidate. If the tree equals the previous candidate's, no new commit is made. |
+| Candidate commit | Tree, parents, dates and message are journalled with the candidate SHA before any push. Recovery uses the journalled SHA and never rebuilds a journalled candidate. If the tree equals the previous candidate's, no new commit is made. |
 | Push | The executor reads the remote ref first. Remote head equals the candidate: pushed. Remote head equals the previously journalled head: push. Anything else: foreign commit (7.7). |
 | Pull request | Lookup of open pull requests by head branch before create. |
 | Status comment | Comment id in the journal; on rebuild, GH-5. |
 | Other comments | First-line marker `<!-- factory:event <run>/<seq> -->` in an App-authored comment, looked up before posting. |
 | Check run | List check runs for the head SHA filtered by name and App id; update the one whose `external_id` matches, else create. |
-| Merge | Read the pull request before every merge call: merged with our head SHA is success. A 409 means a request is pending: poll the pull request's merged state for up to 10 minutes, then re-check eligibility. |
+| Merge | Read the pull request before every merge call: merged with our head SHA is success. A 409 from `merge-async` means a request is pending: poll the pull request's merged state for up to 10 minutes, then re-check eligibility. |
 | Agent session | Session id generated and journalled before spawn; a restarted activity gets a new id. |
-| Follow-up issue, sub-issue | First-line marker `<!-- factory:followup <run>/<index> -->` or `<!-- factory:subissue <run>/<plan sha256>/<key> -->` in the body; lookup by listing issues created by the App since the run started, never the search API. |
+| Follow-up issue, sub-issue | First-line marker `<!-- factory:followup <run>/<index> -->` or `<!-- factory:subissue <run>/<key> -->` in the body; lookup by listing issues created by the App since the run started, never the search API. |
 
 ### 8.6 Failure handling
 
@@ -602,9 +613,10 @@ On startup the daemon, before dispatching anything:
     host.git/                      host-owned bare repository for candidates and publishing
     quarantine/                    object directory written by sandboxed capture
     export/<sha>/                  clean checkout of a candidate, for verify and review
-    target/                        CARGO_TARGET_DIR for agent stages
+    target/                        CARGO_TARGET_DIR for implementer stage executions
     handoff/                       plan.md, progress.md, feedback/*.md, diff files (host-written)
     exec/<seq>/home/               fresh HOME, CARGO_HOME, temp and agent config per stage execution
+    exec/<seq>/target/             CARGO_TARGET_DIR for every other stage execution (new and empty each time)
     events.jsonl                   raw agent event stream, hash-chained
     stages/<seq>-<stage>.json      stage results
     logs/                          full command output
@@ -614,39 +626,56 @@ On startup the daemon, before dispatching anything:
 
 ### 9.2 Workspace creation
 
-- **WS-1.** The host fetches into the bare mirror, then creates `workspace/` with `git clone --no-local --no-checkout --single-branch --branch <default> <mirror> workspace`, checks out `base_sha` detached and removes the remote, all before any worker touches the directory. `--reference`, `--shared`, hard-linked and plain local-path clones are not used: the workspace MUST contain its own object store holding only objects reachable from the base, because the mirror is not visible inside the sandbox and holds other runs' unmerged branches.
+- **WS-1.** The host fetches into the bare mirror, then creates `workspace/` with `git clone --no-local --no-checkout --single-branch --branch <default> <mirror> workspace`, checks out `base_sha` detached and removes the remote, all before any worker touches the directory. `--reference`, `--shared`, hard-linked and plain local-path clones are not used: the workspace MUST contain its own object store holding only objects reachable from the base and from this run's own candidates, because the mirror is not visible inside the sandbox and holds other runs' unmerged branches.
 - **WS-2.** Directory names are derived from ids, never from issue text. The agent's working directory MUST be the workspace root.
 - **WS-3.** The agent MAY run git in its workspace, including committing for its own checkpoints. Nothing in `workspace/.git` is ever used by the host.
-- **WS-4.** Policy may define `setup` commands (for example `cargo fetch --locked`). They run inside the sandbox, with a timeout, at the start of every stage execution that builds: each implementer session and each verify.
+- **WS-4.** Policy may define `setup` commands (for example `cargo fetch --locked`). They run inside the sandbox, with a timeout, at the start of every stage execution that builds: each implementer session and each verify. Setup is not a stage execution of its own: it runs as the first step of the activity it prepares, in the same sandbox instance with the same home and target directory, under `setup.timeout_secs`. A setup failure fails that activity with category `infrastructure`.
 - **WS-5.** Run directories are removed 24 hours after a terminal state *(tunable)*; `target/` and exports are removed earlier (9.3).
 - **WS-6.** The workspace tree MUST derive from the previous candidate. After a base update (12.4) the host discards `workspace/` and re-creates it from the update commit, so a later round can never revert what landed upstream.
 - **WS-7.** The host resolves the toolchain named by `rust-toolchain.toml` at the base commit (channel, components, targets), read as data from the object database, to an installed toolchain directory and puts that directory's `bin` first on the worker `PATH`. rustup and mise shims are never on the worker `PATH`. A missing toolchain or component is a blocking onboarding failure.
+- **WS-10.** `host.git` is created at claim as a bare, single-branch clone of the mirror's default branch (`--no-local`), with its remote removed. Before every test-merge, base update or rebuild the host fetches the default branch (and, on rebuild, this run's work branch) from the mirror into it. It holds only objects reachable from the default branch and from this run's candidates. A workspace made from a commit that is not on the default branch (WS-6, 12.4, 8.4) is cloned from `host.git` at a temporary ref on that commit in the same way as WS-1; the temporary ref is deleted afterwards.
 
 Linked worktrees are not used: they share refs, config and hooks with the hub repository, which conflicts with INV-2.
 
 ### 9.3 Build output
 
-- `CARGO_TARGET_DIR` is outside the workspace: `runs/<run_id>/target` for agent stages. `verify` gets a new, empty target directory on every execution, so a build is cold each time. That cost is accepted; CI is the second clean-environment gate.
-- `target/` and exports are deleted when the run enters `human_review` or a terminal state.
-- No cache writable by a worker is shared between runs or between an agent stage and `verify`. `sccache` is not supported in v1. Seeding target directories from a host-built copy-on-write clone MAY be added after probe P-13 measures it.
+- `CARGO_TARGET_DIR` is outside the workspace. Implementer stage executions of one attempt share `runs/<run_id>/target`. `plan`, `author_tests`, `verify` and `review` each get a new, empty target directory on every execution, so a build there is cold each time. That cost is accepted; CI is the second clean-environment gate.
+- `target/`, per-execution target directories and exports are deleted when the run enters `human_review` or a terminal state.
+- No cache writable by a worker is shared between runs, or between the implementer and any other stage. `sccache` is not supported in v1. Seeding target directories from a host-built copy-on-write clone MAY be added after probe P-13 measures it.
 
 ### 9.4 Capture: building the candidate
 
 Capture runs after the implementer's sandbox instance is destroyed and the process sweep (AG-18) is empty.
 
 1. **Scan (host, `lstat` only, never following symlinks).** Fail if any entry other than the root `.git` has a name that git would treat as `.git` (case-insensitive, including filesystem-equivalent spellings), at any depth; or if any entry is not a regular file, directory or symlink.
-2. **Stage (sandboxed git).** In a new sandbox instance with the workspace mounted read-only, no network and no credentials, the host's git binary runs with a host-written configuration (hooks, filters, fsmonitor, system and global config all disabled). Its object directory is `quarantine/`, with `host.git` objects as a read-only alternate. It builds a fresh index from the previous candidate's tree (or `base_sha`), lists changed and untracked paths honouring ignore rules, and rejects any path that is neither a regular file nor a symlink or exceeds 5 MiB, and any change set over the total-bytes cap. If nothing is rejected it stages the listed paths and writes a tree. A rejected path fails the capture; the host never builds a candidate that silently omits one.
+2. **Stage (sandboxed git).** In a new sandbox instance with the workspace mounted read-only, no network and no credentials, the host's git binary runs with a host-written configuration (hooks, filters, fsmonitor, system and global config all disabled). Its object directory is `quarantine/`, with `host.git` objects as a read-only alternate. It builds a fresh index from the tree the workspace was last created or captured from (the previous candidate's tree, `base_sha` on the first round, or W's tree in a merge-conflict round, 12.4), so upstream content is never counted as the round's change set. The index file lives in `quarantine/`; nothing in `workspace/.git` is read (WS-3). It then lists changed and untracked paths honouring ignore rules, and rejects any path that is neither a regular file nor a symlink or exceeds 5 MiB, and any change set over the total-bytes cap. If nothing is rejected it stages the listed paths and writes a tree. A rejected path fails the capture; the host never builds a candidate that silently omits one.
 3. **Ingest (host, bare `host.git`).** Verify the quarantined objects (hashes recomputed, `fsck` checks), then walk the new tree and reject any entry whose mode is not `100644`, `100755` or `120000`. Submodule entries therefore cannot enter a candidate.
-4. **Commit.** `git commit-tree` on the previous published head (or `base_sha`), with the factory identity, journalled dates, the validated subject and the host-written body and trailers. Journal the candidate and tree SHA.
+4. **Commit.** `git commit-tree` with the previous published head (or `base_sha`) as parent. From a conflicting base update until the next push, the parents are instead W's two parents (previous published head, new default-branch head), never W itself, so the default-branch head stays an ancestor of the work branch. The commit carries the factory identity, journalled dates, the validated subject and the host-written body and trailers. Journal the candidate and tree SHA.
 
-**Subject validation.** The subject is a single line of at most 72 characters without control characters. It is rejected, returning to `implement`, if it contains (case-insensitively) `[skip ci]`, `[ci skip]`, `[no ci]`, `[skip actions]`, `[actions skip]` or `skip-checks`, or anything GH-5a forbids. The pull request title and the squash title and message are generated by the host under the same rule.
+**Capture limits** *(tunable)*: 5 MiB per file, 50 MiB of new or changed bytes per candidate, and a 300 s timeout for the sandboxed staging step. Repository policy may lower them and cannot raise them above operator configuration. A capture timeout is an abandoned activity (8.6, Poison).
 
-**Export.** `verify` and `review` use a clean checkout of the candidate made from `host.git` with a temporary index and `git checkout-index -a --prefix=runs/<run_id>/export/<sha>/`, with no filters or attributes applied. `git archive` MUST NOT be used, because it honours `export-ignore` from the candidate's own `.gitattributes`. The export is writable and disposable for `verify`, read-only for `review`.
+**Subject validation.** The subject is a single line of at most 72 characters without control characters. It is rejected, returning to `implement`, if it contains (case-insensitively) `[skip ci]`, `[ci skip]`, `[no ci]`, `[skip actions]`, `[actions skip]` or `skip-checks`, or anything GH-5a forbids. The pull request title and the squash title are generated by the host from the issue title with any issue reference or issue URL removed (skip tokens are already excluded by the lint, 6.4); the squash message is host-written (5.6).
+
+**Export.** `verify` and `review` use a clean checkout of the candidate made from `host.git`: `git read-tree <candidate>` into a temporary index, then `git --git-dir=host.git --work-tree=runs/<run_id>/export/<sha> checkout-index -a` into that new, empty, host-created directory (bare `host.git` has no work tree of its own, and `checkout-index` needs one), with no filters or attributes applied. `git archive` MUST NOT be used, because it honours `export-ignore` from the candidate's own `.gitattributes`. The export is writable and disposable for `verify`, read-only for `review`.
 
 **Publish.** Push the journalled candidate to `refs/heads/factory/issue-<n>` over HTTPS. The installation token reaches `git push` through a credential helper built into `sf` that receives it over an inherited pipe; it never appears in arguments, environment or a file (INV-1). Then create the draft pull request if no open one exists for the head branch, otherwise update its body, and report the three factory checks for the head SHA.
 
 - **WS-8.** All git mutations run through the `git` CLI in one wrapper crate that parses only porcelain or NUL-delimited output. `gix` MAY be used for read-only fast paths. `git2` is not used. Fetches into a mirror are serialised per repository.
 - **WS-9.** The capture, ingest and export design MUST be prototyped in M0 against a hostile-tree suite before the pipeline depends on it: nested repositories (directory, gitfile, `.GIT` case variant) carrying `core.fsmonitor`; hooks and config; symlinked directories; FIFOs and hard links; `.gitattributes` with filters, `export-ignore` and `-diff`; an agent-edited `.gitignore`; LFS pointers; case collisions; executable bits; large files; an object from another run's branch must not be readable in a fresh workspace. The exact staging mechanism is confirmed by probe P-7.
+
+### 9.5 Ecosystems
+
+Target repositories are Rust first, with other languages to follow (decision D-10). Everything specific to a language's toolchain therefore sits behind one interface, `Ecosystem`, in `factory-core`, with `rust` as the only implementation in v1:
+
+- toolchain resolution and the worker `PATH` (WS-7);
+- the environment for build output and caches (9.3);
+- the default `setup` and `verify` commands offered at onboarding (11.2);
+- integrity rules for dependencies and build scripts, lockfile and generated-file defaults, and the built-in deny list (11.3);
+- the advisory database source (VAL-1) and the mutation-testing command (11.7);
+- the dependency-bump class predicate (13.6);
+- ecosystem-specific readiness checks at onboarding (20.1).
+
+Policy names the ecosystem (`ecosystem = "rust"`). The pipeline, sandbox, GitHub model and gates contain no Cargo-specific logic outside this interface, and a structural test enforces that. Where this specification names `cargo` commands or Cargo files elsewhere, it describes the `rust` implementation. Adding a language means adding an implementation, not changing the pipeline. Repositories that mix ecosystems are out of scope for v1.
 
 ---
 
@@ -678,7 +707,7 @@ struct SessionSpec {
 
 `AgentEvent` is a normalised enum: `Init`, `AssistantText`, `ToolCall`, `ToolResult`, `Usage`, `RateLimited`, `Result`, `Unknown(raw)`. Unknown message types and fields are preserved, never fatal.
 
-v1 ships one driver, for Claude Code. A Codex driver and a generic Agent Client Protocol driver are later additions behind the same trait; the ACP crate has had four major versions in five months, so it is not a v1 dependency.
+v1 ships one driver, for Claude Code. A Codex driver (which can likewise reuse a saved ChatGPT login) and a generic Agent Client Protocol driver are later additions behind the same trait; the ACP crate has had four major versions in five months, so it is not a v1 dependency.
 
 ### 10.2 Roles
 
@@ -695,10 +724,11 @@ Read-only roles are enforced by the sandbox mount mode, not by the tool allowlis
 
 The driver runs the CLI as a subprocess and speaks its stream-JSON protocol. No community SDK crate is used; there is no official Rust SDK.
 
-- **AG-1.** Every invocation is headless and bare: `claude -p --bare --setting-sources user --output-format stream-json --verbose --input-format stream-json`, with an explicit `--session-id`, `--model`, `--permission-mode`, `--permission-prompts none`, tool allowlist (`--tools` / `--allowedTools`), `--settings <file>`, `--mcp-config <file> --strict-mcp-config`, `--json-schema <inline schema>`, `--max-turns`, `--max-budget-usd` and `--append-system-prompt-file <file>`. Flag names are those of Claude Code 2.1.311. The driver owns the mapping. `sf doctor` verifies each flag by invoking the CLI with it against a stub model endpoint and checking for an unknown-option error; it does not parse `--help`, which omits some supported flags.
+- **AG-1.** Every invocation is headless, and bare except in `subscription` mode (AG-3a): `claude -p --bare --setting-sources user --output-format stream-json --verbose --input-format stream-json`, with an explicit `--session-id`, `--model`, `--permission-mode`, `--permission-prompts none`, tool allowlist (`--tools` / `--allowedTools`), `--settings <file>`, `--mcp-config <file> --strict-mcp-config`, `--json-schema <inline schema>`, `--max-turns`, `--max-budget-usd` and `--append-system-prompt-file <file>`. Flag names are those of Claude Code 2.1.311. The driver owns the mapping. `sf doctor` verifies each flag by invoking the CLI with it against a stub model endpoint and checking for an unknown-option error; it does not parse `--help`, which omits some supported flags.
 - **AG-2.** Bare mode skips the repository's `CLAUDE.md`, hooks, skills, plugins and `.mcp.json`, but project settings files can still apply an `env` block and helper commands. `--setting-sources user` is therefore mandatory, so no project or local settings file is read. This is intended (INV-2, INV-10).
 - **AG-2a.** Repository instructions are computed by the host at the policy commit: `AGENTS.md` and the files it references, to at most 2 levels, within a size cap, only inside directories that policy declares (default `docs/**`), resolved only to regular blobs read from the object database. Symlink entries and paths containing `..` are rejected; HTML comments are stripped. The implementer and planner receive them through the system prompt file. The reviewer's system prompt contains only the factory's role prompt; repository instructions reach it in a delimited data block.
-- **AG-3.** Authentication is the model gateway (13.5). With `direct_key` (attended `sf run` only) it is an API key or `apiKeyHelper`. Subscription login is unsupported.
+- **AG-3.** Authentication follows the credential mode (13.5): `subscription` (default) passes a long-lived token from `claude setup-token` as `CLAUDE_CODE_OAUTH_TOKEN`; `gateway` points the CLI at the model gateway; `direct_key` passes an API key or `apiKeyHelper`.
+- **AG-3a.** Bare mode does not read the subscription token, so in `subscription` mode the CLI runs without `--bare` and the isolation bare mode gave is rebuilt from other controls: `--setting-sources user` (no project or local settings, so no project hooks), `--strict-mcp-config` with a host-written MCP file (no `.mcp.json`), and the per-execution config directory of AG-4 as the only user-level configuration. Whether flags can also switch off auto-discovery of `CLAUDE.md`, skills, commands and subagents from the working directory is probe P-21. Until it is answered, and if the answer is no, the host removes `CLAUDE.md`, `CLAUDE.local.md`, `.claude/` and `.mcp.json` from the export the reviewer runs on (the diff still shows changes to them). The planner and implementer run in the workspace, where those files are the repository's own; a change to them by the implementer is a protected-path flag (11.3) and can influence only the implementer's own later rounds. This is a stated weakening of INV-10 in `subscription` mode. The contract test (19.4) asserts the lock-down on every tested CLI version, because the CLI's defaults for `-p` are announced to change.
 - **AG-4.** Each stage execution gets a fresh config directory under `exec/<seq>/home/`, created by the host. It contains a host-written settings file that the sandbox makes read-only to the worker; the rest is writable for transcripts. The host's `--settings` file lives outside any worker-writable path.
 - **AG-5.** The driver checks the CLI version against a tested range at startup and feature-detects from the `capabilities` array of the `system/init` message. Outside the range, the daemon refuses to dispatch.
 - **AG-6.** The raw stream is appended to `events.jsonl` before parsing. Lines up to 10 MiB are accepted; longer lines fail the session. The structured result is read from the `structured_output` field of the final `result` message; its absence is an agent failure.
@@ -756,15 +786,15 @@ The reviewer's schema is in 11.5. An agent's `success` is a claim. It moves the 
 
 ### 10.6 Process supervision
 
-- **AG-11.** Every sandboxed command (agent session, setup, capture, verify) is spawned as the leader of its own process group inside a sandbox instance, with a cleared environment plus an allowlist: `PATH` (9.2 WS-7), `HOME`, `TMPDIR`, `CARGO_HOME`, `CARGO_TARGET_DIR`, locale, `TRACEPARENT`, `HTTPS_PROXY`, `HTTP_PROXY`, `NO_PROXY`, and the model gateway address and per-run token.
+- **AG-11.** Every sandboxed command (agent session, setup, capture, verify) is spawned as the leader of its own process group inside a sandbox instance, with a cleared environment plus an allowlist: `PATH` (9.2 WS-7), `HOME`, `TMPDIR`, `CARGO_HOME`, `CARGO_TARGET_DIR`, locale, `TRACEPARENT`, `HTTPS_PROXY`, `HTTP_PROXY`, `NO_PROXY`, and, for agent sessions only, the model credential for the mode (13.5): the subscription token, or the model gateway address and per-run token.
 - **AG-12.** Stop sequence: send the protocol interrupt or SIGINT and wait up to 10 s for the result message; close stdin; SIGTERM to the group; after 5 s, SIGKILL to the group and destroy the sandbox instance. After SIGTERM the supervisor does not wait for a result message, because the CLI does not emit one.
 - **AG-13.** Stdout is read through a length-capped line codec; stderr is drained concurrently to a log file. Pipes are used, not a PTY. After the leader exits, output is drained for at most 2 s and the pipe handles are then closed, so a grandchild holding a pipe cannot hang the supervisor.
 - **AG-14.** The agent's own `--max-turns` and `--max-budget-usd` are set equal to the factory's session limits, so the control plane's threshold (BUD-1) fires first; a CLI-side cap result is handled as Budget.
 - **AG-15.** The sandbox record, pid, process group id and process start time are journalled before the first exec.
-- **AG-16.** Every sandboxed command is started through a supervisor shim (`sf __supervise`, same binary) that holds a pipe from the daemon and kills its whole tree when that pipe closes, so workers do not outlive a killed daemon. On Linux the sandbox also uses a PID namespace with die-with-parent.
-- **AG-17.** `sf` ships a launchd plist and a systemd unit whose stop timeout (45 s) exceeds the daemon's shutdown budget (19.3).
-- **AG-18.** After every sandboxed command the supervisor sweeps for survivors: any process whose process group or session equals the journalled one, or whose working directory or executable is under `runs/<run_id>/`. They are killed, and the next stage MUST NOT start until the sweep is empty. The same sweep is the orphan rule of 8.4. On macOS a process that changes session and working directory can escape the sweep; this residual gap is recorded in 23.3.
-- **AG-19.** The egress proxy and the model gateway admit connections for a run only while one of its activities is live. This closes the spend and exfiltration path for a process that escaped the sweep.
+- **AG-16.** Every sandboxed command is started through a supervisor shim (`sf __supervise`, same binary) that holds a pipe from the daemon and kills its whole tree when that pipe closes, so workers do not outlive a killed daemon. The sandbox also uses a PID namespace with die-with-parent (level `process`) or a VM (level `hardened`), so no worker process outlives its instance.
+- **AG-17.** `sf` ships a systemd unit whose stop timeout (45 s) exceeds the daemon's shutdown budget (19.3).
+- **AG-18.** After every sandboxed command the supervisor sweeps for survivors: any process whose process group or session equals the journalled one, or whose working directory or executable is under `runs/<run_id>/`. They are killed, and the next stage MUST NOT start until the sweep is empty. The same sweep is the orphan rule of 8.4. With a PID namespace or a VM per instance, the sweep is a second check and not the primary control.
+- **AG-19.** The egress proxy and the model gateway admit connections for a run only while one of its activities is live. This closes the spend and exfiltration path for a process that escaped the sweep. The gateway accepts a per-run token only on connections that arrive through that run's own proxy endpoint (SEC-10); a token presented anywhere else is refused and logged with both run ids.
 
 ---
 
@@ -783,7 +813,7 @@ Passing tests is not enough evidence that a change is correct, and agents weaken
 | 5 | Human review | Is this acceptable to merge? | M1 |
 | 6 | Locked acceptance tests from `author_tests` | Were the criteria tested by someone other than the builder? | M3 |
 | 7 | Diff-scoped mutation testing in CI | Do the tests detect changed behaviour? | M3 |
-| 8 | Holdout scenarios in a separate private repository | Does it work on checks the builder never saw? | Later, optional |
+| 8 | Holdout scenarios in a separate private repository | Does it work on checks the builder never saw? | M6, for classes that require it (13.6) |
 
 ### 11.2 Verify
 
@@ -800,7 +830,7 @@ commands = [
 timeout_secs = 1800
 ```
 
-- **VAL-1.** Commands run on the candidate export in a new sandbox instance with a fresh home and target directory, the same sandbox level as the agent, and no credentials (INV-3, INV-11). `setup` commands run first. A change that adds or alters dependencies makes `cargo build` arbitrary code execution; the sandbox, not the command list, is the control.
+- **VAL-1.** Commands run on the candidate export in a new sandbox instance with a fresh home and target directory, the same sandbox level as the agent, and no credentials (INV-3, INV-11). `setup` commands run first. A change that adds or alters dependencies makes `cargo build` arbitrary code execution; the sandbox, not the command list, is the control. The host fetches the RustSec advisory database daily (never a worker) and exposes it read-only to verify; `cargo deny` in verify runs without fetching.
 - **VAL-2.** `factory/verify` records the tree SHA that was verified and is reported only on a head whose tree equals it (GH-9).
 
 ### 11.3 Integrity check
@@ -810,7 +840,7 @@ A deterministic check on `base_sha..candidate`, run by the host on every candida
 | Rule | Outcome |
 |---|---|
 | Change under a **locked path** (tests written by `author_tests` for this run) | `fail` |
-| Change under `.github/workflows/` | `fail`. For a `type:ci` issue the run escalates with `policy-denial` and attaches the proposed workflow as a patch for a human to commit, because the App cannot push it (GH-11). |
+| Change under `.github/workflows/` | `fail`. For a `type:ci` issue the run escalates with `policy-denial` and attaches the proposed workflow as a patch for a human to commit, because the App cannot push it (GH-11). A `state:ready` resume from this escalation is handled as a reset (7.6): the new attempt starts from the default-branch head that then contains the committed workflow. If nothing else remains to do, the human closes the issue instead. The escalation comment states both options. |
 | Change under a **protected path**: `.factory/**`, `AGENTS.md`, `CLAUDE.md`, `.claude/**`, `.mcp.json`, the instruction directories of AG-2a and any file in the computed instruction set, `.github/**`, `CODEOWNERS`, `.gitattributes` and `.gitignore` at any depth, `docs/specs/**` (outside a `type:spec-delta` issue), `deny.toml`, `clippy.toml`, `rust-toolchain.toml`, `.cargo/**`, plus policy additions | `flag` |
 | New or changed `build.rs`; new dependency or changed dependency source in `Cargo.toml` / `Cargo.lock` | `flag` |
 | A changed path carries an attribute that hides or alters its diff (`-diff`, `binary`, `diff=`, `merge`, `filter`, `working-tree-encoding`, `linguist-generated`, `linguist-vendored`) | `flag`, listed in the pull request body as "hidden or collapsed in the GitHub diff"; `fail` if the attribute was added or changed in the same diff |
@@ -829,7 +859,7 @@ Structural rules (file type, file size, nested repositories, submodule entries) 
 
 ### 11.4 Continuous integration
 
-- **VAL-6.** The operator installs the workflow template supplied by `sf repo add` (20.1). It runs on `pull_request` and `merge_group` only, with top-level `permissions: contents: read`, no secrets, GitHub-hosted runners, and actions pinned to full commit SHAs. It SHOULD fetch dependencies first and then build and test in a container without network access, because CI otherwise gives agent-written code an open network.
+- **VAL-6.** The operator installs the workflow template supplied by `sf repo add` (20.1). It runs on `pull_request`, `merge_group` and `push` to the default branch and on nothing else, with top-level `permissions: contents: read`, no secrets, GitHub-hosted runners, and actions pinned to full commit SHAs. It SHOULD fetch dependencies first and then build and test in a container without network access, because CI otherwise gives agent-written code an open network.
 - **VAL-6a. Workflow audit.** At startup, on every default-branch head change and in `sf repo add`, the factory parses every workflow at the default-branch head. Required from M2. Dispatch in the repository pauses (as for an invalid policy, 16.3) unless:
   - every workflow that runs in the context of a factory ref (`push` matching `factory/**`, `pull_request`, `merge_group`) declares top-level `permissions` with no write scope, references no `secrets.*`, uses no `secrets: inherit`, uses GitHub-hosted runners and pins actions to SHAs;
   - `pull_request_target` and `workflow_run` workflows exclude factory branches;
@@ -837,7 +867,7 @@ Structural rules (file type, file size, nested repositories, submodule entries) 
 
   Anything the parser cannot resolve (a reusable workflow, an unknown expression in `on:` or `permissions:`) fails closed.
 - **VAL-7.** Factory pull requests come from a branch in the same repository, so they do not get the fork sandbox. Release and deployment workflows MUST live behind protected environments and MUST NOT share caches with pull request workflows.
-- **VAL-8.** The required CI checks are `required_checks = [{ name, app_id }]` in operator configuration per repository, which policy may extend but not shorten; the list is non-empty for any repository the daemon dispatches on. `name` is the check-run name as the API returns it (the job name). In `enforced` mode the factory cross-checks the list against the ruleset. The `ci` stage passes when every listed check exists on the head SHA with conclusion `success`, `neutral` or `skipped` from the listed App; it fails on any other conclusion (CI round +1); a check still missing at `ci.timeout_secs` counts as failed with class `infrastructure`.
+- **VAL-8.** The required CI checks are `required_checks = [{ name, app_id }]` in operator configuration per repository, which policy may extend but not shorten; the list is non-empty for any repository the daemon dispatches on. `name` is the check-run name as the API returns it (the job name). In `enforced` mode the factory cross-checks the list against the ruleset. The `ci` stage passes when every listed check exists on the head SHA with conclusion `success`, `neutral` or `skipped` from the listed App; it fails on any other conclusion (CI round +1). A check still missing at `ci.timeout_secs` is not a CI round: the run escalates with category `infrastructure` and does not return to `implement`.
 - **VAL-9.** On a red check the factory fetches the failing job's log through the API, extracts the failing step's tail, and feeds it back as gate feedback.
 - **VAL-10.** Pushes are made with the App installation token, which triggers workflows normally.
 
@@ -878,7 +908,7 @@ The pull request body is generated by the host from a fixed template, with agent
 
 - **Author tests (M3).** A test-author session writes acceptance tests from the criteria before implementation; the host confirms they fail, captures them as a commit, and records their paths as locked for the run (`locked_paths_sha256` in the marker, the list in the pull request body).
 - **Mutation testing (M3).** `cargo mutants --in-diff` runs in CI on the pull request diff; surviving mutants are listed in the manifest. A full run is scheduled weekly and files issues.
-- **Holdout scenarios (optional).** End-to-end scenarios kept in a separate private repository that no worker can read, run by the control plane against the built artifact. Only a behavioural description of a failure is returned. Evidence that this generalises is thin; it is not a v1 dependency.
+- **Holdout scenarios (M6).** End-to-end scenarios kept in a separate private repository that no worker can read, run by the control plane against the built artifact. Only a behavioural description of a failure is returned. Evidence that this generalises is thin, so only classes that cover service behaviour require it (13.6).
 
 ---
 
@@ -891,36 +921,39 @@ Draft at first publish → updated on every round → marked ready after all aut
 ### 12.2 Human review
 
 - **PR-1.** The factory acts on submitted reviews, not on individual review comments. "Changes requested" by an authorised actor starts a human round: the review body and its line comments (from authorised actors only) become gate feedback.
-- **PR-2.** An approval counts only if it is from an authorised actor, on the current head SHA, and, in the `team` profile, from someone other than the issue's approver. Approvals from Apps and bots never count in the factory's own check, whatever GitHub counts. Any push to the work branch invalidates earlier approvals.
-- **PR-3.** If a ready pull request has had no review for 3 days *(tunable)*, the factory nudges the requested reviewers once on the dashboard issue and then stops.
+- **PR-2.** An approval counts only if it is from an authorised actor and on the current head SHA. Approvals from Apps and bots never count in the factory's own check, whatever GitHub counts. Any push to the work branch invalidates earlier approvals.
+- **PR-3.** If a ready pull request has had no review for 3 days *(tunable)*, the factory nudges the approver once on the dashboard issue and then stops.
 
 ### 12.3 Merge
 
-Merge strategy per repository: `human` (the human merges; the factory observes and finishes the run when it sees the merge, 7.7), `factory_serial` (default from M2), or `native_queue` (M6, only if the capability probe finds a merge queue).
+Merge strategy per repository: `human` (the human merges; the factory observes and finishes the run when it sees the merge, 7.7), `factory_serial` (default from M2), or `native_queue` (not scheduled: merge queues are unavailable on personal-account repositories).
+
+Under `human` the factory still runs the test-merge of step 2 on every tick while the run is in `human_review` or `merge`: a conflict starts a base update (12.4). Before base update exists (M2), `sf run` reports the conflict in the status comment and stops; the operator cancels the run and approves the issue again.
 
 For `factory_serial`, the merge coordinator handles one pull request at a time per repository:
 
-1. **Eligibility**, in every mode: an approval valid under PR-2; the three factory checks and the required CI checks satisfied on the head SHA; the head SHA is one the factory pushed; the base is the default branch; no `factory:hold`; no stop (13.7). In `factory-enforced` mode the three factory gates are read from the journal (after a rebuild: from check runs created by the factory App).
+1. **Eligibility**, in every mode: an approval valid under PR-2, or a class decision under 13.6; the three factory checks and the required CI checks satisfied on the head SHA; the head SHA is one the factory pushed; the base is the default branch; no `factory:hold`; no stop (13.7). In `factory-enforced` mode the three factory gates are read from the journal (after a rebuild: from check runs created by the factory App).
 2. **Test-merge** the head into the current default-branch head in bare `host.git` (`git merge-tree --write-tree`, with no in-tree attributes applied). If it conflicts, or if policy `merge.update_when_behind = "always"` and the branch is behind, do a base update (12.4). Otherwise leave the branch untouched, so the approval stays on the SHA the human saw.
 3. **Re-check** approvals, hold and stop immediately before the call, then merge:
-   - `enforced` mode: `PUT /repos/{o}/{r}/pulls/{n}/merge-async` with `sha`, `merge_method: "squash"`, `merge_action: "direct_merge"`, and the host-generated `commit_title` and `commit_message` (5.6); never `bypass_rules`. Journal the returned id and poll the pull request's merged state. A `failed` result re-runs step 1; twice in a row escalates with `infrastructure`.
-   - `factory-enforced` mode: the synchronous merge endpoint with `sha` and the same title and message, so the window between check and merge is one request.
+   - `enforced` mode: `PUT /repos/{o}/{r}/pulls/{n}/merge-async` with `sha`, `merge_method: "squash"`, `merge_action: "direct_merge"`, and the host-generated `commit_title` and `commit_message` (5.6); never `bypass_rules`. A 202 returns a request id: journal it and poll the request status together with the pull request's merged state. Merged with the journalled head SHA is success. A 200 means already merged: confirm the merged head SHA. A `failed` status, or a 400 or 422 from the call, re-runs step 1 and is not a Deterministic failure under 8.6; twice in a row escalates with `infrastructure`. A 409 is handled as in 8.5.
+   - `factory-enforced` mode: the synchronous merge endpoint with `sha` and the same title and message, so the window between check and merge is one request. A 405 (not mergeable) or 409 (the head no longer matches `sha`) re-runs step 1 at once.
 4. **Finish.** If GitHub has not closed the issue within one tick (the repository's auto-close setting may be off), the factory closes it as completed. It writes the final status comment and deletes the branch.
 
-With the default `merge.update_when_behind = "on_conflict"`, a textually clean merge can still break the default branch. This is accepted for small pull requests. A red default-branch CI run after a factory merge pauses merges in that repository, files a `state:triage` issue linking the merged pull request, and counts as a tripwire (15.3).
+With the default `merge.update_when_behind = "on_conflict"`, a textually clean merge can still break the default branch. This is accepted for small pull requests. After each factory merge the reconciler reads the VAL-8 checks on the merge commit on every tick until all have concluded or `ci.timeout_secs` has passed. A failing conclusion, or a check still missing at the timeout, is a red run: it pauses merges in that repository, files a `state:triage` issue linking the merged pull request, and counts as a tripwire (15.3). The pause ends when the VAL-8 checks are satisfied on the current default-branch head, or when the operator runs `sf resume`. Runs waiting in `merge` keep their approval.
 
 - **PR-4.** The factory never merges a pull request whose head it did not push.
 - **PR-5.** Auto-merge without human approval exists only at autonomy level A3 (13.6).
-- **PR-6.** `native_queue` (M6) requires the factory to report its checks on merge-group commits (`gh-readonly-queue/<default>/*`), copying verdicts only when every member's head SHA is one it pushed. Its permissions and polling are specified with that milestone (probe P-19).
+- **PR-6.** `native_queue` (not scheduled) would require the factory to report its checks on merge-group commits (`gh-readonly-queue/<default>/*`), copying verdicts only when every member's head SHA is one it pushed. Its permissions and polling are specified with that milestone (probe P-19).
 
 ### 12.4 Base update
 
 A base update brings the default branch into the work branch without rewriting it.
 
-1. The host creates an update commit in `host.git` with parents (previous published head, new default-branch head). If the test-merge was clean, its tree is the merge result and the commit is the new candidate.
-2. If it conflicted, the host re-creates the workspace from the merge result including conflict markers, writes the conflicting paths to the handoff, and runs an implementer round (merge-conflict round +1). The resulting candidate has the same two parents.
-3. `base_sha` in the marker becomes the new default-branch head; integrity and reviewer diffs use it.
-4. The workspace is re-created from the candidate (WS-6), and the run re-enters at `integrity`. All later stages run on the new head, including `human_review`. A re-approval caused by a base update does not count against the human round cap.
+1. The host fetches the new default-branch head into `host.git` (WS-10) and creates an update commit there with parents (previous published head, new default-branch head). If the test-merge was clean, its tree is the merge result and the commit is the new candidate. If it conflicted, its tree is the merge result including conflict markers; this commit is a work-in-progress base **W**: it is journalled, never pushed and never a candidate.
+2. In the conflict case the host re-creates the workspace from W, writes the conflicting paths to the handoff, and runs an implementer round (merge-conflict round +1). The resulting candidate, and every later candidate until one is published, has W's two parents (9.4).
+3. `base_sha` and `policy_sha` in the marker become the new default-branch head (16.3). Integrity and reviewer diffs use the new `base_sha`; every stage from `integrity` on uses the policy, prompts and repository instructions of the new `policy_sha`. If that policy is invalid, the base update waits as in 16.3.
+4. In the clean case the workspace is re-created from the candidate (WS-6) and the run re-enters at `integrity`; in the conflict case the pipeline continues from `implement`. All later stages run on the new head, including `human_review`. A re-approval caused by a base update does not count against the human round cap.
+5. If the push of an update commit is rejected because the range carries default-branch changes under `.github/workflows/` (GH-11, probe P-20), the failure is not retried. The run does an automatic reset (7.6) if one is still available, and otherwise escalates with `policy-denial`, naming the workflow files that changed on the default branch.
 
 Whether a base-merge push dismisses approvals under GitHub's stale-review rules when the pull request diff is unchanged is probe P-12; until answered, the factory assumes it does.
 
@@ -934,28 +967,28 @@ Attacker-controlled input: issue titles, bodies and comments; pull request text 
 
 | Threat | Control |
 |---|---|
-| Injection steers the agent to exfiltrate secrets | The worker holds no GitHub credential (INV-1) and, under the daemon, no model key (13.5); the environment is scrubbed; egress is default-deny (13.4). |
+| Injection steers the agent to exfiltrate secrets | The worker holds no GitHub credential (INV-1); the environment is scrubbed; egress is default-deny (13.4). The one secret a worker can hold is the model credential: none in `gateway` mode; in `subscription` mode a token that can only make model requests, and whose literal value is searched for in every candidate and every text written to GitHub (13.5). |
 | Injection makes the agent write a malicious change | Integrity flags on sensitive paths, dependencies and hidden diffs; independent reviewer; human approval by default; CI without secrets. Residual risk: a plausible backdoor passing a tired reviewer. Small pull requests and the review-queue limit are the mitigation. |
 | Workspace content attacks the host (hooks, nested repositories, symlinks, FIFOs, attributes, crafted names) | INV-2 and INV-3: the host does not open workspace paths; git on a workspace runs sandboxed; objects are verified at ingest; diffs ignore in-tree attributes (9.4, VAL-5a). |
 | Agent weakens the checks that gate it | Verify and review run on a clean export (INV-11); protected and locked paths; App without Workflows permission; checks bound to the factory App; policy and instructions read from the default branch (INV-10); workflow audit (VAL-6a). |
 | Agent text forges factory state on GitHub (markers, closing keywords, mentions, skip tokens) | GH-5, GH-5a; host-written commit bodies and squash messages. |
-| Unauthorised person triggers or steers work | SEC-1 for every human input; SEC-1a for plan sub-issues; SEC-1b. |
+| Someone other than the operator triggers or steers work | SEC-1 for every human input; SEC-1b; SEC-2 (only the operator's issues); no issue runs without its own approval (INV-4). |
 | Text edited between approval and use | 5.3 rule 6; snapshot from the same read as the check; 7.7; PLAN-2. |
 | Confused deputy: the factory approves or merges its own work | INV-5; PR-2; PR-4; App never a bypass actor. |
 | Malicious dependency or build script | Sandbox for all builds; dependency changes flagged; `cargo deny` in verify. |
 | Agent-written code runs in CI with open network | CI has no secrets and a read-only token (VAL-6a). On a private repository its content can still leave through CI; the template's no-network build step is the control, and repositories that keep their own CI job accept the risk. |
-| Runaway cost | Budgets enforced and metered by the control plane through the gateway; circuit breakers; kill switches (13.7). In `direct_key` mode only the provider-side spend limit binds. |
-| Data leaves through allowed channels (pull request text, branch content, the model endpoint) | The sandbox contains nothing beyond the one repository. On public repositories this residual risk is accepted and stated. |
+| Runaway cost | Turn, time and usage limits enforced by the control plane; circuit breakers; kill switches (13.7). In `subscription` mode the worst case is bounded by the plan's limits, not by a bill. In `gateway` mode usage is metered by the control plane. In `direct_key` mode only the provider-side spend limit binds. |
+| Data leaves through allowed channels (pull request text, branch content, the model endpoint) | The repositories are public, so the only thing of value in a sandbox is the model credential (13.5). |
 | Compromised control plane | `enforced` mode: GitHub rules still require a human approval. In `factory-enforced` mode, and for A3 classes, this risk is not mitigated. |
 
 The OWASP Top 10 for Agentic Applications is the review checklist for changes to this section.
 
 ### 13.2 Trust and triggering
 
-- **SEC-1.** Human inputs that change factory behaviour are: `state:ready`, `factory:hold`, `factory:restart`, `factory:plan-approved`, `factory:stop`, `tier:*`, `risk:*`, `priority:*`, `type:ci` and `type:spec-delta`. Each is honoured only if the most recent `labeled` event for that exact label, with no later `unlabeled` event, has an actor of type User whose repository permission is write, maintain or admin when checked through the permission endpoint. `author_association` is not used. A tier, risk or type label that fails the check is read as its most restrictive value (`risk:high`, plan gate required, not `type:ci`). Issue types and fields are honoured only through their label fallbacks until probe P-17 shows their changes are attributable.
-- **SEC-1a.** A `state:ready` applied by the factory App is honoured only on a sub-issue that: was created by the factory App; is listed with its body hash in the `children` of its parent's status marker; still has exactly that body; and whose parent's plan approval is valid (PLAN-2) with an approver who still has write permission at the sub-issue's claim. That approver is the sub-issue's approver. Any edit to the sub-issue voids the inherited approval and returns it to `state:triage` with one comment.
+- **SEC-1.** Human inputs that change factory behaviour are: `state:ready`, `factory:hold`, `factory:restart`, `factory:plan-approved`, `factory:stop`, `tier:*`, `risk:*`, `priority:*`, `type:ci` and `type:spec-delta`. Except as PLAN-6 provides, each is honoured only if the most recent `labeled` event for that exact label, with no later `unlabeled` event, has an actor of type User whose repository permission is write, maintain or admin when checked through the permission endpoint. `author_association` is not used. A tier, risk or type label that fails the check is read as its most restrictive value (`risk:high`, plan gate required, not `type:ci`). Issue types and fields are honoured only through their label fallbacks until probe P-17 shows their changes are attributable. Removal is covered too: an `unlabeled` event for a `tier:*`, `risk:*` or `type:*` label by anyone who is not an authorised actor is ignored; the value of the last authorised `labeled` event stays in force and the factory re-applies the label once. `state:triage`, `state:needs-human` and closing an issue are deliberately honoured from any human, because they can only stop work (7.7).
+- **SEC-1a.** (Removed. The factory never applies `state:ready`; see PLAN-6 for labels on issues it files.)
 - **SEC-1b.** Factory-set labels are never read back as authority: the journal and check runs are the source.
-- **SEC-2.** **Input trust level** of an issue: `trusted` if the issue author and every editor of its title and body are authorised actors; otherwise `untrusted`. An issue authored by the factory App takes the trust level of the input of the run that produced it. An `untrusted` issue is dispatched only if the repository's sandbox level is `hardened` (13.3), even when a maintainer applied `state:ready`.
+- **SEC-2.** The factory works only on issues written by the operator: the issue's author and every editor of its title and body must be authorised actors, or the factory App for an issue it filed. Any other issue is never dispatched, whoever labels it and at any sandbox level. To act on someone else's report, the operator restates it in an issue of their own.
 - **SEC-3.** The snapshot contains the title, the body, and comments by authorised actors. Other comments are not shown to agents.
 - **SEC-4.** Before use, snapshot text is sanitised: HTML comments and zero-width or bidirectional control characters are removed, and the size is capped (32 KiB body, 8 KiB per comment, 64 KiB total *(tunable)*).
 - **SEC-5.** Pull requests from forks are never processed.
@@ -964,7 +997,7 @@ The OWASP Top 10 for Agentic Applications is the review checklist for changes to
 
 ```rust
 trait Sandbox {
-    fn capabilities(&self) -> SandboxCaps;   // fs_isolation, process_isolation, egress_filtering, vm_boundary, guest_os, guest_arch
+    fn capabilities(&self) -> SandboxCaps;   // fs_isolation, process_isolation, egress_filtering, vm_boundary
     async fn create(&self, run: RunId, policy: &SandboxPolicy) -> Result<Box<dyn SandboxInstance>>;
     async fn reap(&self, record: &SandboxRecord) -> Result<()>;      // after a daemon restart
 }
@@ -979,58 +1012,68 @@ trait SandboxInstance {
 
 One instance exists per stage execution, created from that stage's policy (mounts, read-only or read-write, network) and destroyed when it ends.
 
-| Level | Requires | Backends | Allowed for |
+| Level | Requires | Backend | Used for |
 |---|---|---|---|
 | `none` | — | Passthrough | The fake agent only |
-| `process` | `fs_isolation`, `process_isolation`, `egress_filtering` | macOS: a deny-by-default Seatbelt profile through `sandbox-exec`. Linux (M4): bubblewrap with PID, IPC and user namespaces and seccomp. | `trusted` input (M1–M3) |
-| `hardened` | plus `vm_boundary` | macOS: Apple `container` (one lightweight VM per stage execution; Linux guest). Linux: Firecracker-class microVM or gVisor. | `untrusted` input; any A3 auto-merge (M4) |
+| `process` | `fs_isolation`, `process_isolation`, `egress_filtering` | bubblewrap with PID, IPC, network and user namespaces and a seccomp filter | Attended `sf run` (M1); development |
+| `hardened` | plus `vm_boundary` | One KVM microVM per stage execution (Firecracker or Cloud Hypervisor, decision D-5). The workspace or export is attached as a block device or virtio-fs share, and the per-run proxy is the VM's only network peer. | `sf daemon` (from M2); required for any auto-merge |
 
 - **SEC-6.** Filesystem policy, deny by default:
 
   | Access | Paths |
   |---|---|
-  | Read-write | The workspace (implementer) or the candidate export (verify); `exec/<seq>/home/` and temp; the stage's target directory; `quarantine/` (capture only) |
-  | Read-only | The resolved toolchain; the agent CLI; the role's handoff view; the workspace (planner, capture); the candidate export (reviewer); the host-written settings file; a backend-defined OS baseline enumerated in code and covered by a snapshot test |
-  | Denied | Everything else, including the host home directory, SSH agent, Docker socket, keychain, cloud credential files, the mirror and the rest of the data directory |
+  | Read-write | The workspace (implementer) or the candidate export (verify); `exec/<seq>/home/` and temp; the stage's target directory; `quarantine/`, which also holds the capture index (capture only) |
+  | Read-only | The resolved toolchain; the agent CLI; the host's `git` installation; `host.git/objects` and the host-written git configuration (capture only); the host-fetched advisory database (verify only); the role's handoff view; the workspace (planner, capture); the candidate export (reviewer); the host-written settings file; a backend-defined OS baseline enumerated in code and covered by a snapshot test |
+  | Denied | Everything else, including the host home directory, SSH agent, container sockets, credential files, the mirror and the rest of the data directory |
 
-- **SEC-6a.** A worker cannot signal, trace or message a process outside its sandbox. On macOS the profile limits `signal` and `process-info` to the same sandbox and allows `mach-lookup` only for a fixed list that excludes the security daemon, launchd job submission and AppleEvents. Argument and environment visibility of same-user host processes is not prevented at level `process` on macOS, which is why INV-1 forbids secrets there.
-- **SEC-7.** The sandbox fails closed. The sandbox level has no implicit default: a repository whose operator configuration omits it is not dispatched. If the configured level cannot be provided, the run does not start.
+- **SEC-6a.** A worker cannot see, signal, trace or message a process outside its sandbox: at level `process` through PID, IPC and user namespaces with a private `/proc`; at level `hardened` through the VM boundary. INV-1 keeps every GitHub credential out of child processes regardless. The only secret in a worker's environment is the model credential (13.5).
+- **SEC-7.** The sandbox fails closed. `sf daemon` dispatches only at `hardened`; `process` is accepted for attended `sf run`; `none` only with the fake agent. If the required level cannot be provided, the run does not start.
 - **SEC-8.** The sandbox wraps the whole agent process, not only its shell commands. The agent CLI's built-in sandbox covers only its Bash tool and is not relied on.
-- **SEC-9.** A VM backend with a Linux guest cannot serve repositories that must build on macOS, including possibly the factory's own. Policy key `requires_host_os` makes such a backend unavailable for that repository (decision D-5).
+- **SEC-9.** The microVM guest image is built by the host from a pinned base, contains the resolved toolchain and the agent CLI, and is mounted read-only. Its digest is journalled for every run. Repositories that need another operating system to build are out of scope.
 
 ### 13.4 Network egress
 
-- **SEC-10.** Workers have no direct network access. The only reachable endpoint is a per-run control-plane proxy: a loopback port (Seatbelt), a Unix socket bound into the namespace with an in-sandbox forwarder (bubblewrap), or the host interface (VM). The per-run endpoint is how a connection is attributed to a run (AG-19).
-- **SEC-11.** The proxy allows a short hostname list: the model gateway; the crate registry (`index.crates.io`, `static.crates.io`) or a configured mirror; plus hosts added in operator configuration. For attended `sf run` in `direct_key` mode the model API endpoint replaces the gateway. `github.com` and `api.github.com` are never on a worker's list. Every denied request is logged with the run id.
+- **SEC-10.** Workers have no direct network access. The only reachable endpoint is a per-run control-plane proxy: a Unix socket bound into the namespace with an in-sandbox forwarder (bubblewrap), or a host-side interface that routes only to the proxy (microVM). The per-run endpoint is how a connection is attributed to a run (AG-19).
+- **SEC-11.** The proxy allows a short hostname list: the model endpoint for the credential mode (the model gateway in `gateway` mode; in `subscription` and `direct_key` modes the hosts the agent CLI needs for model requests, fixed by the contract test); the crate registry (`index.crates.io`, `static.crates.io`) or a configured mirror; plus hosts added in operator configuration. `github.com` and `api.github.com` are never on a worker's list. Every denied request is logged with the run id.
 - **SEC-12.** Hostname filtering does not stop abuse of an allowed multi-tenant host. The allowlist is kept short for that reason, and repository policy cannot extend it. Cargo git dependencies outside the list are a blocking onboarding failure.
 
 ### 13.5 Credentials
 
 | Credential | Held by | Notes |
 |---|---|---|
-| GitHub App private key | Control plane, from the OS keychain or a 0600 file | Never passed to any child process |
+| GitHub App private key | Control plane, from a 0600 file or a systemd credential | Never passed to any child process |
 | Installation token | Control plane | One repository, about 1 hour. Reaches `git push` only through the built-in credential helper over an inherited pipe. A test dumps the arguments and environment of every host child during a push and finds no token. |
 | Operator's own GitHub credential | Not stored | Used once by `sf repo check` to read the bypass list (DEP-4) |
-| Model API key, `gateway` mode | Control plane | Required for `sf daemon`. The worker gets the gateway address and a per-run token valid only there. The gateway replaces any authentication header the worker sends, injects the key, meters usage, and forwards only message-creation and token-counting paths. |
-| Model API key, `direct_key` mode | Worker environment | Attended `sf run` at level `process` only; `sf daemon` refuses to start with it. The key is exposed to a subverted worker and budgets are advisory; use a key with a provider-side spend limit. |
+| Subscription token, `subscription` mode (default) | Control plane (0600 file or systemd credential); worker environment | The operator creates it with `claude setup-token` from their own Claude Max plan, on a machine with a browser since the server is headless, and gives it to `sf init`. It is passed to agent sessions only (never to setup, capture or verify) as `CLAUDE_CODE_OAUTH_TOKEN`. Allowed for `sf run` and `sf daemon`. It is exposed to a subverted worker, so: it can only make model requests; the egress allowlist limits where it can be sent; the host searches every candidate and every text written to GitHub for its literal value and fails the stage on a hit; and the operator re-issues it after any such hit. The CLI runs non-bare (AG-3a). No dollar bill can run away: use is bounded by the plan's limits, which the factory shares with the operator's own interactive use. |
+| Model API key, `gateway` mode | Control plane | Not scheduled: the operator uses a Claude Max plan only (decision D-2). It stays specified so that an API key can be added later without redesign. The worker gets the gateway address and a per-run token valid only there. The gateway replaces any authentication header the worker sends, injects the key, meters usage, and forwards only message-creation and token-counting paths. |
+| Model API key, `direct_key` mode | Worker environment | Attended `sf run` at level `process` only; `sf daemon` refuses to start with it, because a stolen pay-as-you-go key has no ceiling the factory controls. Use a key with a provider-side spend limit. |
 
-### 13.6 Autonomy levels
+### 13.6 Autonomy levels and classes
 
 | Level | Meaning |
 |---|---|
 | A0 | Lint and triage only; no code. |
-| A1 | Plan only; the plan is posted for a human. |
-| A2 | **Default.** The factory opens pull requests; a human approves; the factory or the human merges. |
-| A3 | Auto-merge without human approval for classes defined in operator configuration, subject to the conditions below. M6. |
-| A4 | Broad auto-merge. Out of scope. |
+| A1 | Plan only; the plan is posted for the operator. |
+| A2 | The factory opens pull requests; the operator approves each one; the factory merges. Every class of work starts here. |
+| A3 | A class of work merges without review. |
+| Lights-out | The goal (G6): every class that a repository's tier 0 and tier 1 work falls into has earned A3. The operator still approves each issue (INV-4). |
 
-An A3 class is a deterministic predicate over the diff, evaluated by the integrity check: an allowlist of path globs, a maximum changed-line count and allowed file modes; for dependency bumps, only version and checksum fields of crates already in `Cargo.lock`, the same registry source, and a minimum release age. A class defined only by labels or tier is invalid.
+**Classes.** Autonomy is granted per class of work, never per repository. A class is defined in operator configuration and has two parts:
 
-A3 conditions, all required: `enforced` mode with a verified bypass list; sandbox level `hardened`; `risk:low` valid under SEC-1; the diff satisfies the class predicate; no integrity flag; all required checks pass; the class has at least 30 merged pull requests at A2 with a 30-day revert-or-rework rate under 5% *(both tunable; no published evidence supports specific numbers)*. Any tripwire in 15.3 drops the repository back to A2 automatically.
+- A **predicate** over the diff, deterministic and evaluated by the integrity check: an allowlist of path globs, a maximum changed-line count and allowed file modes. For dependency bumps the `Ecosystem` supplies it (for Rust: only version and checksum fields of crates already in `Cargo.lock`, the same registry source, and a minimum release age). A class defined only by labels or tier is invalid.
+- The **evidence** it requires beyond the standard gates. The factory produces a mix of software, and what can be checked automatically differs by kind: for example a mutation-score floor for library and CLI code, a holdout scenario suite for service behaviour (11.7), browser-driven checks for user interfaces. A kind of work for which no such evidence is defined cannot be a class and stays at A2.
 
-How an A3 merge satisfies a ruleset that requires an approval, without the factory approving (INV-5), is not settled. Two candidate layouts are recorded in 23.2 (P-18) and the choice is made at M6. Through M5, 12.3 has no exception to PR-2.
+The expected ladder is: documentation; dependency bumps; test-only changes; small tasks in library and CLI code; then service code with scenario suites.
 
-The operator configuration sets a ceiling per repository; repository policy can only lower it.
+**A3 conditions**, all required for a head to merge without review: `enforced` mode with a verified bypass list; sandbox level `hardened`; risk within the class's ceiling (default `risk:low`), valid under SEC-1; the diff satisfies the class predicate; no integrity flag; all required checks and the class's evidence pass. For such a head the `human_review` stage is skipped, and 12.3 step 1 takes the class decision in place of an approval.
+
+**Promotion** is an operator action (`sf class promote`), offered only when the class has its record: at least 30 merged pull requests at A2, a 30-day revert-or-rework rate under 5%, and the reviewer agent's verdict agreeing with the operator's on at least 95% of them *(all tunable; no published evidence supports specific numbers; decision D-14)*.
+
+**After promotion** the factory marks 1 in 10 auto-merged pull requests of the class *(tunable)* for after-the-fact review on the dashboard issue; a problem found there counts as an escaped defect. Any tripwire in 15.3 demotes the class to A2 automatically; it must earn promotion again.
+
+**Open design point.** How an A3 merge satisfies a ruleset that requires an approval, without the factory approving (INV-5), is not settled. Two candidate layouts are recorded as probe P-18 and the choice is made in M4. Until then 12.3 has no exception to PR-2.
+
+Repository policy can only lower what operator configuration allows.
 
 ### 13.7 Kill switches
 
@@ -1049,7 +1092,7 @@ Every run keeps an append-only record: actor and permission at trigger, snapshot
 
 ## 14. Budgets and cost
 
-Limits are enforced by the control plane from gateway-metered usage. Agent-side caps are a second line only: they are client-side estimates and can be exceeded.
+Limits are enforced by the control plane. In `gateway` mode usage is metered by the gateway. In `subscription` and `direct_key` modes usage comes from the agent CLI's own reports, and dollar figures are the API-equivalent cost the CLI reports, not money spent: they still stop runaway sessions and make runs comparable, but the binding constraint in `subscription` mode is the plan's rate limit (8.3). Agent-side caps are a second line only: they are client-side estimates and can be exceeded.
 
 | Scope | Default *(tunable; to be set by the operator)* |
 |---|---|
@@ -1093,7 +1136,7 @@ Idle and tool-call time are the stall rules of 8.2, not budgets.
 
 ### 15.3 Tripwires
 
-Evaluated daily per repository. Any of these pauses A3 (if enabled) and opens a dashboard notice: 30-day revert-or-rework rate above 10%; an escaped defect in an auto-merged change; a red default-branch CI run after a factory merge (which also pauses merges, 12.3); any secret-scan hit in a published commit; three budget stops in a day *(all tunable)*.
+Evaluated daily per repository. Any of these demotes the affected class to A2 (13.6) and opens a dashboard notice: 30-day revert-or-rework rate above 10%; an escaped defect in an auto-merged change; a red default-branch CI run after a factory merge (which also pauses merges, 12.3); any secret-scan hit in a published commit; three budget stops in a day *(all tunable)*.
 
 ### 15.4 Feedback into the harness
 
@@ -1111,11 +1154,11 @@ Each repository has one pinned issue, maintained by the factory and edited in pl
 
 | Layer | Location | Trust | Holds |
 |---|---|---|---|
-| Operator | `~/.config/sf/config.toml` | Trusted | Credentials and their mode, data directory and disk limits, repository allowlist with profile, reviewers, sandbox level, autonomy ceiling, required CI checks and acknowledged workflows per repository, egress allowlist, global budgets and concurrency, agent CLI path and version range |
+| Operator | `~/.config/sf/config.toml` | Trusted | Credentials and their mode, data directory and disk limits, repository allowlist, classes and their autonomy (13.6), dispatch schedule, required CI checks and acknowledged workflows per repository, egress allowlist, global budgets and concurrency, agent CLI path and version range |
 | Repository policy | `.factory/policy.toml` and `.factory/prompts/*.md` at the default-branch head | Reviewed, but changeable by pull request | Stages enabled, verify and setup commands, per-stage model and limits, round caps, size budget, extra protected paths and required checks, instruction directories, generated-file globs, merge settings |
 | Issue | Labels | Honoured only under SEC-1 | Tier, risk, priority, type, hold, restart |
 
-- **CFG-1.** Repository policy can only tighten operator settings: lower budgets and concurrency, lower autonomy, add protected paths and required checks, set `merge.update_when_behind = "always"`, and disable `plan` for tier 0–1, `author_tests`, and `review` for tier 0. It cannot lower the sandbox level, extend the egress allowlist, shorten built-in protected paths or the required-check list, disable `capture`, `integrity`, `verify` or human review, or name credentials.
+- **CFG-1.** Repository policy can only tighten operator settings: lower budgets and concurrency, lower autonomy, add protected paths and required checks, set `merge.update_when_behind = "always"`, and disable `plan` (for tier 0, and for tier 1 issues where the plan gate of 7.4 does not apply), `author_tests`, and `review` for tier 0. It cannot lower the sandbox level, extend the egress allowlist, shorten built-in protected paths or the required-check list, disable `capture`, `integrity`, `verify` or human review, or name credentials.
 - **CFG-2.** Files are TOML, parsed with unknown fields rejected, and each has a `schema_version`. A JSON Schema is generated for editor support.
 - **CFG-3.** A change to `.factory/**` is itself a protected-path change and is never auto-merged.
 
@@ -1123,9 +1166,10 @@ Each repository has one pinned issue, maintained by the factory and edited in pl
 
 ```toml
 schema_version = 1
+ecosystem = "rust"
 
 [stages]
-plan = "auto"            # auto = by tier and risk
+plan = "auto"            # auto = by tier and risk; false never removes the plan gate
 author_tests = false
 review = true
 
@@ -1185,7 +1229,7 @@ One binary, `sf`. Every command accepts `--json`.
 |---|---|
 | Setup | `sf init` · `sf app create` · `sf repo add|check|remove <owner/repo>` · `sf doctor [--probe]` |
 | Operate | `sf daemon` · `sf run <owner/repo#n>` (same engine, one item, foreground, resumable) · `sf status` · `sf show <run|issue>` · `sf logs <run> [--follow]` · `sf pause` · `sf resume` · `sf drain` · `sf cancel <run>` · `sf retry <run>` |
-| Inspect | `sf cost [--since]` · `sf metrics [--failures]` · `sf policy check|explain` · `sf issue lint <n>` |
+| Inspect | `sf cost [--since]` · `sf metrics [--failures]` · `sf policy check|explain` · `sf issue lint <n>` · `sf class list|promote|demote` |
 | Maintain | `sf gc` · `sf rebuild` · `sf export <run>` · `sf eval run|report` · `sf self-update [--rollback]` |
 
 - **CLI-1.** `sf doctor` checks credentials, App permissions, CLI versions and flags, sandbox availability at the configured level, git version, the toolchain for each repository, enforcement mode and the capability probe. `--probe` additionally runs the live probe suite (23.2) against a scratch repository and records the answers.
@@ -1219,7 +1263,7 @@ SQLite in WAL mode, accessed from one writer thread.
 
 | Data | Default *(tunable)* |
 |---|---|
-| `target/`, exports | Removed when the run enters `human_review` or a terminal state |
+| Target directories, exports | Removed when the run enters `human_review` or a terminal state |
 | Workspace and run directory | Removed 24 h after a terminal state |
 | Agent event streams and transcripts | 30 days; 180 days for failed, reset or reverted runs |
 | Journal rows | Kept; event detail pruned after 180 days |
@@ -1288,9 +1332,9 @@ Not used: any community Claude SDK crate, `git2` for mutations, `figment`, `sled
 | Recovery (simulation) | The real engine and the real SQLite store with scripted executors driven by a fault plan: crash before commit, after commit before the effect, after the effect before the acknowledgement, duplicate completion, reordered completion. Property: no duplicate external write, and convergence to the fault-free state. |
 | Process crash | A daemon built with failpoints is killed with SIGKILL at each stage boundary and restarted, against `fake-github` |
 | Drivers | A `fake-agent` binary that replays scripted stream-JSON and misbehaves on demand: hang, garbage, oversized line, loop, ignore SIGINT, a `setsid` grandchild holding stdout, the daemon killed mid-session. Recorded fixtures from the real CLI. |
-| Git | Real `git` in temp directories with the hostile-tree suite of WS-9; a round after a base update never reverts upstream content |
+| Git | Real `git` in temp directories with the hostile-tree suite of WS-9; a round after a base update never reverts upstream content; a base update where the default branch added a tracked file matching an ignore rule keeps that file; a candidate built after a gate failure on an unpublished update commit has the new default-branch head as an ancestor |
 | GitHub | `fake-github`: a stateful HTTP fake implementing the REST and GraphQL subset the gateway uses, hosted by the test process so it survives a killed daemon; pushes go to a local bare repository. `wiremock` for adapter edge cases including rate-limit and ETag paths. |
-| Sandbox | Per backend: read the host home, a keychain item, or the arguments and environment of a host process; reach a non-allowlisted host; write outside the allowed paths; signal the daemon; submit a launchd job; send an AppleEvent. An M0 probe records which of these the Seatbelt prototype blocks. |
+| Sandbox | Per backend: read the host home, a credential file, or the arguments and environment of a host process; see or signal a host process; reach a non-allowlisted host; write outside the allowed paths; escape through a setuid binary or a mount. These run on the server if CI runners cannot provide user namespaces and KVM (probe P-16). |
 | End to end | With the fake agent against `fake-github` on every pull request. Against a scratch GitHub repository only in a scheduled workflow on the default branch, behind a protected environment, with a separate test App installed on the scratch repository only. |
 | Contract | A scheduled test against the installed agent CLI that asserts the flags and message shapes the driver relies on, and that `.claude/settings.json`, `.claude/settings.local.json` and a settings file written mid-session into the config directory have no effect |
 
@@ -1305,10 +1349,10 @@ Not used: any community Claude SDK crate, `git2` for mutations, `figment`, `sled
 ### 20.1 `sf repo add`
 
 1. Check that the App is installed; read the capability probe and enforcement mode.
-2. Produce a readiness report. **Blocking:** a single-command setup and test entry point that passes on the default branch under the sandbox; an `AGENTS.md`; the toolchain of WS-7 installed; no submodules, no `filter=` attributes and a clean round-trip checkout at the default-branch head; no Cargo git dependency outside the egress list; the workflow audit (VAL-6a). **Advisory:** check speed, flake rate, documentation layout, architecture rules, the repository's auto-close setting, other installed Apps that can write pull requests, and past approving reviews by bot accounts.
+2. Produce a readiness report. **Blocking:** a single-command setup and test entry point that passes on the default branch under the sandbox; an `AGENTS.md`; the toolchain of WS-7 installed; no submodules, no `filter=` attributes and a clean round-trip checkout at the default-branch head; no Cargo git dependency outside the egress list; `cargo deny`, if used in verify, passes without fetching against the host-fetched advisory database; the workflow audit (VAL-6a). **Advisory:** check speed, flake rate, documentation layout, architecture rules, the repository's auto-close setting, other installed Apps that can write pull requests, and past approving reviews by bot accounts.
 3. Open one onboarding pull request containing `.factory/policy.toml`, default prompts, the issue forms, a `CODEOWNERS` entry for protected paths and an `AGENTS.md` skeleton if missing. The CI workflow template is not pushed by the App (GH-11): `sf repo add` writes it to a local file and prints the commit command, and the operator adds it to the onboarding branch with their own credentials.
 4. Do nothing else in that repository until the pull request is merged and a workflow satisfying VAL-6a exists on the default branch. Closing the pull request opts the repository out.
-5. After the merge: create the label set through the API, write the workflow's check names into `required_checks`, and only then activate the ruleset of 20.3.
+5. After the merge: create the label set through the API and write the workflow's check names into `required_checks`. Only then is the ruleset of 20.3 activated, by the operator: the App has no Administration permission (GH-11) and `sf` holds no credential that can write rulesets. `sf repo add` prints the ruleset as importable JSON; `sf repo check` then re-detects the mode (4.1) and verifies the bypass list (DEP-4).
 
 Until M5 the same steps are done by hand from this checklist.
 
@@ -1320,12 +1364,7 @@ A repository advances by operator command: `observe` (A0: readiness lint and pla
 
 For the default branch, in `enforced` mode: require a pull request; one approval; dismiss stale approvals on new commits; require approval of the most recent push by someone other than the pusher; require code-owner review; require the status checks `factory/integrity`, `factory/verify`, `factory/review` (source: the factory App) and the CI checks of VAL-8; do not require branches to be up to date; block force pushes and deletions. Signed commits are not required in v1 (5.6).
 
-Required checks apply to every pull request, so human-authored pull requests need a rule:
-
-- `solo`: the repository-admin role is a bypass actor in pull-request-only mode. This is required, because an author cannot approve their own pull request and the factory checks exist only on factory pull requests. Human pull requests are merged through that bypass and are outside the factory's guarantee. The factory App is never a bypass actor.
-- `team`: no bypass is needed. The factory reports its three checks as `neutral` ("not a factory pull request") on every open same-repository pull request that is not its own; such pull requests wait for the daemon. An admin bypass in pull-request-only mode MAY be configured as a fallback for daemon outages.
-
-The mode detection of 4.1 accepts exactly these bypass configurations.
+Required checks apply to every pull request, and the factory checks exist only on factory pull requests. The repository-admin role is therefore a bypass actor in pull-request-only mode: without it the operator could not merge a pull request they wrote themselves, since an author cannot approve their own pull request. Human pull requests are merged through that bypass and are outside the factory's guarantee. The factory App is never a bypass actor. The mode detection of 4.1 accepts exactly this bypass configuration.
 
 ### 20.4 Repository conventions the factory expects
 
@@ -1341,7 +1380,7 @@ The mode detection of 4.1 accepts exactly these bypass configurations.
 
 - **BOOT-1.** Humans (with interactive agent assistance) build M0 and M1. From M1 the factory is run attended on its own repository from an installed, tagged build; from M2 unattended.
 - **BOOT-2.** The binary that operates on the factory repository is always an installed, pinned release, never a build of the tree it is changing. The factory version is recorded in every marker.
-- **BOOT-3.** Upgrading the operating binary is a human action (`sf self-update`), allowed only after the eval gate passes on the candidate: a smoke eval until M3, the eval suite afterwards. Previous binaries and store backups are kept for rollback (18.1).
+- **BOOT-3.** From M2, upgrading the operating binary is a human action (`sf self-update`), allowed only after the eval gate passes on the candidate: the smoke eval until M3, the eval suite afterwards. During M1 the operator installs a newer tagged build by hand; the gate is the harness tests of 19.4 passing on the tagged commit. Previous binaries and store backups are kept for rollback (18.1).
 - **BOOT-4.** The factory's own gate code, prompts, policy and this specification are protected paths in its repository and are never auto-merged.
 - **BOOT-5.** From M2 the factory also runs on a second, unrelated repository, so defects that self-hosting would hide become visible.
 
@@ -1362,38 +1401,51 @@ Public benchmark scores are not acceptance criteria.
 
 | Milestone | Scope | Exit criterion |
 |---|---|---|
-| **M0 Foundations** | Workspace, CI and a tagged release build; `factory-core` types and engine skeleton with property tests; `factory-proc` with the supervisor shim; git wrapper; GitHub App creation; `sf doctor`; the probe suite (23.2); prototypes of capture, ingest and export against the hostile-tree suite (WS-9) and of the Seatbelt profile | All M0 probes answered and recorded; the hostile-tree suite passes; a cold `cargo build` of the factory repository and one real agent turn succeed under the Seatbelt profile with only the proxy reachable |
-| **M1a Skeleton** | Store with `runs` and `events`; claim; implement at sandbox level `process` with the egress proxy (fake agent, then the Claude driver); per-session budgets; capture; integrity with path, structural and secret rules; verify on the export; publish a draft pull request; then exit. `sf run` on the same issue resumes from the journal. | One real issue reaches a draft pull request and survives an interrupted run |
-| **M1b Attended run** | Status comment and marker; factory check runs; CI wait; ready and evidence manifest; observation of human review and merge (strategy `human`) | Five real issues on the factory repository merged by a human from factory pull requests, using a tagged, installed build |
-| **M2 Daemon** | Poll and reconcile loop; outbox, activities and recovery; scheduler and limits for two repositories onboarded by hand; SEC-1 for all human inputs; outbound encoder; workflow audit; model gateway (the daemon refuses `direct_key`); escalation and resume; plan stage and gate; reviewer stage; in-place rounds; base update; reset; `factory_serial` merge; follow-up issue filing; dashboard issue; control API; kill switches; `sf rebuild`; `sf self-update` with rollback; smoke eval | 48 hours unattended on a second repository with no manual repair; the process-crash test passes at every stage boundary; no model key present in any worker; self-hosting on a pinned release begins |
-| **M3 Validation depth** | Issue forms and readiness lint enforced; tiers, spec deltas and tier 2 decomposition; `author_tests` with locked paths; tampering heuristics; mutation testing in CI; failure classification; eval suite v1 | The eval suite gates a release; reviewer agreement with humans is measured |
-| **M4 Hardening** | VM sandbox backend; Linux host with the `process` backend; hash-chained audit digest in pull requests; `untrusted` input permitted | Sandbox escape tests pass at `hardened` on both hosts |
-| **M5 Operations** | `sf repo add` onboarding automation; more than two repositories; metrics and tripwires; retention and `sf gc`; `sf export`; OpenTelemetry export | A third repository onboarded through the onboarding pull request plus the operator-committed workflow file |
-| **M6 Merge automation** | A3 classes with predicates, promotion and demotion, and the chosen ruleset layout; `native_queue` strategy; optional `createCommitOnBranch` publishing; second agent driver | One A3 class enabled on one repository with tripwires exercised in a test |
+| **M0 Foundations** | Workspace, CI and a tagged release build; the Linux server provisioned; `factory-core` types, the `Ecosystem` interface with its `rust` implementation, and the engine skeleton with property tests; `factory-proc` with the supervisor shim; git wrapper; GitHub App creation; `sf doctor`; the probe suite (23.2); prototypes of capture, ingest and export against the hostile-tree suite (WS-9), of the bubblewrap sandbox, and of the egress proxy | All M0 probes answered and recorded; the hostile-tree suite passes; a cold build of the factory repository and one real agent turn succeed on the server under bubblewrap with only the proxy reachable |
+| **M1a Skeleton** | Store with `runs` and `events`; claim; implement at sandbox level `process` with the egress proxy (fake agent, then the Claude driver in `subscription` mode); per-session limits; capture; integrity with path, structural and secret rules, including the literal-token scan; verify on the export; publish a draft pull request; then exit. `sf run` on the same issue resumes from the journal. | One real issue reaches a draft pull request and survives an interrupted run |
+| **M1b Attended run** | Status comment and marker; factory check runs; CI wait; ready and evidence manifest; observation of human review and merge (strategy `human`) | Five real issues on the factory repository merged by the operator from factory pull requests, using a tagged, installed build |
+| **M2 Daemon** | The microVM backend, with the daemon dispatching only at `hardened`; systemd unit; poll and reconcile loop; outbox, activities and recovery; scheduler and limits for two repositories onboarded by hand; SEC-1 for all human inputs; outbound encoder; workflow audit; lock-down contract test and plan-limit pause; escalation and resume; plan stage and gate; reviewer stage; in-place rounds; base update; reset; `factory_serial` merge; follow-up issue filing; dashboard issue; control API; kill switches; `sf rebuild`; `sf self-update` with rollback; smoke eval | 48 hours unattended on a second repository with no manual repair; the process-crash test passes at every stage boundary; sandbox escape tests pass at `hardened`; a planted copy of the subscription token is caught before publish; self-hosting on a pinned release begins |
+| **M3 Validation depth** | Issue forms and readiness lint enforced; tiers, spec deltas and tier 2 decomposition; `author_tests` with locked paths; tampering heuristics; mutation testing in CI; failure classification; reviewer agreement tracking; eval suite v1 | The eval suite gates a release; reviewer agreement with the operator is measured |
+| **M4 Earned auto-merge** | Classes with predicates and evidence; promotion and automatic demotion; the ruleset layout for A3 (P-18); sampled after-the-fact review; tripwires; hash-chained audit digest in pull requests; first classes: documentation and dependency bumps | One class promoted on the factory repository on its real record; a planted defect demotes it in a test |
+| **M5 Operations** | `sf repo add` onboarding automation; more than two repositories; metrics; retention and `sf gc`; `sf export`; OpenTelemetry export | A third repository onboarded through the onboarding pull request plus the operator-committed workflow file |
+| **M6 Towards lights-out** | Classes for test-only changes and for small tasks in library and CLI code, backed by mutation-score floors; the holdout scenario runner and classes for service code; a second ecosystem | On one repository, at least half of the pull requests merged over 30 days *(tunable)* needed no review, with no tripwire fired |
 
-Until M4 the factory runs only on repositories where every issue author and editor is an authorised actor (SEC-2).
+Not scheduled: API-key credential modes and the model gateway; a second agent driver; the native merge queue; `createCommitOnBranch` publishing; webhooks; work on issues not written by the operator.
 
 ---
 
 ## 23. Open items
 
-### 23.1 Decisions for the operator
+### 23.1 Decisions
+
+Decided by the operator on 2026-11-18:
+
+| # | Decision |
+|---|---|
+| D-1 | The factory's repository is public on the operator's personal account, so GitHub enforces the ruleset (`enforced` mode). |
+| D-2 | The model credential is the operator's own Claude Max subscription. There is no API-key fallback: when plan limits are reached the factory pauses. |
+| D-3 | The host is a Linux server on the operator's own hardware with KVM. macOS is not a supported host. |
+| D-7 | The daemon always runs at sandbox level `hardened`. (An earlier draft accepted `process` for the daemon; with KVM available that is no longer needed.) |
+| D-10 | Target repositories are Rust first; language-specific parts sit behind the `Ecosystem` interface so others can follow (9.5). |
+| D-11 | The goal is lights-out operation, earned per class of work (13.6). The operator approves every issue, including each sub-issue of a feature. |
+| D-12 | The factory stops at merge. Releases and deployments stay human actions. |
+| D-13 | The factory works only on issues the operator wrote (SEC-2). |
+
+Still open:
 
 | # | Decision | Assumed until decided |
 |---|---|---|
-| D-1 | Is the factory repository public, or private on a paid plan? On the current Free personal account a private repository gets `factory-enforced` mode only. | Supports both; recommends `enforced` |
-| D-2 | Model credential (API key or cloud provider) and the budget values of section 14. | Console API key behind the gateway; the listed defaults |
-| D-3 | Host platforms. | macOS only through M3; Linux in M4 |
 | D-4 | Which second repository does the factory run on from M2? | To be named |
-| D-5 | VM backend on macOS for M4. Apple `container` is young, its hardening record is unverified, and its Linux guest cannot build macOS-only repositories. | Apple `container`, re-evaluated at M4 |
-| D-6 | Should the reviewer use a different model family from the implementer? | Same provider, different model; configurable |
-| D-7 | The daemon runs at sandbox level `process` during M2–M3. The research recommended a VM boundary for all unattended runs. | Accepted, because input is restricted to authorised actors until M4 |
+| D-5 | The microVM monitor: Firecracker or Cloud Hypervisor. | Decided by the M2 prototype (boot time, workspace attachment, guest image build) |
+| D-6 | A reviewer from a different model family needs a second subscription and driver. | A different Claude model from the implementer |
 | D-8 | Eval trials and budget required per promotion type (binary, prompts, policy defaults, model). | Regression set at one trial for a binary; full suite at three trials otherwise |
-| D-9 | `merge.update_when_behind`: `on_conflict` keeps the human approval on the reviewed commit but can let a semantic conflict reach the default branch; `always` re-validates every time at the cost of re-approval. | `on_conflict` |
+| D-9 | `merge.update_when_behind`: `on_conflict` keeps the approval on the reviewed commit but can let a semantic conflict reach the default branch; `always` re-validates every time at the cost of re-approval. | `on_conflict` |
+| D-14 | The class ladder, promotion thresholds and audit sampling rate of 13.6, and the limit values of section 14. | The listed defaults |
+| D-15 | A dispatch schedule that leaves plan capacity for the operator's own interactive use. | None: the factory may run at any hour |
 
 ### 23.2 Probes
 
-Facts the design depends on that research could not confirm from primary sources. `sf doctor --probe` answers each against a scratch repository, and the answer is recorded in the store and in `docs/research/probes.md`. All are M0 unless marked.
+Facts the design depends on that research could not confirm from primary sources. `sf doctor --probe` answers each against a scratch repository, and the answer is recorded in `docs/research/probes.md` and, once the store exists (M1a), imported into its `probes` table. All are M0 unless marked.
 
 | # | Question | Design impact |
 |---|---|---|
@@ -1402,7 +1454,7 @@ Facts the design depends on that research could not confirm from primary sources
 | P-3 | Can an App bot be an issue assignee? | Optional "assigned to the factory" signal |
 | P-4 | How does an issue form render into the body? | Parser of 6.2 |
 | P-5 | Is a push that changes `.github/workflows/` rejected for an App without the Workflows permission on every push path? | Defence in depth for 11.3 |
-| P-6 | Does the agent CLI's inner Bash sandbox work inside an outer Seatbelt sandbox? | AG-8 |
+| P-6 | Does the agent CLI's inner Bash sandbox work inside the outer bubblewrap sandbox and inside the microVM, or must it be disabled? | AG-8 |
 | P-7 | Does sandboxed staging with a quarantine object directory and host-side ingest behave as specified on the hostile-tree suite, and what is the exact ignore-rule mechanism? | 9.4, WS-9 |
 | P-8 | Who is reported as the editor of an issue title and body through the API? Is `lastEditedAt` set for API edits, and does a title change always produce a rename event? | 5.3 rule 6, 7.7, SEC-2 |
 | P-9 | Do blocked-by dependencies work across repositories, and what is the per-issue limit? | 5.3; cross-repository work is out of scope for v1 regardless |
@@ -1410,20 +1462,26 @@ Facts the design depends on that research could not confirm from primary sources
 | P-11 | Does `merge-async` behave as documented on a personal-account repository, including `merge_action` and the custom commit message? | 12.3 |
 | P-12 | Does a base-merge commit pushed by the App dismiss approvals under "dismiss stale approvals" or "require approval of the most recent push" when the pull request diff is unchanged? | 12.4; decision D-9 |
 | P-13 | Cold versus seeded build time and size for the factory repository. | 9.3 |
-| P-14 | Is `current_user_can_bypass` populated for installation tokens on the branch-rules endpoint? | DEP-4 |
+| P-14 | Is `current_user_can_bypass` populated for installation tokens on the ruleset objects that contribute to the default branch's rules? | DEP-4 |
 | P-15 | Which encodings suppress mentions, issue references and closing keywords in comments, pull request bodies and commit messages? | GH-5a |
-| P-16 | Which of the sandbox escape attempts of 19.4 does the Seatbelt prototype block? | SEC-6a |
+| P-16 | Can GitHub-hosted Linux runners run the sandbox tests (unprivileged user namespaces for bubblewrap, `/dev/kvm` for the microVM)? If not, they run on the server on a schedule. | 19.4 |
 | P-17 | Do issue type and issue field changes expose an actor and a timestamp? | SEC-1; use of types and fields |
-| P-18 | (M6) For A3: does a ruleset accept zero required approvals with required code-owner review, and does an unowned CODEOWNERS pattern lift the requirement? The alternative is a fourth factory-reported check `factory/approval`. | 13.6 |
-| P-19 | (M6) Can an installation token list merge-queue refs and entries, and which permission does that need? | PR-6 |
+| P-18 | (M4) For A3: does a ruleset accept zero required approvals with required code-owner review, and does an unowned CODEOWNERS pattern lift the requirement? The alternative is a fourth factory-reported check `factory/approval`. | 13.6 |
+| P-19 | (Not scheduled) Can an installation token list merge-queue refs and entries, and which permission does that need? | PR-6 |
+| P-20 | Is the push of a base-update merge commit (12.4), or the ref update of a reset (7.6), rejected for an App without the Workflows permission when the default branch changed a file under `.github/workflows/` since the old `base_sha`? | 12.4, 7.6, GH-11 |
+| P-21 | In non-bare `claude -p` with `--setting-sources user` and `--strict-mcp-config`, which of these still load from the working directory: `CLAUDE.md`, `CLAUDE.local.md`, skills, commands, subagents, plugins, hooks? Is there a flag or setting that disables each? | AG-3a |
+| P-22 | Under subscription authentication: do `--max-turns` and `--max-budget-usd` work, what usage does the stream report, and what does the CLI emit when a plan limit is reached (event shape and reset time)? Which hosts does the CLI contact? | Section 14, 8.3, SEC-11 |
+| P-23 | (M4) Can a host-side pass-through supply the subscription credential so that the worker holds none: does the CLI accept a custom base URL under subscription authentication, and is that within the plan's terms? | 13.5; would remove the token from workers before auto-merge |
 
 ### 23.3 Known weak points
 
 - Human review is the main defence against a plausible but wrong change, and review quality falls as volume rises. The review-queue limit and the size budget are blunt tools.
-- In the `solo` profile there is no separation between the person who approves the issue and the person who approves the code, and human pull requests bypass the ruleset.
+- There is one human, so the person who approves the issue is also the person who approves the code, and their own pull requests bypass the ruleset.
 - Reviewer agents are lenient by default and unevaluated until M3.
 - The agent CLI's protocol and flags change often. The pinned version range and the contract test contain this but do not remove it.
-- On macOS at sandbox level `process`, a worker process that leaves its session and working directory can survive the sweep until the daemon restarts; AG-19 cuts its network, not its CPU.
+- In `subscription` mode a token valid for a year sits in the environment of a process that may be subverted, and the CLI runs without bare mode. The mitigations (model-requests-only scope, egress allowlist, literal-token scan, lock-down contract test) reduce this but do not remove it. Bare mode is announced to become the default for `-p`, which may force a change to this mode.
+- The plan's limits are shared with the operator's own interactive use and assume ordinary individual usage; a busy daemon may exhaust them and stall both.
+- Lights-out rests on class predicates and automated evidence. For user interfaces and service behaviour this specification does not yet define that evidence, so those kinds of work stay reviewed until it does.
 - Every verify is a cold build. On a large repository this may dominate cycle time until a safe seeded cache exists.
 - Most published throughput and quality figures for such systems are self-reported. No target in this specification is derived from them.
 
@@ -1448,6 +1506,7 @@ Symphony's Elixir reference now includes a minimal GitHub Issues adapter (open/c
 The reports in `docs/research/` hold the evidence and source URLs behind this specification:
 
 - `01-state-of-the-art`, `02-orchestration-architecture`, `03-specs-and-validation`, `04-github-integration`, `05-rust-implementation`, `06-security-governance-ops`: the six research angles.
-- `07-gaps`: contradictions between the reports and how they were resolved. This specification departs from two of its resolutions, recorded as D-7 and in 13.6.
+- `07-gaps`: contradictions between the reports and how they were resolved. Where this specification departs from one of its resolutions, 23.1 or 13.6 records why.
 - `08-fact-check`: 66 load-bearing claims checked against primary sources (56 confirmed, 9 partly, 1 wrong; corrections are applied here).
 - `09-spec-review`: the 59 findings of the adversarial review of draft 1, each with the reviewer's proposed fix and the sceptic's verdict. This draft addresses each one, not always with the proposed fix.
+- `10-spec-recheck`: the 47 problems a recheck found in draft 2 (unresolved findings and contradictions the rewrite introduced), addressed in draft 3.

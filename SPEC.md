@@ -145,7 +145,7 @@ At startup and daily, the factory probes each repository and records what is ava
 
 ### 4.4 Host requirements
 
-- A Linux server on the operator's own hardware (x86-64 or arm64) with KVM available to the factory's user. macOS and Windows are not supported hosts. The workspace still compiles on macOS for development, with the sandbox backends compiled out; there only sandbox level `none` with the fake agent works.
+- A Linux server on the operator's own hardware (x86-64 or arm64) with KVM available to the factory's user. macOS and Windows are not supported hosts. The workspace still compiles on macOS for development, with the sandbox backends compiled out; there only sandbox level `none` with the fake agent works. Linux-only code is developed in a local Linux VM (DEV-3).
 - Unprivileged user namespaces enabled, and `bubblewrap` installed.
 - `git` ≥ 2.42. The data directory on its own volume if possible.
 - An agent CLI inside a tested version range (v1: Claude Code; 10.3).
@@ -1334,13 +1334,18 @@ Not used: any community Claude SDK crate, `git2` for mutations, `figment`, `sled
 | Drivers | A `fake-agent` binary that replays scripted stream-JSON and misbehaves on demand: hang, garbage, oversized line, loop, ignore SIGINT, a `setsid` grandchild holding stdout, the daemon killed mid-session. Recorded fixtures from the real CLI. |
 | Git | Real `git` in temp directories with the hostile-tree suite of WS-9; a round after a base update never reverts upstream content; a base update where the default branch added a tracked file matching an ignore rule keeps that file; a candidate built after a gate failure on an unpublished update commit has the new default-branch head as an ancestor |
 | GitHub | `fake-github`: a stateful HTTP fake implementing the REST and GraphQL subset the gateway uses, hosted by the test process so it survives a killed daemon; pushes go to a local bare repository. `wiremock` for adapter edge cases including rate-limit and ETag paths. |
-| Sandbox | Per backend: read the host home, a credential file, or the arguments and environment of a host process; see or signal a host process; reach a non-allowlisted host; write outside the allowed paths; escape through a setuid binary or a mount. These run on the server if CI runners cannot provide user namespaces and KVM (probe P-16). |
+| Sandbox | Per backend: read the host home, a credential file, or the arguments and environment of a host process; see or signal a host process; reach a non-allowlisted host; write outside the allowed paths; escape through a setuid binary or a mount. During development they also run in the development VM (DEV-3). These run on the server if CI runners cannot provide user namespaces and KVM (probe P-16). |
 | End to end | With the fake agent against `fake-github` on every pull request. Against a scratch GitHub repository only in a scheduled workflow on the default branch, behind a protected environment, with a separate test App installed on the scratch repository only. |
 | Contract | A scheduled test against the installed agent CLI that asserts the flags and message shapes the driver relies on, and that `.claude/settings.json`, `.claude/settings.local.json` and a settings file written mid-session into the config directory have no effect |
 
-### 19.5 CI for the factory repository
+### 19.5 Checks and CI for the factory repository
 
-`cargo fmt --check`; `cargo clippy -D warnings`; `cargo nextest run --locked`; `cargo test --doc`; `cargo deny check`; unused-dependency check; the structural test. The workflow follows VAL-6 itself.
+- **DEV-1.** One command, `cargo xtask check`, runs every check of the factory repository. An agent session runs it before each commit, the pre-commit hook runs it again, and CI runs the same command, so the local set and the CI set cannot drift apart.
+- **DEV-2.** The set: `cargo fmt --check`; `cargo clippy -D warnings`; `cargo nextest run --locked`; `cargo test --doc`; `cargo doc` with warnings denied, broken intra-doc links included; `cargo deny check`; the unused-dependency check; the structural test; `typos` over code and documents; a cross-reference check that every requirement id and section number cited in `SPEC.md`, `AGENTS.md` and the code resolves; a check of local Markdown links; `cargo mutants --in-diff` on the changed code, failing on a surviving mutant; coverage with `cargo llvm-cov`, reported without a floor until there is code to measure. If commits become too slow, mutation testing moves to pre-push; no check is dropped.
+- **DEV-3.** On macOS, `cargo xtask check` also runs clippy and the tests inside the development VM, on every run, so Linux-only code is checked whatever a change touches. The VM is Lima running the latest Debian stable on the Mac's architecture, with `vmType: vz` and nested virtualisation so that `/dev/kvm` is available. Its configuration is committed, and `cargo xtask` creates and starts it. x86-64 coverage comes from CI.
+- **DEV-4.** Development builds of `sf` run in the VM (BOOT-2). It holds the operator's Claude Code login (D-2), which shares quota with the operator's interactive sessions, and no GitHub credential beyond the one `sf` needs for the scratch repository.
+
+The workflow follows VAL-6 itself. Which checks run on GitHub-hosted runners, which on the server, and which are required on the default branch is still open.
 
 ---
 
@@ -1378,9 +1383,9 @@ Required checks apply to every pull request, and the factory checks exist only o
 
 ### 21.1 Self-hosting
 
-- **BOOT-1.** Humans (with interactive agent assistance) build M0 and M1. From M1 the factory is run attended on its own repository from an installed, tagged build; from M2 unattended.
-- **BOOT-2.** The binary that operates on the factory repository is always an installed, pinned release, never a build of the tree it is changing. The factory version is recorded in every marker.
-- **BOOT-3.** From M2, upgrading the operating binary is a human action (`sf self-update`), allowed only after the eval gate passes on the candidate: the smoke eval until M3, the eval suite afterwards. During M1 the operator installs a newer tagged build by hand; the gate is the harness tests of 19.4 passing on the tagged commit. Previous binaries and store backups are kept for rollback (18.1).
+- **BOOT-1.** Humans (with interactive agent assistance) build M0 and M1 (D-16). Claude Code sessions on the operator's Mac write the code, one issue, branch and pull request at a time, and the operator reviews and merges every pull request. That work is tracked as issues on the factory repository, grouped under one GitHub milestone per roadmap milestone; the operator never makes them `state:ready`, so the factory never claims them. From M1 the factory is run attended on its own repository from an installed, tagged build; from M2 unattended.
+- **BOOT-2.** The binary that operates on the factory repository is always an installed, pinned release, never a build of the tree it is changing. A development build runs only against the scratch repository (`sapientpants/sf-scratch`), never against the factory repository. The factory version is recorded in every marker.
+- **BOOT-3.** From M2, upgrading the operating binary is a human action (`sf self-update`), allowed only after the eval gate passes on the candidate: the smoke eval until M3, the eval suite afterwards. The first tag, `v0.1.0`, is cut when the rest of M0 passes in CI and in the development VM; the operator installs it on the server to run M0's exit check (22). During M1 the operator installs a newer tagged build by hand; the gate is the harness tests of 19.4 passing on the tagged commit. Previous binaries and store backups are kept for rollback (18.1).
 - **BOOT-4.** The factory's own gate code, prompts, policy and this specification are protected paths in its repository and are never auto-merged.
 - **BOOT-5.** From M2 the factory also runs on a second, unrelated repository, so defects that self-hosting would hide become visible.
 
@@ -1401,7 +1406,7 @@ Public benchmark scores are not acceptance criteria.
 
 | Milestone | Scope | Exit criterion |
 |---|---|---|
-| **M0 Foundations** | Workspace, CI and a tagged release build; the Linux server provisioned; `factory-core` types, the `Ecosystem` interface with its `rust` implementation, and the engine skeleton with property tests; `factory-proc` with the supervisor shim; git wrapper; GitHub App creation; `sf doctor`; the probe suite (23.2); prototypes of capture, ingest and export against the hostile-tree suite (WS-9), of the bubblewrap sandbox, and of the egress proxy | All M0 probes answered and recorded; the hostile-tree suite passes; a cold build of the factory repository and one real agent turn succeed on the server under bubblewrap with only the proxy reachable |
+| **M0 Foundations** | Workspace, the check command and the development VM (DEV-1, DEV-3), CI and the first tagged release build (BOOT-3); the Linux server provisioned; `factory-core` types, the `Ecosystem` interface with its `rust` implementation, and the engine skeleton with property tests; `factory-proc` with the supervisor shim; git wrapper; GitHub App creation; `sf doctor`; the probe suite (23.2); prototypes of capture, ingest and export against the hostile-tree suite (WS-9), of the bubblewrap sandbox, and of the egress proxy | All M0 probes answered and recorded; the hostile-tree suite passes; a cold build of the factory repository and one real agent turn succeed on the server under bubblewrap with only the proxy reachable |
 | **M1a Skeleton** | Store with `runs` and `events`; claim; implement at sandbox level `process` with the egress proxy (fake agent, then the Claude driver in `subscription` mode); per-session limits; capture; integrity with path, structural and secret rules, including the literal-token scan; verify on the export; publish a draft pull request; then exit. `sf run` on the same issue resumes from the journal. | One real issue reaches a draft pull request and survives an interrupted run |
 | **M1b Attended run** | Status comment and marker; factory check runs; CI wait; ready and evidence manifest; observation of human review and merge (strategy `human`) | Five real issues on the factory repository merged by the operator from factory pull requests, using a tagged, installed build |
 | **M2 Daemon** | The microVM backend, with the daemon dispatching only at `hardened`; systemd unit; poll and reconcile loop; outbox, activities and recovery; scheduler and limits for two repositories onboarded by hand; SEC-1 for all human inputs; outbound encoder; workflow audit; lock-down contract test and plan-limit pause; escalation and resume; plan stage and gate; reviewer stage; in-place rounds; base update; reset; `factory_serial` merge; follow-up issue filing; dashboard issue; control API; kill switches; `sf rebuild`; `sf self-update` with rollback; smoke eval | 48 hours unattended on a second repository with no manual repair; the process-crash test passes at every stage boundary; sandbox escape tests pass at `hardened`; a planted copy of the subscription token is caught before publish; self-hosting on a pinned release begins |
@@ -1430,6 +1435,7 @@ Decided by the operator on 2026-11-18:
 | D-11 | The goal is lights-out operation, earned per class of work (13.6). The operator approves every issue, including each sub-issue of a feature. |
 | D-12 | The factory stops at merge. Releases and deployments stay human actions. |
 | D-13 | The factory works only on issues the operator wrote (SEC-2). |
+| D-16 | M0 and M1 are built by Claude Code sessions on the operator's Mac, one pull request per issue, each merged by the operator (BOOT-1). The server is reached only from the operator's home, so every step on it is the operator's; Linux-only code is developed in a local VM (DEV-3). Every check runs before each commit through one command (DEV-1). |
 
 Still open:
 

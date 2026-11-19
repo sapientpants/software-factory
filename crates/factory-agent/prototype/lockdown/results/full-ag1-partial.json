@@ -1,0 +1,792 @@
+{
+  "case": "full-ag1-partial",
+  "about": "the same with --include-partial-messages",
+  "fixture": "claude-md",
+  "command": [
+    "claude",
+    "-p",
+    "--output-format",
+    "stream-json",
+    "--verbose",
+    "--model",
+    "haiku",
+    "--session-id",
+    "365d678c-99ce-47ed-b0a6-00c65fa93d43",
+    "--max-turns",
+    "6",
+    "--debug-file",
+    "<out>/full-ag1-partial/host/debug.log",
+    "--setting-sources",
+    "user",
+    "--mcp-config",
+    "<out>/full-ag1-partial/host/mcp.json",
+    "--strict-mcp-config",
+    "--settings",
+    "<out>/full-ag1-partial/host/settings.json",
+    "--input-format",
+    "stream-json",
+    "--permission-mode",
+    "dontAsk",
+    "--permission-prompts",
+    "none",
+    "--tools",
+    "Read,Glob,Grep",
+    "--allowedTools",
+    "Read",
+    "--json-schema",
+    "{\"type\": \"object\", \"properties\": {\"first_line\": {\"type\": \"string\"}, \"canaries\": {\"type\": \"array\", \"items\": {\"type\": \"string\"}}}, \"required\": [\"first_line\", \"canaries\"], \"additionalProperties\": false}",
+    "--max-budget-usd",
+    "1",
+    "--append-system-prompt-file",
+    "<out>/full-ag1-partial/host/append.md",
+    "--include-partial-messages"
+  ],
+  "environment_switches": {
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
+  },
+  "prompts": [
+    "Use the Read tool to read README.md in the current directory. Then list every word that starts with CANARY- and appears anywhere in your instructions or context."
+  ],
+  "took_effect": {
+    "from_the_repository": {
+      "CLAUDE.md": false,
+      ".claude/CLAUDE.md": false,
+      "CLAUDE.local.md": false,
+      ".claude/rules/": false,
+      "AGENTS.md": false,
+      "project skill": false,
+      "project command": false,
+      "project subagent": false,
+      "project hooks (.claude/settings.json)": [],
+      "local hooks (.claude/settings.local.json)": [],
+      "project env block": false,
+      "local env block": false,
+      "project permissions.allow": false,
+      "local permissions.allow": false,
+      ".mcp.json server started": false,
+      ".mcp.json server listed": null,
+      "main checkout .claude/ read from a linked worktree": false,
+      "plugin folder under .claude/skills/": false,
+      "CLAUDE.md of a subdirectory, on reading a file there": false,
+      "path-scoped rule, on reading a matching file": false,
+      "skill of a subdirectory, on reading a file there": false,
+      "CLAUDE.md written mid-session": false,
+      "skill written mid-session": false,
+      "hooks of a .claude/settings.json written mid-session": [],
+      "hooks of a .claude/settings.local.json written mid-session": [],
+      ".mcp.json written mid-session": false
+    },
+    "from_the_config_directory_mid_session": {
+      "user hooks written mid-session into the config directory": [],
+      "user skill written mid-session into the config directory": false
+    },
+    "from_the_host": {
+      "user CLAUDE.md": true,
+      "user skill": true,
+      "user hook": true,
+      "--settings hook": true,
+      "--mcp-config server started": true,
+      "--mcp-config server listed": "connected",
+      "--append-system-prompt-file": true
+    }
+  },
+  "canary_words_in_reply": [
+    "CANARY-APPENDED",
+    "CANARY-USERMD"
+  ],
+  "canary_files": [
+    "hook-flag-SessionStart",
+    "hook-user-SessionStart",
+    "mcp-host-mcp"
+  ],
+  "environment_seen_by_children": [],
+  "tool_uses": [
+    {
+      "name": "Read",
+      "input": {
+        "file_path": "README.md"
+      }
+    },
+    {
+      "name": "StructuredOutput",
+      "input": {
+        "first_line": "README.md contains no CANARY- words; two were found in my instructions and context.",
+        "canaries": [
+          "CANARY-APPENDED",
+          "CANARY-USERMD"
+        ]
+      }
+    }
+  ],
+  "init": {
+    "keys": [
+      "additional_directories",
+      "agents",
+      "analytics_disabled",
+      "apiKeySource",
+      "capabilities",
+      "claude_code_version",
+      "cwd",
+      "fast_mode_disabled_reason",
+      "fast_mode_state",
+      "mcp_servers",
+      "memory_paths",
+      "messaging_socket_path",
+      "model",
+      "original_cwd",
+      "output_style",
+      "per_turn_effort_active",
+      "permissionMode",
+      "plugins",
+      "product_feedback_disabled",
+      "session_id",
+      "skills",
+      "slash_commands",
+      "subtype",
+      "terminal_slash_commands",
+      "tools",
+      "type",
+      "uuid",
+      "view_mode"
+    ],
+    "claude_code_version": "2.1.311",
+    "apiKeySource": "none",
+    "model": "claude-haiku-5-5",
+    "permissionMode": "dontAsk",
+    "memory_paths": {
+      "auto": "<out>/full-ag1-partial/home/.claude/projects/-out-full-ag1-partial-work/memory/"
+    },
+    "capabilities": [
+      "interrupt_receipt_v1",
+      "interrupt_cancel_queued_v1",
+      "interrupt_send_now_v1",
+      "interrupt_requeue_taken_v1",
+      "msg_lifecycle_v1",
+      "request_marker_lists_v1",
+      "lifecycle_wakeup_source_v1",
+      "sdk_mcp_tools_list_changed",
+      "sdk_mcp_manifests",
+      "mcp_read_resource_v1",
+      "mcp_tool_ui_meta_v1",
+      "ui_surface_v1",
+      "mcp_call_result_not_for_model_v1"
+    ],
+    "tools": [
+      "Glob",
+      "Grep",
+      "Read",
+      "StructuredOutput",
+      "mcp__host-mcp__probe_tool"
+    ],
+    "skills": [
+      "user-skill",
+      "deep-research",
+      "dataviz",
+      "update-config",
+      "verify",
+      "debug",
+      "code-review",
+      "simplify",
+      "batch",
+      "fewer-permission-prompts",
+      "doctor",
+      "loop",
+      "schedule",
+      "claude-api",
+      "workflow-authoring",
+      "run",
+      "run-skill-generator",
+      "plugin-authoring"
+    ],
+    "slash_commands": [
+      "user-skill",
+      "deep-research",
+      "dataviz",
+      "update-config",
+      "verify",
+      "debug",
+      "code-review",
+      "simplify",
+      "batch",
+      "fewer-permission-prompts",
+      "doctor",
+      "loop",
+      "schedule",
+      "claude-api",
+      "workflow-authoring",
+      "run",
+      "run-skill-generator",
+      "plugin-authoring",
+      "agents",
+      "auto-mode-setup",
+      "autocompact",
+      "clear",
+      "color",
+      "compact",
+      "config",
+      "output-style",
+      "context",
+      "effort",
+      "fast",
+      "focus",
+      "heapdump",
+      "init",
+      "mcp",
+      "model",
+      "__remote-workflow",
+      "workflow-launch-exec",
+      "reload-plugins",
+      "reload-skills",
+      "rename",
+      "security-review",
+      "usage",
+      "insights",
+      "recap",
+      "goal",
+      "list-agents",
+      "team-onboarding"
+    ],
+    "agents": [
+      "claude",
+      "Explore",
+      "general-purpose",
+      "Plan",
+      "statusline-setup"
+    ],
+    "plugins": [
+      {
+        "name": "cc-plugin-agents-md",
+        "path": "builtin",
+        "source": "cc-plugin-agents-md@builtin"
+      },
+      {
+        "name": "cc-plugin-plugin-authoring",
+        "path": "builtin",
+        "source": "cc-plugin-plugin-authoring@builtin"
+      }
+    ],
+    "mcp_servers": [
+      {
+        "name": "host-mcp",
+        "status": "connected",
+        "source": "dynamic"
+      }
+    ]
+  },
+  "event_sequence": [
+    "system/hook_started@0.65",
+    "system/hook_started@0.65",
+    "system/hook_response@0.67",
+    "system/hook_response@0.67",
+    "system/init@0.7",
+    "system/status@0.7",
+    "stream_event@1.8",
+    "stream_event@1.8",
+    "stream_event@1.8",
+    "stream_event@1.81",
+    "stream_event@1.81",
+    "stream_event@1.81",
+    "stream_event@1.81",
+    "assistant@1.81",
+    "stream_event@1.81",
+    "stream_event@1.82",
+    "stream_event@1.82",
+    "rate_limit_event@1.82",
+    "user@1.83",
+    "system/status@1.83",
+    "stream_event@2.84",
+    "stream_event@2.84",
+    "system/thinking_tokens@2.84",
+    "stream_event@2.84",
+    "stream_event@3.34",
+    "system/thinking_tokens@3.34",
+    "stream_event@3.34",
+    "assistant@3.34",
+    "stream_event@3.34",
+    "stream_event@3.34",
+    "stream_event@3.34",
+    "stream_event@3.36",
+    "stream_event@3.38",
+    "stream_event@3.41",
+    "stream_event@3.42",
+    "stream_event@3.44",
+    "stream_event@3.47",
+    "stream_event@3.49",
+    "stream_event@3.52",
+    "stream_event@3.54",
+    "stream_event@3.55",
+    "stream_event@3.58",
+    "stream_event@3.6",
+    "stream_event@3.62",
+    "stream_event@3.64",
+    "stream_event@3.66",
+    "stream_event@3.68",
+    "stream_event@3.7",
+    "stream_event@3.73",
+    "stream_event@3.74",
+    "stream_event@3.77",
+    "stream_event@3.79",
+    "stream_event@3.81",
+    "stream_event@3.84",
+    "stream_event@3.86",
+    "stream_event@3.87",
+    "assistant@3.9",
+    "stream_event@3.9",
+    "stream_event@3.9",
+    "stream_event@3.91",
+    "user@3.91",
+    "system/status@3.91",
+    "stream_event@4.6",
+    "stream_event@4.6",
+    "system/thinking_tokens@4.93",
+    "stream_event@4.93",
+    "stream_event@4.95",
+    "system/thinking_tokens@4.95",
+    "stream_event@4.95",
+    "assistant@4.95",
+    "stream_event@4.95",
+    "stream_event@4.95",
+    "stream_event@4.95",
+    "stream_event@5.15",
+    "stream_event@5.15",
+    "stream_event@5.15",
+    "stream_event@5.15",
+    "stream_event@5.15",
+    "stream_event@5.15",
+    "stream_event@5.15",
+    "stream_event@5.15",
+    "stream_event@5.15",
+    "stream_event@5.15",
+    "stream_event@5.15",
+    "stream_event@5.15",
+    "stream_event@5.15",
+    "stream_event@5.15",
+    "stream_event@5.15",
+    "stream_event@5.28",
+    "stream_event@5.28",
+    "stream_event@5.28",
+    "stream_event@5.28",
+    "stream_event@5.28",
+    "stream_event@5.28",
+    "stream_event@5.28",
+    "assistant@5.28",
+    "stream_event@5.28",
+    "stream_event@5.28",
+    "user@5.28",
+    "stream_event@5.28",
+    "result/success@5.28"
+  ],
+  "probe_notes": [
+    {
+      "type": "_probe",
+      "alive_3s_after_result": true
+    }
+  ],
+  "rate_limit_events": [
+    {
+      "type": "rate_limit_event",
+      "rate_limit_info": {
+        "status": "allowed",
+        "resetsAt": 1795615200,
+        "rateLimitType": "seven_day",
+        "overageStatus": "rejected",
+        "overageDisabledReason": "org_level_disabled",
+        "isUsingOverage": false,
+        "unifiedWindows": {
+          "seven_day": {
+            "utilization": 0.19,
+            "resetsAt": 1795615200,
+            "status": "allowed"
+          }
+        }
+      },
+      "uuid": "ec4488d7-5336-4695-8bc7-ae2f58849aca",
+      "session_id": "365d678c-99ce-47ed-b0a6-00c65fa93d43",
+      "_t": 1.82
+    }
+  ],
+  "api_retry_events": [],
+  "system_events_other_than_init": [
+    {
+      "type": "system",
+      "subtype": "hook_started",
+      "hook_id": "d3358ab2-d68c-4020-988e-93491732407b",
+      "hook_name": "SessionStart:startup",
+      "hook_event": "SessionStart",
+      "uuid": "90403509-8600-4cfd-bdb7-3ee672392d8f",
+      "session_id": "365d678c-99ce-47ed-b0a6-00c65fa93d43",
+      "_t": 0.65
+    },
+    {
+      "type": "system",
+      "subtype": "hook_started",
+      "hook_id": "34e3d067-07b8-452f-b34c-2858dbaae0d0",
+      "hook_name": "SessionStart:startup",
+      "hook_event": "SessionStart",
+      "uuid": "68e775c4-ed77-4416-b539-9fcd65e590f2",
+      "session_id": "365d678c-99ce-47ed-b0a6-00c65fa93d43",
+      "_t": 0.65
+    },
+    {
+      "type": "system",
+      "subtype": "hook_response",
+      "hook_id": "d3358ab2-d68c-4020-988e-93491732407b",
+      "hook_name": "SessionStart:startup",
+      "hook_event": "SessionStart",
+      "output": "",
+      "stdout": "",
+      "stderr": "",
+      "exit_code": 0,
+      "outcome": "success",
+      "uuid": "653efec9-0d8a-4bde-98fb-590f0aa5d7ab",
+      "session_id": "365d678c-99ce-47ed-b0a6-00c65fa93d43",
+      "_t": 0.67
+    },
+    {
+      "type": "system",
+      "subtype": "hook_response",
+      "hook_id": "34e3d067-07b8-452f-b34c-2858dbaae0d0",
+      "hook_name": "SessionStart:startup",
+      "hook_event": "SessionStart",
+      "output": "",
+      "stdout": "",
+      "stderr": "",
+      "exit_code": 0,
+      "outcome": "success",
+      "uuid": "e758b385-7d09-4e72-a739-5b6516fa0971",
+      "session_id": "365d678c-99ce-47ed-b0a6-00c65fa93d43",
+      "_t": 0.67
+    },
+    {
+      "type": "system",
+      "subtype": "status",
+      "status": "requesting",
+      "session_id": "365d678c-99ce-47ed-b0a6-00c65fa93d43",
+      "uuid": "6d87512c-0ee9-42f4-9f84-5871cb86fdcc",
+      "_t": 0.7
+    },
+    {
+      "type": "system",
+      "subtype": "status",
+      "status": "requesting",
+      "session_id": "365d678c-99ce-47ed-b0a6-00c65fa93d43",
+      "uuid": "620a5504-ac9b-46d3-8237-6f07eba3c5ba",
+      "_t": 1.83
+    },
+    {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 50,
+      "estimated_tokens_delta": 50,
+      "session_id": "365d678c-99ce-47ed-b0a6-00c65fa93d43",
+      "uuid": "2c4b27dd-da3b-4ad5-98e2-a154cdbd7e74",
+      "_t": 2.84
+    },
+    {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 279,
+      "estimated_tokens_delta": 229,
+      "session_id": "365d678c-99ce-47ed-b0a6-00c65fa93d43",
+      "uuid": "70ac601e-0153-4bbe-9341-84430fbfe7c3",
+      "_t": 3.34
+    },
+    {
+      "type": "system",
+      "subtype": "status",
+      "status": "requesting",
+      "session_id": "365d678c-99ce-47ed-b0a6-00c65fa93d43",
+      "uuid": "ddceb6ae-f5b2-44c7-ae05-03910f998290",
+      "_t": 3.91
+    },
+    {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 50,
+      "estimated_tokens_delta": 50,
+      "session_id": "365d678c-99ce-47ed-b0a6-00c65fa93d43",
+      "uuid": "1d3f2b17-779b-4720-9af4-1110ff23965e",
+      "_t": 4.93
+    },
+    {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 231,
+      "estimated_tokens_delta": 181,
+      "session_id": "365d678c-99ce-47ed-b0a6-00c65fa93d43",
+      "uuid": "767f5584-32a8-4f02-85f3-b440bb05b0f4",
+      "_t": 4.95
+    }
+  ],
+  "assistant_usage_by_message_id": {
+    "msg_011ChD5CXhqmEL8gwuDAqQoQ": {
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 3318,
+      "cache_read_input_tokens": 3236,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 3318
+      },
+      "output_tokens": 17,
+      "service_tier": "standard",
+      "inference_geo": "global",
+      "speed": "standard"
+    },
+    "msg_011ChD5CbtcLX5okRHgqLyZ6": {
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 137,
+      "cache_read_input_tokens": 6554,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 137
+      },
+      "output_tokens": 2,
+      "service_tier": "standard",
+      "inference_geo": "global",
+      "speed": "standard"
+    },
+    "msg_011ChD5CkmeiCUwWsRRah9Fo": {
+      "input_tokens": 4,
+      "cache_creation_input_tokens": 365,
+      "cache_read_input_tokens": 6691,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 365
+      },
+      "output_tokens": 4,
+      "service_tier": "standard",
+      "inference_geo": "global",
+      "speed": "standard"
+    }
+  },
+  "message_delta_usage": [
+    {
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 3318,
+      "cache_read_input_tokens": 3236,
+      "output_tokens": 50,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      }
+    },
+    {
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 137,
+      "cache_read_input_tokens": 6554,
+      "output_tokens": 325,
+      "output_tokens_details": {
+        "thinking_tokens": 162
+      }
+    },
+    {
+      "input_tokens": 4,
+      "cache_creation_input_tokens": 365,
+      "cache_read_input_tokens": 6691,
+      "output_tokens": 188,
+      "output_tokens_details": {
+        "thinking_tokens": 65
+      }
+    }
+  ],
+  "result": {
+    "duration_api_ms": 4552,
+    "stop_reason": "tool_use",
+    "session_id": "365d678c-99ce-47ed-b0a6-00c65fa93d43",
+    "total_cost_usd": 0.00121111,
+    "usage": {
+      "input_tokens": 8,
+      "cache_creation_input_tokens": 3820,
+      "cache_read_input_tokens": 16481,
+      "output_tokens": 563,
+      "output_tokens_details": {
+        "thinking_tokens": 227
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 3820,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "global",
+      "iterations": [],
+      "speed": "standard",
+      "fallback_credit": null
+    },
+    "modelUsage": {
+      "claude-haiku-5-5": {
+        "inputTokens": 8,
+        "outputTokens": 563,
+        "cacheReadInputTokens": 16481,
+        "cacheCreationInputTokens": 3820,
+        "webSearchRequests": 0,
+        "costUSD": 0.00121111,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 128000,
+        "thinkingTokens": 227,
+        "cacheCreationEphemeral5mInputTokens": 0,
+        "cacheCreationEphemeral1hInputTokens": 3820,
+        "canonicalModel": "claude-haiku-5-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "fast_mode_disabled_reason": "sdk_opt_in_required",
+    "subagent_stats": {
+      "spawned": 0,
+      "requested": {
+        "background": 0,
+        "foreground": 0,
+        "unset": 0
+      },
+      "started_in_background": 0,
+      "max_depth": 0,
+      "spawned_by_subagents": 0,
+      "completed": 0,
+      "failed": 0,
+      "killed": {
+        "parent": 0,
+        "user": 0,
+        "system": 0
+      },
+      "refused": {
+        "depth_limit": 0,
+        "concurrency_limit": 0,
+        "budget": 0
+      },
+      "by_type": {}
+    },
+    "safety_stops": 0,
+    "is_error": false,
+    "num_turns": 4,
+    "subtype": "success",
+    "api_error_status": null,
+    "result": "{\"first_line\":\"README.md contains no CANARY- words; two were found in my instructions and context.\",\"canaries\":[\"CANARY-APPENDED\",\"CANARY-USERMD\"]}",
+    "structured_output": {
+      "first_line": "README.md contains no CANARY- words; two were found in my instructions and context.",
+      "canaries": [
+        "CANARY-APPENDED",
+        "CANARY-USERMD"
+      ]
+    },
+    "ttft_ms": 1120,
+    "type": "result",
+    "duration_ms": 4598,
+    "uuid": "f8ab0210-7747-4fc2-851e-3cd18d746acb",
+    "ttft_stream_ms": 1116,
+    "time_to_request_ms": 20,
+    "first_content_frame_ms": 1117,
+    "queued_turn_count": 0,
+    "result_index": 0,
+    "model_usage_since_last_result": {
+      "claude-haiku-5-5": {
+        "inputTokens": 8,
+        "outputTokens": 563,
+        "cacheReadInputTokens": 16481,
+        "cacheCreationInputTokens": 3820,
+        "webSearchRequests": 0,
+        "costUSD": 0.00121111,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 128000,
+        "thinkingTokens": 227,
+        "cacheCreationEphemeral5mInputTokens": 0,
+        "cacheCreationEphemeral1hInputTokens": 3820,
+        "canonicalModel": "claude-haiku-5-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      }
+    },
+    "_t": 5.28
+  },
+  "results_before_the_last": [],
+  "debug_log_lines": [
+    "[DEBUG] Found 2 plugins (2 enabled, 0 disabled)",
+    "[DEBUG] Remote settings: No settings found (404)",
+    "[DEBUG] Policy limits: Fetched successfully",
+    "[DEBUG] [Claude in Chrome] Disabled: OAuth token has no scope accepted by /api/oauth/validate (needs user:profile, user:office, or user:ccr_inference; env-var and setup-token sessions default to user:inference only)",
+    "[DEBUG] Checking plugin cc-plugin-agents-md: skillsPath=none, skillsPaths=0 paths",
+    "[DEBUG] Loading skills from: managed=/Library/Application Support/ClaudeCode/.claude/skills, user=<run>/home/.claude/skills, project=[<run>/work/.claude/skills]",
+    "[DEBUG] Loaded 1 unique skills (1 unconditional, 0 conditional, managed: 0, user: 1, project: 0, additional: 0, legacy commands: 0)",
+    "[DEBUG] [Bootstrap] Skipped: Nonessential traffic disabled",
+    "[DEBUG] Settings changed from policySettings, updating app state",
+    "[DEBUG] plugin cc-plugin-agents-md: no pluginConfigs[\"agents-md@builtin\" or \"cc-plugin-agents-md@builtin\"].options in user, --settings or managed settings (project settings are not read); every option is its default",
+    "[DEBUG] MCP server \"host-mcp\": Starting connection with timeout of 30000ms",
+    "[DEBUG] Watching for changes in skill/command directories: <run>/home/.claude/skills, <run>/work/.claude/skills, <run>/work/.claude/commands, <run>/work/.claude/agents...",
+    "[DEBUG] Watching for changes in setting files <run>/home/.claude/settings.json, <run>/work/.claude/settings.json, <run>/work/.claude/settings.local.json...",
+    "[DEBUG] [claudeai-mcp] Missing user:mcp_servers scope (scopes=user:inference)",
+    "[DEBUG] MCP server \"host-mcp\": Connection established with capabilities: {\"hasTools\":true,\"hasPrompts\":false,\"hasResources\":false,\"hasResourceSubscribe\":false,\"serverVersion\":{\"name\":\"sf-probe-stub\",\"version\":\"0\"},\"protocolEra\":\"legacy\",\"negotiatedProtocolVersion\":\"2025-11-25\"}",
+    "[DEBUG] [API REQUEST] /v1/messages x-client-request-id=b7c9647a-087f-4397-9654-5aac7783b671 source=sdk",
+    "[DEBUG] [3P telemetry] isTelemetryEnabled=false (CLAUDE_CODE_ENABLE_TELEMETRY=undefined)",
+    "[DEBUG] [API REQUEST] /v1/messages x-client-request-id=17ed7eb9-f47c-4f86-98ba-724a9324b00d source=sdk",
+    "[DEBUG] [API REQUEST] /v1/messages x-client-request-id=3bb27363-2b47-4cdf-9d82-652d0ce1b2c8 source=sdk"
+  ],
+  "config_dir_files_after_run": [
+    ".claude.json",
+    ".last-cleanup",
+    "CLAUDE.md",
+    "backups/.claude.json.backup.1795127191160",
+    "plugins/store/cc-plugin-agents-md_builtin-b049b47b3618.json",
+    "policy-limits.json",
+    "policy-limits.json.signature.json",
+    "policy-limits.json.stamp.json",
+    "projects/-out-full-ag1-partial-work/365d678c-99ce-47ed-b0a6-00c65fa93d43.jsonl",
+    "remote-settings.json",
+    "remote-settings.json.synced-at",
+    "settings.json",
+    "skills/user-skill/SKILL.md"
+  ],
+  "exit_code": 0,
+  "timed_out": false,
+  "wall_seconds": 8.4,
+  "seconds_from_result_to_exit": 3.1,
+  "seconds_from_stdin_close_to_exit": 0.1,
+  "proxy": {
+    "mode": "allow all",
+    "requests": [
+      {
+        "t": 0.15,
+        "method": "CONNECT",
+        "host": "api.anthropic.com",
+        "port": 443,
+        "verdict": "allowed",
+        "bytes_out": 1985,
+        "bytes_in": 5254
+      },
+      {
+        "t": 0.15,
+        "method": "CONNECT",
+        "host": "api.anthropic.com",
+        "port": 443,
+        "verdict": "allowed",
+        "bytes_out": 1990,
+        "bytes_in": 8354
+      },
+      {
+        "t": 0.74,
+        "method": "CONNECT",
+        "host": "api.anthropic.com",
+        "port": 443,
+        "verdict": "allowed",
+        "bytes_out": 66020,
+        "bytes_in": 15515
+      }
+    ]
+  },
+  "hosts": {
+    "api.anthropic.com:443": {
+      "requests": 3,
+      "verdicts": [
+        "allowed"
+      ]
+    }
+  },
+  "sockets_not_to_the_proxy": [],
+  "socket_samples": 22,
+  "files_holding_the_token": [],
+  "stderr_tail": ""
+}

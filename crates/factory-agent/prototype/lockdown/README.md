@@ -40,10 +40,17 @@ Each session is one or two short turns on the `haiku` alias. The whole matrix
 reported about 0.04 API-equivalent dollars per pass (the sum of `total_cost_usd`).
 
 `results/` holds the pass the probe record was written from: one summary per
-case, `overview.md`, and the raw stream-JSON of nine cases
+case, `overview.md`, and the raw stream-JSON of ten cases
 (`*.events.jsonl`). The scratch directory appears in them as `<out>`. The
 harness adds `--debug-file` to every command line; the selected debug-log
 lines in each summary come from it.
+
+Reading a summary: under `took_effect`, an instruction file is `false` both
+when it was not in context and when the prompt of the case did not ask for
+canary words (the `perm-*`, `cap-*` and `partial-messages` cases, and
+`net-deny-all`, which got no answer). Only the cases that ask say anything
+about instruction files. A raw stream is copied to `results/` only if the
+token was found in no file of its session.
 
 Limits: one CLI version (2.1.311), on macOS, without the factory's sandbox.
 The proxy sees host names, not request paths. No session was driven into a

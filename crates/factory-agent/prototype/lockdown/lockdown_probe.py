@@ -235,6 +235,27 @@ CASES = [
             ],
         },
     ),
+    case(
+        "full-ag1-partial",
+        "the same with --include-partial-messages",
+        prompt="structured",
+        max_turns=6,
+        stream_input=True,
+        **{
+            **AG3A,
+            "flags": [
+                "--input-format", "stream-json",
+                "--permission-mode", "dontAsk",
+                "--permission-prompts", "none",
+                "--tools", "Read,Glob,Grep",
+                "--allowedTools", "Read",
+                "--json-schema", json.dumps(RESULT_SCHEMA),
+                "--max-budget-usd", "1",
+                "--append-system-prompt-file", "@APPEND@",
+                "--include-partial-messages",
+            ],
+        },
+    ),
 ]
 
 
@@ -506,9 +527,10 @@ def process_tree(root: int) -> list[int]:
 class ConnectionWatcher(threading.Thread):
     """Samples the sockets of the CLI's process tree for traffic past the proxy.
 
-    A sample every 0.3 s can miss a short connection, and a lookup made through
-    the system resolver is not a socket of these processes. It is a check on
-    the proxy log, not a packet capture.
+    A sample every 0.3 s can miss a short connection, a child that detached
+    from the tree is not followed, and a lookup made through the system
+    resolver is not a socket of these processes. It is a check on the proxy
+    log, not a packet capture.
     """
 
     def __init__(self, root: int, proxy_port: int):
@@ -924,7 +946,7 @@ def main() -> int:
             print("   the token is in the summary; nothing written", flush=True)
             return 1
         (args.results / f"{spec['name']}.json").write_text(text + "\n", encoding="utf-8")
-        if spec["name"] in args.keep_events:
+        if spec["name"] in args.keep_events and not summary["files_holding_the_token"]:
             raw = (args.out / spec["name"] / "events.jsonl").read_text("utf-8")
             (args.results / f"{spec['name']}.events.jsonl").write_text(scrub(raw, args.out), encoding="utf-8")
         took = summary["took_effect"]

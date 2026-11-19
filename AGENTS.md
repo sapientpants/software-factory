@@ -8,7 +8,7 @@ Start of milestone M0. The repository holds a spec, its evidence and a Cargo wor
 
 - `SPEC.md` is the single source of truth for the design. Its status row says which draft it is and whether that draft was reviewed.
 - `docs/research/NN-*.md` are the sourced evidence behind the spec. They are records: add new ones, leave existing ones as written.
-- Checks, each of which must pass before a change is done: `cargo fmt --all --check`; `cargo clippy --workspace --all-targets --locked -- -D warnings`; `cargo test --workspace --locked`. The rest of the SPEC 19.5 set (DEV-2), the `cargo xtask check` command that runs it (DEV-1), the development VM (DEV-3) and the CI workflow are still M0 work; add each here when it exists.
+- Checks, each of which must pass before a change is done: `cargo fmt --all --check`; `cargo clippy --workspace --all-targets --locked -- -D warnings`; `cargo test --workspace --locked`. The rest of the SPEC 19.5 set (DEV-2), the `cargo xtask check` command that runs it (DEV-1), the development VM (DEV-3) and the CI workflow (DEV-5) are still M0 work; add each here when it exists.
 - `xtask/tests/structure.rs` holds the crate table of SPEC 19.1 as data. Adding a crate or a dependency between crates means changing the spec's table and that test together.
 
 ## The system in one paragraph

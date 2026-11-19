@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | Status | Draft 4. Drafts 1 and 2 were reviewed (`docs/research/09-spec-review.md`, `10-spec-recheck.md`) and draft 3 addressed the findings. Draft 4 applies the operator's requirement decisions (23.1) and has not been reviewed. |
-| Date | 2026-11-18 |
+| Date | 2026-11-19 |
 | Implementation language | Rust (toolchain 1.100, edition 2024) |
 | System of record | git on GitHub for code, GitHub Issues for work items |
 | Research basis | `docs/research/01`–`08` (sourced reports and a fact-check table) |
@@ -344,6 +344,8 @@ Task issues are created from an issue form (`.github/ISSUE_TEMPLATE/factory-task
 - Spec files are protected paths (11.3): changing them outside a spec-delta issue trips a flag.
 
 The format is implemented natively. The factory does not shell out to spec-kit, OpenSpec or Kiro.
+
+The factory's own repository does not use this layout yet (D-18, D-19).
 
 ### 6.4 Readiness lint
 
@@ -1386,7 +1388,7 @@ Required checks apply to every pull request, and the factory checks exist only o
 - **BOOT-1.** Humans (with interactive agent assistance) build M0 and M1 (D-16). Claude Code sessions on the operator's Mac write the code, one issue, branch and pull request at a time, and the operator reviews and merges every pull request. That work is tracked as issues on the factory repository, grouped under one GitHub milestone per roadmap milestone; the operator never makes them `state:ready`, so the factory never claims them. From M1 the factory is run attended on its own repository from an installed, tagged build; from M2 unattended.
 - **BOOT-2.** The binary that operates on the factory repository is always an installed, pinned release, never a build of the tree it is changing. A development build runs only against the scratch repository (`sapientpants/sf-scratch`), never against the factory repository. The factory version is recorded in every marker.
 - **BOOT-3.** From M2, upgrading the operating binary is a human action (`sf self-update`), allowed only after the eval gate passes on the candidate: the smoke eval until M3, the eval suite afterwards. The first tag, `v0.1.0`, is cut when the rest of M0 passes in CI and in the development VM; the operator installs it on the server to run M0's exit check (22). During M1 the operator installs a newer tagged build by hand; the gate is the harness tests of 19.4 passing on the tagged commit. Previous binaries and store backups are kept for rollback (18.1).
-- **BOOT-4.** The factory's own gate code, prompts, policy and this specification are protected paths in its repository and are never auto-merged.
+- **BOOT-4.** The factory's own gate code, prompts, policy and this specification are protected paths in its repository and are never auto-merged. The built-in list of 11.3 covers neither `SPEC.md` nor the research records behind it, so the factory repository's policy MUST list `SPEC.md` and `docs/research/**` in `[paths] protected_extra` (16.2).
 - **BOOT-5.** From M2 the factory also runs on a second, unrelated repository, so defects that self-hosting would hide become visible.
 
 ### 21.2 Evaluation
@@ -1423,7 +1425,7 @@ Not scheduled: API-key credential modes and the model gateway; a second agent dr
 
 ### 23.1 Decisions
 
-Decided by the operator on 2026-11-18:
+Decided by the operator on 2026-11-18 (D-18 on 2026-11-19):
 
 | # | Decision |
 |---|---|
@@ -1437,6 +1439,7 @@ Decided by the operator on 2026-11-18:
 | D-13 | The factory works only on issues the operator wrote (SEC-2). |
 | D-16 | M0 and M1 are built by Claude Code sessions on the operator's Mac, one pull request per issue, each merged by the operator (BOOT-1). The server is reached only from the operator's home, so every step on it is the operator's; Linux-only code is developed in a local VM (DEV-3). Every check runs before each commit through one command (DEV-1). |
 | D-17 | The factory's repository, code and documents alike, is licensed `MIT OR Apache-2.0`, copyright Marc Tremblay. Every crate inherits the licence from the workspace, and the structural test (19.1) checks it. Source files carry no per-file licence header. |
+| D-18 | `SPEC.md` stays one file through M0 and M1 and keeps its ids (`INV-`, `GH-`, `SEC-` and so on); it is not split into the living-spec layout of 6.3. Issues in that period cite those ids, with `SPEC.md` as the spec file path. The spec is protected through the repository's policy (BOOT-4). |
 
 Still open:
 
@@ -1449,6 +1452,7 @@ Still open:
 | D-9 | `merge.update_when_behind`: `on_conflict` keeps the approval on the reviewed commit but can let a semantic conflict reach the default branch; `always` re-validates every time at the cost of re-approval. | `on_conflict` |
 | D-14 | The class ladder, promotion thresholds and audit sampling rate of 13.6, and the limit values of section 14. | The listed defaults |
 | D-15 | A dispatch schedule that leaves plan capacity for the operator's own interactive use. | None: the factory may run at any hour |
+| D-19 | The layout of the factory's own specification from M2: one file, or the living-spec layout of 6.3 with either the existing id prefixes or ids renamed to `R-<CAP>-<NNN>`. | As D-18, until decided when M3, which builds spec deltas, is scoped |
 
 ### 23.2 Probes
 

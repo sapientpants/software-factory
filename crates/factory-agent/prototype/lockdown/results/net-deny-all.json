@@ -1,0 +1,772 @@
+{
+  "case": "net-deny-all",
+  "about": "AG-3a, the proxy denies every host",
+  "fixture": "claude-md",
+  "command": [
+    "claude",
+    "-p",
+    "--output-format",
+    "stream-json",
+    "--verbose",
+    "--model",
+    "haiku",
+    "--session-id",
+    "a47276bd-7f5d-4985-bf93-d29bf7c35c94",
+    "--max-turns",
+    "3",
+    "--debug-file",
+    "<out>/net-deny-all/host/debug.log",
+    "--setting-sources",
+    "user",
+    "--mcp-config",
+    "<out>/net-deny-all/host/mcp.json",
+    "--strict-mcp-config",
+    "--settings",
+    "<out>/net-deny-all/host/settings.json",
+    "<prompt>"
+  ],
+  "environment_switches": {
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
+  },
+  "prompts": [
+    "List every word that starts with CANARY- and appears anywhere in your instructions or context. Reply with those words separated by spaces and nothing else. If there are none, reply NONE. Do not use any tools."
+  ],
+  "took_effect": {
+    "from_the_repository": {
+      "CLAUDE.md": false,
+      ".claude/CLAUDE.md": false,
+      "CLAUDE.local.md": false,
+      ".claude/rules/": false,
+      "AGENTS.md": false,
+      "project skill": false,
+      "project command": false,
+      "project subagent": false,
+      "project hooks (.claude/settings.json)": [],
+      "local hooks (.claude/settings.local.json)": [],
+      "project env block": false,
+      "local env block": false,
+      "project permissions.allow": false,
+      "local permissions.allow": false,
+      ".mcp.json server started": false,
+      ".mcp.json server listed": null,
+      "main checkout .claude/ read from a linked worktree": false,
+      "plugin folder under .claude/skills/": false,
+      "CLAUDE.md of a subdirectory, on reading a file there": false,
+      "path-scoped rule, on reading a matching file": false,
+      "skill of a subdirectory, on reading a file there": false,
+      "CLAUDE.md written mid-session": false,
+      "skill written mid-session": false,
+      "hooks of a .claude/settings.json written mid-session": [],
+      "hooks of a .claude/settings.local.json written mid-session": [],
+      ".mcp.json written mid-session": false
+    },
+    "from_the_config_directory_mid_session": {
+      "user hooks written mid-session into the config directory": [],
+      "user skill written mid-session into the config directory": false
+    },
+    "from_the_host": {
+      "user CLAUDE.md": false,
+      "user skill": true,
+      "user hook": true,
+      "--settings hook": true,
+      "--mcp-config server started": true,
+      "--mcp-config server listed": "connected",
+      "--append-system-prompt-file": false
+    }
+  },
+  "canary_words_in_reply": [],
+  "canary_files": [
+    "hook-flag-SessionStart",
+    "hook-user-SessionStart",
+    "mcp-host-mcp"
+  ],
+  "environment_seen_by_children": [],
+  "tool_uses": [],
+  "init": {
+    "keys": [
+      "agents",
+      "analytics_disabled",
+      "apiKeySource",
+      "capabilities",
+      "claude_code_version",
+      "cwd",
+      "fast_mode_disabled_reason",
+      "fast_mode_state",
+      "mcp_servers",
+      "memory_paths",
+      "messaging_socket_path",
+      "model",
+      "output_style",
+      "per_turn_effort_active",
+      "permissionMode",
+      "plugins",
+      "product_feedback_disabled",
+      "session_id",
+      "skills",
+      "slash_commands",
+      "subtype",
+      "terminal_slash_commands",
+      "tools",
+      "type",
+      "uuid",
+      "view_mode"
+    ],
+    "claude_code_version": "2.1.311",
+    "apiKeySource": "none",
+    "model": "claude-haiku-5-5",
+    "permissionMode": "default",
+    "memory_paths": {
+      "auto": "<out>/net-deny-all/home/.claude/projects/-out-net-deny-all-work/memory/"
+    },
+    "capabilities": [
+      "interrupt_receipt_v1",
+      "interrupt_cancel_queued_v1",
+      "interrupt_send_now_v1",
+      "interrupt_requeue_taken_v1",
+      "msg_lifecycle_v1",
+      "request_marker_lists_v1",
+      "lifecycle_wakeup_source_v1",
+      "sdk_mcp_tools_list_changed",
+      "sdk_mcp_manifests",
+      "mcp_read_resource_v1",
+      "mcp_tool_ui_meta_v1",
+      "ui_surface_v1",
+      "mcp_call_result_not_for_model_v1"
+    ],
+    "tools": [
+      "Task",
+      "Bash",
+      "CronCreate",
+      "CronDelete",
+      "CronList",
+      "Edit",
+      "EnterWorktree",
+      "ExitWorktree",
+      "ListAgents",
+      "Monitor",
+      "NotebookEdit",
+      "Read",
+      "ReportFindings",
+      "ScheduleWakeup",
+      "SendMessage",
+      "Skill",
+      "TaskStop",
+      "ToolSearch",
+      "WebSearch",
+      "Workflow",
+      "Write",
+      "mcp__host-mcp__probe_tool"
+    ],
+    "skills": [
+      "user-skill",
+      "deep-research",
+      "dataviz",
+      "update-config",
+      "verify",
+      "debug",
+      "code-review",
+      "simplify",
+      "batch",
+      "fewer-permission-prompts",
+      "doctor",
+      "loop",
+      "claude-api",
+      "workflow-authoring",
+      "run",
+      "run-skill-generator",
+      "plugin-authoring"
+    ],
+    "slash_commands": [
+      "user-skill",
+      "deep-research",
+      "dataviz",
+      "update-config",
+      "verify",
+      "debug",
+      "code-review",
+      "simplify",
+      "batch",
+      "fewer-permission-prompts",
+      "doctor",
+      "loop",
+      "claude-api",
+      "workflow-authoring",
+      "run",
+      "run-skill-generator",
+      "plugin-authoring",
+      "agents",
+      "auto-mode-setup",
+      "autocompact",
+      "clear",
+      "color",
+      "compact",
+      "config",
+      "output-style",
+      "context",
+      "effort",
+      "fast",
+      "focus",
+      "init",
+      "mcp",
+      "model",
+      "__remote-workflow",
+      "workflow-launch-exec",
+      "reload-plugins",
+      "reload-skills",
+      "rename",
+      "security-review",
+      "usage",
+      "insights",
+      "recap",
+      "goal",
+      "list-agents"
+    ],
+    "agents": [
+      "claude",
+      "Explore",
+      "general-purpose",
+      "Plan",
+      "statusline-setup"
+    ],
+    "plugins": [
+      {
+        "name": "cc-plugin-agents-md",
+        "path": "builtin",
+        "source": "cc-plugin-agents-md@builtin"
+      },
+      {
+        "name": "cc-plugin-plugin-authoring",
+        "path": "builtin",
+        "source": "cc-plugin-plugin-authoring@builtin"
+      }
+    ],
+    "mcp_servers": [
+      {
+        "name": "host-mcp",
+        "status": "connected",
+        "source": "dynamic"
+      }
+    ]
+  },
+  "event_sequence": [
+    "system/hook_started@18.14",
+    "system/hook_started@18.14",
+    "system/hook_response@18.16",
+    "system/hook_response@18.16",
+    "system/init@18.2",
+    "system/api_retry@18.22",
+    "system/api_retry@18.81",
+    "system/api_retry@19.85",
+    "system/api_retry@21.97",
+    "system/api_retry@26.23",
+    "system/api_retry@35.15",
+    "system/api_retry@53.55",
+    "system/api_retry@92.82",
+    "system/api_retry@125.79",
+    "system/api_retry@157.88",
+    "assistant@195.47",
+    "result/success@195.47"
+  ],
+  "probe_notes": [],
+  "rate_limit_events": [],
+  "api_retry_events": [
+    {
+      "type": "system",
+      "subtype": "api_retry",
+      "attempt": 1,
+      "max_retries": 10,
+      "retry_delay_ms": 586,
+      "error_status": null,
+      "error": "unknown",
+      "session_id": "a47276bd-7f5d-4985-bf93-d29bf7c35c94",
+      "uuid": "67c3004c-54e3-4e24-a8f2-eafb226fe62d",
+      "_t": 18.22
+    },
+    {
+      "type": "system",
+      "subtype": "api_retry",
+      "attempt": 2,
+      "max_retries": 10,
+      "retry_delay_ms": 1018,
+      "error_status": null,
+      "error": "unknown",
+      "session_id": "a47276bd-7f5d-4985-bf93-d29bf7c35c94",
+      "uuid": "4e2762ba-03f2-4435-ab81-2aaf7384f024",
+      "_t": 18.81
+    },
+    {
+      "type": "system",
+      "subtype": "api_retry",
+      "attempt": 3,
+      "max_retries": 10,
+      "retry_delay_ms": 2119,
+      "error_status": null,
+      "error": "unknown",
+      "session_id": "a47276bd-7f5d-4985-bf93-d29bf7c35c94",
+      "uuid": "96027d41-33d2-4a94-9771-c8ac42d6a2d5",
+      "_t": 19.85
+    },
+    {
+      "type": "system",
+      "subtype": "api_retry",
+      "attempt": 4,
+      "max_retries": 10,
+      "retry_delay_ms": 4249,
+      "error_status": null,
+      "error": "unknown",
+      "session_id": "a47276bd-7f5d-4985-bf93-d29bf7c35c94",
+      "uuid": "86e9f5e1-1987-42ce-b2fd-429464e56d77",
+      "_t": 21.97
+    },
+    {
+      "type": "system",
+      "subtype": "api_retry",
+      "attempt": 5,
+      "max_retries": 10,
+      "retry_delay_ms": 8898,
+      "error_status": null,
+      "error": "unknown",
+      "session_id": "a47276bd-7f5d-4985-bf93-d29bf7c35c94",
+      "uuid": "c4efb997-3f67-421b-99bb-fd454784881c",
+      "_t": 26.23
+    },
+    {
+      "type": "system",
+      "subtype": "api_retry",
+      "attempt": 6,
+      "max_retries": 10,
+      "retry_delay_ms": 18389,
+      "error_status": null,
+      "error": "unknown",
+      "session_id": "a47276bd-7f5d-4985-bf93-d29bf7c35c94",
+      "uuid": "7b810cc8-9a22-41b6-9003-28339aa49d15",
+      "_t": 35.15
+    },
+    {
+      "type": "system",
+      "subtype": "api_retry",
+      "attempt": 7,
+      "max_retries": 10,
+      "retry_delay_ms": 39271,
+      "error_status": null,
+      "error": "unknown",
+      "session_id": "a47276bd-7f5d-4985-bf93-d29bf7c35c94",
+      "uuid": "dded00cf-7ec1-4f14-b6c4-1c6dbb5ca7e1",
+      "_t": 53.55
+    },
+    {
+      "type": "system",
+      "subtype": "api_retry",
+      "attempt": 8,
+      "max_retries": 10,
+      "retry_delay_ms": 32955,
+      "error_status": null,
+      "error": "unknown",
+      "session_id": "a47276bd-7f5d-4985-bf93-d29bf7c35c94",
+      "uuid": "f45dd1fa-90ff-4db2-879b-45013fdae83a",
+      "_t": 92.82
+    },
+    {
+      "type": "system",
+      "subtype": "api_retry",
+      "attempt": 9,
+      "max_retries": 10,
+      "retry_delay_ms": 32087,
+      "error_status": null,
+      "error": "unknown",
+      "session_id": "a47276bd-7f5d-4985-bf93-d29bf7c35c94",
+      "uuid": "367d2583-d8e5-48fd-87b2-0f0bedb30d1f",
+      "_t": 125.79
+    },
+    {
+      "type": "system",
+      "subtype": "api_retry",
+      "attempt": 10,
+      "max_retries": 10,
+      "retry_delay_ms": 37587,
+      "error_status": null,
+      "error": "unknown",
+      "session_id": "a47276bd-7f5d-4985-bf93-d29bf7c35c94",
+      "uuid": "eea24991-f941-45a1-a9e1-dfb0254b610a",
+      "_t": 157.88
+    }
+  ],
+  "system_events_other_than_init": [
+    {
+      "type": "system",
+      "subtype": "hook_started",
+      "hook_id": "93c89d2f-7458-4245-a63d-171f90e17a0a",
+      "hook_name": "SessionStart:startup",
+      "hook_event": "SessionStart",
+      "uuid": "86553d59-5c29-462e-9ad3-f739f3c6e5b4",
+      "session_id": "a47276bd-7f5d-4985-bf93-d29bf7c35c94",
+      "_t": 18.14
+    },
+    {
+      "type": "system",
+      "subtype": "hook_started",
+      "hook_id": "3810bdb4-4cf8-43b8-b5d5-fcdcac678442",
+      "hook_name": "SessionStart:startup",
+      "hook_event": "SessionStart",
+      "uuid": "be41641e-54b1-483c-9cec-ae0fae12cb0e",
+      "session_id": "a47276bd-7f5d-4985-bf93-d29bf7c35c94",
+      "_t": 18.14
+    },
+    {
+      "type": "system",
+      "subtype": "hook_response",
+      "hook_id": "93c89d2f-7458-4245-a63d-171f90e17a0a",
+      "hook_name": "SessionStart:startup",
+      "hook_event": "SessionStart",
+      "output": "",
+      "stdout": "",
+      "stderr": "",
+      "exit_code": 0,
+      "outcome": "success",
+      "uuid": "986efa72-f965-47b3-8b06-7ef9e97fee20",
+      "session_id": "a47276bd-7f5d-4985-bf93-d29bf7c35c94",
+      "_t": 18.16
+    },
+    {
+      "type": "system",
+      "subtype": "hook_response",
+      "hook_id": "3810bdb4-4cf8-43b8-b5d5-fcdcac678442",
+      "hook_name": "SessionStart:startup",
+      "hook_event": "SessionStart",
+      "output": "",
+      "stdout": "",
+      "stderr": "",
+      "exit_code": 0,
+      "outcome": "success",
+      "uuid": "1c00a00f-897b-40da-b16b-d7c7ac4adc8b",
+      "session_id": "a47276bd-7f5d-4985-bf93-d29bf7c35c94",
+      "_t": 18.16
+    }
+  ],
+  "assistant_usage_by_message_id": {
+    "71a014fb-83e3-4fb3-bc68-11f605ed900b": {
+      "output_tokens_details": null,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": null,
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": null,
+      "iterations": null,
+      "speed": null,
+      "fallback_credit": null
+    }
+  },
+  "result": {
+    "duration_api_ms": 0,
+    "stop_reason": "stop_sequence",
+    "session_id": "a47276bd-7f5d-4985-bf93-d29bf7c35c94",
+    "total_cost_usd": 0,
+    "usage": {
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "output_tokens": 0,
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [],
+      "speed": "standard",
+      "fallback_credit": null
+    },
+    "modelUsage": {},
+    "permission_denials": [],
+    "terminal_reason": "api_error",
+    "fast_mode_state": "off",
+    "fast_mode_disabled_reason": "sdk_opt_in_required",
+    "subagent_stats": {
+      "spawned": 0,
+      "requested": {
+        "background": 0,
+        "foreground": 0,
+        "unset": 0
+      },
+      "started_in_background": 0,
+      "max_depth": 0,
+      "spawned_by_subagents": 0,
+      "completed": 0,
+      "failed": 0,
+      "killed": {
+        "parent": 0,
+        "user": 0,
+        "system": 0
+      },
+      "refused": {
+        "depth_limit": 0,
+        "concurrency_limit": 0,
+        "budget": 0
+      },
+      "by_type": {}
+    },
+    "safety_stops": 0,
+    "is_error": true,
+    "num_turns": 1,
+    "subtype": "success",
+    "api_error_status": null,
+    "result": "API Error: Couldn't connect through your proxy (ERR_PROXY_TUNNEL) \u2014 the proxy refused the tunnel: check its credentials and that it allows this host",
+    "type": "result",
+    "duration_ms": 177284,
+    "uuid": "c448082a-f08a-4d69-9574-0ce2ad1a8be0",
+    "queued_turn_count": 0,
+    "result_index": 0,
+    "model_usage_since_last_result": {},
+    "_t": 195.47
+  },
+  "results_before_the_last": [],
+  "debug_log_lines": [
+    "[DEBUG] Found 2 plugins (2 enabled, 0 disabled)",
+    "[DEBUG] [Claude in Chrome] Disabled: OAuth token has no scope accepted by /api/oauth/validate (needs user:profile, user:office, or user:ccr_inference; env-var and setup-token sessions default to user:inference only)",
+    "[DEBUG] Checking plugin cc-plugin-agents-md: skillsPath=none, skillsPaths=0 paths",
+    "[DEBUG] Loading skills from: managed=/Library/Application Support/ClaudeCode/.claude/skills, user=<run>/home/.claude/skills, project=[<run>/work/.claude/skills]",
+    "[DEBUG] Loaded 1 unique skills (1 unconditional, 0 conditional, managed: 0, user: 1, project: 0, additional: 0, legacy commands: 0)",
+    "[DEBUG] [Bootstrap] Skipped: Nonessential traffic disabled",
+    "[DEBUG] [3P telemetry] isTelemetryEnabled=false (CLAUDE_CODE_ENABLE_TELEMETRY=undefined)",
+    "[DEBUG] plugin cc-plugin-agents-md: no pluginConfigs[\"agents-md@builtin\" or \"cc-plugin-agents-md@builtin\"].options in user, --settings or managed settings (project settings are not read); every option is its default",
+    "[DEBUG] Watching for changes in skill/command directories: <run>/home/.claude/skills, <run>/work/.claude/skills, <run>/work/.claude/commands, <run>/work/.claude/agents...",
+    "[DEBUG] MCP server \"host-mcp\": Starting connection with timeout of 30000ms",
+    "[DEBUG] [claudeai-mcp] Missing user:mcp_servers scope (scopes=user:inference)",
+    "[DEBUG] Watching for changes in setting files <run>/home/.claude/settings.json, <run>/work/.claude/settings.json, <run>/work/.claude/settings.local.json...",
+    "[DEBUG] MCP server \"host-mcp\": Connection established with capabilities: {\"hasTools\":true,\"hasPrompts\":false,\"hasResources\":false,\"hasResourceSubscribe\":false,\"serverVersion\":{\"name\":\"sf-probe-stub\",\"version\":\"0\"},\"protocolEra\":\"legacy\",\"negotiatedProtocolVersion\":\"2025-11-25\"}",
+    "[DEBUG] [API REQUEST] /v1/messages x-client-request-id=1758a0a2-a561-44c3-bb91-e37094a2dd99 source=sdk",
+    "[DEBUG] [API REQUEST] /v1/messages x-client-request-id=0a2e9133-22e6-4497-92b7-97ed65d687c6 source=sdk",
+    "[DEBUG] [API REQUEST] /v1/messages x-client-request-id=e767f65c-61fa-4863-b259-d9f32e6a0322 source=sdk",
+    "[DEBUG] [API REQUEST] /v1/messages x-client-request-id=55f57fbf-cd1f-47e4-87ec-135fb7d56e04 source=sdk",
+    "[DEBUG] [API REQUEST] /v1/messages x-client-request-id=d306a844-a0b3-4e43-b93c-672a527d7e2e source=sdk",
+    "[DEBUG] [API REQUEST] /v1/messages x-client-request-id=f00bec7a-5a60-4084-95da-a0fc7dfb82b9 source=sdk",
+    "[DEBUG] [API REQUEST] /v1/messages x-client-request-id=929d5868-848b-4b0c-95d2-40d8227ac1b6 source=sdk",
+    "[DEBUG] [API REQUEST] /v1/messages x-client-request-id=ebeae3e6-4f73-4bf6-bd2c-83c748969c09 source=sdk",
+    "[DEBUG] [API REQUEST] /v1/messages x-client-request-id=534efc55-1dc9-47c1-8a67-06ca10441cf2 source=sdk",
+    "[DEBUG] [API REQUEST] /v1/messages x-client-request-id=d3a2d339-d29d-467d-9c84-7deb18d4eb26 source=sdk",
+    "[DEBUG] [API REQUEST] /v1/messages x-client-request-id=139dcb04-7c52-462b-8915-bf104c7a5e10 source=sdk"
+  ],
+  "config_dir_files_after_run": [
+    ".claude.json",
+    ".last-cleanup",
+    "CLAUDE.md",
+    "backups/.claude.json.backup.1795125857515",
+    "plugins/store/cc-plugin-agents-md_builtin-b049b47b3618.json",
+    "projects/-out-net-deny-all-work/a47276bd-7f5d-4985-bf93-d29bf7c35c94.jsonl",
+    "settings.json",
+    "skills/user-skill/SKILL.md"
+  ],
+  "exit_code": 1,
+  "timed_out": false,
+  "wall_seconds": 195.5,
+  "seconds_from_result_to_exit": 0.1,
+  "seconds_from_stdin_close_to_exit": null,
+  "proxy": {
+    "mode": "allow only []",
+    "requests": [
+      {
+        "t": 0.07,
+        "method": "CONNECT",
+        "host": "api.anthropic.com",
+        "port": 443,
+        "verdict": "denied"
+      },
+      {
+        "t": 0.07,
+        "method": "CONNECT",
+        "host": "api.anthropic.com",
+        "port": 443,
+        "verdict": "denied"
+      },
+      {
+        "t": 0.09,
+        "method": "CONNECT",
+        "host": "api.anthropic.com",
+        "port": 443,
+        "verdict": "denied"
+      },
+      {
+        "t": 0.09,
+        "method": "CONNECT",
+        "host": "api.anthropic.com",
+        "port": 443,
+        "verdict": "denied"
+      },
+      {
+        "t": 0.59,
+        "method": "CONNECT",
+        "host": "api.anthropic.com",
+        "port": 443,
+        "verdict": "denied"
+      },
+      {
+        "t": 0.6,
+        "method": "CONNECT",
+        "host": "api.anthropic.com",
+        "port": 443,
+        "verdict": "denied"
+      },
+      {
+        "t": 1.64,
+        "method": "CONNECT",
+        "host": "api.anthropic.com",
+        "port": 443,
+        "verdict": "denied"
+      },
+      {
+        "t": 1.68,
+        "method": "CONNECT",
+        "host": "api.anthropic.com",
+        "port": 443,
+        "verdict": "denied"
+      },
+      {
+        "t": 3.8,
+        "method": "CONNECT",
+        "host": "api.anthropic.com",
+        "port": 443,
+        "verdict": "denied"
+      },
+      {
+        "t": 3.83,
+        "method": "CONNECT",
+        "host": "api.anthropic.com",
+        "port": 443,
+        "verdict": "denied"
+      },
+      {
+        "t": 8.33,
+        "method": "CONNECT",
+        "host": "api.anthropic.com",
+        "port": 443,
+        "verdict": "denied"
+      },
+      {
+        "t": 8.74,
+        "method": "CONNECT",
+        "host": "api.anthropic.com",
+        "port": 443,
+        "verdict": "denied"
+      },
+      {
+        "t": 17.9,
+        "method": "CONNECT",
+        "host": "api.anthropic.com",
+        "port": 443,
+        "verdict": "denied"
+      },
+      {
+        "t": 18.1,
+        "method": "CONNECT",
+        "host": "api.anthropic.com",
+        "port": 443,
+        "verdict": "denied"
+      },
+      {
+        "t": 18.22,
+        "method": "CONNECT",
+        "host": "api.anthropic.com",
+        "port": 443,
+        "verdict": "denied"
+      },
+      {
+        "t": 18.81,
+        "method": "CONNECT",
+        "host": "api.anthropic.com",
+        "port": 443,
+        "verdict": "denied"
+      },
+      {
+        "t": 19.84,
+        "method": "CONNECT",
+        "host": "api.anthropic.com",
+        "port": 443,
+        "verdict": "denied"
+      },
+      {
+        "t": 21.97,
+        "method": "CONNECT",
+        "host": "api.anthropic.com",
+        "port": 443,
+        "verdict": "denied"
+      },
+      {
+        "t": 26.23,
+        "method": "CONNECT",
+        "host": "api.anthropic.com",
+        "port": 443,
+        "verdict": "denied"
+      },
+      {
+        "t": 35.14,
+        "method": "CONNECT",
+        "host": "api.anthropic.com",
+        "port": 443,
+        "verdict": "denied"
+      },
+      {
+        "t": 53.54,
+        "method": "CONNECT",
+        "host": "api.anthropic.com",
+        "port": 443,
+        "verdict": "denied"
+      },
+      {
+        "t": 92.82,
+        "method": "CONNECT",
+        "host": "api.anthropic.com",
+        "port": 443,
+        "verdict": "denied"
+      },
+      {
+        "t": 125.78,
+        "method": "CONNECT",
+        "host": "api.anthropic.com",
+        "port": 443,
+        "verdict": "denied"
+      },
+      {
+        "t": 157.88,
+        "method": "CONNECT",
+        "host": "api.anthropic.com",
+        "port": 443,
+        "verdict": "denied"
+      },
+      {
+        "t": 195.47,
+        "method": "CONNECT",
+        "host": "api.anthropic.com",
+        "port": 443,
+        "verdict": "denied"
+      }
+    ]
+  },
+  "hosts": {
+    "api.anthropic.com:443": {
+      "requests": 25,
+      "verdicts": [
+        "denied"
+      ]
+    }
+  },
+  "sockets_not_to_the_proxy": [],
+  "socket_samples": 491,
+  "files_holding_the_token": [],
+  "stderr_tail": ""
+}

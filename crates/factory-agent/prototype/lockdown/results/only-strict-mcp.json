@@ -1,0 +1,622 @@
+{
+  "case": "only-strict-mcp",
+  "about": "--strict-mcp-config with the host MCP file, alone",
+  "fixture": "claude-md",
+  "command": [
+    "claude",
+    "-p",
+    "--output-format",
+    "stream-json",
+    "--verbose",
+    "--model",
+    "haiku",
+    "--session-id",
+    "32689806-a121-4036-9fde-391279ec3ad7",
+    "--max-turns",
+    "3",
+    "--debug-file",
+    "<out>/only-strict-mcp/host/debug.log",
+    "--mcp-config",
+    "<out>/only-strict-mcp/host/mcp.json",
+    "--strict-mcp-config",
+    "<prompt>"
+  ],
+  "environment_switches": {
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
+  },
+  "prompts": [
+    "List every word that starts with CANARY- and appears anywhere in your instructions or context. Reply with those words separated by spaces and nothing else. If there are none, reply NONE. Do not use any tools."
+  ],
+  "took_effect": {
+    "from_the_repository": {
+      "CLAUDE.md": true,
+      ".claude/CLAUDE.md": true,
+      "CLAUDE.local.md": true,
+      ".claude/rules/": true,
+      "AGENTS.md": false,
+      "project skill": true,
+      "project command": true,
+      "project subagent": true,
+      "project hooks (.claude/settings.json)": [
+        "hook-project-SessionStart",
+        "hook-project-Stop",
+        "hook-project-UserPromptSubmit"
+      ],
+      "local hooks (.claude/settings.local.json)": [
+        "hook-local-SessionStart"
+      ],
+      "project env block": true,
+      "local env block": true,
+      "project permissions.allow": false,
+      "local permissions.allow": false,
+      ".mcp.json server started": false,
+      ".mcp.json server listed": null,
+      "main checkout .claude/ read from a linked worktree": false,
+      "plugin folder under .claude/skills/": false,
+      "CLAUDE.md of a subdirectory, on reading a file there": false,
+      "path-scoped rule, on reading a matching file": false,
+      "skill of a subdirectory, on reading a file there": false,
+      "CLAUDE.md written mid-session": false,
+      "skill written mid-session": false,
+      "hooks of a .claude/settings.json written mid-session": [],
+      "hooks of a .claude/settings.local.json written mid-session": [],
+      ".mcp.json written mid-session": false
+    },
+    "from_the_config_directory_mid_session": {
+      "user hooks written mid-session into the config directory": [],
+      "user skill written mid-session into the config directory": false
+    },
+    "from_the_host": {
+      "user CLAUDE.md": true,
+      "user skill": true,
+      "user hook": true,
+      "--settings hook": false,
+      "--mcp-config server started": true,
+      "--mcp-config server listed": "connected",
+      "--append-system-prompt-file": false
+    }
+  },
+  "canary_words_in_reply": [
+    "CANARY-DOTCLAUDEMD",
+    "CANARY-LOCALMD",
+    "CANARY-PROJECTMD",
+    "CANARY-RULES",
+    "CANARY-USERMD"
+  ],
+  "canary_files": [
+    "hook-local-SessionStart",
+    "hook-project-SessionStart",
+    "hook-project-Stop",
+    "hook-project-UserPromptSubmit",
+    "hook-user-SessionStart",
+    "mcp-host-mcp"
+  ],
+  "environment_seen_by_children": [
+    "SF_PROBE_LOCAL_ENV=set-by-local-settings",
+    "SF_PROBE_PROJECT_ENV=set-by-project-settings"
+  ],
+  "tool_uses": [],
+  "init": {
+    "keys": [
+      "additional_directories",
+      "agents",
+      "analytics_disabled",
+      "apiKeySource",
+      "capabilities",
+      "claude_code_version",
+      "cwd",
+      "fast_mode_disabled_reason",
+      "fast_mode_state",
+      "mcp_servers",
+      "memory_paths",
+      "messaging_socket_path",
+      "model",
+      "original_cwd",
+      "output_style",
+      "per_turn_effort_active",
+      "permissionMode",
+      "plugins",
+      "product_feedback_disabled",
+      "session_id",
+      "skills",
+      "slash_commands",
+      "subtype",
+      "terminal_slash_commands",
+      "tools",
+      "type",
+      "uuid",
+      "view_mode"
+    ],
+    "claude_code_version": "2.1.311",
+    "apiKeySource": "none",
+    "model": "claude-haiku-5-5",
+    "permissionMode": "default",
+    "memory_paths": {
+      "auto": "<out>/only-strict-mcp/home/.claude/projects/-out-only-strict-mcp-work/memory/"
+    },
+    "capabilities": [
+      "interrupt_receipt_v1",
+      "interrupt_cancel_queued_v1",
+      "interrupt_send_now_v1",
+      "interrupt_requeue_taken_v1",
+      "msg_lifecycle_v1",
+      "request_marker_lists_v1",
+      "lifecycle_wakeup_source_v1",
+      "sdk_mcp_tools_list_changed",
+      "sdk_mcp_manifests",
+      "mcp_read_resource_v1",
+      "mcp_tool_ui_meta_v1",
+      "ui_surface_v1",
+      "mcp_call_result_not_for_model_v1"
+    ],
+    "tools": [
+      "Task",
+      "Bash",
+      "CronCreate",
+      "CronDelete",
+      "CronList",
+      "Edit",
+      "EnterWorktree",
+      "ExitWorktree",
+      "ListAgents",
+      "Monitor",
+      "NotebookEdit",
+      "Read",
+      "RemoteTrigger",
+      "ReportFindings",
+      "ScheduleWakeup",
+      "SendMessage",
+      "Skill",
+      "TaskStop",
+      "ToolSearch",
+      "WebFetch",
+      "WebSearch",
+      "Workflow",
+      "Write",
+      "mcp__host-mcp__probe_tool"
+    ],
+    "skills": [
+      "user-skill",
+      "probe-skill",
+      "deep-research",
+      "dataviz",
+      "update-config",
+      "verify",
+      "debug",
+      "code-review",
+      "simplify",
+      "batch",
+      "fewer-permission-prompts",
+      "doctor",
+      "loop",
+      "schedule",
+      "claude-api",
+      "workflow-authoring",
+      "run",
+      "run-skill-generator",
+      "plugin-authoring"
+    ],
+    "slash_commands": [
+      "user-skill",
+      "probe-skill",
+      "probe-command",
+      "deep-research",
+      "dataviz",
+      "update-config",
+      "verify",
+      "debug",
+      "code-review",
+      "simplify",
+      "batch",
+      "fewer-permission-prompts",
+      "doctor",
+      "loop",
+      "schedule",
+      "claude-api",
+      "workflow-authoring",
+      "run",
+      "run-skill-generator",
+      "plugin-authoring",
+      "agents",
+      "auto-mode-setup",
+      "autocompact",
+      "clear",
+      "color",
+      "compact",
+      "config",
+      "output-style",
+      "context",
+      "effort",
+      "fast",
+      "focus",
+      "heapdump",
+      "init",
+      "mcp",
+      "model",
+      "__remote-workflow",
+      "workflow-launch-exec",
+      "reload-plugins",
+      "reload-skills",
+      "rename",
+      "security-review",
+      "usage",
+      "insights",
+      "recap",
+      "goal",
+      "list-agents",
+      "team-onboarding"
+    ],
+    "agents": [
+      "claude",
+      "Explore",
+      "general-purpose",
+      "Plan",
+      "probe-agent",
+      "statusline-setup"
+    ],
+    "plugins": [
+      {
+        "name": "cc-plugin-agents-md",
+        "path": "builtin",
+        "source": "cc-plugin-agents-md@builtin"
+      },
+      {
+        "name": "cc-plugin-plugin-authoring",
+        "path": "builtin",
+        "source": "cc-plugin-plugin-authoring@builtin"
+      }
+    ],
+    "mcp_servers": [
+      {
+        "name": "host-mcp",
+        "status": "connected",
+        "source": "dynamic"
+      }
+    ]
+  },
+  "event_sequence": [
+    "system/hook_started@0.47",
+    "system/hook_started@0.47",
+    "system/hook_started@0.47",
+    "system/hook_response@0.49",
+    "system/hook_response@0.49",
+    "system/hook_response@0.49",
+    "system/init@0.53",
+    "system/thinking_tokens@1.53",
+    "system/thinking_tokens@2.11",
+    "assistant@2.12",
+    "assistant@2.29",
+    "rate_limit_event@2.3",
+    "result/success@2.34"
+  ],
+  "probe_notes": [],
+  "rate_limit_events": [
+    {
+      "type": "rate_limit_event",
+      "rate_limit_info": {
+        "status": "allowed",
+        "resetsAt": 1795615200,
+        "rateLimitType": "seven_day",
+        "overageStatus": "rejected",
+        "overageDisabledReason": "org_level_disabled",
+        "isUsingOverage": false,
+        "unifiedWindows": {
+          "seven_day": {
+            "utilization": 0.18,
+            "resetsAt": 1795615200,
+            "status": "allowed"
+          }
+        }
+      },
+      "uuid": "9e635c27-79c5-4787-9892-b60eea336f47",
+      "session_id": "32689806-a121-4036-9fde-391279ec3ad7",
+      "_t": 2.3
+    }
+  ],
+  "api_retry_events": [],
+  "system_events_other_than_init": [
+    {
+      "type": "system",
+      "subtype": "hook_started",
+      "hook_id": "a1f72128-bb1b-42c3-b9c4-cb3a78d7061b",
+      "hook_name": "SessionStart:startup",
+      "hook_event": "SessionStart",
+      "uuid": "e996af5f-35d0-4d9d-b215-74b9968e0292",
+      "session_id": "32689806-a121-4036-9fde-391279ec3ad7",
+      "_t": 0.47
+    },
+    {
+      "type": "system",
+      "subtype": "hook_started",
+      "hook_id": "7c526ea9-2c9e-436b-aae0-cc91afbfd8b8",
+      "hook_name": "SessionStart:startup",
+      "hook_event": "SessionStart",
+      "uuid": "f71fbee2-fc2a-493b-91e5-d9dddafd9527",
+      "session_id": "32689806-a121-4036-9fde-391279ec3ad7",
+      "_t": 0.47
+    },
+    {
+      "type": "system",
+      "subtype": "hook_started",
+      "hook_id": "acd89923-3cb8-4691-b7c6-63c070c8beb2",
+      "hook_name": "SessionStart:startup",
+      "hook_event": "SessionStart",
+      "uuid": "f27c627e-ae69-43f7-8e4d-3e1b1c7bcd95",
+      "session_id": "32689806-a121-4036-9fde-391279ec3ad7",
+      "_t": 0.47
+    },
+    {
+      "type": "system",
+      "subtype": "hook_response",
+      "hook_id": "7c526ea9-2c9e-436b-aae0-cc91afbfd8b8",
+      "hook_name": "SessionStart:startup",
+      "hook_event": "SessionStart",
+      "output": "",
+      "stdout": "",
+      "stderr": "",
+      "exit_code": 0,
+      "outcome": "success",
+      "uuid": "57200dbb-50a1-415a-9f21-71dfa18be4d2",
+      "session_id": "32689806-a121-4036-9fde-391279ec3ad7",
+      "_t": 0.49
+    },
+    {
+      "type": "system",
+      "subtype": "hook_response",
+      "hook_id": "a1f72128-bb1b-42c3-b9c4-cb3a78d7061b",
+      "hook_name": "SessionStart:startup",
+      "hook_event": "SessionStart",
+      "output": "",
+      "stdout": "",
+      "stderr": "",
+      "exit_code": 0,
+      "outcome": "success",
+      "uuid": "32e00b35-c413-42a5-8d41-8c6c921d5e74",
+      "session_id": "32689806-a121-4036-9fde-391279ec3ad7",
+      "_t": 0.49
+    },
+    {
+      "type": "system",
+      "subtype": "hook_response",
+      "hook_id": "acd89923-3cb8-4691-b7c6-63c070c8beb2",
+      "hook_name": "SessionStart:startup",
+      "hook_event": "SessionStart",
+      "output": "",
+      "stdout": "",
+      "stderr": "",
+      "exit_code": 0,
+      "outcome": "success",
+      "uuid": "21b1c8f8-bcad-4f6b-adb5-cbc4894f54c0",
+      "session_id": "32689806-a121-4036-9fde-391279ec3ad7",
+      "_t": 0.49
+    },
+    {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 50,
+      "estimated_tokens_delta": 50,
+      "session_id": "32689806-a121-4036-9fde-391279ec3ad7",
+      "uuid": "4fbc09ca-75e9-4bd0-9a33-208c6c1f4518",
+      "_t": 1.53
+    },
+    {
+      "type": "system",
+      "subtype": "thinking_tokens",
+      "estimated_tokens": 299,
+      "estimated_tokens_delta": 249,
+      "session_id": "32689806-a121-4036-9fde-391279ec3ad7",
+      "uuid": "bd0e59c3-9c5c-44fa-bc17-53890d1ebf91",
+      "_t": 2.11
+    }
+  ],
+  "assistant_usage_by_message_id": {
+    "msg_011ChD3PPuMfhpwm8EU7v6g8": {
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 4924,
+      "cache_read_input_tokens": 13547,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 4924
+      },
+      "output_tokens": 6,
+      "service_tier": "standard",
+      "inference_geo": "global",
+      "speed": "standard"
+    }
+  },
+  "result": {
+    "duration_api_ms": 1764,
+    "stop_reason": "end_turn",
+    "session_id": "32689806-a121-4036-9fde-391279ec3ad7",
+    "total_cost_usd": 0.00125347,
+    "usage": {
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 4924,
+      "cache_read_input_tokens": 13547,
+      "output_tokens": 266,
+      "output_tokens_details": {
+        "thinking_tokens": 208
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 4924,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "global",
+      "iterations": [],
+      "speed": "standard",
+      "fallback_credit": null
+    },
+    "modelUsage": {
+      "claude-haiku-5-5": {
+        "inputTokens": 2,
+        "outputTokens": 266,
+        "cacheReadInputTokens": 13547,
+        "cacheCreationInputTokens": 4924,
+        "webSearchRequests": 0,
+        "costUSD": 0.00125347,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 128000,
+        "thinkingTokens": 208,
+        "cacheCreationEphemeral5mInputTokens": 0,
+        "cacheCreationEphemeral1hInputTokens": 4924,
+        "canonicalModel": "claude-haiku-5-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "fast_mode_disabled_reason": "sdk_opt_in_required",
+    "subagent_stats": {
+      "spawned": 0,
+      "requested": {
+        "background": 0,
+        "foreground": 0,
+        "unset": 0
+      },
+      "started_in_background": 0,
+      "max_depth": 0,
+      "spawned_by_subagents": 0,
+      "completed": 0,
+      "failed": 0,
+      "killed": {
+        "parent": 0,
+        "user": 0,
+        "system": 0
+      },
+      "refused": {
+        "depth_limit": 0,
+        "concurrency_limit": 0,
+        "budget": 0
+      },
+      "by_type": {}
+    },
+    "safety_stops": 0,
+    "is_error": false,
+    "num_turns": 1,
+    "subtype": "success",
+    "api_error_status": null,
+    "result": "CANARY-USERMD CANARY-PROJECTMD CANARY-DOTCLAUDEMD CANARY-RULES CANARY-LOCALMD",
+    "ttft_ms": 1610,
+    "type": "result",
+    "duration_ms": 1829,
+    "uuid": "d9335628-fa26-4065-9775-f8ef6c6d4eb6",
+    "ttft_stream_ms": 818,
+    "time_to_request_ms": 38,
+    "first_content_frame_ms": 818,
+    "queued_turn_count": 0,
+    "result_index": 0,
+    "model_usage_since_last_result": {
+      "claude-haiku-5-5": {
+        "inputTokens": 2,
+        "outputTokens": 266,
+        "cacheReadInputTokens": 13547,
+        "cacheCreationInputTokens": 4924,
+        "webSearchRequests": 0,
+        "costUSD": 0.00125347,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 128000,
+        "thinkingTokens": 208,
+        "cacheCreationEphemeral5mInputTokens": 0,
+        "cacheCreationEphemeral1hInputTokens": 4924,
+        "canonicalModel": "claude-haiku-5-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      }
+    },
+    "_t": 2.34
+  },
+  "results_before_the_last": [],
+  "debug_log_lines": [
+    "[DEBUG] Found 2 plugins (2 enabled, 0 disabled)",
+    "[DEBUG] Remote settings: No settings found (404)",
+    "[DEBUG] Policy limits: Fetched successfully",
+    "[DEBUG] [Claude in Chrome] Disabled: OAuth token has no scope accepted by /api/oauth/validate (needs user:profile, user:office, or user:ccr_inference; env-var and setup-token sessions default to user:inference only)",
+    "[DEBUG] Dropped 1 project-scoped permissions.allow entry \u2014 workspace not yet trusted",
+    "[DEBUG] Applying permission update: Adding 1 allow rule(s) to destination 'localSettings': [\"Bash(touch perm-local-marker)\"]",
+    "[DEBUG] Checking plugin cc-plugin-agents-md: skillsPath=none, skillsPaths=0 paths",
+    "[DEBUG] Loading skills from: managed=/Library/Application Support/ClaudeCode/.claude/skills, user=<run>/home/.claude/skills, project=[<run>/work/.claude/skills]",
+    "[DEBUG] Loaded 3 unique skills (3 unconditional, 0 conditional, managed: 0, user: 1, project: 1, additional: 0, legacy commands: 1)",
+    "[DEBUG] [Bootstrap] Skipped: Nonessential traffic disabled",
+    "[DEBUG] Settings changed from policySettings, updating app state",
+    "[DEBUG] [3P telemetry] isTelemetryEnabled=false (CLAUDE_CODE_ENABLE_TELEMETRY=undefined)",
+    "[DEBUG] plugin cc-plugin-agents-md: no pluginConfigs[\"agents-md@builtin\" or \"cc-plugin-agents-md@builtin\"].options in user, --settings or managed settings (project settings are not read); every option is its default",
+    "[DEBUG] Watching for changes in skill/command directories: <run>/home/.claude/skills, <run>/work/.claude/skills, <run>/work/.claude/commands, <run>/work/.claude/agents...",
+    "[DEBUG] MCP server \"host-mcp\": Starting connection with timeout of 30000ms",
+    "[DEBUG] Watching for changes in setting files <run>/home/.claude/settings.json, <run>/work/.claude/settings.json, <run>/work/.claude/settings.local.json...",
+    "[DEBUG] [claudeai-mcp] Missing user:mcp_servers scope (scopes=user:inference)",
+    "[DEBUG] MCP server \"host-mcp\": Connection established with capabilities: {\"hasTools\":true,\"hasPrompts\":false,\"hasResources\":false,\"hasResourceSubscribe\":false,\"serverVersion\":{\"name\":\"sf-probe-stub\",\"version\":\"0\"},\"protocolEra\":\"legacy\",\"negotiatedProtocolVersion\":\"2025-11-25\"}",
+    "[DEBUG] Hooks: UserPromptSubmit [sh -c 'env | grep \"^SF_PROBE_\" > \"<run>/canary/hook-project-UserPromptSubmit\"; exit 0'] finished with status 0 (11ms)",
+    "[DEBUG] [API REQUEST] /v1/messages x-client-request-id=a136041f-5385-4bea-b905-b85f068ccb4b source=sdk",
+    "[DEBUG] Hooks: Stop [sh -c 'env | grep \"^SF_PROBE_\" > \"<run>/canary/hook-project-Stop\"; exit 0'] finished with status 0 (22ms)"
+  ],
+  "config_dir_files_after_run": [
+    ".claude.json",
+    "CLAUDE.md",
+    "backups/.claude.json.backup.1795125765158",
+    "plugins/store/cc-plugin-agents-md_builtin-b049b47b3618.json",
+    "policy-limits.json",
+    "policy-limits.json.signature.json",
+    "policy-limits.json.stamp.json",
+    "projects/-out-only-strict-mcp-work/32689806-a121-4036-9fde-391279ec3ad7.jsonl",
+    "remote-settings.json",
+    "remote-settings.json.synced-at",
+    "settings.json",
+    "skills/user-skill/SKILL.md"
+  ],
+  "exit_code": 0,
+  "timed_out": false,
+  "wall_seconds": 2.4,
+  "seconds_from_result_to_exit": 0.1,
+  "seconds_from_stdin_close_to_exit": null,
+  "proxy": {
+    "mode": "allow all",
+    "requests": [
+      {
+        "t": 0.11,
+        "method": "CONNECT",
+        "host": "api.anthropic.com",
+        "port": 443,
+        "verdict": "allowed",
+        "bytes_out": 1985,
+        "bytes_in": 5256
+      },
+      {
+        "t": 0.11,
+        "method": "CONNECT",
+        "host": "api.anthropic.com",
+        "port": 443,
+        "verdict": "allowed",
+        "bytes_out": 2014,
+        "bytes_in": 8354
+      },
+      {
+        "t": 0.58,
+        "method": "CONNECT",
+        "host": "api.anthropic.com",
+        "port": 443,
+        "verdict": "allowed",
+        "bytes_out": 55743,
+        "bytes_in": 8503
+      }
+    ]
+  },
+  "hosts": {
+    "api.anthropic.com:443": {
+      "requests": 3,
+      "verdicts": [
+        "allowed"
+      ]
+    }
+  },
+  "sockets_not_to_the_proxy": [],
+  "socket_samples": 7,
+  "files_holding_the_token": [],
+  "stderr_tail": "Ignoring 1 permissions.allow entry from .claude/settings.json: this workspace has not been trusted. Run Claude Code interactively here once and accept the trust dialog, or set projects[\"<out>/only-strict-mcp/work\"].hasTrustDialogAccepted: true in <out>/only-strict-mcp/home/.claude/.claude.json.\n"
+}

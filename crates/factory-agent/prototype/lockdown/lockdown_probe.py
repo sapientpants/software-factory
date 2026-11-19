@@ -214,6 +214,7 @@ CASES = [
     # Caps (AG-14) and the whole AG-1 line.
     case("cap-max-turns", "--max-turns 1 on a prompt that needs two turns", prompt="read", max_turns=1, **AG3A),
     case("cap-max-budget", "--max-budget-usd 0.0001 on a prompt that needs two turns", prompt="read", max_turns=6, **{**AG3A, "flags": ["--max-budget-usd", "0.0001"]}),
+    case("partial-messages", "AG-3a with --include-partial-messages, for per-call usage", prompt="read", max_turns=4, **{**AG3A, "flags": ["--include-partial-messages"]}),
     case(
         "full-ag1",
         "every flag of AG-1 except --bare, with stream-JSON input",
@@ -824,6 +825,8 @@ def summarise(spec, cmd, events, run: Path, cwd: Path, canary: Path, config: Pat
         "api_retry_events": [e for e in events if e.get("subtype") == "api_retry"],
         "system_events_other_than_init": [e for e in events if e.get("type") == "system" and e.get("subtype") not in ("init", "api_retry")][:12],
         "assistant_usage_by_message_id": usages,
+        # Only with --include-partial-messages: the usage that closes each model call.
+        "message_delta_usage": [e["event"].get("usage") for e in events if e.get("type") == "stream_event" and e.get("event", {}).get("type") == "message_delta"],
         "result": result,
         "results_before_the_last": results[:-1],
         "debug_log_lines": debug,

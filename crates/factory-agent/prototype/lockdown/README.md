@@ -40,7 +40,7 @@ Each session is one or two short turns on the `haiku` alias. The whole matrix
 reported about 0.04 API-equivalent dollars per pass (the sum of `total_cost_usd`).
 
 `results/` holds the pass the probe record was written from: one summary per
-case, `overview.md`, and the raw stream-JSON of eight cases
+case, `overview.md`, and the raw stream-JSON of nine cases
 (`*.events.jsonl`). The scratch directory appears in them as `<out>`. The
 harness adds `--debug-file` to every command line; the selected debug-log
 lines in each summary come from it.

@@ -233,13 +233,14 @@ class Run:
             b += ["--proc", "/proc", "--dev", "/dev",
                   "--ro-bind", self.ws, self.ws,
                   "--bind", self.q, self.q,
+                  "--ro-bind", os.path.join(self.q, "config"), os.path.join(self.q, "config"),  # SEC-6
                   "--ro-bind", os.path.join(self.host, "objects"), os.path.join(self.host, "objects"),
                   "--chdir", self.q]
             for k, v in e.items():
                 b += ["--setenv", k, v]
             argv = b + ["--"] + argv
             if VERBOSE:
-                print("      $ [bwrap: workspace ro, quarantine rw, host.git/objects ro, no network]")
+                print("      $ [bwrap: workspace ro, quarantine rw but its config ro, host.git/objects ro, no network]")
         return sh(argv, env=e, stdin=stdin, cwd=self.q if not BWRAP else None, timeout=timeout)
 
 

@@ -1,0 +1,410 @@
+git 2.56.1 on darwin, sandbox: none, scratch: /private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq
+
+== benign change set
+   change set: D 'README.md', M 'build/keep.log', D 'docs/guide.md', D 'scripts/run.sh', M 'src/lib.rs', ? 'README.md/index.md', ? 'scripts', ? 'src/link.rs', ? 'src/new.rs' 
+   1 scan: ok
+   2 listing: ok
+   3 stage: ok
+   4 ingest: ok
+   tree b7a123508c914b47d3b41b0837870119c58538e7  candidate 5c75f5d3121eaae37a021850a2c32549886da85b
+   note: export == workspace
+   canary: untouched
+
+== executable bits
+   change set: M 'README.md', M 'scripts/run.sh', ? 'scripts/new.sh', ? 'scripts/setuid.sh', ? 'scripts/world.sh' 
+   1 scan: ok
+   2 listing: ok
+   3 stage: ok
+   4 ingest: ok
+   tree c8f02a1042b9c43e717bcb211c20f594902722ec  candidate 72cffa54292a45104cee02b2334cd2e6218fe615
+   note: export == workspace
+   note: modes {'README.md': '100755', 'scripts/run.sh': '100644', 'scripts/new.sh': '100755', 'scripts/setuid.sh': '100755', 'scripts/world.sh': '100644'}
+   canary: untouched
+
+== unreadable file
+   change set: ? 'src/locked.rs' 
+   1 scan: ok
+   2 listing: ok
+   3 stage: REJECT update-index --add (exit 128): error: open("src/locked.rs"): Permission denied | fatal: Unable to process path src/locked.rs; not staged: 'src/locked.rs'
+   4 ingest: ok
+   canary: untouched
+
+== root .git made hostile (config, hooks, info/exclude, info/attributes)
+   change set: ? 'src/new.rs' 
+   1 scan: ok
+   2 listing: ok
+   3 stage: ok
+   4 ingest: ok
+   tree 00fd45cd31e990204e640b5ed1f6fd6c1d1aeb6d  candidate 9a9f7ad139e3e63e4a5522fb99ca221ceb36e353
+   note: export == workspace
+   canary: untouched
+
+== root .git replaced by a gitfile
+   change set: ? 'src/new.rs' 
+   1 scan: ok
+   2 listing: ok
+   3 stage: ok
+   4 ingest: ok
+   tree 00fd45cd31e990204e640b5ed1f6fd6c1d1aeb6d  candidate c236518443b7d0c49af5e40fd573a9627c62d10b
+   note: export == workspace
+   canary: untouched
+
+== nested repository (directory, with commits, fsmonitor, hooks)
+   change set: ? 'vendor/nested/' 
+   1 scan: REJECT 'vendor/nested/.git': name equivalent to .git
+   2 listing: REJECT 'vendor/nested/': a directory git will not descend into (nested repository)
+   3 stage: REJECT update-index --add (exit 0): Ignoring path vendor/nested/; not staged: 'vendor/nested/'
+   4 ingest: ok
+   canary: untouched
+
+== nested repository (directory, no commits)
+   change set: ? 'vendor/nested/' 
+   1 scan: REJECT 'vendor/nested/.git': name equivalent to .git
+   2 listing: REJECT 'vendor/nested/': a directory git will not descend into (nested repository)
+   3 stage: REJECT update-index --add (exit 0): Ignoring path vendor/nested/; not staged: 'vendor/nested/'
+   4 ingest: ok
+   canary: untouched
+
+== nested repository (gitfile)
+   change set: ? 'vendor/nested/' 
+   1 scan: REJECT 'vendor/nested/.git': name equivalent to .git
+   2 listing: REJECT 'vendor/nested/': a directory git will not descend into (nested repository)
+   3 stage: REJECT update-index --add (exit 0): Ignoring path vendor/nested/; not staged: 'vendor/nested/'
+   4 ingest: ok
+   canary: untouched
+
+== nested repository (.git is a symlink to a repository)
+   change set: ? 'vendor/nested/' 
+   1 scan: REJECT 'vendor/nested/.git': name equivalent to .git
+   2 listing: REJECT 'vendor/nested/': a directory git will not descend into (nested repository)
+   3 stage: REJECT update-index --add (exit 0): Ignoring path vendor/nested/; not staged: 'vendor/nested/'
+   4 ingest: ok
+   canary: untouched
+
+== .git file that names no repository
+   change set: ? 'vendor/odd/inner.txt' 
+   1 scan: REJECT 'vendor/odd/.git': name equivalent to .git
+   2 listing: ok
+   3 stage: ok
+   4 ingest: ok
+   note: without the scan: git descends, stages inner.txt and silently leaves .git out
+   canary: untouched
+
+== nested repository in an ignored directory
+   change set: (empty) 
+   1 scan: REJECT 'target/nested/.git': name equivalent to .git
+   2 listing: ok
+   3 stage: ok
+   4 ingest: ok
+   canary: untouched
+
+== nested repository (.git with trailing space (NTFS))
+   change set: ? 'vendor/tmp/.git /COMMIT_EDITMSG', ? 'vendor/tmp/.git /HEAD', ? 'vendor/tmp/.git /config', ? 'vendor/tmp/.git /hooks/fsmonitor-watchman', ? 'vendor/tmp/.git /hooks/post-checkout', ? 'vendor/tmp/.git /hooks/post-index-change', ? 'vendor/tmp/.git /hooks/pre-commit', ? 'vendor/tmp/.git /hooks/reference-transaction', ? 'vendor/tmp/.git /index', ? 'vendor/tmp/.git /logs/HEAD', ? 'vendor/tmp/.git /logs/refs/heads/main', ? 'vendor/tmp/.git /objects/10/8aabee1ecf7ab27858b9b94edb90863ce0f006' …
+   1 scan: REJECT 'vendor/tmp/.git ': name equivalent to .git
+   2 listing: ok
+   3 stage: REJECT update-index --add (exit 0): Ignoring path vendor/tmp/.git /COMMIT_EDITMSG | Ignoring path vendor/tmp/.git /HEAD | Ignoring path vendor/tmp/.git /config | Ignoring path vendor/tmp/.git /hooks/fsmonitor-watchman | Ignoring path vendor/tmp/.git /hooks/post-checkout | Ignoring path vendor/tmp/.git /hooks/post-index-change | Ignori; not staged: 'vendor/tmp/.git /COMMIT_EDITMSG', 'vendor/tmp/.git /HEAD', 'vendor/tmp/.git /config' …
+   4 ingest: ok
+   canary: untouched
+
+== nested repository (git~1 (NTFS short name))
+   change set: ? 'vendor/tmp/git~1/COMMIT_EDITMSG', ? 'vendor/tmp/git~1/HEAD', ? 'vendor/tmp/git~1/config', ? 'vendor/tmp/git~1/hooks/fsmonitor-watchman', ? 'vendor/tmp/git~1/hooks/post-checkout', ? 'vendor/tmp/git~1/hooks/post-index-change', ? 'vendor/tmp/git~1/hooks/pre-commit', ? 'vendor/tmp/git~1/hooks/reference-transaction', ? 'vendor/tmp/git~1/index', ? 'vendor/tmp/git~1/logs/HEAD', ? 'vendor/tmp/git~1/logs/refs/heads/main', ? 'vendor/tmp/git~1/objects/10/8aabee1ecf7ab27858b9b94edb90863ce0f006' …
+   1 scan: REJECT 'vendor/tmp/git~1': name equivalent to .git
+   2 listing: ok
+   3 stage: REJECT update-index --add (exit 0): Ignoring path vendor/tmp/git~1/COMMIT_EDITMSG | Ignoring path vendor/tmp/git~1/HEAD | Ignoring path vendor/tmp/git~1/config | Ignoring path vendor/tmp/git~1/hooks/fsmonitor-watchman | Ignoring path vendor/tmp/git~1/hooks/post-checkout | Ignoring path vendor/tmp/git~1/hooks/post-index-change | Ignori; not staged: 'vendor/tmp/git~1/COMMIT_EDITMSG', 'vendor/tmp/git~1/HEAD', 'vendor/tmp/git~1/config' …
+   4 ingest: ok
+   canary: untouched
+
+== nested repository (.g<U+200C>it (HFS))
+   change set: ? 'vendor/tmp/.g\u200cit/COMMIT_EDITMSG', ? 'vendor/tmp/.g\u200cit/HEAD', ? 'vendor/tmp/.g\u200cit/config', ? 'vendor/tmp/.g\u200cit/hooks/fsmonitor-watchman', ? 'vendor/tmp/.g\u200cit/hooks/post-checkout', ? 'vendor/tmp/.g\u200cit/hooks/post-index-change', ? 'vendor/tmp/.g\u200cit/hooks/pre-commit', ? 'vendor/tmp/.g\u200cit/hooks/reference-transaction', ? 'vendor/tmp/.g\u200cit/index', ? 'vendor/tmp/.g\u200cit/logs/HEAD', ? 'vendor/tmp/.g\u200cit/logs/refs/heads/main', ? 'vendor/tmp/.g\u200cit/objects/10/8aabee1ecf7ab27858b9b94edb90863ce0f006' …
+   1 scan: REJECT 'vendor/tmp/.g\u200cit': name equivalent to .git
+   2 listing: ok
+   3 stage: REJECT update-index --add (exit 0): Ignoring path vendor/tmp/.g‌it/COMMIT_EDITMSG | Ignoring path vendor/tmp/.g‌it/HEAD | Ignoring path vendor/tmp/.g‌it/config | Ignoring path vendor/tmp/.g‌it/hooks/fsmonitor-watchman | Ignoring path vendor/tmp/.g‌it/hooks/post-checkout | Ignoring path vendor/tmp/.g‌it/hooks/post-index-change | Ignori; not staged: 'vendor/tmp/.g\u200cit/COMMIT_EDITMSG', 'vendor/tmp/.g\u200cit/HEAD', 'vendor/tmp/.g\u200cit/config' …
+   4 ingest: ok
+   canary: untouched
+
+== file named with backslashes around .git
+   change set: ? 'vendor/x\\.git\\config' 
+   1 scan: REJECT 'vendor/x\\.git\\config': name equivalent to .git
+   2 listing: ok
+   3 stage: REJECT update-index --add (exit 0): Ignoring path vendor/x\.git\config; not staged: 'vendor/x\\.git\\config'
+   4 ingest: ok
+   canary: untouched
+
+== embedded bare repository (no .git name anywhere)
+   change set: ? 'vendor/bare/COMMIT_EDITMSG', ? 'vendor/bare/HEAD', ? 'vendor/bare/config', ? 'vendor/bare/hooks/fsmonitor-watchman', ? 'vendor/bare/hooks/post-checkout', ? 'vendor/bare/hooks/post-index-change', ? 'vendor/bare/hooks/pre-commit', ? 'vendor/bare/hooks/reference-transaction', ? 'vendor/bare/index', ? 'vendor/bare/logs/HEAD', ? 'vendor/bare/logs/refs/heads/main', ? 'vendor/bare/objects/10/8aabee1ecf7ab27858b9b94edb90863ce0f006' …
+   1 scan: ok
+   2 listing: ok
+   3 stage: ok
+   4 ingest: ok
+   tree 95e2e8ac290431f184a611a6367189a45ec449f6  candidate 6d6d07c66c3f44ecc66f0731281fbdba8a3b8892
+   note: export == workspace
+   note: tree holds vendor/bare/COMMIT_EDITMSG, vendor/bare/HEAD, vendor/bare/config, vendor/bare/hooks, vendor/bare/index, vendor/bare/logs, vendor/bare/objects, vendor/bare/refs
+   canary: untouched
+
+== symlinked directories
+   change set: D 'src/lib.rs', D 'src/main.rs', ? 'dangling', ? 'etc-link', ? 'outside-link', ? 'scripts/docs-link', ? 'src' 
+   1 scan: ok
+   2 listing: ok
+   3 stage: ok
+   4 ingest: ok
+   tree 144ce15853ec249d3c17ba3b05a84e8d4b1ad83f  candidate 731f54a44d00acc2bf7d310be8d73b50416f530b
+   note: export == workspace
+   canary: untouched
+
+== FIFO at the top level
+   change set: (empty) 
+   1 scan: REJECT 'pipe': not a regular file, directory or symlink
+   2 listing: ok
+   3 stage: ok
+   4 ingest: ok
+   canary: untouched
+
+== FIFO in an ignored directory
+   change set: (empty) 
+   1 scan: REJECT 'target/pipe': not a regular file, directory or symlink
+   2 listing: ok
+   3 stage: ok
+   4 ingest: ok
+   canary: untouched
+
+== tracked file replaced by a FIFO
+   change set: M 'src/lib.rs' 
+   1 scan: REJECT 'src/lib.rs': not a regular file, directory or symlink
+   2 listing: REJECT 'src/lib.rs': not a file or symlink in the scan inventory (kind -)
+   3 stage: REJECT update-index --add (exit 128): error: src/lib.rs: unsupported file type | fatal: Unable to process path src/lib.rs; not staged: 'src/lib.rs'
+   4 ingest: ok
+   canary: untouched
+
+== unix socket
+   change set: (empty) 
+   1 scan: REJECT 'sock': not a regular file, directory or symlink
+   2 listing: ok
+   3 stage: ok
+   4 ingest: ok
+   canary: untouched
+
+== hard links (inside the workspace and to a file outside it)
+   change set: ? 'src/a.rs', ? 'src/b.rs', ? 'src/outside.rs' 
+   1 scan: ok
+   2 listing: ok
+   3 stage: ok
+   4 ingest: ok
+   tree 4299f47986aa8da67d8107fa59095b32c8c32ca1  candidate 52251f1512d1f33ad5f78493edc64c992b1793a0
+   note: export == workspace
+   note: two entries, one blob
+   canary: untouched
+
+== .gitattributes: filter, eol, encoding, ident, export-ignore, -diff
+   change set: M 'src/lib.rs', ? '.gitattributes', ? 'asset.bin', ? 'crlf.txt', ? 'id.txt', ? 'secret.txt', ? 'utf16.txt' 
+   1 scan: ok
+   2 listing: ok
+   3 stage: ok
+   4 ingest: ok
+   tree da1a4b1c5f3fb2c4dfebe9e56f93963d27fd01c7  candidate dc5023d80f3dc5fb5614fb4af9774d8d24ed52ae
+   note: export == workspace
+   note: git archive omits secret.txt
+   note: -diff: text diff with the empty attribute source: True; hidden when the candidate's attributes apply: True
+   canary: untouched
+
+== agent-edited .gitignore
+   change set: M '.gitignore', M 'build/keep.log', ? 'build/shown.log', ? 'target/debug/app' 
+   1 scan: ok
+   2 listing: ok
+   3 stage: ok
+   4 ingest: ok
+   tree 095c9d30cd9df17717bb0d5e03b50c78bfdfcc80  candidate c1e60115c3c903ec361b7ee88b0ee7948f95d701
+   note: export == workspace
+   note: in tree: .gitignore=yes, hidden/tool.rs=no, target/debug/app=yes, build/shown.log=yes, vendor/self/.gitignore=no, vendor/self/blob.rs=no
+   canary: untouched
+
+== .gitignore is a symlink to a file outside
+   change set: T '.gitignore', ? 'src/new.rs' 
+   1 scan: ok
+   2 listing: ok
+   3 stage: ok
+   4 ingest: ok
+   tree 8e5aba24f52c840ca14edd290982c036d9ca5972  candidate 55c6e07a7575d96957acae8ca25890b6452f5b5d
+   note: export == workspace
+   note: status stderr: warning: unable to access '.gitignore': Too many levels of symbolic links
+   canary: untouched
+
+== large file (6 MiB, untracked)
+   change set: ? 'big.bin' 
+   1 scan: ok
+   2 listing: REJECT 'big.bin': 6291456 bytes, over the per-file cap
+   3 stage: ok
+   4 ingest: REJECT 'big.bin': blob of 6291456 bytes, over the per-file cap
+   canary: untouched
+
+== large file in an ignored directory
+   change set: (empty) 
+   1 scan: ok
+   2 listing: ok
+   3 stage: ok
+   4 ingest: ok
+   tree 9ae0737c925eae0cf07ef95cdd028f6509337816  candidate e44350245b94cd5cdf4201a98c788de6d1427b3b
+   note: export == workspace
+   canary: untouched
+
+== sparse file (1 TiB apparent size)
+   change set: ? 'huge.bin' 
+   1 scan: ok
+   2 listing: REJECT 'huge.bin': 1099511627776 bytes, over the per-file cap; change set of 1099511627776 bytes, over the total cap
+   3 stage: REJECT not staged: 'huge.bin'
+   4 ingest: ok
+   canary: untouched
+
+== change set over the total cap (11 files of 4.9 MiB)
+   change set: ? 'data/0.bin', ? 'data/1.bin', ? 'data/10.bin', ? 'data/2.bin', ? 'data/3.bin', ? 'data/4.bin', ? 'data/5.bin', ? 'data/6.bin', ? 'data/7.bin', ? 'data/8.bin', ? 'data/9.bin' 
+   1 scan: ok
+   2 listing: REJECT change set of 56518242 bytes, over the total cap
+   3 stage: ok
+   4 ingest: REJECT index-pack --strict: fatal: pack exceeds maximum allowed size (51.00 MiB)
+   canary: untouched
+
+== names: newline, leading dash, tab, quote, non-UTF-8, 255 bytes
+   change set: ? 'odd/ lead', ? 'odd/--stdin', ? 'odd/-rf', ? 'odd/new\nline.txt', ? 'odd/quo"te', ? 'odd/tab\tname', ? 'odd/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' 
+   1 scan: ok
+   2 listing: ok
+   3 stage: ok
+   4 ingest: ok
+   tree e1ad9ca342f6fc35c4a71e8cd15c267f49963345  candidate 66d16f61023bd896d788c67c505d52ab10608822
+   note: export == workspace
+   canary: untouched
+
+== experiment: exact commands of a benign capture
+      $  /opt/homebrew/bin/git --attr-source=4b825dc642cb6eb9a060e54bf8d69288fbee4904 clone -q --bare --no-local --single-branch --branch main --template= /private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/mirror.git /private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/host.git
+      $  /opt/homebrew/bin/git --attr-source=4b825dc642cb6eb9a060e54bf8d69288fbee4904 remote remove origin
+      $  /opt/homebrew/bin/git --attr-source=4b825dc642cb6eb9a060e54bf8d69288fbee4904 clone -q --no-local --no-checkout --single-branch --branch main --template= /private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/mirror.git /private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/workspace
+      $  /opt/homebrew/bin/git --attr-source=4b825dc642cb6eb9a060e54bf8d69288fbee4904 checkout -q --detach c5d2c3fda8a9431ede6b3cff07900d0b4817a93d
+      $  /opt/homebrew/bin/git --attr-source=4b825dc642cb6eb9a060e54bf8d69288fbee4904 remote remove origin
+      $  /opt/homebrew/bin/git --attr-source=4b825dc642cb6eb9a060e54bf8d69288fbee4904 init -q --bare --template= /private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/quarantine
+      $ GIT_INDEX_FILE=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/quarantine/index /opt/homebrew/bin/git --attr-source=4b825dc642cb6eb9a060e54bf8d69288fbee4904 --git-dir=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/quarantine --work-tree=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/workspace read-tree 9ae0737c925eae0cf07ef95cdd028f6509337816
+      $ GIT_INDEX_FILE=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/quarantine/index /opt/homebrew/bin/git --attr-source=4b825dc642cb6eb9a060e54bf8d69288fbee4904 --git-dir=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/quarantine --work-tree=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/workspace update-index -q --refresh
+      $ GIT_INDEX_FILE=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/quarantine/index /opt/homebrew/bin/git --attr-source=4b825dc642cb6eb9a060e54bf8d69288fbee4904 --git-dir=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/quarantine --work-tree=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/workspace diff-files -z --raw --no-renames --ignore-submodules=all
+      $ GIT_INDEX_FILE=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/quarantine/index /opt/homebrew/bin/git --attr-source=4b825dc642cb6eb9a060e54bf8d69288fbee4904 --git-dir=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/quarantine --work-tree=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/workspace ls-files -z --others --exclude-standard
+      $ GIT_INDEX_FILE=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/quarantine/index /opt/homebrew/bin/git --attr-source=4b825dc642cb6eb9a060e54bf8d69288fbee4904 --git-dir=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/quarantine --work-tree=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/workspace update-index -z --force-remove --stdin
+      $ GIT_INDEX_FILE=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/quarantine/index /opt/homebrew/bin/git --attr-source=4b825dc642cb6eb9a060e54bf8d69288fbee4904 --git-dir=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/quarantine --work-tree=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/workspace update-index -z --add --stdin
+      $ GIT_INDEX_FILE=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/quarantine/index /opt/homebrew/bin/git --attr-source=4b825dc642cb6eb9a060e54bf8d69288fbee4904 --git-dir=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/quarantine --work-tree=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/workspace diff-files -z --raw --no-renames --ignore-submodules=all
+      $ GIT_INDEX_FILE=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/quarantine/index /opt/homebrew/bin/git --attr-source=4b825dc642cb6eb9a060e54bf8d69288fbee4904 --git-dir=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/quarantine --work-tree=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/workspace ls-files -z --others --exclude-standard
+      $ GIT_INDEX_FILE=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/quarantine/index /opt/homebrew/bin/git --attr-source=4b825dc642cb6eb9a060e54bf8d69288fbee4904 --git-dir=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/quarantine --work-tree=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/workspace write-tree
+      $ GIT_INDEX_FILE=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/quarantine/index /opt/homebrew/bin/git --attr-source=4b825dc642cb6eb9a060e54bf8d69288fbee4904 --git-dir=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/quarantine --work-tree=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/workspace pack-objects --revs --stdout --local -q
+      $ GIT_OBJECT_DIRECTORY=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/incoming GIT_ALTERNATE_OBJECT_DIRECTORIES=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/host.git/objects /opt/homebrew/bin/git --attr-source=4b825dc642cb6eb9a060e54bf8d69288fbee4904 --git-dir=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/host.git index-pack --stdin --strict --max-input-size=53477376
+      $ GIT_OBJECT_DIRECTORY=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/incoming GIT_ALTERNATE_OBJECT_DIRECTORIES=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/host.git/objects /opt/homebrew/bin/git --attr-source=4b825dc642cb6eb9a060e54bf8d69288fbee4904 --git-dir=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/host.git cat-file -t 7d74e996880737f4eb0ac847e9352a20fa6d8193
+      $ GIT_OBJECT_DIRECTORY=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/incoming GIT_ALTERNATE_OBJECT_DIRECTORIES=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/host.git/objects /opt/homebrew/bin/git --attr-source=4b825dc642cb6eb9a060e54bf8d69288fbee4904 --git-dir=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/host.git ls-tree -r -t -z -l --full-tree 7d74e996880737f4eb0ac847e9352a20fa6d8193
+      $ GIT_OBJECT_DIRECTORY=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/incoming GIT_ALTERNATE_OBJECT_DIRECTORIES=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/host.git/objects /opt/homebrew/bin/git --attr-source=4b825dc642cb6eb9a060e54bf8d69288fbee4904 --git-dir=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/host.git diff-tree -r -z --raw --no-renames --no-abbrev 9ae0737c925eae0cf07ef95cdd028f6509337816 7d74e996880737f4eb0ac847e9352a20fa6d8193
+      $  /opt/homebrew/bin/git --attr-source=4b825dc642cb6eb9a060e54bf8d69288fbee4904 --git-dir=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/host.git commit-tree --no-gpg-sign 7d74e996880737f4eb0ac847e9352a20fa6d8193 -p c5d2c3fda8a9431ede6b3cff07900d0b4817a93d -F -
+      $ GIT_INDEX_FILE=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/export/bc2fc3f17e2dc74db54342915440ef3de09dedea.index /opt/homebrew/bin/git --attr-source=4b825dc642cb6eb9a060e54bf8d69288fbee4904 --git-dir=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/host.git read-tree bc2fc3f17e2dc74db54342915440ef3de09dedea
+      $ GIT_INDEX_FILE=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/export/bc2fc3f17e2dc74db54342915440ef3de09dedea.index /opt/homebrew/bin/git --attr-source=4b825dc642cb6eb9a060e54bf8d69288fbee4904 --git-dir=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/host.git --work-tree=/private/var/folders/57/hmzjr3nd39bc9fccprc7cf680000gp/T/sf-p7-fle6t5wq/runs/commands/export/bc2fc3f17e2dc74db54342915440ef3de09dedea checkout-index -a
+   => same inputs give bc2fc3f17e2d twice: True
+   => tree equals the previous tree: True; layers: candidate
+
+== experiment: staging with in-tree attributes honoured against the empty attribute source
+   staging with empty tree attributes, export with empty tree: export == workspace
+   staging with in-tree attributes, export with empty tree: export differs from workspace at ['crlf.txt', 'id.txt', 'utf16.txt']
+   staging with in-tree attributes, export with in-tree: export differs from workspace at ['id.txt', 'utf16.txt']
+   => export == workspace; export differs from workspace at ['crlf.txt', 'id.txt', 'utf16.txt']; export differs from workspace at ['id.txt', 'utf16.txt']
+
+== experiment: base commit that carries attributes: does an untouched workspace show a change set?
+   checkout with empty-tree attributes, staging with empty-tree: change set (empty)
+   checkout with in-tree attributes, staging with in-tree: change set (empty)
+   checkout with in-tree attributes, staging with empty-tree: change set [('M', 'crlf.txt'), ('M', 'utf16.txt')]
+   checkout with empty-tree attributes, staging with in-tree: change set (empty)
+   => same source, empty change set: True; in-tree checkout then empty-tree staging shows untouched files as changed: True; the reverse: False
+
+== experiment: export: checkout-index with and without the empty attribute source
+   blob is b'one\ntwo\n'; export with GIT_ATTR_SOURCE=empty tree: b'one\ntwo\n'; without: b'one\r\ntwo\r\n'
+   => True
+
+== experiment: naive staging: git add -A on a nested repository
+   add -A stderr: warning: adding embedded git repository: vendor/nested
+   => ingest: ["'vendor/nested': mode 160000"]; canary fired: False
+
+== experiment: base tree with a gitlink, populated by a hostile nested repository
+   diff-files --ignore-submodules=all: change set (empty); canary untouched
+   diff-files --ignore-submodules=none: change set (empty); canary FIRED
+
+== experiment: .gitignore is a FIFO and the scan is skipped
+   => ['ls-files: TIMEOUT after 5s']
+
+== experiment: untracked FIFO and the scan is skipped: does git list it?
+   => change set (empty)
+
+== experiment: subverted staging: hostile packs and tree names
+   tree with an entry named .git: ["index-pack --strict: error: object 844e32858c207f74f3d80721ef01c4b82fad2423: hasDotgit: contains '.git' | fatal: fsck error in packed object"]
+   tree with an entry named .GIT: ["index-pack --strict: error: object 621259c847ef9d7c33c14d2881524737cb522a90: hasDotgit: contains '.git' | fatal: fsck error in packed object"]
+   tree with an entry named git~1: ["index-pack --strict: error: object c51e6c398f300b07d8951c5abe555dff3e52ed91: hasDotgit: contains '.git' | fatal: fsck error in packed object"]
+   tree with a gitlink: ["'sub': mode 160000"]
+   tree with a .gitmodules symlink: ['index-pack --strict: error: object be4ac4edcc2ed5de02beabdb2974db0fd99e6e97: gitmodulesSymlink: .gitmodules is a symbolic link | fatal: fsck error in packed object']
+   tree naming a blob that is not in the pack: ['index-pack --strict: fatal: did not receive expected object 1111111111111111111111111111111111111111']
+   tree naming another run's blob: ['index-pack --strict: fatal: did not receive expected object b1ba71266acd5594f563bff519747c34fa1f63bd']
+   truncated pack: ['index-pack --strict: fatal: early EOF']
+   tree name that is not hex: ["tree name 'HEAD; rm -rf /' is not an object name"]
+   garbage in place of a pack: ['index-pack --strict: fatal: early EOF']
+   => objects/pack holds 3 files, as after the clone: ['idx', 'pack', 'rev']
+
+== experiment: another run's objects
+   => in the mirror: True; in a fresh workspace: False; in host.git: False
+
+== experiment: export of a case-colliding tree on a case-insensitive file system
+   checkout-index: fatal: cannot create directory at 'a': File exists | export holds ['A']
+   => file written outside the export: False
+
+
+| Case | Must stop at | Observed | As expected |
+|---|---|---|---|
+| benign change set | candidate | candidate | yes |
+| executable bits | candidate | candidate | yes |
+| unreadable file | stage | stopped by 3 stage | yes |
+| root .git made hostile (config, hooks, info/exclude, info/attributes) | candidate | candidate | yes |
+| root .git replaced by a gitfile | candidate | candidate | yes |
+| nested repository (directory, with commits, fsmonitor, hooks) | scan | stopped by 1 scan, 2 listing, 3 stage | yes |
+| nested repository (directory, no commits) | scan | stopped by 1 scan, 2 listing, 3 stage | yes |
+| nested repository (gitfile) | scan | stopped by 1 scan, 2 listing, 3 stage | yes |
+| nested repository (.git is a symlink to a repository) | scan | stopped by 1 scan, 2 listing, 3 stage | yes |
+| .git file that names no repository | scan | stopped by 1 scan | yes |
+| nested repository in an ignored directory | scan | stopped by 1 scan | yes |
+| nested repository (.GIT) | scan | skipped (needs a case-sensitive file system) | yes |
+| nested repository (.git with trailing space (NTFS)) | scan | stopped by 1 scan, 3 stage | yes |
+| nested repository (git~1 (NTFS short name)) | scan | stopped by 1 scan, 3 stage | yes |
+| nested repository (.g<U+200C>it (HFS)) | scan | stopped by 1 scan, 3 stage | yes |
+| file named with backslashes around .git | scan | stopped by 1 scan, 3 stage | yes |
+| embedded bare repository (no .git name anywhere) | candidate | candidate | yes |
+| symlinked directories | candidate | candidate | yes |
+| FIFO at the top level | scan | stopped by 1 scan | yes |
+| FIFO in an ignored directory | scan | stopped by 1 scan | yes |
+| tracked file replaced by a FIFO | scan | stopped by 1 scan, 2 listing, 3 stage | yes |
+| unix socket | scan | stopped by 1 scan | yes |
+| hard links (inside the workspace and to a file outside it) | candidate | candidate | yes |
+| .gitattributes: filter, eol, encoding, ident, export-ignore, -diff | candidate | candidate | yes |
+| agent-edited .gitignore | candidate | candidate | yes |
+| .gitignore is a symlink to a file outside | candidate | candidate | yes |
+| large file (6 MiB, untracked) | listing | stopped by 2 listing, 4 ingest | yes |
+| large file in an ignored directory | candidate | candidate | yes |
+| sparse file (1 TiB apparent size) | listing | stopped by 2 listing, 3 stage | yes |
+| change set over the total cap (11 files of 4.9 MiB) | listing | stopped by 2 listing, 4 ingest | yes |
+| case collision | ingest | skipped (needs a case-sensitive file system) | yes |
+| names: newline, leading dash, tab, quote, non-UTF-8, 255 bytes | candidate | candidate | yes |
+| commit-tree is repeatable |  | same inputs give bc2fc3f17e2d twice: True | yes |
+| empty change set |  | tree equals the previous tree: True; layers: candidate | yes |
+| only the empty attribute source at both ends reproduces the workspace |  | export == workspace; export differs from workspace at ['crlf.txt', 'id.txt', 'utf16.txt']; export differs from workspace at ['id.txt', 'utf16.txt'] | yes |
+| workspace checkout and staging must use the same attribute source |  | same source, empty change set: True; in-tree checkout then empty-tree staging shows untouched files as changed: True; the reverse: False | yes |
+| checkout-index applies the candidate's own attributes unless told otherwise |  | True | yes |
+| git add -A turns a nested repository into a gitlink |  | ingest: ["'vendor/nested': mode 160000"]; canary fired: False | yes |
+| gitlink in base, diff-files --ignore-submodules=all |  | nothing ran | yes |
+| gitlink in base, diff-files --ignore-submodules=none |  | nested fsmonitor ran | yes |
+| git blocks on a FIFO named .gitignore |  | ['ls-files: TIMEOUT after 5s'] | yes |
+| git silently omits an untracked FIFO |  | change set (empty) | yes |
+| tree with an entry named .git | ingest | rejected | yes |
+| tree with an entry named .GIT | ingest | rejected | yes |
+| tree with an entry named git~1 | ingest | rejected | yes |
+| tree with a gitlink | ingest | rejected | yes |
+| tree with a .gitmodules symlink | ingest | rejected | yes |
+| tree naming a blob that is not in the pack | ingest | rejected | yes |
+| tree naming another run's blob | ingest | rejected | yes |
+| truncated pack | ingest | rejected | yes |
+| tree name that is not hex | ingest | rejected | yes |
+| garbage in place of a pack | ingest | rejected | yes |
+| host.git after ten rejected ingests |  | objects/pack holds 3 files, as after the clone: ['idx', 'pack', 'rev'] | yes |
+| another run's blob |  | in the mirror: True; in a fresh workspace: False; in host.git: False | yes |
+| symlink A and directory a in one tree |  | file written outside the export: False | yes |

@@ -18,3 +18,9 @@ SF_PROTO_BWRAP=1 ./linux.sh     # the same, staging under bubblewrap
 
 `-v` prints every git command; `-k <text>` runs the cases whose name contains
 the text. `results/` holds the three runs the probe answer was written from.
+
+`extra_checks.sh` records four single observations the probe record cites:
+the `GIT_ATTR_SOURCE` variable against the `--attr-source` option, `--remove`
+against `--force-remove` behind a symlink, `ls-tree -z --format` quoting, and
+`core.fsmonitor` of a nested repository under `diff-files`. Its output on
+git 2.56.1, 2.47.3 and 2.39.5 is in `results/extra-*.txt`.

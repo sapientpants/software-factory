@@ -1,0 +1,15 @@
+== git version 2.47.3 on Linux
+-- 1. GIT_ATTR_SOURCE against --attr-source, staging a CRLF file under eol=crlf
+variable: exit 0, blob bytes: o n e \r \n
+option: blob bytes: o n e \r \n
+-- 2. update-index --remove against --force-remove for a path now behind a symlink
+error: 'src/lib.rs' is beyond a symbolic link
+fatal: Unable to process path src/lib.rs
+--remove: exit 128
+--force-remove: exit 0, index now holds: []
+-- 3. ls-tree -z, with --format and with -l, on a name that holds a tab
+--format:  1 0 0 6 4 4 \t " t a b \ t n a m e " \0
+-l:        1 0 0 6 4 4 b l o b c 1 b 0 7 3 0 e 0 1 3 3 4 4 7 b a d c f d 4 7 f d 1 4 4 e 2 5 4 8 0 7 b 0 6 e 1 1 \t t a b \t n a m e \0
+-- 4. a gitlink in the index, a nested repository at its path whose only hostile setting is core.fsmonitor
+--ignore-submodules=all:  canary untouched
+--ignore-submodules=none: canary FIRED

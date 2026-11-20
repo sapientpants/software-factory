@@ -89,7 +89,7 @@ INSIDE_SH = """#!/bin/sh
   for ns in user mnt pid net ipc; do echo "ns $ns $(readlink /proc/self/ns/$ns)"; done
   grep -E '^(NoNewPrivs|Seccomp|Seccomp_filters):' /proc/self/status | tr -s '\\t' ' ' | sed 's/^/status /'
   echo "processes visible: $(ls /proc | grep -c '^[0-9]')"
-  echo "interfaces: $(sed -n '3,$s/:.*//p' /proc/net/dev | tr -s ' \\n' ' ')"
+  echo "interfaces besides lo: $(sed -n '3,$s/:.*//p' /proc/net/dev | tr -d ' ' | grep -c -v -x lo)"
   echo "proxy variables: $(env | grep -i -E '^(https?|all|no)_proxy=' | sed 's|//[^@]*@|//<credentials>@|' | sort | tr '\\n' ' ')"
   for target in ./canary-cwd @OUTSIDE@/canary-outside @TMP_CANARY@; do
     if (: >"$target") 2>/dev/null; then echo "write $target: ok"; else echo "write $target: denied"; fi

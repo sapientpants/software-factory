@@ -42,9 +42,23 @@ Thirteen sessions of one or two turns on the `haiku` alias: a pass reported 0.01
 
 | File | Run |
 |---|---|
-| `results/container-2026-11-20.txt` | A Debian 13 container on the Mac (arm64, Docker Desktop's 7.0.14-linuxkit kernel), built from the `Dockerfile` here and started with `--privileged`. The script ran the way it is to run on the server: as a system user named `sf` with no home directory, started from a directory that user cannot read, with a copy of the binary in `/tmp` and the token on standard input. Claude Code 2.1.311, bubblewrap 0.12.0, socat 1.8.0.3 |
+| `results/server-2026-11-20.txt` | The server, at 18:35 UTC, started by the operator from a login as `sudo -H -u sf python3 /tmp/inner_sandbox_probe.py --claude /tmp/claude-p6 --token-stdin`, so as the factory's user, with a copy of the operator's Claude Code 2.1.311 binary. Debian 13, x86-64, bubblewrap 0.12.0, **no `socat`**. The script at commit `cbe7a0c` |
+| `results/container-2026-11-20.txt` | A Debian 13 container on the Mac (arm64, Docker Desktop's 7.0.14-linuxkit kernel), built from the `Dockerfile` here and started with `--privileged`. The script ran the way it is to run on the server: as a system user named `sf` with no home directory, started from a directory that user cannot read, with a copy of the binary in `/tmp` and the token on standard input. Claude Code 2.1.311, bubblewrap 0.12.0, socat 1.8.0.3. The script at commit `cbe7a0c` |
 
-The container run is a rehearsal of the script, not the answer to P-6: the probe asks about the server.
+In the server's file the names of 13 network interfaces are replaced by `<13 names redacted>`, on 12 lines. The repository is public and the operator chose to name nothing that identifies the server. Trailing spaces are dropped in both files. Since these runs the script prints how many interfaces there are besides `lo`, and no names.
+
+P-6 asks about the server. The server has no `socat`, which the CLI's sandbox needs, so the container run is the only one in which that sandbox started.
+
+## What the server run showed
+
+- **With no `sandbox` block, or with `enabled: false`, the Bash tool runs in the CLI's own namespaces** under both outer sandboxes and without one. The command wrote in all three places and reached `api.anthropic.com`. Nothing on stderr.
+- **With `enabled: true` the CLI started no sandbox, in any of the seven cases.** It wrote to stderr `Sandbox disabled: sandbox is enabled but dependencies are missing: socat not installed` and `Commands will run WITHOUT sandboxing`, and the command ran as if the setting were absent. `allowUnsandboxedCommands: false` and `enableWeakerNestedSandbox` changed nothing. The session ended with `success` and exit code 0, and the stream says nothing of it: the `system/init` message has no field that mentions a sandbox.
+- **With `failIfUnavailable: true` as well, the CLI did not start:** exit code 1 after one second, no `system/init` message, a `result` of subtype `error_during_execution`, and on stderr `sandbox required but unavailable` and `sandbox.failIfUnavailable is set`.
+- **bubblewrap nests in the stand-in on the server** and does not under `--disable-userns`: the preflight lines `nested`.
+
+## What the container run showed
+
+The container run was a rehearsal of the script. It differs from the server in having `socat`.
 
 The container has no `sudo`, so `runuser` stood in for it:
 
@@ -59,16 +73,14 @@ CLAUDE_CODE_OAUTH_TOKEN="$(cat ~/.config/sf-probe/oauth-token)" \
       python3 /tmp/inner_sandbox_probe.py --claude /tmp/claude-p6 --token-stdin'
 ```
 
-What it showed there:
-
 - **With no `sandbox` block, or with `enabled: false`, the Bash tool runs in the CLI's own namespaces** under both outer sandboxes. The CLI starts no sandbox of its own.
 - **With `enabled: true` under the `bwrap` stand-in, the CLI's sandbox works nested.** The command runs in a new user, mount, PID and network namespace, with two seccomp filters, cannot write outside the working directory and is refused `api.anthropic.com` by the CLI's proxy. `enableWeakerNestedSandbox` was not needed.
 - **With `enabled: true` under `nouserns`, every Bash command fails:** `bwrap: Creating new namespace failed`. The session still ends with `success` and exit code 0. `failIfUnavailable` does not stop the CLI at startup, and `enableWeakerNestedSandbox` does not help.
-- **Unless `allowUnsandboxedCommands` is `false`, the model may run the command again outside the sandbox.** It did in three passes of four, with `dangerouslyDisableSandbox: true` in the tool call, and the command then ran in the CLI's namespaces.
+- **Unless `allowUnsandboxedCommands` is `false`, the model may run the command again outside the sandbox.** It did in three passes of four, of which the kept output is the last, with `dangerouslyDisableSandbox: true` in the tool call, and the command then ran in the CLI's namespaces.
 
-## What the container run does not show
+## What neither run shows
 
-- **The server.** Another kernel, another architecture, and no Docker around the outer sandbox.
+- **The CLI's sandbox starting on the server.** That needs `socat` there. The container has another kernel, another architecture, and Docker around the outer sandbox.
 - **The factory's sandbox.** The stand-in shares the network namespace and has no seccomp filter and no proxy.
 - **A microVM**, which P-6 also asks about. That is M2 work (D-5).
 - **Another model or a longer session.** Whether a model retries outside the sandbox is the model's choice; one short prompt on `haiku` was tried.

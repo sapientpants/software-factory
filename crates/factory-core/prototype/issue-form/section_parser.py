@@ -26,7 +26,11 @@ NAMES = {name.lower(): name for name in FIELDS.values()}
 NO_RESPONSE = "_No response_"
 
 # Which saved issue came from which submission.
-ISSUES = {3: "a-complete", 2: "b-sparse", 1: "c-hostile"}
+ISSUES = {3: "a-complete", 2: "b-sparse", 1: "c-hostile", 4: "d-leftovers"}
+
+# Fields the operator typed by hand before pressing Create, so that the
+# submission's file does not hold what was sent.
+BY_HAND = {4: {"outcome", "context"}}
 
 FENCE_OPEN = re.compile(r"^ {0,3}(`{3,}|~{3,})(.*)$")
 ATX = re.compile(r"^ {0,3}(#{1,6})(?:[ \t]+(.*?))??(?:[ \t]+#+)?[ \t]*$")
@@ -133,6 +137,9 @@ def main(inputs, results):
         for field, name in FIELDS.items():
             typed = section_text(split_lines(fields.get(field, "")))
             read = sections.get(name, [])
+            if field in BY_HAND.get(number, ()):
+                print(f"  {name}: typed by hand, reads {show(read)}")
+                continue
             for keep in ("first", "last"):
                 got = naive(body, keep).get(name)
                 if got != typed:
@@ -143,6 +150,10 @@ def main(inputs, results):
                 print(f"  {name}: {len(read)} sections, the typed text is number {read.index(typed) + 1 if typed in read else 'none'} of them")
             elif repeated and len(read) == 1 and typed.startswith(read[0]):
                 print(f"  {name}: cut short by a section heading typed into it: {len(read[0])} of {len(typed)} characters read")
+            elif not repeated and len(read) == 1 and read[0].startswith(typed) and "### " in read[0][len(typed):]:
+                print(f"  {name}: runs on past the field, over a form heading inside its open fence: {len(read[0])} characters read, {len(typed)} submitted")
+            elif not repeated and not read and typed and f"### {name}" in body:
+                print(f"  {name}: no section, its heading is inside the open fence of an earlier field")
             else:
                 ok = False
                 print(f"  {name}: MISMATCH typed {show(typed)} read {show(read)}")

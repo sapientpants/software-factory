@@ -99,6 +99,21 @@ SUBMISSIONS = {
             "-------"
         ),
     },
+    # The second round: what the first three left open. The operator types the
+    # Context field by hand, so it is absent here.
+    "d-leftovers": {
+        "title": "P-4 probe D: what the first three left open",
+        "outcome": "   ",
+        "acceptance-criteria": (
+            "- AC-1 (review): WHEN a fence is made of tildes THE SYSTEM SHALL treat it as a fence.\n"
+            "\n"
+            "~~~\n"
+            "### Outcome\n"
+            "~~~"
+        ),
+        "out-of-scope": f"{FENCE}\nThis fence is never closed.",
+        "stop-conditions": "The last field ends with two spaces and two line feeds.  \n\n",
+    },
 }
 
 out = pathlib.Path(sys.argv[1])

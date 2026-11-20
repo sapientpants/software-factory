@@ -34,3 +34,15 @@ repeated section names: {'Outcome': 5, 'Acceptance criteria': 2}
   Stop conditions: naive last-wins reads "Unicode: café, “quotes”, 日本語, 🙂\n\ta line that starts with a tab"
   Stop conditions: cut short by a section heading typed into it: 62 of 146 characters read
 
+== issue 4 (d-leftovers): 346 bytes, 0 CR, ends with newline: True
+level-3 headings: sketch 5, GitHub's HTML 5, same list: True
+repeated section names: none
+  Outcome: typed by hand, reads ["   sdfsdf"]
+  Spec refs: round trip holds (empty)
+  Context: typed by hand, reads ["line 1\nline 2"]
+  Acceptance criteria: naive first-wins reads "- AC-1 (review): WHEN a fence is made of tildes THE SYSTEM SHALL treat it as a fence.\n\n~~~"
+  Acceptance criteria: naive last-wins reads "- AC-1 (review): WHEN a fence is made of tildes THE SYSTEM SHALL treat it as a fence.\n\n~~~"
+  Acceptance criteria: round trip holds (106 characters)
+  Out of scope: runs on past the field, over a form heading inside its open fence: 111 characters read, 31 submitted
+  Stop conditions: no section, its heading is inside the open fence of an earlier field
+

@@ -1,0 +1,7 @@
+{
+  "title": "P-4 probe D: what the first three left open",
+  "outcome": "   ",
+  "acceptance-criteria": "- AC-1 (review): WHEN a fence is made of tildes THE SYSTEM SHALL treat it as a fence.\n\n~~~\n### Outcome\n~~~",
+  "out-of-scope": "```\nThis fence is never closed.",
+  "stop-conditions": "The last field ends with two spaces and two line feeds.  \n\n"
+}

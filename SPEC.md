@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | Status | Draft 4. Drafts 1 and 2 were reviewed (`docs/research/09-spec-review.md`, `10-spec-recheck.md`) and draft 3 addressed the findings. Draft 4 applies the operator's requirement decisions (23.1) and has not been reviewed. |
-| Date | 2026-11-19 |
+| Date | 2026-11-20 |
 | Implementation language | Rust (toolchain 1.100, edition 2024) |
 | System of record | git on GitHub for code, GitHub Issues for work items |
 | Research basis | `docs/research/01`–`08` (sourced reports and a fact-check table) |
@@ -520,11 +520,13 @@ The daemon is the only dispatcher for a store, enforced by an exclusive file loc
 
 1. One GraphQL read of the issue: check SEC-1 on the `state:ready` label and rule 6 of 5.3; capture the snapshot; record tier, risk and type under SEC-1. Read the default-branch head once: it is both `base_sha` and `policy_sha`. Refuse a base tree that contains a submodule entry. Run the readiness lint on the snapshot.
 2. Insert the run row carrying all of the above. A unique index on (repository, issue) for non-terminal runs makes this the authoritative local claim.
-3. Create `refs/heads/factory/issue-<n>` at `base_sha` through the API. An existing ref whose SHA equals the journalled `base_sha` of this run counts as created. A ref left by a `cancelled` run of this store is force-updated. Any other existing ref aborts the claim: the run row is closed as `cancelled` and the issue goes to `state:needs-human` with category `policy-denial`.
+3. Create `refs/heads/factory/issue-<n>` at `base_sha` with `POST /git/refs`. GitHub refuses the call with a 422 when the ref exists, and with a 422 for every fault in the ref name or the object that probe P-1 tried, and only an undocumented message tells them apart. A 422 from this call is therefore not a Deterministic failure under 8.6 until the claim has read the ref by its exact name, with `GET /git/ref/heads/factory/issue-<n>`:
+   - The ref exists. If its SHA equals the journalled `base_sha` of this run, it counts as created. A ref left by a `cancelled` run of this store is force-updated. Any other existing ref aborts the claim: the run row is closed as `cancelled` and the issue goes to `state:needs-human` with category `policy-denial`.
+   - The ref does not exist (404). The create was refused for another reason and is a Deterministic failure (8.6), and the escalation carries GitHub's message. One such reason is a branch whose name collides with the ref, `factory` or one under `factory/issue-<n>/`, which GitHub reports only as `Reference update failed`.
 4. Add `state:in-progress`, then remove `state:ready` and every other `state:*` label (`state:triage`, or `state:needs-human` left by a lint failure), and remove `needs:clarification` if present.
 5. Create the status comment with the complete marker.
 
-Running two daemons against one repository from different hosts is unsupported. The branch-ref step is a best-effort fence against that mistake, not a distributed lock.
+Running two daemons against one repository from different hosts is unsupported. The branch-ref step is a best-effort fence against that mistake, not a distributed lock. It stops a second daemon only when the two read different default-branch heads: a daemon that finds the ref at its own `base_sha` counts it as created (step 3), and neither GitHub's answer nor the ref says who created it (probe P-1).
 
 **Deadlines.** There are no leases. The supervisor owns one set of deadlines per stage kind:
 
@@ -1368,7 +1370,7 @@ Not used: any community Claude SDK crate, `git2` for mutations, `figment`, `sled
 ### 20.1 `sf repo add`
 
 1. Check that the App is installed; read the capability probe and enforcement mode.
-2. Produce a readiness report. **Blocking:** a single-command setup and test entry point that passes on the default branch under the sandbox; an `AGENTS.md`; the toolchain of WS-7 installed; no submodules, no `filter=` attributes and a clean round-trip checkout at the default-branch head; no Cargo git dependency outside the egress list; `cargo deny`, if used in verify, passes without fetching against the host-fetched advisory database; the workflow audit (VAL-6a). **Advisory:** check speed, flake rate, documentation layout, architecture rules, the repository's auto-close setting, other installed Apps that can write pull requests, and past approving reviews by bot accounts.
+2. Produce a readiness report. **Blocking:** a single-command setup and test entry point that passes on the default branch under the sandbox; an `AGENTS.md`; the toolchain of WS-7 installed; no submodules, no `filter=` attributes and a clean round-trip checkout at the default-branch head; no branch named `factory`, which would make every work branch impossible to create (8.2); no Cargo git dependency outside the egress list; `cargo deny`, if used in verify, passes without fetching against the host-fetched advisory database; the workflow audit (VAL-6a). **Advisory:** check speed, flake rate, documentation layout, architecture rules, the repository's auto-close setting, other installed Apps that can write pull requests, and past approving reviews by bot accounts.
 3. Open one onboarding pull request containing `.factory/policy.toml`, default prompts, the issue forms, a `CODEOWNERS` entry for protected paths and an `AGENTS.md` skeleton if missing. The CI workflow template is not pushed by the App (GH-11): `sf repo add` writes it to a local file and prints the commit command, and the operator adds it to the onboarding branch with their own credentials.
 4. Do nothing else in that repository until the pull request is merged and a workflow satisfying VAL-6a exists on the default branch. Closing the pull request opts the repository out.
 5. After the merge: create the label set through the API and write the workflow's check names into `required_checks`. Only then is the ruleset of 20.3 activated, by the operator: the App has no Administration permission (GH-11) and `sf` holds no credential that can write rulesets. `sf repo add` prints the ruleset as importable JSON; `sf repo check` then re-detects the mode (4.1) and verifies the bypass list (DEP-4).
@@ -1473,7 +1475,7 @@ Facts the design depends on that research could not confirm from primary sources
 
 | # | Question | Design impact |
 |---|---|---|
-| P-1 | What does creating an existing ref return (409 or 422, and the message)? | Claim fence error handling (8.2) |
+| P-1 | What does creating an existing ref return (409 or 422, and the message)? Answered on 2026-11-20 by calls on the scratch repository, with the operator's token and not an installation token: a 422 with the message `Reference already exists`, whatever SHA the call asks for, under API versions `2026-03-10` and `2022-11-28`. Every fault in the ref name or the object that was tried got a 422 as well, told apart by its message alone, and a branch name that collides with the ref gets the same message as an object that is not a commit. No 409 was seen. Of two creates sent at once, one succeeded and the other got this 422, in each of 40 pairs; neither the answer nor the ref says who created it. | 8.2, 20.1 |
 | P-2 | Does an approving review from a GitHub App, or from `github-actions[bot]`, count toward required approvals under a ruleset? | Onboarding warning; PR-2 already ignores them |
 | P-3 | Can an App bot be an issue assignee? | Optional "assigned to the factory" signal |
 | P-4 | How does an issue form render into the body? | Parser of 6.2 |

@@ -513,3 +513,112 @@ Each session ran behind a CONNECT proxy in the harness that logs the host of eve
 - The rest of what report 12 asks of 8.3: stopping dispatch early on `allowed_warning`, leaving `CLAUDE_CODE_RETRY_WATCHDOG` unset, a pause that survives a restart, and acting on the event because the process outlives its error result. None is written back, since no session met a limit.
 - No session used a subagent, whose calls report 12 says `message_delta` does not cover, and none ran in `direct_key` mode.
 - The pass reported $0.04 in all, the sum of `total_cost_usd` over 38 sessions on the `haiku` alias. What share of the plan's window that is cannot be read from the stream.
+
+## P-1: creating a ref that already exists
+
+Answered 2026-11-20 for #13, by calls to the REST API on `sapientpants/sf-scratch`, made with `gh` 2.104.0 and `curl` on the operator's OAuth token. The factory will make this call with an installation token; none exists yet. The documentary research behind the question is `04-github-integration` ("report 04" below), which found 409 and 422 both documented for the call and `422 Reference already exists` reported but unverified.
+
+**Answer.** `422 Unprocessable Entity`, with the message `Reference already exists`, whether the second call asks for the same SHA or another one. No call returned a 409. The status does not tell this apart from other failures: every fault in the ref name or the object that was tried got a 422 too, and only the message differed. One of those messages, `Reference update failed`, covers both an object that is not a commit and a branch name that collides with the new ref. So the claim cannot go by the status, and it should not go by a message GitHub does not document. It reads the ref after a 422, and the read decides (8.2 step 3). The read has a limit of its own: it cannot tell a ref the run made itself from one that another daemon made at the same SHA.
+
+### Method
+
+Each row of the table under "What the call returned" is one request, sent once under `X-GitHub-Api-Version: 2026-03-10`, the version GH-17 pins, and once under `2022-11-28`. The paired creates and the reads say for themselves which version they ran under. The server named the version in `X-GitHub-Api-Version-Selected` on every response whose headers were kept, except the 401, which carries no such header. The headers of the `curl` pairs were not kept.
+
+```sh
+gh api -i --method POST repos/sapientpants/sf-scratch/git/refs \
+  -H "X-GitHub-Api-Version: <version>" -f ref=<ref> -f sha=<sha>
+```
+
+The refs follow 5.6: `refs/heads/factory/issue-9001` and its neighbours under the first version, `issue-8001` under the second. The SHAs:
+
+| Name below | Value |
+|---|---|
+| The base | `a1d8965ce3a54cdee3a3190a786e6443937c8ef7`, the head of `main` |
+| Another commit | `1f934b934c5d073f7953b596f3beeec04c25ffaf`, the head of `probe/p-16` |
+| A tree, a blob | `15b48d174e237be5af22a12a341709e02162c134`, `1f17817c69d5eb273bb9f8de2de1d6c2cfb1cf5b`, both of the base |
+| No object | `0123456789abcdef0123456789abcdef01234567` |
+
+The scratch repository has no ruleset and no branch protection. All 43 refs the probe created were deleted afterwards, and the repository again holds only `main` and `probe/p-16`. The two scripts that sent the requests are not in the repository; this section copies what they sent and what came back.
+
+### What the call returned
+
+Both API versions gave the same status and the same body in every case, apart from the issue number in a ref name. The row with a branch `factory` was run last, after the other refs had been deleted.
+
+| Request | Status | `message` |
+|---|---|---|
+| A new ref at the base | 201 | None. The body is the ref, with `object.sha` and `object.type` |
+| The same ref again, at the base | 422 | `Reference already exists` |
+| The same ref again, at another commit | 422 | `Reference already exists` |
+| The same ref again, at no object | 422 | `Object does not exist` |
+| The same ref again, with `abc123` as the SHA | 422 | `Invalid request.\n\nAt least 40 characters are required; only 6 were supplied.\nabc123 does not match /^([0-9a-f]{40}(?:[0-9a-f]{24})?)$/.` |
+| A new ref at no object | 422 | `Object does not exist` |
+| A new ref with `abc123` as the SHA | 422 | The `Invalid request.` message above |
+| A new ref without a `sha` field | 422 | `Invalid request.\n\n"sha" wasn't supplied.` |
+| A new ref at a tree, and at a blob | 422 | `Reference update failed` |
+| `heads/factory/issue-9002` and `factory/issue-9002` as the ref | 422 | `Reference name must start with 'refs/'.` |
+| `refs/heads/factory/issue..9002`, and the same name with a space for the dots | 422 | `<the ref> is not a valid ref name.` |
+| `refs/heads/factory/issue-9001/sub`, while the branch `factory/issue-9001` exists | 422 | `Reference update failed` |
+| `refs/heads/factory`, while the branch `factory/issue-9001` exists | 422 | `Reference update failed` |
+| `refs/heads/factory/issue-9001`, while a branch `factory` exists | 422 | `Reference update failed` |
+| The first request without a credential | 401 | `Requires authentication` |
+
+The whole body of the answer to the question:
+
+```json
+{"message":"Reference already exists","documentation_url":"https://docs.github.com/rest/git/refs#create-a-reference","status":"422"}
+```
+
+Every 422 had this shape: three fields, `status` as a string, the same `documentation_url`, and no `errors` array. The message is the only part that differs.
+
+### Two creates at once
+
+40 pairs of creates, each pair for one new ref and sent at the same moment on two connections. In 20 pairs both requests asked for the base; in 20, one asked for the base and one for the other commit. 20 pairs were two `gh api` processes started together, 10 under each API version. 20 were one `curl --parallel --parallel-immediate` process under `2026-03-10`.
+
+In every pair one request got a 201 and the other a 422 with `Reference already exists`. The ref was afterwards at the SHA of the request that got the 201: read after each `gh` pair, and for the `curl` pairs in one listing after the last of them. When the two asked for different commits, either one won. No pair gave two 201s, a 409, or any other message.
+
+Timings were taken for the `curl` pairs only. Both requests of a pair were in flight together there: each took between 0.48 and 0.83 s, and in two pairs the two answers arrived within a millisecond of each other. Whether any two requests reached the ref update on GitHub's side at the same instant cannot be seen from outside.
+
+### Reading the ref afterwards
+
+| Request, while `factory/issue-9001` exists | Status | Body |
+|---|---|---|
+| `GET /git/ref/heads/factory/issue-9001` | 200 | The ref, with `object.sha` |
+| `GET /git/ref/heads/factory/issue-900` | 404 | `Not Found` |
+| `GET /git/ref/heads/factory/issue-9501` | 404 | `Not Found` |
+| `GET /git/ref/heads/factory` | 404 | `Not Found` |
+| `GET /git/ref/heads/factory/issue-9001/sub` | 404 | `Not Found` |
+| `GET /git/matching-refs/heads/factory/issue-900` | 200 | A list holding `refs/heads/factory/issue-9001` |
+
+The first three rows were run under both API versions, the last three under `2026-03-10` only. `git/ref` matches the exact name, so issue 900 does not see the branch of issue 9001. `git/matching-refs` matches a prefix and is the wrong call for the fence. With a branch `factory` in place of `factory/issue-9001`, the read of `factory/issue-9001` returned 404 under both versions.
+
+### Findings
+
+**The status separates nothing.** 8.6 classes a 422 as Deterministic: no retry, escalate. At this call the same status is also the ordinary answer to a ref the run created itself before a crash, which 8.2 counts as created.
+
+**The message does not say whose ref it is.** It is the same for the base and for another commit, and the ref itself holds nothing but a SHA. The claim needs the read to compare that SHA, and the comparison is all it has. A ref at the run's own `base_sha` that another daemon created reads exactly like the run's own ref from before a crash.
+
+**GitHub lets one create through; step 3 lets the loser through when the SHAs match.** One 201 in each of 40 pairs, and the loser was told `Reference already exists`. That is the atomic create the fence of 8.2 is built on. In the 20 pairs where both requests asked for the same SHA, though, a read by the loser finds the ref at the SHA it asked for, and step 3 counts that as created. Two daemons that read the same default-branch head would both go on. The rule is older than this probe and is what makes the step replayable (8.5). 8.2 now says what the fence does not stop.
+
+**A colliding branch name looks like a bad object.** Git cannot hold a branch `factory` next to a branch `factory/issue-9001`. All three creates of that kind were refused: `factory/issue-9001` while `factory` existed, `factory` while `factory/issue-9001` existed, and `factory/issue-9001/sub` while `factory/issue-9001` existed. The answer is `Reference update failed`, the message GitHub also gives for a tree or a blob, and a read of the ref that was asked for returns 404. A target repository with a branch named `factory` therefore fails every claim, and nothing in the response names the cause.
+
+**A bad SHA is reported before an existing ref.** With a malformed SHA or one of no object, the call reports that and not the existing ref. No other fault was tried against an existing ref. The factory creates the ref at a SHA it has just read from the default branch, so this order does not hide an existing ref from it.
+
+### Against report 04
+
+- `422 Reference already exists` is confirmed.
+- The 409 that the documentation lists for the call was not produced by any case here.
+
+### What changed in the spec
+
+1. 8.2 step 3 names the call. A 422 from it is not a Deterministic failure until the ref has been read by its exact name. If the ref exists, the rules that step already had apply to its SHA. If it does not, the 422 is Deterministic and the escalation carries GitHub's message.
+2. 8.2 says what the fence does not stop: a second daemon that read the same default-branch head.
+3. The readiness report of 20.1 blocks on a branch named `factory`.
+
+### Still open
+
+- Whether step 3 should count an existing ref at `base_sha` as created only on a replay, that is after a restart or after a request whose answer never arrived, and treat it as foreign on a first try. That would close the same-SHA case. It is a decision about the fence, and it is not taken here.
+- An installation token. Every call here used the operator's OAuth token. What the App gets when it lacks a permission was not observed, and nor was whether its answers differ in any other case.
+- A ruleset or branch protection that restricts creating `factory/**`. The scratch repository has neither.
+- What produces the documented 409.
+- The force-update of a ref left by a `cancelled` run (8.2) and the lease of a reset (7.6). They are `PATCH` calls and no part of this probe.
+- GraphQL `createRef`. Not tried; GH-17 uses REST for writes.

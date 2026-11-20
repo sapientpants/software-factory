@@ -667,7 +667,7 @@ The third run was at 12:13 UTC, started by the operator on the server with `sudo
 
 Before it, the operator did two things on the server:
 
-- **Created the user,** a system user named `sf`, and added it to group `kvm`. What the output shows of the result: a user with uid 103, and `getent group kvm` giving `kvm:x:993:sf`. Of the groups `kvm`, `sudo`, `wheel` and `docker` it is in `kvm` alone. Its home directory and its shell were not read. The operator decided the same day that the user is named `sf` and that its home directory is `/home/sf` by default.
+- **Created the user,** a system user named `sf`, and added it to group `kvm`. What the output shows of the result: a user with uid 103, and `getent group kvm` giving `kvm:x:993:sf`. Of the groups `kvm`, `sudo`, `wheel` and `docker` it is in `kvm` alone. Its home directory and its shell were not read. The spec names `sf` and the home directory `/home/sf` as defaults for this user. The operator stated the same day that `/home/sf` is a default and not a decision, and that the code is to support any home directory.
 - **Removed the container images that no container used.** `/var` went from 104 MiB free to 11 GiB free of 22.
 
 What the run showed:
@@ -691,7 +691,7 @@ What follows:
 
 ### What changed in the spec
 
-1. The host requirements of 4.4 name the factory's user and its home directory by default, `sf` and `/home/sf`, as the operator decided on 2026-11-20.
+1. The host requirements of 4.4 name defaults for the factory's user and its home directory, `sf` and `/home/sf`. CFG-4 is new: no home directory is built into the code, as the operator stated on 2026-11-20.
 2. The table of 4.4 marks what the second and the third run added: `bubblewrap` is installed, the factory's user exists and can open `/dev/kvm`, an agent CLI is installed for the operator's account only, and `/var` is no longer full.
 3. The provisioning sentence of 4.4 lists what is left: an agent CLI and a toolchain for the factory's user, and the data directory.
 4. The P-24 row of 23.2 carries the answer.

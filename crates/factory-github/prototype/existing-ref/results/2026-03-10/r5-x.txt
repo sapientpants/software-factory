@@ -1,0 +1,6 @@
+HTTP/2.0 422 Unprocessable Entity
+Date: Fri, 20 Nov 2026 05:59:10 GMT
+X-Github-Api-Version-Selected: 2026-03-10
+X-Github-Request-Id: F7D0:3E25D9:6F5500B:A9BCD60:6AFFE1AD
+
+{"message":"Reference already exists","documentation_url":"https://docs.github.com/rest/git/refs#create-a-reference","status":"422"}gh: Reference already exists (HTTP 422)

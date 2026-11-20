@@ -1,0 +1,6 @@
+HTTP/2.0 422 Unprocessable Entity
+Date: Fri, 20 Nov 2026 06:00:16 GMT
+X-Github-Api-Version-Selected: 2022-11-28
+X-Github-Request-Id: E869:3AC725:328084:5ADA59:6AFFE1F0
+
+{"message":"refs/heads/factory/issue 8002 is not a valid ref name.","documentation_url":"https://docs.github.com/rest/git/refs#create-a-reference","status":"422"}gh: refs/heads/factory/issue 8002 is not a valid ref name. (HTTP 422)

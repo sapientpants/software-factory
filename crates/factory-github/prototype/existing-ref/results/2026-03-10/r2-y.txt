@@ -1,0 +1,6 @@
+HTTP/2.0 201 Created
+Date: Fri, 20 Nov 2026 05:59:06 GMT
+X-Github-Api-Version-Selected: 2026-03-10
+X-Github-Request-Id: F3A6:11A2A3:6F43B0D:A99F62A:6AFFE1AA
+
+{"ref":"refs/heads/factory/issue-9103","node_id":"REF_kwDOVzkiD71yZWZzL2hlYWRzL2ZhY3RvcnkvaXNzdWUtOTEwMw","url":"https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/factory/issue-9103","object":{"sha":"a1d8965ce3a54cdee3a3190a786e6443937c8ef7","type":"commit","url":"https://api.github.com/repos/sapientpants/sf-scratch/git/commits/a1d8965ce3a54cdee3a3190a786e6443937c8ef7"}}

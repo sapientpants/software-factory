@@ -1,0 +1,2 @@
+x 201 start=0.518080 total=0.518603 conn=1
+y 422 start=0.577787 total=0.578615 conn=1

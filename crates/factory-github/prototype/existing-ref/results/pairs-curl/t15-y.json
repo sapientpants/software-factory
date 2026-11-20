@@ -1,0 +1,10 @@
+{
+  "ref": "refs/heads/factory/issue-7016",
+  "node_id": "REF_kwDOVzkiD71yZWZzL2hlYWRzL2ZhY3RvcnkvaXNzdWUtNzAxNg",
+  "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/factory/issue-7016",
+  "object": {
+    "sha": "1f934b934c5d073f7953b596f3beeec04c25ffaf",
+    "type": "commit",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/1f934b934c5d073f7953b596f3beeec04c25ffaf"
+  }
+}

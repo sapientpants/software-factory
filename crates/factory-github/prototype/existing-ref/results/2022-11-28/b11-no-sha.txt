@@ -1,0 +1,8 @@
+HTTP/2.0 422 Unprocessable Entity
+Date: Fri, 20 Nov 2026 06:00:18 GMT
+X-Github-Api-Version-Selected: 2022-11-28
+X-Github-Request-Id: FB66:2C3FEB:32B078:5AFF58:6AFFE1F2
+
+{"message":"Invalid request.\n\n\"sha\" wasn't supplied.","documentation_url":"https://docs.github.com/rest/git/refs#create-a-reference","status":"422"}gh: Invalid request.
+
+"sha" wasn't supplied. (HTTP 422)

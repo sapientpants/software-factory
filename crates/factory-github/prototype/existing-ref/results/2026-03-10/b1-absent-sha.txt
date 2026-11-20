@@ -1,0 +1,6 @@
+HTTP/2.0 422 Unprocessable Entity
+Date: Fri, 20 Nov 2026 05:58:57 GMT
+X-Github-Api-Version-Selected: 2026-03-10
+X-Github-Request-Id: FAEC:3E25D9:6F4F043:A9B3B85:6AFFE1A1
+
+{"message":"Object does not exist","documentation_url":"https://docs.github.com/rest/git/refs#create-a-reference","status":"422"}gh: Object does not exist (HTTP 422)

@@ -1,0 +1,6 @@
+HTTP/2.0 422 Unprocessable Entity
+Date: Fri, 20 Nov 2026 06:00:18 GMT
+X-Github-Api-Version-Selected: 2022-11-28
+X-Github-Request-Id: FB8B:2FF123:317992:59DBD0:6AFFE1F1
+
+{"message":"Reference update failed","documentation_url":"https://docs.github.com/rest/git/refs#create-a-reference","status":"422"}gh: Reference update failed (HTTP 422)

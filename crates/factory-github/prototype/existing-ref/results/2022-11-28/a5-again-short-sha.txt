@@ -1,0 +1,9 @@
+HTTP/2.0 422 Unprocessable Entity
+Date: Fri, 20 Nov 2026 06:00:13 GMT
+X-Github-Api-Version-Selected: 2022-11-28
+X-Github-Request-Id: EFFD:3A3261:330F64:5B5B93:6AFFE1EC
+
+{"message":"Invalid request.\n\nAt least 40 characters are required; only 6 were supplied.\nabc123 does not match /^([0-9a-f]{40}(?:[0-9a-f]{24})?)$/.","documentation_url":"https://docs.github.com/rest/git/refs#create-a-reference","status":"422"}gh: Invalid request.
+
+At least 40 characters are required; only 6 were supplied.
+abc123 does not match /^([0-9a-f]{40}(?:[0-9a-f]{24})?)$/. (HTTP 422)

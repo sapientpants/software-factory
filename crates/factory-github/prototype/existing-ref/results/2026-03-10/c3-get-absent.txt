@@ -1,0 +1,6 @@
+HTTP/2.0 404 Not Found
+Date: Fri, 20 Nov 2026 05:59:03 GMT
+X-Github-Api-Version-Selected: 2026-03-10
+X-Github-Request-Id: EA5A:269A28:702EE4D:AAC5119:6AFFE1A7
+
+{"message":"Not Found","documentation_url":"https://docs.github.com/rest/git/refs#get-a-reference","status":"404"}gh: Not Found (HTTP 404)

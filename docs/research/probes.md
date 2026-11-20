@@ -1054,3 +1054,180 @@ So the form does refuse a required field of spaces only, which makes the inferen
 - **A Markdown parser in place of the line rule.** The rule does not know block quotes, list items or HTML blocks, so `> ### Outcome` and `- ### Outcome` are headings on the page and content to the rule, and a heading line inside an HTML block is the reverse. 19.2 lists no Markdown crate. The agreement with GitHub's HTML was shown for four bodies, which hold a closed fence of backticks, a closed fence of tildes and an open fence of backticks.
 - **The order of sanitisation and parsing on real text.** WI-1 puts SEC-4 first, so a heading inside an HTML comment is gone before the parser runs. Neither exists yet.
 - **A body edited after creation,** and a body read with an installation token. Not tried.
+
+## P-8: who edited an issue, and when
+
+Answered 2026-11-20 for #15, by edits of six issues on `sapientpants/sf-scratch`. They were made three ways: through REST and GraphQL with `gh` 2.104.0 on the operator's OAuth token, in the web interface by a session driving Chrome signed in as the operator, and through REST by a workflow, whose token makes its writes those of `github-actions[bot]`. The factory will read with an installation token of its own App; none exists yet. The question comes from the review of draft 2 (`09-spec-review`, finding K35; "report 09" below), which proposed rule 6 of 5.3 and asked for P-8 to cover it.
+
+**Answer.** The API and the web interface report alike. A body edit sets `lastEditedAt` and `editor`, and adds an entry to the edit history that names who made it. A title edit changes none of the three. What it leaves is a rename event, which names its actor: one event for each of the 32 title changes made, whoever made them and by whichever path. So rule 6 needs both times, as it says, and SEC-2 needs both lists of names.
+
+`editor` is the last editor of the body and no more. The edit history names the editor of every body edit, the author for the text the issue was created with, and still names the editor of a revision after its text was deleted. An App is named as a `Bot`, under a login that differs between GraphQL and REST and a numeric id that does not.
+
+Every time is a whole second. A body edit and a `labeled` event in one second cannot be put in order, and a command that edits and labels in one go put them in one second in each of three trials. Rule 6 now counts an edit in the label's second as made since the label.
+
+### Method
+
+Each write was followed by three reads of the issue: one GraphQL query, `GET /issues/{n}` and `GET /issues/{n}/events`. The query asks for what rule 6 and SEC-2 read:
+
+```graphql
+issue(number: $n) {
+  title body createdAt updatedAt lastEditedAt includesCreatedEdit
+  author { __typename login }
+  editor { __typename login }
+  userContentEdits(first: 100) {
+    totalCount
+    nodes { createdAt editedAt deletedAt editor { __typename login } deletedBy { __typename login } diff }
+  }
+  timelineItems(first: 100, itemTypes: [RENAMED_TITLE_EVENT, LABELED_EVENT, UNLABELED_EVENT]) {
+    nodes {
+      __typename
+      ... on RenamedTitleEvent { createdAt actor { __typename login } previousTitle currentTitle }
+      ... on LabeledEvent { createdAt actor { __typename login } label { name } }
+      ... on UnlabeledEvent { createdAt actor { __typename login } label { name } }
+    }
+  }
+}
+```
+
+| Issue on `sf-scratch` | What was done to it |
+|---|---|
+| #5 | Created through REST, then 18 steps under `X-GitHub-Api-Version: 2026-03-10`, the version GH-17 pins: the title, the body and both, through `PATCH /issues/{n}` and through the GraphQL mutation `updateIssue`, which is what `gh issue edit` sends; the same calls with the value the issue already had; changes of case and of white space only; a label, a close, a reopen and a comment; the body emptied and filled again |
+| #7 | The same 18 steps under `2022-11-28` |
+| #6 | 35 trials of a label and an edit sent close together, under "Times" below |
+| #8 | Created by the operator; renamed and edited by the workflow; then edited by the operator |
+| #9 | Created, renamed and edited by the workflow; then renamed and edited by the operator |
+| #10 | Created through REST; then, in the web interface: the title saved unchanged, the title changed, the body saved unchanged, the body changed, a task-list box ticked, and a revision deleted from the edit history |
+
+The session also opened the page of #8, to see whom it names. What a page showed is reported below from the session's own reading of it; no screenshot was kept.
+
+The label is `probe:p-8`, made for the probe. No label of 5.2 was applied to anything. The workflow, `probe-p8.yml`, is on the branch `probe/p-8` of the scratch repository at commit [`735b509`](https://github.com/sapientpants/sf-scratch/blob/735b509f20f51970ee3e202403a91ec9938afd40/.github/workflows/probe-p8.yml): one shell step, no actions, `permissions: issues: write`, run once as [44809990832](https://github.com/sapientpants/sf-scratch/actions/runs/44809990832). Its log is copied with the other results, since Actions logs expire.
+
+The scripts and every response are on the branch `prototype/issue-edit-probe`, at commit [`798d24e`](https://github.com/sapientpants/software-factory/tree/798d24ee9882566a254a8bbb030b43f8890ad798/crates/factory-github/prototype/issue-edits), with the response headers cut down to status, date, API version and request id. They are throwaway code. The six issues, the label and the branch stay on the scratch repository. So does #11, which a slip in running the script created; it was never edited and is closed.
+
+### What each change left behind
+
+The two API versions gave the same result at every step, and the web interface the same as the API for the changes made both ways.
+
+| Change | `lastEditedAt` and `editor` | Edit history | Rename event | `updatedAt` |
+|---|---|---|---|---|
+| The title: REST, GraphQL, the web interface | As before; null on an issue whose body was never edited | As before | One, with the actor and both titles | Moves |
+| The body: REST, GraphQL, the web editor | The time of the edit, and who made it | One entry more | None | Moves |
+| A task-list box ticked on the page | As for a body edit | As for a body edit | None | Moves |
+| The title and the body in one `PATCH` | As for a body edit | One entry more | One, in the same second | Moves |
+| A title or body equal to the one the issue has: REST, GraphQL, Save pressed in the web interface with nothing changed | As before | As before | None | As before |
+| A label, a close, a reopen, a comment | As before | As before | None | Moves |
+| A revision deleted from the history, in the web interface | As before | The entry stays, marked deleted | None | As before |
+
+What counts as a change is any difference in the bytes. A title in other letter case made a rename event. So did a title with two spaces added at the end, and GitHub kept the spaces. A body with a line feed added at the end made a history entry, and so did the same body with carriage returns, which GitHub also kept. An emptied body is `null` in REST and `""` in GraphQL.
+
+`updatedAt` is of no use to rule 6. It moves for a label and a comment, and twice it was a second later than the `lastEditedAt` of the edit that moved it.
+
+In REST the issue itself has no field for an edit. `GET /issues/{n}` gives `updated_at` and nothing else, and the edit history is not in REST at all. The rename is there as a `renamed` event with `actor` and `rename.from` and `rename.to`. So the body's half of rule 6 and of SEC-2 can only be read through GraphQL, which is where 5.3 already puts the read.
+
+### The edit history
+
+`userContentEdits` is empty until the body is first edited, and `includesCreatedEdit` is false. The first edit adds two entries: one for the edit, and one for the text the issue was created with. The second carries the author as `editor` and the issue's creation time as `editedAt`. From then on `includesCreatedEdit` is true and each edit adds one entry, newest first. The history of #5 after its seven body edits:
+
+| `editedAt` | `editor` | `diff` |
+|---|---|---|
+| 20:10:25 | `sapientpants` | `Body 18.` |
+| 20:10:19 | `sapientpants` | null: the body was emptied |
+| 20:09:46 | `sapientpants` | The body with carriage returns |
+| 20:09:40 | `sapientpants` | The body with a line feed at the end |
+| 20:09:14 | `sapientpants` | `Body 7.` and a second paragraph, by `updateIssue` |
+| 20:08:49 | `sapientpants` | `Body 3.` and a second paragraph |
+| 20:08:43 | `sapientpants` | `Body 2.` and a second paragraph |
+| 20:08:31 | `sapientpants` | `Body 0.` and a second paragraph: the body as created |
+
+`diff` is the whole body after the edit, not a difference. An entry's `createdAt` equals its `editedAt`, except on the entry for the created text, where `createdAt` is the time of the first edit. `lastEditedAt` equalled the newest `editedAt` at every read.
+
+The web interface offers "Delete revision" on a revision of the history. The middle one of #10's three was deleted, 17 minutes after it was made. The entry is still there, with its `editor` and its `editedAt`. `deletedAt` and `deletedBy` are now set, and `diff` is the string `deleted`. `totalCount`, `lastEditedAt` and `editor` did not change. The page shows the same: the editor, the time and "deleted this revision".
+
+### Who is named
+
+| | GraphQL | REST |
+|---|---|---|
+| The operator | `User`, login `sapientpants`, `databaseId` 305936 | `type: User`, login `sapientpants`, `id` 305936 |
+| The workflow | `Bot`, login `github-actions`, `databaseId` 41898282 | `type: Bot`, login `github-actions[bot]`, `id` 41898282 |
+
+The node ids agree as well. The workflow's own token, asked for `viewer.login` through GraphQL, got `github-actions[bot]`; only as an `author`, `editor` or `actor` does the login lose its suffix.
+
+The history of #8, which the operator created and edited last, with the workflow in between:
+
+| `editedAt` | `editor` |
+|---|---|
+| 20:18:13 | `sapientpants`, `User` |
+| 20:17:45 | `github-actions`, `Bot` |
+| 20:17:16 | `sapientpants`, `User`: the body as created |
+
+Its `editor` field says `sapientpants`, and so does the page, as "Last edited by sapientpants", until the menu under that text is opened. Its one rename event has the workflow as `actor`. On #9 the `author` is the `Bot`, the entry for the created text names the `Bot`, and the operator's later rename and edit name the operator. Nothing on either issue names anyone who did not act on it, and no actor was null.
+
+The workflow's token read the whole history of #8, with editors and text. Its job had been given `issues: write` and nothing else.
+
+### Times, and a label in the same second
+
+GraphQL and REST give every time to the second. On #6 a label and an edit were sent close together, with the label removed and two seconds left before each trial. "Sent first" means the first call had answered before the second was sent.
+
+| Trial | Count | The edit's time against the `labeled` event's |
+|---|---|---|
+| Label sent first, then a body edit | 6 | One second later in all 6 |
+| Body edit sent first, then the label | 6 | One second earlier in 5; the same second in 1 |
+| Label and body edit sent at once | 4 | The same second in all 4 |
+| Label sent first, then a title edit | 6 | One second later in 5; the same second in 1 |
+| Title edit sent first, then the label | 6 | One second earlier in 5; the same second in 1 |
+| Label and title edit sent at once | 4 | The same second in all 4 |
+| One `PATCH` with a title, a body and a label set | 2 | All three times the same second, in both |
+| `gh issue edit --body … --add-label …` | 1 | The same second |
+
+A call took under a second, so two calls sent in turn landed in one second some of the time, and two sent at once every time. In the one tie between two calls sent in turn, the body edit was made before the label.
+
+For a body edit there is nothing else to go by. It is not an event of the timeline, and its history entry carries the same whole second.
+
+A rename is an event, and events have an order. The ids of the 87 events of #6 in REST rise with their position, and the GraphQL timeline lists them in the same order. Of the eight seconds that hold both a rename and a `labeled` event, two came from calls sent in turn, and there the timeline has the two events in the order sent. In both single `PATCH` calls the rename is listed before the label. For the four pairs sent at once the true order is not known.
+
+### Findings
+
+**The two halves of an issue are attributed in two places.** Nothing reports an edit of the title and the body alike. A check that reads `lastEditedAt` alone misses every title change, and on an issue whose body was never edited it reads null however often the title changed. Rule 6 already named both; the probe shows that it has to.
+
+**`editor` is not the list SEC-2 asks for.** SEC-2 wants every editor to be an authorised actor. On #8 the field names the operator while the history holds an edit by an App. The names are in `userContentEdits` for the body and in the rename events for the title, and the author is `author`. An issue can hold more of either than one page of a read returns, and a read that stops at the first page has not seen every editor.
+
+**A deleted revision does not hide its editor.** What is lost is the text. SEC-2 needs the name, and the name stays.
+
+**A tie cannot be broken for the body, so rule 6 does not try.** The operator decided on 2026-11-20 that an edit in the second of the `labeled` event counts as made since it. The cost falls on the operator's own shortcut: one command that edits the body and applies `state:ready` is refused whenever the two land in one second, as they did in all three trials, and the issue goes back to triage with a note. A label applied in a later second passes. A second command sent straight after the edit is not always later: one pair of six shared a second. The other choice would let through an edit made up to a second after the approval.
+
+**The title could be ordered, and rule 6 does not rely on it.** The timeline's order was right in the two same-second pairs whose order is known, which is thin. The operator decided on 2026-11-20, asked separately, that the title is held to the body's rule: a title change in the label's second also counts as made since. One rule for both halves is simpler, and it is the stricter one.
+
+**The login is not an identity across the two APIs.** `github-actions` and `github-actions[bot]` are one account. SEC-2 lets the factory App be the author or editor of an issue it filed, and a comparison of logins between a GraphQL read and anything from REST would not recognise it. The numeric id of the bot account is the same in both, `databaseId` in one and `id` in the other. It is the account's id and not the App's, and it was seen for the Actions App only.
+
+**No write is silent, and no trace is false.** Every change of the bytes left its mark, 32 renames and 39 body edits in all, and a write that changed nothing left none: not a rename event, not a history entry, not a move of `updatedAt`. So rule 6 does not send an issue back to triage because someone pressed Save.
+
+**The page's own controls edit the body.** Ticking a task-list box is a body edit by whoever ticked it, with a history entry and a new `lastEditedAt`. An operator who ticks a box on an approved issue has edited it after approval, and 7.7 then applies to an active run as for any other edit.
+
+**The events come oldest first, and the first page is not the latest.** `GET /issues/{n}/events` returned the first 30 of 87, and the GraphQL query above asks for the first 100. Rule 6 needs the last rename and the last `labeled` event, so the factory's read has to ask from the end.
+
+### Against report 09
+
+- K35 asked whether `lastEditedAt` is set for body edits made through the API. It is, by REST and by GraphQL.
+- K35 asked whether a title change always produces a rename event. It did in each of 32 changes. A title sent unchanged produces none, and nothing has changed then.
+- K35 said the fix "needs only edit times, not editor identity". For rule 6 that holds. The times it has are whole seconds, which K35 did not consider.
+
+### What changed in the spec
+
+1. Rule 6 of 5.3 says which times it compares, the body's `lastEditedAt` and that of the last rename event, and that an edit in the second of the `labeled` event counts as made since it. The operator decided the second part on 2026-11-20, for the body and then for the title.
+2. Step 2 of the resume in 7.5 says "since" where it said "after", to match.
+3. SEC-2 says where the editors are read: the edit history for the body and the rename events for the title, and not the `editor` field. It says that the factory App is recognised by the numeric id of its bot account.
+4. The P-8 row of 23.2 carries the answer.
+
+7.7 did not change. Its rows turn on who edited and on whether the editor can be identified, and both lists give a name for every edit seen here.
+
+### Still open
+
+- **An installation token of the factory's App.** The workflow's token is an installation token of another App and read everything. What the factory's App reads with the permissions of 5.7 was not observed.
+- **An editor that cannot be identified.** 7.5 and 7.7 provide for one. No actor was null in any read; an account deleted after its edit is the likely case, and it was not made.
+- **A second human.** Every user edit here is the operator's. An edit by a collaborator, or by the author of an issue who has no write permission, should name that account in the same places. It was not seen.
+- **More edits than one page.** The longest history here has 20 entries and the longest timeline 87 items. Paging through either was not tried.
+- **The order of the timeline within one second,** for the four pairs sent at once and in general. Rule 6 does not depend on it.
+- **An edit of a comment.** PLAN-2 compares a `labeled` event with the last edit of the plan comment, and SEC-3 reads comments. Comments have their own `lastEditedAt` and history, which this probe did not touch. PLAN-2 asks for an event "later than" the edit, which a tie does not satisfy, so it already reads as rule 6 now does.
+- **A transferred issue, and one created by email.** Not tried.
+- **Which revisions can be deleted, and by whom.** One middle revision was deleted by the repository's owner. Whether the newest or the created text can be, and whether an editor without write permission can delete their own, was not looked at. The entry survived the one deletion made.
+- **What the hash of an empty body is.** REST gives `null` and GraphQL `""`. `title_body_sha256` (5.4) has to pick one reading, and the code that computes it does not exist yet.

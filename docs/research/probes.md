@@ -842,9 +842,9 @@ The run of 18:46, without `socat`: the three `on-strict` cases gave what they ga
 
 ## P-4: how an issue form renders into the issue body
 
-Answered 2026-11-20 for #14, by three issues that the operator created in the web interface of `sapientpants/sf-scratch` through the issue form of 6.2, read back with `gh` 2.104.0 on the operator's OAuth token. Report 03 (`03-specs-and-validation`) proposed the form and a body "parsed strictly"; report 07 (`07-gaps`, R7) found the layout undocumented and asked for a tolerant parser for that reason.
+Answered 2026-11-20 for #14, by three issues that the operator created in the web interface of `sapientpants/sf-scratch` through the issue form of 6.2, read back with `gh` 2.104.0 on the operator's OAuth token. A fourth issue, created later the same day, is under "The fourth issue". Report 03 (`03-specs-and-validation`) proposed the form and a body "parsed strictly"; report 07 (`07-gaps`, R7) found the layout undocumented and asked for a tolerant parser for that reason.
 
-**Answer.** The body is one block per field, in the form's order, with a blank line between blocks. A block is the line `### <label>`, a blank line, and the field's text exactly as it was submitted. A field left empty gets the text `_No response_`. That is all GitHub adds: no text before the first heading, no newline at the end, no escaping, and nothing on the issue that says a form made it.
+**Answer.** The body is one block per field, in the form's order, with a blank line between blocks. A block is the line `### <label>`, a blank line, and the field's text exactly as it was submitted. A field left empty gets the text `_No response_`. That is all GitHub adds: no text before the first heading, nothing after the last field's text, no escaping, and nothing on the issue that says a form made it.
 
 The section parser of WI-1 holds for such a body: a sketch of it read back every field of the two ordinary issues as submitted. It cannot hold for every body. A field's text goes in unescaped, so a line of it that reads `### Outcome` is the form's own heading byte for byte, and the body no longer says where the field ends. WI-1 now says what the parser accepts, and WI-1a makes a repeated section name a failure of the readiness lint.
 
@@ -894,7 +894,7 @@ body:
 
 6.2 names the six sections and their order. The rest is this probe's choice: one `input` among five `textarea` elements, to see both, and only the two fields that tier 0 needs (6.1) marked required, so that the others could be left empty. The form has no `labels` key (GH-3).
 
-The operator created three issues, each from a link that prefilled the form through query parameters named after the field ids, and pressed Create without changing a field. No text was typed by hand.
+The operator created three issues, each from a link that prefilled the form through query parameters named after the field ids, and pressed Create without changing a field. No text was typed by hand in these three.
 
 | Issue on `sf-scratch` | Submission | Body |
 |---|---|---|
@@ -940,7 +940,7 @@ _No response_
 | Order | The form's, with every field present, filled or not |
 | Between a heading and its text, and between blocks | One blank line, which is two line feeds |
 | An empty field | `_No response_`, the same for the `input` and a `textarea`. GitHub renders it as *No response* in italics |
-| The end of the body | The last field's text. No newline follows |
+| The end of the body | The last field's text. Nothing follows it, and the white space it ends in is kept (#4) |
 | A list | As submitted, with its markers: `-`, `*`, `1.` and `- [ ]` all arrived unchanged, and so did the two-space indent of a nested item |
 | A fenced block, inline code, a link | As submitted |
 
@@ -979,6 +979,24 @@ A line rule in Python, not a Markdown parser. A section starts at a level-3 ATX 
 
 Two simpler parsers, which split on lines starting `### ` and keep one section per name, read #3 and #2 correctly and #1 wrongly either way. Keeping the first, the acceptance criteria are the one line `AC-9` that was typed into Context. Keeping the last, the outcome is "A second outcome.", also from Context. Neither knows fences, so the first also takes the Stop conditions from inside the fenced block.
 
+### The fourth issue
+
+Created at 19:43 UTC the same day, after the sections above were written and merged (#38), for what the first three issues left open. The operator opened a fourth link, which prefilled Outcome, a required field, with three spaces and left Context empty. They were asked to type two lines into Context by hand, press Create, and type into Outcome only if the form refused. The issue is #4, 346 bytes, read the same four ways with the same bytes each time. The evidence is on the same branch, at commit [`36aa497`](https://github.com/sapientpants/software-factory/tree/36aa4979e18704117e7cb648ed5fe64857cda5ea/crates/factory-core/prototype/issue-form).
+
+| Submitted | In the body | GitHub's HTML |
+|---|---|---|
+| `line 1`, Enter, `line 2`, typed by hand into Context | `line 1\nline 2`: a line feed, and no carriage return anywhere in the body | Two lines of one paragraph |
+| Three prefilled spaces in Outcome, then `sdfsdf` typed by hand | `   sdfsdf` | `sdfsdf` |
+| A fence of tildes around `### Outcome`, in Acceptance criteria | Kept | Code |
+| A fence of backticks opened in Out of scope and never closed | Kept. The form's `### Stop conditions` and that field's text follow it as usual | One code block to the end of the body, with the Stop conditions heading inside it |
+| A last field that ends in two spaces and two line feeds | Kept: the body ends `line feeds.  \n\n` | Inside the code block |
+
+The sketch found five level-3 headings, as GitHub's HTML has: no "Stop conditions". Acceptance criteria came back as submitted. Out of scope ran on to the end of the body, 111 characters where 31 were submitted, and there was no Stop conditions section. No name repeats in this body.
+
+**The required field.** The operator's account, in full: "outcome keeps clearing the text, so I had to type and quickly hit create to get it to work". So the Outcome field lost what was typed into it more than once, and the issue was created by typing and pressing Create at once. They did not say in so many words that the form refused the three spaces alone. That they typed into Outcome at all, which they were asked to do only on a refusal, says it did **(inference)**. No error text or screenshot was kept.
+
+**What cleared the field.** The operator then opened two more links without submitting either, one that prefilled Outcome with three spaces and one that prefilled it with `hello`, and typed into Outcome in each. Their report: "both clear to show the prefill". So a field that a link prefilled goes back to the link's value after it is typed into, whatever that value is, and the clearing in #4 says nothing about the spaces. The Context field of #4, which the link left alone, kept what was typed. What sets the reset off, and after how long, was not reported, and a session could not watch it: the browser tools did not connect. Whether Create was pressed on the three spaces alone was not reported either; no fifth issue exists on the scratch repository.
+
 ### Findings
 
 **The layout is regular, and the heading is the label.** Keying on heading text is enough to find the sections of a body the form made from ordinary text. Every field of #3 and #2 came back as submitted.
@@ -989,7 +1007,9 @@ Two simpler parsers, which split on lines starting `### ` and keep one section p
 
 **Where a heading counts has to follow what GitHub renders.** The operator approves the page, and the parser reads the source. On these three bodies the line rule and GitHub's HTML agree on every level-3 heading: the one in a fence and the one indented four spaces are code, and the ones with a leading space, a closing `###` or another case are headings. An issue about the parser itself will quote these headings, which is why the fence matters. Matching without regard to case goes with this: `### outcome` is a heading on the page, so it counts as the name and trips WI-1a.
 
-**The body keeps a carriage return it is given.** Whether a browser sends one for a line typed in a field was not seen, since every field was prefilled. The parser takes either line ending.
+**The body keeps a carriage return it is given, and typing does not give it one.** The one carriage return of #1 came from the link. The two lines typed by hand in #4 arrived with a line feed between them. The parser takes either line ending.
+
+**A fence left open hides the form's later headings, from the page and from the parser alike.** In #4 the Stop conditions heading is code on GitHub's page and no section to the sketch, with no name repeated, so WI-1a does not catch it. The two agree, and the operator sees a page that is plainly broken. The lint catches it only when the swallowed section is one the tier requires.
 
 **Nothing marks a form-made issue.** The factory cannot tell one from a body written by hand, by `gh issue create` or by the factory itself (PLAN-5), so one parser reads them all, and a body is valid by its sections and not by how it was made.
 
@@ -1007,15 +1027,16 @@ Two simpler parsers, which split on lines starting `### ` and keep one section p
 3. WI-1a is new, and a design choice that the evidence prompts but does not make: a name that starts more than one section fails the readiness lint, and no section of that body is used. 6.4 lists the rule.
 4. WI-1b replaces the round-trip test in the probe suite: the recorded bodies are fixtures of the parser's tests, and a new submission is the operator's to make. The first paragraph of 23.2 excepts P-4 from what `sf doctor --probe` answers.
 5. The P-4 row of 23.2 carries the answer.
+6. After the fourth issue: 6.2 no longer says that the body does not end in a newline, since it ends as the last field does. WI-1b and the P-4 row count four bodies and say what the fourth showed. No rule of the parser changed.
 
 ### Still open
 
-- **Text typed by hand.** All three issues were prefilled from a link. What a browser sends for a line break typed in a field was not observed.
-- **A required field of spaces only.** Not submitted, so it is not known whether the form accepts it. The lint decides either way.
-- **Space at the end of the last field.** No submission ended in any, so it is not known whether GitHub trims the end of the body.
+- **A required field of spaces only.** The fourth issue did not settle it: the operator's account suggests the form refused, and nothing of the form's own was kept. The lint decides either way. A link that prefills the field is the wrong tool for a second try, since the field goes back to the link's value; the spaces would have to be typed.
+- **Why a prefilled field resets.** Seen by the operator in three pages and not looked into. The factory makes no such links.
+- **Text pasted into a field,** from a source with carriage returns. Typed text and prefilled text were seen; pasted text was not.
 - **Which fields the form requires, and their element types.** 6.2 does not say, and the scratch form's choices were made to see empty fields. Tier 1 needs all six sections (6.1); whether the form or only the lint enforces that is undecided. It matters when the form is enforced (M3).
 - **The line format of an acceptance criterion.** The list arrives as typed, under any marker. 6.4 needs each criterion's verification method and 10.5 its id, and 6.2 gives no line format to read them from. Also M3.
 - **The other elements.** `dropdown`, `checkboxes`, `markdown`, `upload` and a `textarea` with `render`. The form of 6.2 uses none.
-- **A Markdown parser in place of the line rule.** The rule does not know block quotes, list items or HTML blocks, so `> ### Outcome` and `- ### Outcome` are headings on the page and content to the rule, and a heading line inside an HTML block is the reverse. 19.2 lists no Markdown crate. The agreement with GitHub's HTML was shown for three bodies, which hold one fence, of backticks and closed. A fence of tildes was not submitted, and nor was one left open, which would take the form's later headings into the field it stands in, with no name repeated.
+- **A Markdown parser in place of the line rule.** The rule does not know block quotes, list items or HTML blocks, so `> ### Outcome` and `- ### Outcome` are headings on the page and content to the rule, and a heading line inside an HTML block is the reverse. 19.2 lists no Markdown crate. The agreement with GitHub's HTML was shown for four bodies, which hold a closed fence of backticks, a closed fence of tildes and an open fence of backticks.
 - **The order of sanitisation and parsing on real text.** WI-1 puts SEC-4 first, so a heading inside an HTML comment is gone before the parser runs. Neither exists yet.
 - **A body edited after creation,** and a body read with an installation token. Not tried.

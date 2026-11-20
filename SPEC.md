@@ -152,6 +152,25 @@ At startup and daily, the factory probes each repository and records what is ava
 - The daemon runs as a dedicated system user under systemd. The operator controls it through GitHub and through `sf` over SSH; there is no remote client.
 - A run does not start when the sandbox backend for its required level is unavailable (13.3).
 
+**The operator's server.** Observed on 2026-11-20 by a script that the operator ran over SSH as their own account, without root (`docs/research/14-server-facts.md`). The server is not named here, and no address is given.
+
+| | Observed | Against the requirements |
+|---|---|---|
+| Distribution | Debian 13 (trixie) on bare metal, the distribution of the development VM (DEV-3). systemd 257, cgroup v2 | Met |
+| Kernel | `6.12.116+deb13-amd64` | |
+| CPU | x86-64, one Intel Core Ultra 5 125H: 14 cores, 18 logical CPUs, VT-x | Met |
+| Memory | 14.9 GiB, and 977 MiB of swap | |
+| Disk | One 931.5 GiB NVMe disk. Free: 49 GiB of 55 on `/`, 64 MiB of 22 GiB on `/var`, 792 GiB of 838 on `/srv` | `/srv` is a volume of its own for the data directory. `/var` is full |
+| `/dev/kvm` | Present as `crw-rw---- root kvm`, with `kvm_intel` loaded. Group `kvm` has no member, and the account could not open the device | Not usable by an unprivileged user. The factory's user has to be a member of `kvm`; no member has opened the device yet |
+| User namespaces | `kernel.unprivileged_userns_clone` is 1. AppArmor is enabled, but the kernel has no `kernel.apparmor_restrict_unprivileged_userns`, the setting that DEV-6 lifts on the hosted runners. The account created a user and a mount namespace and mounted a tmpfs in them | Met |
+| `bubblewrap` | Not installed, so none of the bubblewrap tests of P-16 has run on the server | Not met |
+| `git` | 2.47.3, one of the two versions P-7 ran on | Met |
+| Agent CLI, Rust toolchain | Not found on the account's `PATH`; a copy under the home directory would have been missed | Not settled |
+| Reached | Over SSH; `sshd` listens on port 22 on every address. From the operator's home network, and over the operator's VPN from elsewhere (D-16) | |
+| Reaches | `github.com`, `api.github.com`, `api.anthropic.com`, `index.crates.io` and `static.crates.io` answered over HTTPS with no proxy, and `git ls-remote` of the scratch repository worked. No request carried a credential | |
+
+Provisioning the server (22, M0) therefore includes installing `bubblewrap`, creating the factory's system user as a member of group `kvm`, putting the data directory on `/srv`, and freeing space on `/var`. The observations that need bubblewrap or membership of `kvm` are made after that, and the table is updated then.
+
 ---
 
 ## 5. GitHub data model
@@ -1422,7 +1441,7 @@ Public benchmark scores are not acceptance criteria.
 
 | Milestone | Scope | Exit criterion |
 |---|---|---|
-| **M0 Foundations** | Workspace, the check command and the development VM (DEV-1, DEV-3), CI with its ruleset (DEV-5, DEV-8) and the first tagged release build (BOOT-3); the Linux server provisioned; `factory-core` types, the `Ecosystem` interface with its `rust` implementation, and the engine skeleton with property tests; `factory-proc` with the supervisor shim; git wrapper; GitHub App creation; `sf doctor`; the probe suite (23.2); prototypes of capture, ingest and export against the hostile-tree suite (WS-9), of the bubblewrap sandbox, and of the egress proxy | All M0 probes answered and recorded; the hostile-tree suite passes; a cold build of the factory repository and one real agent turn succeed on the server under bubblewrap with only the proxy reachable |
+| **M0 Foundations** | Workspace, the check command and the development VM (DEV-1, DEV-3), CI with its ruleset (DEV-5, DEV-8) and the first tagged release build (BOOT-3); the Linux server provisioned (4.4); `factory-core` types, the `Ecosystem` interface with its `rust` implementation, and the engine skeleton with property tests; `factory-proc` with the supervisor shim; git wrapper; GitHub App creation; `sf doctor`; the probe suite (23.2); prototypes of capture, ingest and export against the hostile-tree suite (WS-9), of the bubblewrap sandbox, and of the egress proxy | All M0 probes answered and recorded; the hostile-tree suite passes; a cold build of the factory repository and one real agent turn succeed on the server under bubblewrap with only the proxy reachable |
 | **M1a Skeleton** | Store with `runs` and `events`; claim; implement at sandbox level `process` with the egress proxy (fake agent, then the Claude driver in `subscription` mode); per-session limits; capture; integrity with path, structural and secret rules, including the literal-token scan; verify on the export; publish a draft pull request; then exit. `sf run` on the same issue resumes from the journal. | One real issue reaches a draft pull request and survives an interrupted run |
 | **M1b Attended run** | Status comment and marker; factory check runs; CI wait; ready and evidence manifest; observation of human review and merge (strategy `human`) | Five real issues on the factory repository merged by the operator from factory pull requests, using a tagged, installed build |
 | **M2 Daemon** | The microVM backend, with the daemon dispatching only at `hardened`; systemd unit; poll and reconcile loop; outbox, activities and recovery; scheduler and limits for two repositories onboarded by hand; SEC-1 for all human inputs; outbound encoder; workflow audit; lock-down contract test and plan-limit pause; escalation and resume; plan stage and gate; reviewer stage; in-place rounds; base update; reset; `factory_serial` merge; follow-up issue filing; dashboard issue; control API; kill switches; `sf rebuild`; `sf self-update` with rollback; smoke eval | 48 hours unattended on a second repository with no manual repair; the process-crash test passes at every stage boundary; sandbox escape tests pass at `hardened`; a planted copy of the subscription token is caught before publish; self-hosting on a pinned release begins |
@@ -1451,7 +1470,7 @@ Decided by the operator on 2026-11-18 (D-18 and D-20 on 2026-11-19):
 | D-11 | The goal is lights-out operation, earned per class of work (13.6). The operator approves every issue, including each sub-issue of a feature. |
 | D-12 | The factory stops at merge. Releases and deployments stay human actions. |
 | D-13 | The factory works only on issues the operator wrote (SEC-2). |
-| D-16 | M0 and M1 are built by Claude Code sessions on the operator's Mac, one pull request per issue, each merged by the operator (BOOT-1). The server is reached only from the operator's home, so every step on it is the operator's; Linux-only code is developed in a local VM (DEV-3). Every check runs before each commit through one command (DEV-1). |
+| D-16 | M0 and M1 are built by Claude Code sessions on the operator's Mac, one pull request per issue, each merged by the operator (BOOT-1). Every step on the server is the operator's, and no session opens a connection to it. When this was decided the server was reached only from the operator's home; the operator's VPN now reaches it from elsewhere too (4.4), and the rule stays. Linux-only code is developed in a local VM (DEV-3). Every check runs before each commit through one command (DEV-1). |
 | D-17 | The factory's repository, code and documents alike, is licensed `MIT OR Apache-2.0`, copyright Marc Tremblay. Every crate inherits the licence from the workspace, and the structural test (19.1) checks it. Source files carry no per-file licence header. |
 | D-18 | `SPEC.md` stays one file through M0 and M1 and keeps its ids (`INV-`, `GH-`, `SEC-` and so on); it is not split into the living-spec layout of 6.3. Issues in that period cite those ids, with `SPEC.md` as the spec file path. The spec is protected through the repository's policy (BOOT-4). |
 | D-20 | CI for the factory repository runs on GitHub-hosted runners only, with one job for x86-64 Linux and one for arm64 Linux; there is no macOS job and no self-hosted runner. Nothing that needs KVM or the Claude Code login runs in CI. Once the workflow exists, a ruleset on `main` requires both jobs and has no bypass actor; the ruleset of 20.3 replaces it at M1b (DEV-5 to DEV-8). |
@@ -1536,3 +1555,4 @@ The reports in `docs/research/` hold the evidence and source URLs behind this sp
 - `08-fact-check`: 66 load-bearing claims checked against primary sources (56 confirmed, 9 partly, 1 wrong; corrections are applied here).
 - `09-spec-review`: the 59 findings of the adversarial review of draft 1, each with the reviewer's proposed fix and the sceptic's verdict. This draft addresses each one, not always with the proposed fix.
 - `10-spec-recheck`: the 47 problems a recheck found in draft 2 (unresolved findings and contradictions the rewrite introduced), addressed in draft 3.
+- `14-server-facts`: what the operator's server is, observed on 2026-11-20 and set against the host requirements of 4.4. Reports 11 to 13 are on `research/*` branches and are cited from `probes.md`.

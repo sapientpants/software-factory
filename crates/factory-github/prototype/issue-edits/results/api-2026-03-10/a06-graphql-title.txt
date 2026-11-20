@@ -1,0 +1,5 @@
+HTTP/2.0 200 OK
+Date: Fri, 20 Nov 2026 20:09:08 GMT
+X-Github-Request-Id: F0D4:D459C:1B93447:29C9DF2:6B00A8E3
+
+{"data":{"updateIssue":{"issue":{"title":"P-8 probe, API 2026-03-10: title 6","lastEditedAt":"2026-11-20T20:08:49Z","updatedAt":"2026-11-20T20:09:08Z","editor":{"login":"sapientpants"}}}}}

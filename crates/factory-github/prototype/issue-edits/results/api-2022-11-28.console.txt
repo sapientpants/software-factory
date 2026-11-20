@@ -1,0 +1,39 @@
+a00-create.txt	POST issues	HTTP/2.0 201 Created
+a00-create	lastEditedAt=null	editor=null	edits=0	renames=0	updatedAt=2026-11-20T20:17:11Z
+a01-rest-title.txt	PATCH issues/7	HTTP/2.0 200 OK
+a01-rest-title	lastEditedAt=null	editor=null	edits=0	renames=1	updatedAt=2026-11-20T20:17:17Z
+a02-rest-body.txt	PATCH issues/7	HTTP/2.0 200 OK
+a02-rest-body	lastEditedAt=2026-11-20T20:17:23Z	editor=sapientpants	edits=2	renames=1	updatedAt=2026-11-20T20:17:23Z
+a03-rest-both.txt	PATCH issues/7	HTTP/2.0 200 OK
+a03-rest-both	lastEditedAt=2026-11-20T20:17:29Z	editor=sapientpants	edits=3	renames=2	updatedAt=2026-11-20T20:17:29Z
+a04-rest-same-title.txt	PATCH issues/7	HTTP/2.0 200 OK
+a04-rest-same-title	lastEditedAt=2026-11-20T20:17:29Z	editor=sapientpants	edits=3	renames=2	updatedAt=2026-11-20T20:17:29Z
+a05-rest-same-body.txt	PATCH issues/7	HTTP/2.0 200 OK
+a05-rest-same-body	lastEditedAt=2026-11-20T20:17:29Z	editor=sapientpants	edits=3	renames=2	updatedAt=2026-11-20T20:17:29Z
+a06-graphql-title.txt	graphql	HTTP/2.0 200 OK
+a06-graphql-title	lastEditedAt=2026-11-20T20:17:29Z	editor=sapientpants	edits=3	renames=3	updatedAt=2026-11-20T20:17:48Z
+a07-graphql-body.txt	graphql	HTTP/2.0 200 OK
+a07-graphql-body	lastEditedAt=2026-11-20T20:17:54Z	editor=sapientpants	edits=4	renames=3	updatedAt=2026-11-20T20:17:54Z
+a08-graphql-same.txt	graphql	HTTP/2.0 200 OK
+a08-graphql-same	lastEditedAt=2026-11-20T20:17:54Z	editor=sapientpants	edits=4	renames=3	updatedAt=2026-11-20T20:17:54Z
+a09-rest-title-case.txt	PATCH issues/7	HTTP/2.0 200 OK
+a09-rest-title-case	lastEditedAt=2026-11-20T20:17:54Z	editor=sapientpants	edits=4	renames=4	updatedAt=2026-11-20T20:18:08Z
+a10-rest-title-trailing-space.txt	PATCH issues/7	HTTP/2.0 200 OK
+a10-rest-title-trailing-space	lastEditedAt=2026-11-20T20:17:54Z	editor=sapientpants	edits=4	renames=5	updatedAt=2026-11-20T20:18:14Z
+a11-rest-body-trailing-newline.txt	PATCH issues/7	HTTP/2.0 200 OK
+a11-rest-body-trailing-newline	lastEditedAt=2026-11-20T20:18:20Z	editor=sapientpants	edits=5	renames=5	updatedAt=2026-11-20T20:18:20Z
+a12-rest-body-crlf.txt	PATCH issues/7	HTTP/2.0 200 OK
+a12-rest-body-crlf	lastEditedAt=2026-11-20T20:18:26Z	editor=sapientpants	edits=6	renames=5	updatedAt=2026-11-20T20:18:27Z
+a13-label.txt	POST issues/7/labels	HTTP/2.0 200 OK
+a13-label	lastEditedAt=2026-11-20T20:18:26Z	editor=sapientpants	edits=6	renames=5	updatedAt=2026-11-20T20:18:33Z
+a14-close.txt	PATCH issues/7	HTTP/2.0 200 OK
+a14-close	lastEditedAt=2026-11-20T20:18:26Z	editor=sapientpants	edits=6	renames=5	updatedAt=2026-11-20T20:18:39Z
+a15-reopen.txt	PATCH issues/7	HTTP/2.0 200 OK
+a15-reopen	lastEditedAt=2026-11-20T20:18:26Z	editor=sapientpants	edits=6	renames=5	updatedAt=2026-11-20T20:18:46Z
+a16-comment.txt	POST issues/7/comments	HTTP/2.0 201 Created
+a16-comment	lastEditedAt=2026-11-20T20:18:26Z	editor=sapientpants	edits=6	renames=5	updatedAt=2026-11-20T20:18:52Z
+a17-rest-body-empty.txt	PATCH issues/7	HTTP/2.0 200 OK
+a17-rest-body-empty	lastEditedAt=2026-11-20T20:18:58Z	editor=sapientpants	edits=7	renames=5	updatedAt=2026-11-20T20:18:58Z
+a18-rest-body-back.txt	PATCH issues/7	HTTP/2.0 200 OK
+a18-rest-body-back	lastEditedAt=2026-11-20T20:19:05Z	editor=sapientpants	edits=8	renames=5	updatedAt=2026-11-20T20:19:05Z
+issue 7

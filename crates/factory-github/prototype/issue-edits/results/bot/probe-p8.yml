@@ -1,0 +1,61 @@
+# Probe P-8 of the software factory's spec: who is named when a GitHub App
+# edits an issue? The job's token belongs to the GitHub Actions App, so its
+# writes are made as github-actions[bot]. One shell step, no actions.
+# 8 is replaced by bot.sh with an issue the operator wrote.
+name: probe-p8
+on:
+  push:
+    branches: [probe/p-8]
+permissions:
+  issues: write
+jobs:
+  edit:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Edit issues as github-actions[bot]
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          TARGET: "8"
+        run: |
+          set -u
+          show='{number, title, body, user: .user.login, created_at, updated_at}'
+          v='X-GitHub-Api-Version: 2026-03-10'
+
+          echo "== create an issue"
+          X=$(gh api --method POST "repos/$REPO/issues" -H "$v" \
+            -f title="P-8 probe, bot's own: title 0" -f body="Body 0, by the workflow." --jq .number)
+          echo "created=$X"
+          sleep 3
+          echo "== rename it"
+          gh api --method PATCH "repos/$REPO/issues/$X" -H "$v" -f title="P-8 probe, bot's own: title 1" --jq "$show"
+          sleep 3
+          echo "== edit its body"
+          gh api --method PATCH "repos/$REPO/issues/$X" -H "$v" -f body="Body 2, by the workflow." --jq "$show"
+          sleep 3
+          echo "== rename the operator's issue"
+          gh api --method PATCH "repos/$REPO/issues/$TARGET" -H "$v" -f title="P-8 probe, bot target: title 1, by the workflow" --jq "$show"
+          sleep 3
+          echo "== edit the body of the operator's issue"
+          gh api --method PATCH "repos/$REPO/issues/$TARGET" -H "$v" -f body="Body 2, by the workflow." --jq "$show"
+          sleep 3
+
+          echo "== what this token reads of the operator's issue"
+          gh api graphql -F n="$TARGET" -f owner="${REPO%/*}" -f name="${REPO#*/}" -f query='
+            query($owner: String!, $name: String!, $n: Int!) {
+              viewer { login }
+              repository(owner: $owner, name: $name) {
+                issue(number: $n) {
+                  title body lastEditedAt includesCreatedEdit
+                  author { __typename login }
+                  editor { __typename login }
+                  userContentEdits(first: 100) {
+                    totalCount
+                    nodes { createdAt editedAt deletedAt editor { __typename login } diff }
+                  }
+                  timelineItems(first: 100, itemTypes: [RENAMED_TITLE_EVENT]) {
+                    nodes { ... on RenamedTitleEvent { createdAt actor { __typename login } previousTitle currentTitle } }
+                  }
+                }
+              }
+            }'

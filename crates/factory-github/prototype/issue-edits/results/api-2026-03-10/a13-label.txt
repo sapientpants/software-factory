@@ -1,0 +1,6 @@
+HTTP/2.0 200 OK
+Date: Fri, 20 Nov 2026 20:09:53 GMT
+X-Github-Api-Version-Selected: 2026-03-10
+X-Github-Request-Id: E6FC:3EB801:1A9B8E1:285C677:6B00A910
+
+[{"id":13161851395,"node_id":"LA_kwDOVzkiD88AAAADEIHqAw","url":"https://api.github.com/repos/sapientpants/sf-scratch/labels/probe:p-8","name":"probe:p-8","color":"ededed","default":false,"description":"Probe P-8: a label with no meaning to the factory","archived_at":null,"archived_by":null}]

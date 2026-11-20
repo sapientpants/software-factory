@@ -1,0 +1,91 @@
+edit	Set up job	﻿2026-11-20T20:17:26.5992570Z Current runner version: '2.338.2'
+edit	Set up job	2026-11-20T20:17:26.6017853Z ##[group]Runner Image Provisioner
+edit	Set up job	2026-11-20T20:17:26.6018766Z Hosted Compute Agent
+edit	Set up job	2026-11-20T20:17:26.6019319Z Version: 20261111.635
+edit	Set up job	2026-11-20T20:17:26.6019970Z Commit: b8a594ea514ff44cadb5342986c68b1eac6e22ed
+edit	Set up job	2026-11-20T20:17:26.6020744Z Build Date: 2026-11-11T01:49:01Z
+edit	Set up job	2026-11-20T20:17:26.6021417Z Worker ID: {ed45def2-c680-4009-916e-e30afd0afafe}
+edit	Set up job	2026-11-20T20:17:26.6022166Z Region: us-east-1
+edit	Set up job	2026-11-20T20:17:26.6022953Z Cloud: AWS
+edit	Set up job	2026-11-20T20:17:26.6023505Z ##[endgroup]
+edit	Set up job	2026-11-20T20:17:26.6025077Z ##[group]Operating System
+edit	Set up job	2026-11-20T20:17:26.6025682Z Ubuntu
+edit	Set up job	2026-11-20T20:17:26.6026221Z 24.04.5
+edit	Set up job	2026-11-20T20:17:26.6026709Z LTS
+edit	Set up job	2026-11-20T20:17:26.6027217Z ##[endgroup]
+edit	Set up job	2026-11-20T20:17:26.6027754Z ##[group]Runner Image
+edit	Set up job	2026-11-20T20:17:26.6028345Z Image: ubuntu-24.04
+edit	Set up job	2026-11-20T20:17:26.6028920Z Version: 20261116.133.1
+edit	Set up job	2026-11-20T20:17:26.6029942Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261116.133/images/ubuntu/Ubuntu2404-Readme.md
+edit	Set up job	2026-11-20T20:17:26.6031718Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261116.133
+edit	Set up job	2026-11-20T20:17:26.6033239Z ##[endgroup]
+edit	Set up job	2026-11-20T20:17:26.6034338Z ##[group]GITHUB_TOKEN Permissions
+edit	Set up job	2026-11-20T20:17:26.6036707Z Issues: write
+edit	Set up job	2026-11-20T20:17:26.6037261Z Metadata: read
+edit	Set up job	2026-11-20T20:17:26.6037785Z ##[endgroup]
+edit	Set up job	2026-11-20T20:17:26.6039941Z Secret source: Actions
+edit	Set up job	2026-11-20T20:17:26.6040983Z Cache mode: write
+edit	Set up job	2026-11-20T20:17:26.6041850Z Prepare workflow directory
+edit	Set up job	2026-11-20T20:17:26.6368973Z Prepare all required actions
+edit	Set up job	2026-11-20T20:17:26.6474161Z Complete job name: edit
+edit	Edit issues as github-actions[bot]	﻿2026-11-20T20:17:26.7401360Z ##[group]Run set -u
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7402073Z ^[[36;1mset -u^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7402863Z ^[[36;1mshow='{number, title, body, user: .user.login, created_at, updated_at}'^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7403729Z ^[[36;1mv='X-GitHub-Api-Version: 2026-03-10'^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7404284Z ^[[36;1m^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7404678Z ^[[36;1mecho "== create an issue"^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7405287Z ^[[36;1mX=$(gh api --method POST "repos/$REPO/issues" -H "$v" \^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7406113Z ^[[36;1m  -f title="P-8 probe, bot's own: title 0" -f body="Body 0, by the workflow." --jq .number)^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7406793Z ^[[36;1mecho "created=$X"^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7407244Z ^[[36;1msleep 3^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7407644Z ^[[36;1mecho "== rename it"^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7408376Z ^[[36;1mgh api --method PATCH "repos/$REPO/issues/$X" -H "$v" -f title="P-8 probe, bot's own: title 1" --jq "$show"^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7409121Z ^[[36;1msleep 3^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7409526Z ^[[36;1mecho "== edit its body"^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7410326Z ^[[36;1mgh api --method PATCH "repos/$REPO/issues/$X" -H "$v" -f body="Body 2, by the workflow." --jq "$show"^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7411103Z ^[[36;1msleep 3^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7411542Z ^[[36;1mecho "== rename the operator's issue"^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7412422Z ^[[36;1mgh api --method PATCH "repos/$REPO/issues/$TARGET" -H "$v" -f title="P-8 probe, bot target: title 1, by the workflow" --jq "$show"^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7413463Z ^[[36;1msleep 3^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7413941Z ^[[36;1mecho "== edit the body of the operator's issue"^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7414762Z ^[[36;1mgh api --method PATCH "repos/$REPO/issues/$TARGET" -H "$v" -f body="Body 2, by the workflow." --jq "$show"^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7415509Z ^[[36;1msleep 3^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7415887Z ^[[36;1m^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7416335Z ^[[36;1mecho "== what this token reads of the operator's issue"^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7417123Z ^[[36;1mgh api graphql -F n="$TARGET" -f owner="${REPO%/*}" -f name="${REPO#*/}" -f query='^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7417872Z ^[[36;1m  query($owner: String!, $name: String!, $n: Int!) {^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7418422Z ^[[36;1m    viewer { login }^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7418901Z ^[[36;1m    repository(owner: $owner, name: $name) {^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7419405Z ^[[36;1m      issue(number: $n) {^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7419941Z ^[[36;1m        title body lastEditedAt includesCreatedEdit^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7420685Z ^[[36;1m        author { __typename login }^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7421241Z ^[[36;1m        editor { __typename login }^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7421829Z ^[[36;1m        userContentEdits(first: 100) {^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7422311Z ^[[36;1m          totalCount^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7423078Z ^[[36;1m          nodes { createdAt editedAt deletedAt editor { __typename login } diff }^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7423746Z ^[[36;1m        }^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7424275Z ^[[36;1m        timelineItems(first: 100, itemTypes: [RENAMED_TITLE_EVENT]) {^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7425175Z ^[[36;1m          nodes { ... on RenamedTitleEvent { createdAt actor { __typename login } previousTitle currentTitle } }^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7425954Z ^[[36;1m        }^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7426391Z ^[[36;1m      }^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7426776Z ^[[36;1m    }^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:26.7427151Z ^[[36;1m  }'^[[0m
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:28.7461767Z shell: /usr/bin/bash -e {0}
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:28.7462499Z env:
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:28.7465458Z   GH_TOKEN: ***
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:28.7465794Z   REPO: sapientpants/sf-scratch
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:28.7466129Z   TARGET: 8
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:28.7466392Z ##[endgroup]
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:28.7618829Z == create an issue
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:31.5734795Z created=9
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:34.5729849Z == rename it
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:35.1819844Z {"body":"Body 0, by the workflow.","created_at":"2026-11-20T20:17:31Z","number":9,"title":"P-8 probe, bot's own: title 1","updated_at":"2026-11-20T20:17:34Z","user":"github-actions[bot]"}
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:38.1849606Z == edit its body
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:38.9161313Z {"body":"Body 2, by the workflow.","created_at":"2026-11-20T20:17:31Z","number":9,"title":"P-8 probe, bot's own: title 1","updated_at":"2026-11-20T20:17:38Z","user":"github-actions[bot]"}
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:41.9190583Z == rename the operator's issue
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:42.5480796Z {"body":"Body 0, by the operator.","created_at":"2026-11-20T20:17:16Z","number":8,"title":"P-8 probe, bot target: title 1, by the workflow","updated_at":"2026-11-20T20:17:42Z","user":"sapientpants"}
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:45.5510431Z == edit the body of the operator's issue
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:46.2436902Z {"body":"Body 2, by the workflow.","created_at":"2026-11-20T20:17:16Z","number":8,"title":"P-8 probe, bot target: title 1, by the workflow","updated_at":"2026-11-20T20:17:45Z","user":"sapientpants"}
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:49.2467315Z == what this token reads of the operator's issue
+edit	Edit issues as github-actions[bot]	2026-11-20T20:17:49.5736496Z {"data":{"viewer":{"login":"github-actions[bot]"},"repository":{"issue":{"title":"P-8 probe, bot target: title 1, by the workflow","body":"Body 2, by the workflow.","lastEditedAt":"2026-11-20T20:17:45Z","includesCreatedEdit":true,"author":{"__typename":"User","login":"sapientpants"},"editor":{"__typename":"Bot","login":"github-actions"},"userContentEdits":{"totalCount":2,"nodes":[{"createdAt":"2026-11-20T20:17:45Z","editedAt":"2026-11-20T20:17:45Z","deletedAt":null,"editor":{"__typename":"Bot","login":"github-actions"},"diff":"Body 2, by the workflow."},{"createdAt":"2026-11-20T20:17:45Z","editedAt":"2026-11-20T20:17:16Z","deletedAt":null,"editor":{"__typename":"User","login":"sapientpants"},"diff":"Body 0, by the operator."}]},"timelineItems":{"nodes":[{"createdAt":"2026-11-20T20:17:42Z","actor":{"__typename":"Bot","login":"github-actions"},"previousTitle":"P-8 probe, bot target: title 0","currentTitle":"P-8 probe, bot target: title 1, by the workflow"}]}}}}}
+edit	Complete job	﻿2026-11-20T20:17:49.5870011Z Cleaning up orphan processes

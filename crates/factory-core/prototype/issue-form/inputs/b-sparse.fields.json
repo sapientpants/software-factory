@@ -1,0 +1,5 @@
+{
+  "title": "P-4 probe B: only the required fields",
+  "outcome": "The typo in the README is fixed.",
+  "acceptance-criteria": "- AC-1 (review): WHEN the README is read THE SYSTEM SHALL spell `factory` correctly."
+}

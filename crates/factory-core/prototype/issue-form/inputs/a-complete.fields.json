@@ -1,0 +1,9 @@
+{
+  "title": "P-4 probe A: every field filled",
+  "outcome": "`sf issue lint` reports a missing section by its heading text. The message names the form field the operator has to fill.",
+  "spec-refs": "WI-1, SPEC.md section 6.4",
+  "context": "Likely involved:\n\n- `crates/factory-core/src/issue.rs`\n- `crates/factory-cli/src/main.rs`\n  - the `lint` subcommand only\n\nBackground: https://example.com/design-note\n\n```text\nerror: section \"Stop conditions\" is empty\n```",
+  "acceptance-criteria": "- AC-1 (test): WHEN a required section is missing THE SYSTEM SHALL name its heading in the lint output.\n- AC-2 (review): WHEN every section is present THE SYSTEM SHALL print nothing and exit 0.",
+  "out-of-scope": "1. The dispatcher.\n2. The status comment.",
+  "stop-conditions": "* The headings of the form changed on GitHub's side.\n* A section appears twice."
+}

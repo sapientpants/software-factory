@@ -1,0 +1,36 @@
+== issue 3 (a-complete): 794 bytes, 0 CR, ends with newline: False
+level-3 headings: sketch 6, GitHub's HTML 6, same list: True
+repeated section names: none
+  Outcome: round trip holds (121 characters)
+  Spec refs: round trip holds (25 characters)
+  Context: round trip holds (220 characters)
+  Acceptance criteria: round trip holds (193 characters)
+  Out of scope: round trip holds (41 characters)
+  Stop conditions: round trip holds (79 characters)
+
+== issue 2 (b-sparse): 283 bytes, 0 CR, ends with newline: False
+level-3 headings: sketch 6, GitHub's HTML 6, same list: True
+repeated section names: none
+  Outcome: round trip holds (32 characters)
+  Spec refs: round trip holds (empty)
+  Context: round trip holds (empty)
+  Acceptance criteria: round trip holds (84 characters)
+  Out of scope: round trip holds (empty)
+  Stop conditions: round trip holds (empty)
+
+== issue 1 (c-hostile): 1347 bytes, 1 CR, ends with newline: False
+level-3 headings: sketch 12, GitHub's HTML 12, same list: True
+repeated section names: {'Outcome': 5, 'Acceptance criteria': 2}
+  Outcome: naive last-wins reads "A second outcome."
+  Outcome: 5 sections, the typed text is number 1 of them
+  Spec refs: round trip holds (empty)
+  Context: naive first-wins reads "A level-3 heading that is also a field of the form:"
+  Context: naive last-wins reads "A level-3 heading that is also a field of the form:"
+  Context: cut short by a section heading typed into it: 51 of 445 characters read
+  Acceptance criteria: naive first-wins reads "- AC-9 (manual): WHEN this line is read as a criterion THE SYSTEM SHALL be wrong."
+  Acceptance criteria: 2 sections, the typed text is number 2 of them
+  Out of scope: round trip holds (empty)
+  Stop conditions: naive first-wins reads "inside a fence\n```\n\n<!-- an HTML comment -->\n<details><summary>HTML</summary>inside details</details>"
+  Stop conditions: naive last-wins reads "Unicode: café, “quotes”, 日本語, 🙂\n\ta line that starts with a tab"
+  Stop conditions: cut short by a section heading typed into it: 62 of 146 characters read
+

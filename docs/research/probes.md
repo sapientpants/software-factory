@@ -626,27 +626,27 @@ The first three rows were run under both API versions, the last three under `202
 
 ## P-24: bubblewrap and `/dev/kvm` on the server
 
-Partly answered 2026-11-20 for #7, by a second run of the script behind [14-server-facts](14-server-facts.md) ("report 14" below), after the operator installed `bubblewrap` and Claude Code on the server. The probe asks for the factory's user. That user does not exist yet, so the run was again the operator's own account, unprivileged, over SSH.
+Answered 2026-11-20 for #7, by a second and a third run of the script behind [14-server-facts](14-server-facts.md) ("report 14" below). The second run followed the operator installing `bubblewrap` and Claude Code on the server, and was again the operator's own account, unprivileged, over SSH. The third was the factory's system user, which the operator had created in between as a member of group `kvm`.
 
-**Answer so far.** With bubblewrap 0.12.0 from Debian 13, the five stand-in tests of P-16 pass on the server as provisioned, with no sysctl changed and no AppArmor profile unloaded, and the sandbox holds no network interface but `lo`. Whether the kernel accepts a seccomp filter was not tested, and `/dev/kvm` was not opened, because the account is not in group `kvm`.
+**Answer.** Yes to all three, with stand-in commands and not the factory's sandbox. As the factory's user, with bubblewrap 0.12.0 from Debian 13, the five tests of P-16 pass on the server as provisioned, with no sysctl changed and no AppArmor profile unloaded, and the sandbox holds no network interface but `lo`. A sandbox that bubblewrap is given a seccomp filter for runs under that filter. The user opens `/dev/kvm`, and `KVM_GET_API_VERSION` and `KVM_CREATE_VM` succeed. No guest was booted.
 
 ### Method
 
-The script is the one of report 14, changed after its first run to print nothing that identifies the server and to look for tools under `~/.cargo/bin` and `~/.local/bin`. It and its output are on the branch `prototype/server-facts`, at commit [`e2be280`](https://github.com/sapientpants/software-factory/tree/e2be2808996b7a293c90c04343e67a76be31da62/crates/factory-sandbox/prototype/server-facts); the output is `results/server-2026-11-20-second.txt`. The run was at 08:53 UTC, 24 minutes after the run of report 14. It changes nothing on the server.
+The script is the one of report 14, changed after its first run to print nothing that identifies the server and to look for tools under `~/.cargo/bin` and `~/.local/bin`. It and its output are on the branch `prototype/server-facts`, at commit [`e2be280`](https://github.com/sapientpants/software-factory/tree/e2be2808996b7a293c90c04343e67a76be31da62/crates/factory-sandbox/prototype/server-facts); the output of the second run is `results/server-2026-11-20-second.txt`. That run was at 08:53 UTC, 24 minutes after the run of report 14. The script changes nothing on the server.
 
-Between the runs the operator installed the Debian package `bubblewrap` and Claude Code. Nothing else is known to have changed: the kernel, the sysctls, the list of security modules and the files in `/etc/apparmor.d` read the same in both outputs.
+Between the first and the second run the operator installed the Debian package `bubblewrap` and Claude Code. Nothing else is known to have changed: the kernel, the sysctls, the list of security modules and the files in `/etc/apparmor.d` read the same in both outputs.
 
-### bubblewrap
+### bubblewrap, as the operator's account
 
 `bwrap` is `0.12.0-1~deb13u1`, at `/usr/bin/bwrap` with mode `-rwxr-xr-x`, so it is not setuid and relies on unprivileged user namespaces. The tests are those of P-16, with the same arguments:
 
 | | basic | caps | nested | copy | unshare |
 |---|---|---|---|---|---|
-| The server, as provisioned | ok | ok | ok | ok | ok |
+| The server, as provisioned, in the second and the third run | ok | ok | ok | ok | ok |
 | Hosted runner, Ubuntu 24.04, as provisioned (P-16) | fail | fail | fail | fail | fail |
 | Hosted runner, Ubuntu 26.04, as provisioned (P-16) | ok | fail | fail | fail | fail |
 
-Inside the basic sandbox, `/proc/net/dev` listed `lo` and nothing else.
+Inside the basic sandbox, `/proc/net/dev` listed `lo` and nothing else, in both runs.
 
 What follows:
 
@@ -661,17 +661,45 @@ What follows:
 - **`/var` is still full:** 104 MiB free of 22 GiB, against 64 MiB before.
 - `/dev/kvm`, the sysctls, `git`, the listener on port 22 and the five HTTPS requests gave what report 14 records.
 
+### As the factory's user
+
+The third run was at 12:13 UTC, started by the operator on the server with `sudo -H -u sf bash /tmp/server-facts.sh`. The script is at commit [`23708d3`](https://github.com/sapientpants/software-factory/tree/23708d3382961ca59a0ea285c0b673824a454c60/crates/factory-sandbox/prototype/server-facts) of the same branch and the output is `results/server-2026-11-20-third.txt`, with one account name redacted. Since the second run the script also gives bubblewrap a seccomp filter.
+
+Before it, the operator did two things on the server:
+
+- **Created the user,** a system user named `sf`, and added it to group `kvm`. What the output shows of the result: a user with uid 103, and `getent group kvm` giving `kvm:x:993:sf`. Of the groups `kvm`, `sudo`, `wheel` and `docker` it is in `kvm` alone. Its home directory and its shell were not read. The operator decided the same day that the user is named `sf` and that its home directory is `/home/sf` by default.
+- **Removed the container images that no container used.** `/var` went from 104 MiB free to 11 GiB free of 22.
+
+What the run showed:
+
+| | |
+|---|---|
+| The five tests of P-16 | All `ok`, as in the second run |
+| Network interfaces in the basic sandbox | `lo` alone |
+| A seccomp filter | The script gives `bwrap --seccomp` a filter of one instruction that allows every system call, and runs `grep Seccomp /proc/self/status` inside. It printed `Seccomp: 2` and `Seccomp_filters: 1`: the process ran in filter mode with one filter attached |
+| Opening `/dev/kvm` for reading and writing | `ok` |
+| `KVM_GET_API_VERSION`, then `KVM_CREATE_VM` | `ok`: the version is 12 and the second call returned |
+| Claude Code, Rust toolchain | Neither, for this user. The copy of Claude Code is under the operator's home directory |
+
+`ls -l /dev/kvm` gave the same mode and owner as before with a new timestamp, later than the second run, so the device node was made again in between; the machine was probably restarted **(inference)**. The kernel, the sysctls and the list of security modules read as in the earlier runs.
+
+What follows:
+
+- **The server gives the factory's user what level `process` needs, and the device that level `hardened` needs (13.3).** Both rest on stand-in commands.
+- **Membership of group `kvm` is enough for `/dev/kvm`.** No udev rule like the one the hosted runners need (P-16) is involved.
+- **The kernel takes a seccomp filter from bubblewrap.** The filter allowed everything, so this says nothing about a filter of the factory's.
+
 ### What changed in the spec
 
-1. The table of 4.4 marks what the second run added: `bubblewrap` is installed and its requirement is met, and an agent CLI is installed for the operator's account.
-2. The provisioning sentence of 4.4 no longer lists installing `bubblewrap`.
-3. The P-24 row of 23.2 carries this partial answer.
+1. The host requirements of 4.4 name the factory's user and its home directory by default, `sf` and `/home/sf`, as the operator decided on 2026-11-20.
+2. The table of 4.4 marks what the second and the third run added: `bubblewrap` is installed, the factory's user exists and can open `/dev/kvm`, an agent CLI is installed for the operator's account only, and `/var` is no longer full.
+3. The provisioning sentence of 4.4 lists what is left: an agent CLI and a toolchain for the factory's user, and the data directory.
+4. The P-24 row of 23.2 carries the answer.
 
 ### Still open
 
-- **The factory's user.** It does not exist yet. Every result is for the operator's account.
-- **A seccomp filter.** No test passed `--seccomp` to bubblewrap.
-- **`/dev/kvm`.** Not opened by anyone. The script says how to run its two ioctls as a member of group `kvm`.
-- **The factory's sandbox** in place of the stand-in commands, with the mounts of SEC-6 and the proxy of SEC-10.
-- **A Claude Code session on the server,** inside bubblewrap or outside it. Probe P-6 (#12) is the first; it now has both tools it was waiting for.
-
+- **The factory's sandbox** in place of the stand-in commands, with its own seccomp filter, the mounts of SEC-6 and the proxy of SEC-10.
+- **A guest.** Whether a Firecracker or Cloud Hypervisor microVM boots on the server is M2 work (D-5).
+- **Which AppArmor profiles are loaded.** Not listed in any run; it needs root.
+- **The user's home directory and shell on the server,** which no run read, and whether anything but the operator can become the user.
+- **A Claude Code session on the server,** inside bubblewrap or outside it. Probe P-6 (#12) is the first. The CLI is installed for the operator's account and not for the factory's user.

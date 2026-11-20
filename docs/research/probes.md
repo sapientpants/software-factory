@@ -623,3 +623,55 @@ The first three rows were run under both API versions, the last three under `202
 - What produces the documented 409.
 - The force-update of a ref left by a `cancelled` run (8.2) and the lease of a reset (7.6). They are `PATCH` calls and no part of this probe.
 - GraphQL `createRef`. Not tried; GH-17 uses REST for writes.
+
+## P-24: bubblewrap and `/dev/kvm` on the server
+
+Partly answered 2026-11-20 for #7, by a second run of the script behind [14-server-facts](14-server-facts.md) ("report 14" below), after the operator installed `bubblewrap` and Claude Code on the server. The probe asks for the factory's user. That user does not exist yet, so the run was again the operator's own account, unprivileged, over SSH.
+
+**Answer so far.** With bubblewrap 0.12.0 from Debian 13, the five stand-in tests of P-16 pass on the server as provisioned, with no sysctl changed and no AppArmor profile unloaded, and the sandbox holds no network interface but `lo`. Whether the kernel accepts a seccomp filter was not tested, and `/dev/kvm` was not opened, because the account is not in group `kvm`.
+
+### Method
+
+The script is the one of report 14, changed after its first run to print nothing that identifies the server and to look for tools under `~/.cargo/bin` and `~/.local/bin`. It and its output are on the branch `prototype/server-facts`, at commit [`e2be280`](https://github.com/sapientpants/software-factory/tree/e2be2808996b7a293c90c04343e67a76be31da62/crates/factory-sandbox/prototype/server-facts); the output is `results/server-2026-11-20-second.txt`. The run was at 08:53 UTC, 24 minutes after the run of report 14. It changes nothing on the server.
+
+Between the runs the operator installed the Debian package `bubblewrap` and Claude Code. Nothing else is known to have changed: the kernel, the sysctls, the list of security modules and the files in `/etc/apparmor.d` read the same in both outputs.
+
+### bubblewrap
+
+`bwrap` is `0.12.0-1~deb13u1`, at `/usr/bin/bwrap` with mode `-rwxr-xr-x`, so it is not setuid and relies on unprivileged user namespaces. The tests are those of P-16, with the same arguments:
+
+| | basic | caps | nested | copy | unshare |
+|---|---|---|---|---|---|
+| The server, as provisioned | ok | ok | ok | ok | ok |
+| Hosted runner, Ubuntu 24.04, as provisioned (P-16) | fail | fail | fail | fail | fail |
+| Hosted runner, Ubuntu 26.04, as provisioned (P-16) | ok | fail | fail | fail | fail |
+
+Inside the basic sandbox, `/proc/net/dev` listed `lo` and nothing else.
+
+What follows:
+
+- **The namespaces of level `process` (13.3) are available to an unprivileged account on the server.** `--unshare-all` takes a user, PID, IPC and network namespace among others. No step like the one DEV-6 needs on the hosted runners is needed here.
+- **No AppArmor profile confines bubblewrap there (inference).** `caps` and `nested` pass, and on Ubuntu 26.04 they fail for as long as the `bwrap` profile is loaded (P-16). So a sandbox-escape test that passes on the server passes because of the sandbox's own policy. The loaded profiles were not listed, which needs root.
+- **Nothing in 13.3 has to change on this evidence.** The evidence is stand-in commands; the factory's sandbox does not exist yet.
+
+### What else the second run showed
+
+- **Claude Code 2.1.311** is at `~/.local/bin/claude` of the operator's account. It is the version P-21 and P-22 ran on. The script asked it for its version only; no session ran, and whether a credential is in place was not looked at.
+- **No Rust toolchain** for that account: `rustup`, `rustc` and `cargo` are neither on the `PATH` nor under `~/.cargo/bin`. Report 14 could not settle this.
+- **`/var` is still full:** 104 MiB free of 22 GiB, against 64 MiB before.
+- `/dev/kvm`, the sysctls, `git`, the listener on port 22 and the five HTTPS requests gave what report 14 records.
+
+### What changed in the spec
+
+1. The table of 4.4 marks what the second run added: `bubblewrap` is installed and its requirement is met, and an agent CLI is installed for the operator's account.
+2. The provisioning sentence of 4.4 no longer lists installing `bubblewrap`.
+3. The P-24 row of 23.2 carries this partial answer.
+
+### Still open
+
+- **The factory's user.** It does not exist yet. Every result is for the operator's account.
+- **A seccomp filter.** No test passed `--seccomp` to bubblewrap.
+- **`/dev/kvm`.** Not opened by anyone. The script says how to run its two ioctls as a member of group `kvm`.
+- **The factory's sandbox** in place of the stand-in commands, with the mounts of SEC-6 and the proxy of SEC-10.
+- **A Claude Code session on the server,** inside bubblewrap or outside it. Probe P-6 (#12) is the first; it now has both tools it was waiting for.
+

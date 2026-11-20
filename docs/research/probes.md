@@ -842,7 +842,7 @@ The run of 18:46, without `socat`: the three `on-strict` cases gave what they ga
 
 ## P-4: how an issue form renders into the issue body
 
-Answered 2026-11-20 for #14, by three issues that the operator created in the web interface of `sapientpants/sf-scratch` through the issue form of 6.2, read back with `gh` 2.104.0 on the operator's OAuth token. Report 07 (`07-gaps`, R7) found the layout undocumented and asked for a tolerant parser for that reason.
+Answered 2026-11-20 for #14, by three issues that the operator created in the web interface of `sapientpants/sf-scratch` through the issue form of 6.2, read back with `gh` 2.104.0 on the operator's OAuth token. Report 03 (`03-specs-and-validation`) proposed the form and a body "parsed strictly"; report 07 (`07-gaps`, R7) found the layout undocumented and asked for a tolerant parser for that reason.
 
 **Answer.** The body is one block per field, in the form's order, with a blank line between blocks. A block is the line `### <label>`, a blank line, and the field's text exactly as it was submitted. A field left empty gets the text `_No response_`. That is all GitHub adds: no text before the first heading, no newline at the end, no escaping, and nothing on the issue that says a form made it.
 
@@ -955,7 +955,7 @@ From #1. In each row the body holds the field's text byte for byte.
 | Two line feeds before the first line and three after the last | Kept, so four line feeds follow the heading and five precede the next one | One paragraph |
 | Spaces at the start and at the end of a line | Kept | Not shown |
 | A carriage return and a line feed, sent as `%0D%0A` | Kept: the body holds one `\r\n` among line feeds | A line break, as for a line feed alone |
-| A tab, accented letters, curly quotes, kanji, an emoji | Kept | As text |
+| A tab, accented letters, curly quotes, kanji, an emoji | Kept | As text, without the tab, which started a line |
 | `<!-- an HTML comment -->` and a `<details>` element | Kept | The comment is not rendered |
 | `### Acceptance criteria` and `### Outcome`, each on a line of the Context field | Kept, unescaped | Level-3 headings, as the form's own |
 | `### Stop conditions` inside a fenced block | Kept | Code |
@@ -969,7 +969,7 @@ Nothing else on the issue tells a form from a hand-written body. `labels` is emp
 
 ### The parser sketch
 
-A line rule in Python, not a Markdown parser. A section starts at a level-3 ATX heading whose text is one of the six names, compared without case, outside a fenced code block: up to three spaces, `###`, a space or tab, the text, and an optional closing run of `#`. It ends at the next such heading. Blank lines at either end are dropped, and a text that is then empty or `_No response_` counts as empty.
+A line rule in Python, not a Markdown parser. A section starts at a level-3 ATX heading whose text is one of the six names, compared without case, outside a fenced code block: up to three spaces, `###`, a space or tab, the text, and an optional closing run of `#`. It ends at the next such heading. Lines of nothing but white space are dropped at either end, and a text that is then empty, or `_No response_` with or without white space around it, counts as empty.
 
 | Issue | Level-3 headings: the sketch, and `<h3>` in GitHub's HTML | Sections against the fields as submitted |
 |---|---|---|
@@ -1003,9 +1003,9 @@ Two simpler parsers, which split on lines starting `### ` and keep one section p
 ### What changed in the spec
 
 1. 6.2 states the layout as observed.
-2. WI-1 says what the parser accepts: the sanitised body (SEC-4), either line ending, a level-3 ATX heading outside a fenced code block with one of the six names in any case, other headings as content, blank lines trimmed, and `_No response_` or nothing as empty.
-3. WI-1a is new: a name that starts more than one section fails the readiness lint, and no section of that body is used. 6.4 lists the rule.
-4. WI-1b replaces the round-trip test in the probe suite: the recorded bodies are fixtures of the parser's tests, and a new submission is the operator's to make.
+2. WI-1 says what the parser accepts: the sanitised body (SEC-4), either line ending, a level-3 ATX heading outside a fenced code block with one of the six names in any case, other headings as content, blank lines trimmed, and `_No response_` or nothing as empty. Two of these are choices and not observations: the match without regard to case, and sanitising before parsing.
+3. WI-1a is new, and a design choice that the evidence prompts but does not make: a name that starts more than one section fails the readiness lint, and no section of that body is used. 6.4 lists the rule.
+4. WI-1b replaces the round-trip test in the probe suite: the recorded bodies are fixtures of the parser's tests, and a new submission is the operator's to make. The first paragraph of 23.2 excepts P-4 from what `sf doctor --probe` answers.
 5. The P-4 row of 23.2 carries the answer.
 
 ### Still open
@@ -1016,6 +1016,6 @@ Two simpler parsers, which split on lines starting `### ` and keep one section p
 - **Which fields the form requires, and their element types.** 6.2 does not say, and the scratch form's choices were made to see empty fields. Tier 1 needs all six sections (6.1); whether the form or only the lint enforces that is undecided. It matters when the form is enforced (M3).
 - **The line format of an acceptance criterion.** The list arrives as typed, under any marker. 6.4 needs each criterion's verification method and 10.5 its id, and 6.2 gives no line format to read them from. Also M3.
 - **The other elements.** `dropdown`, `checkboxes`, `markdown`, `upload` and a `textarea` with `render`. The form of 6.2 uses none.
-- **A Markdown parser in place of the line rule.** The rule does not know block quotes, list items or HTML blocks, so `> ### Outcome` and `- ### Outcome` are headings on the page and content to the rule, and a heading line inside an HTML block is the reverse. 19.2 lists no Markdown crate. The agreement with GitHub's HTML was shown for three bodies.
+- **A Markdown parser in place of the line rule.** The rule does not know block quotes, list items or HTML blocks, so `> ### Outcome` and `- ### Outcome` are headings on the page and content to the rule, and a heading line inside an HTML block is the reverse. 19.2 lists no Markdown crate. The agreement with GitHub's HTML was shown for three bodies, which hold one fence, of backticks and closed. A fence of tildes was not submitted, and nor was one left open, which would take the form's later headings into the field it stands in, with no name repeated.
 - **The order of sanitisation and parsing on real text.** WI-1 puts SEC-4 first, so a heading inside an HTML comment is gone before the parser runs. Neither exists yet.
 - **A body edited after creation,** and a body read with an installation token. Not tried.

@@ -16,12 +16,25 @@ A case is an outer sandbox and a `sandbox` block in the host's `--settings` file
 python3 inner_sandbox_probe.py --list
 python3 inner_sandbox_probe.py                  # every case, on this machine
 python3 inner_sandbox_probe.py -k nouserns      # the cases named *nouserns*
-ssh <server> python3 - < inner_sandbox_probe.py | tee results/server-<date>.txt
 ```
 
-It needs `bwrap`, `python3`, `curl` and a native `claude` binary, and runs as an ordinary user. The CLI's sandbox also needs `socat`; without it the cases that turn the sandbox on show what a missing dependency does, which is a different question. The token is read from `CLAUDE_CODE_OAUTH_TOKEN` or from `~/.config/sf-probe/oauth-token` (mode 0600) of the account that runs the script, and is passed in the environment only. The output replaces the home directory, the account's name, the host name and the token's literal value, should one appear.
+On the server the operator becomes the factory's user with `sudo`, which asks for a password, so the script is copied there and started from a login. That user has no CLI and no token of its own. It is given a copy of the binary to read, and the token on standard input, which the operator's shell opens:
 
-What a run leaves behind: nothing of its own. It works in `~/.cache/sf-p6-*` and writes one empty file in `/tmp`, and removes both. In the two `none` cases the CLI itself makes `/tmp/claude-<uid>` and `/tmp/cc-socks`, as any session of that account does.
+```sh
+# On the Mac
+scp inner_sandbox_probe.py <server>:/tmp/
+# On the server, as the operator
+install -m 755 "$(readlink -f ~/.local/bin/claude)" /tmp/claude-p6
+sudo -H -u sf python3 /tmp/inner_sandbox_probe.py --claude /tmp/claude-p6 --token-stdin \
+  < ~/.config/sf-probe/oauth-token | tee /tmp/p6-server.txt
+rm /tmp/claude-p6 /tmp/inner_sandbox_probe.py
+# On the Mac
+scp <server>:/tmp/p6-server.txt results/server-<date>.txt
+```
+
+It needs `bwrap`, `python3`, `curl` and a native `claude` binary, and runs as an ordinary user. The CLI's sandbox also needs `socat`; without it the cases that turn the sandbox on show what a missing dependency does, which is a different question. The token is read from standard input with `--token-stdin`, from `CLAUDE_CODE_OAUTH_TOKEN`, or from `~/.config/sf-probe/oauth-token` (mode 0600) of the account that runs the script, and is passed to the sessions in the environment only. The output replaces the home directory, the account's name, the host name and the token's literal value, should one appear.
+
+What a run leaves behind: nothing of its own. It works in `~/.cache/sf-p6-*`, or in `/var/tmp/sf-p6-*` when the user has no home directory to write in, and writes one empty file in `/tmp`, and removes both. In the two `none` cases the CLI itself makes `/tmp/claude-<uid>` and `/tmp/cc-socks` or `/tmp/cc-socks-<uid>`, as any session of that user does.
 
 Thirteen sessions of one or two turns on the `haiku` alias: a pass reported 0.01 API-equivalent dollars.
 
@@ -29,15 +42,21 @@ Thirteen sessions of one or two turns on the `haiku` alias: a pass reported 0.01
 
 | File | Run |
 |---|---|
-| `results/container-2026-11-20.txt` | A Debian 13 container on the Mac (arm64, Docker Desktop's 7.0.14-linuxkit kernel), built from the `Dockerfile` here and started with `--privileged`, as an unprivileged user. Claude Code 2.1.311, bubblewrap 0.12.0, socat 1.8.0.3 |
+| `results/container-2026-11-20.txt` | A Debian 13 container on the Mac (arm64, Docker Desktop's 7.0.14-linuxkit kernel), built from the `Dockerfile` here and started with `--privileged`. The script ran the way it is to run on the server: as a system user named `sf` with no home directory, started from a directory that user cannot read, with a copy of the binary in `/tmp` and the token on standard input. Claude Code 2.1.311, bubblewrap 0.12.0, socat 1.8.0.3 |
 
 The container run is a rehearsal of the script, not the answer to P-6: the probe asks about the server.
+
+The container has no `sudo`, so `runuser` stood in for it:
 
 ```sh
 docker build -t sf-p6-dryrun .
 CLAUDE_CODE_OAUTH_TOKEN="$(cat ~/.config/sf-probe/oauth-token)" \
-  docker run --rm --privileged -e CLAUDE_CODE_OAUTH_TOKEN \
-  -v "$PWD/inner_sandbox_probe.py:/probe.py:ro" sf-p6-dryrun python3 /probe.py
+  docker run --rm --privileged -u 0 -e CLAUDE_CODE_OAUTH_TOKEN \
+  -v "$PWD/inner_sandbox_probe.py:/tmp/inner_sandbox_probe.py:ro" sf-p6-dryrun sh -c '
+    useradd -r sf && install -m 755 "$(readlink -f /home/probe/.local/bin/claude)" /tmp/claude-p6 &&
+    chmod 700 /home/probe && cd /home/probe &&
+    printenv CLAUDE_CODE_OAUTH_TOKEN | runuser -u sf -- env -u CLAUDE_CODE_OAUTH_TOKEN HOME=/home/sf \
+      python3 /tmp/inner_sandbox_probe.py --claude /tmp/claude-p6 --token-stdin'
 ```
 
 What it showed there:
@@ -45,7 +64,7 @@ What it showed there:
 - **With no `sandbox` block, or with `enabled: false`, the Bash tool runs in the CLI's own namespaces** under both outer sandboxes. The CLI starts no sandbox of its own.
 - **With `enabled: true` under the `bwrap` stand-in, the CLI's sandbox works nested.** The command runs in a new user, mount, PID and network namespace, with two seccomp filters, cannot write outside the working directory and is refused `api.anthropic.com` by the CLI's proxy. `enableWeakerNestedSandbox` was not needed.
 - **With `enabled: true` under `nouserns`, every Bash command fails:** `bwrap: Creating new namespace failed`. The session still ends with `success` and exit code 0. `failIfUnavailable` does not stop the CLI at startup, and `enableWeakerNestedSandbox` does not help.
-- **Unless `allowUnsandboxedCommands` is `false`, the model may run the command again outside the sandbox.** It did in two passes of three, with `dangerouslyDisableSandbox: true` in the tool call, and the command then ran in the CLI's namespaces.
+- **Unless `allowUnsandboxedCommands` is `false`, the model may run the command again outside the sandbox.** It did in three passes of four, with `dangerouslyDisableSandbox: true` in the tool call, and the command then ran in the CLI's namespaces.
 
 ## What the container run does not show
 

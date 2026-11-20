@@ -12,15 +12,20 @@ the record does not depend on what the model says. A case is the pair of:
   stand-in with `--disable-userns`, in which nothing can create a user namespace;
 - the `sandbox` block of the host's `--settings` file.
 
-Run it on the server as an ordinary user, without sudo:
+Run it on the server as an ordinary user, never as root:
 
     python3 inner_sandbox_probe.py | tee results.txt
-    ssh <server> python3 - < inner_sandbox_probe.py | tee results.txt
 
-The token is read from the environment (CLAUDE_CODE_OAUTH_TOKEN) or from
-~/.config/sf-probe/oauth-token, and is passed to the sessions in the environment only.
-The script writes under ~/.cache/sf-p6-* and one empty file in /tmp, and removes both when
-it ends. Each session may run one command, `sh ./inside.sh`, and nothing else. It
+As another user, such as the factory's, who has neither a CLI nor a token of its own:
+
+    sudo -H -u sf python3 /tmp/inner_sandbox_probe.py --claude /tmp/claude-p6 --token-stdin \
+        < ~/.config/sf-probe/oauth-token | tee results.txt
+
+The token is read from standard input (--token-stdin), from the environment
+(CLAUDE_CODE_OAUTH_TOKEN) or from ~/.config/sf-probe/oauth-token, and is passed to the
+sessions in the environment only. The script writes under ~/.cache/sf-p6-*, or under
+/var/tmp when the user has no home directory to write in, and one empty file in /tmp,
+and removes both when it ends. Each session may run one command, `sh ./inside.sh`, and nothing else. It
 prints no host name, no account name and no address.
 """
 
@@ -180,19 +185,21 @@ def preflight(claude: Path, scratch: Path):
     for tool, flag, containing in (("bwrap", "--version", ""), ("socat", "-V", "socat version"), ("curl", "--version", "")):
         path = shutil.which(tool)
         out(f"{tool}: {first_line([tool, flag], containing) + ' (' + path + ')' if path else 'not installed'}")
-    out(f"claude: {first_line([str(claude), '--version'])} ({claude})")
+    run_dir = scratch / "preflight"
+    for name in ("work", "home", "host", "outside", "out"):
+        (run_dir / name).mkdir(parents=True)
+    path = "/usr/local/bin:/usr/bin:/bin"
+    code, text = run([str(claude), "--version"], env={"HOME": str(run_dir / "home"), "PATH": path})
+    out(f"claude: {text.splitlines()[-1][:120] if text else code} ({claude})")
     limit = Path("/proc/sys/user/max_user_namespaces")
     out(f"user.max_user_namespaces: {limit.read_text().strip() if limit.exists() else 'absent'}")
 
     out("\nThe outer sandboxes without the CLI (expected: nested ok under bwrap, fail under nouserns):\n")
-    run_dir = scratch / "preflight"
-    for name in ("work", "home", "host", "outside", "out"):
-        (run_dir / name).mkdir(parents=True)
     inner = ["bwrap", "--unshare-user", "--unshare-pid", "--ro-bind", "/", "/", "--proc", "/proc", "--dev", "/dev", "--", "true"]
     for kind in ("bwrap", "nouserns"):
         prefix, _ = outer_command(kind, run_dir, claude)
         for label, cmd in (("starts", ["true"]), ("nested", inner), ("claude --version", ["/sf/bin/claude", "--version"])):
-            code, text = run(prefix + cmd)
+            code, text = run(prefix + cmd, env={"HOME": "/sf/home", "PATH": path})
             detail = "ok" if code == 0 else f"fail (exit {code}): {text.splitlines()[-1] if text else ''}"
             out(f"{kind:9} {label:17} {detail}")
 
@@ -394,6 +401,8 @@ def main():
     parser.add_argument("--model", default="haiku")
     parser.add_argument("--timeout", type=int, default=240, help="seconds per session")
     parser.add_argument("--keep", action="store_true", help="keep the scratch directory")
+    parser.add_argument("--claude", metavar="PATH", help="the CLI's native binary, when this user has none installed")
+    parser.add_argument("--token-stdin", action="store_true", help="read the token from standard input")
     args = parser.parse_args()
 
     cases = [case for case in CASES if not args.k or args.k in case[0]]
@@ -410,30 +419,47 @@ def main():
         out("This is root. Run it again as an ordinary user.")
         return 2
 
-    found = shutil.which("claude", path=SEARCH_PATH)
+    found = args.claude or shutil.which("claude", path=SEARCH_PATH)
     if not found or not shutil.which("bwrap"):
         out(f"claude: {found or 'not found'}; bwrap: {shutil.which('bwrap') or 'not found'}. Both are needed.")
         return 2
     claude = Path(found).resolve()
-    if claude.read_bytes()[:4] != b"\x7fELF":
+    if not os.access(claude, os.R_OK | os.X_OK):
+        out(f"{claude} cannot be read and run by this user.")
+        return 2
+    with open(claude, "rb") as binary:
+        magic = binary.read(4)
+    if magic != b"\x7fELF":
         out(f"{claude} is not a native binary, so it cannot be bound into the sandbox as one file.")
         return 2
 
     token = os.environ.get("CLAUDE_CODE_OAUTH_TOKEN", "").strip()
     source = "the environment"
-    if not token and TOKEN_FILE.exists():
+    if args.token_stdin:
+        token, source = sys.stdin.read().strip(), "standard input"
+    elif not token and os.access(TOKEN_FILE, os.R_OK):
         token, source = TOKEN_FILE.read_text().strip(), str(TOKEN_FILE)
     if not token:
-        out(f"No token: set CLAUDE_CODE_OAUTH_TOKEN or write the output of `claude setup-token` to {TOKEN_FILE} (mode 0600).")
+        out(f"No token: pass --token-stdin, set CLAUDE_CODE_OAUTH_TOKEN or write the output of `claude setup-token` to {TOKEN_FILE} (mode 0600).")
         return 2
     REDACT.token = token
 
-    cache = Path(os.environ.get("XDG_CACHE_HOME") or HOME / ".cache")
-    cache.mkdir(parents=True, exist_ok=True)
     # Not under /tmp: the CLI's sandbox leaves the temporary directory writable, and the
-    # write test needs a directory that is neither that nor the working directory.
-    scratch = Path(tempfile.mkdtemp(prefix="sf-p6-", dir=cache))
+    # write test needs a directory that is neither that nor the working directory. A
+    # system user may have no home directory, so /var/tmp is the second choice.
+    scratch = None
+    for cache in (Path(os.environ.get("XDG_CACHE_HOME") or HOME / ".cache"), Path("/var/tmp")):
+        try:
+            cache.mkdir(parents=True, exist_ok=True)
+            scratch = Path(tempfile.mkdtemp(prefix="sf-p6-", dir=cache))
+            break
+        except OSError:
+            continue
+    if scratch is None:
+        out("No directory to work in: neither the cache directory nor /var/tmp is writable.")
+        return 2
     REDACT.add(str(scratch), "<scratch>")
+    os.chdir(scratch)  # under sudo the starting directory may be one this user cannot read
     try:
         preflight(claude, scratch)
         out(f"\nToken from {source}. Model {args.model}. {len(cases)} sessions, at most {args.timeout}s each.")

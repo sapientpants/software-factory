@@ -149,7 +149,7 @@ At startup and daily, the factory probes each repository and records what is ava
 - Unprivileged user namespaces enabled, and `bubblewrap` installed.
 - `git` ≥ 2.42. The data directory on its own volume if possible.
 - An agent CLI inside a tested version range (v1: Claude Code; 10.3).
-- The daemon runs as a dedicated system user under systemd, by default `sf` with the home directory `/home/sf`. The operator controls it through GitHub and through `sf` over SSH; there is no remote client.
+- The daemon runs as a dedicated system user under systemd, by default `sf`. Its home directory is `/home/sf` by default and can be any other path (CFG-4). The operator controls it through GitHub and through `sf` over SSH; there is no remote client.
 - A run does not start when the sandbox backend for its required level is unavailable (13.3).
 
 **The operator's server.** Observed on 2026-11-20 by a script that the operator ran over SSH as their own account, without root (`docs/research/14-server-facts.md`). The server is not named here, and no address is given. The operator then installed `bubblewrap` and Claude Code and ran the script again the same day; what that run added is marked "second run" below. A third run that day was made as the factory's system user, which the operator had created as a member of group `kvm`. Both are recorded under P-24 in `docs/research/probes.md`. An observation made later is added with its own date.
@@ -1187,6 +1187,7 @@ Each repository has one pinned issue, maintained by the factory and edited in pl
 - **CFG-1.** Repository policy can only tighten operator settings: lower budgets and concurrency, lower autonomy, add protected paths and required checks, set `merge.update_when_behind = "always"`, and disable `plan` (for tier 0, and for tier 1 issues where the plan gate of 7.4 does not apply), `author_tests`, and `review` for tier 0. It cannot lower the sandbox level, extend the egress allowlist, shorten built-in protected paths or the required-check list, disable `capture`, `integrity`, `verify` or human review, or name credentials.
 - **CFG-2.** Files are TOML, parsed with unknown fields rejected, and each has a `schema_version`. A JSON Schema is generated for editor support.
 - **CFG-3.** A change to `.factory/**` is itself a protected-path change and is never auto-merged.
+- **CFG-4.** No home directory is built into the code or into the systemd unit (AG-17). `~` in the table above is the home directory of the user the process runs as, wherever that is. The factory reads and writes no other path under a home directory unless the operator configuration names it.
 
 ### 16.2 Example policy
 

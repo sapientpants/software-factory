@@ -13,7 +13,8 @@ ssh <server> 'bash -s' < server-facts.sh | tee results/server-<date>.txt
 | File | Run |
 |---|---|
 | `results/server-2026-11-20.txt` | The operator's run of 2026-11-20 at 08:30 UTC, over SSH from the Mac, as the operator's own account. The script at commit `82693bd` |
-| `results/server-2026-11-20-second.txt` | The same, at 08:53 UTC, after the operator installed `bubblewrap` and Claude Code. The script at commit `734fec1`, which is the one in this directory |
+| `results/server-2026-11-20-second.txt` | The same, at 08:53 UTC, after the operator installed `bubblewrap` and Claude Code. The script at commit `734fec1` |
+| `results/server-2026-11-20-third.txt` | At 12:13 UTC, on the server as the factory's system user (`sudo -H -u sf bash /tmp/server-facts.sh`), after the operator created that user as a member of group `kvm` and removed unused container images. The script at commit `60f0b06`, which is the one in this directory |
 
 What is not as the script printed it, in the first file:
 
@@ -22,6 +23,8 @@ What is not as the script printed it, in the first file:
 - **The text was pasted from a terminal**, so tabs arrived as spaces.
 
 The second file needed no redaction. It is the script's output as the session captured it, with trailing spaces dropped.
+
+In the third file one value is replaced by `<redacted>`: the account's name, in a message that `find` printed because the factory's user cannot read the directory the command was started in. That message is harmless; the two files `find` was asked for are listed after it.
 
 The script here is not the one that made the first run. The one that did is at commit `82693bd` of this branch. Since then:
 
@@ -46,3 +49,10 @@ The changed script first ran in a Debian 13 container on the Mac, where `/dev/kv
 - **A seccomp filter.** The bubblewrap tests pass no `--seccomp` argument.
 - **The factory's sandbox.** The tests are the stand-in commands of P-16.
 - **A Claude Code session.** The script only asked the CLI for its version.
+
+## What the third run does not show
+
+- **The factory's sandbox.** The tests are still the stand-in commands of P-16, and the seccomp filter allows everything: it shows that the kernel takes a filter from bubblewrap, not that a filter of the factory's works.
+- **A guest.** `/dev/kvm` was opened and answered two ioctls. Nothing was booted.
+- **Whether the run came over SSH.** `sudo` resets the environment, so the script saw no `SSH_CONNECTION` and printed "no".
+- **The user's home directory and shell.** The script does not read them.

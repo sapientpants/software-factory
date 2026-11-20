@@ -1,0 +1,127 @@
+# Server facts for issue #7
+
+Collected 2026-11-20T12:13:20Z as uid 103 (unprivileged).
+Member of these groups, of kvm, sudo, wheel and docker: kvm
+
+## Distribution, kernel, hardware
+
+PRETTY_NAME="Debian GNU/Linux 13 (trixie)"
+VERSION_ID="13"
+VERSION_CODENAME=trixie
+ID=debian
+$ uname -srm
+  Linux 6.12.116+deb13-amd64 x86_64
+$ uname -v
+  #1 SMP PREEMPT_DYNAMIC Debian 6.12.116-1 (2026-11-07)
+$ nproc
+  18
+$ lscpu (selected)
+  Architecture:                            x86_64
+  CPU(s):                                  18
+  Model name:                              Intel(R) Core(TM) Ultra 5 125H
+  Thread(s) per core:                      2
+  Core(s) per socket:                      14
+  Socket(s):                               1
+  Virtualization:                          VT-x
+MemTotal:       15671772 kB
+MemAvailable:   12830800 kB
+SwapTotal:       1000444 kB
+$ df -hT --local -x tmpfs -x devtmpfs -x squashfs -x overlay -x efivarfs
+  Filesystem     Type  Size  Used Avail Use% Mounted on
+  /dev/nvme0n1p2 ext4   55G  2.9G   49G   6% /
+  /dev/nvme0n1p3 ext4   22G   11G   11G  49% /var
+  /dev/nvme0n1p5 ext4  838G  3.2G  792G   1% /srv
+  /dev/nvme0n1p1 vfat  975M  9.1M  966M   1% /boot/efi
+Network filesystems mounted: 1
+$ lsblk -o NAME,SIZE,TYPE,FSTYPE,MOUNTPOINT
+  NAME          SIZE TYPE FSTYPE MOUNTPOINT
+  nvme0n1     931.5G disk
+  |-nvme0n1p1   976M part vfat   /boot/efi
+  |-nvme0n1p2  55.3G part ext4   /
+  |-nvme0n1p3  22.1G part ext4   /var
+  |-nvme0n1p4   977M part swap   [SWAP]
+  `-nvme0n1p5 852.2G part ext4   /srv
+$ systemctl --version (first line)
+  systemd 257 (257.13-1~deb13u1)
+$ systemd-detect-virt
+  none
+  (exit 1)
+$ stat -fc %T /sys/fs/cgroup
+  cgroup2fs
+
+## /dev/kvm
+
+$ ls -l /dev/kvm
+  crw-rw---- 1 root kvm 10, 232 Nov 20 10:06 /dev/kvm
+$ getent group kvm
+  kvm:x:993:sf
+CPU flags vmx or svm on 18 of 18 logical CPUs (x86 only)
+$ lsmod | grep kvm
+  kvm_intel             417792  0
+  kvm                  1396736  1 kvm_intel
+open     ok
+ioctls   ok
+  (ioctls: KVM_GET_API_VERSION returning 12, then KVM_CREATE_VM)
+
+## User namespaces and their restrictions
+
+/proc/sys/kernel/unprivileged_userns_clone = 1
+/proc/sys/user/max_user_namespaces = 60236
+/proc/sys/kernel/apparmor_restrict_unprivileged_userns: absent
+/proc/sys/kernel/apparmor_restrict_unprivileged_unconfined: absent
+/sys/kernel/security/lsm = lockdown,capability,landlock,yama,apparmor,tomoyo,bpf,ipe,ima,evm
+/sys/module/apparmor/parameters/enabled = Y
+$ ls /etc/apparmor.d | grep -i -E "bwrap|userns"
+find: Failed to restore initial working directory: /home/<redacted>: Permission denied
+  /etc/apparmor.d/unprivileged_userns
+  /etc/apparmor.d/lxc-usernsexec
+Seccomp:	0
+Seccomp_filters:	0
+
+## Installed tools
+
+git     git version 2.47.3 (/usr/bin/git)
+bwrap   bubblewrap 0.12.0 (/usr/bin/bwrap)
+curl    curl 8.14.1 (x86_64-pc-linux-gnu) libcurl/8.14.1 OpenSSL/3.5.7 zlib/1.3.1 brotli/1.1.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.2 libssh2/1.11.1 nghttp2/1.64.0 nghttp3/1.8.0 librtmp/2.3 OpenLDAP/2.6.10 (/usr/bin/curl)
+claude  not installed
+rustup  not installed
+rustc   not installed
+cargo   not installed
+$ ls -l /usr/bin/bwrap
+  -rwxr-xr-x 1 root root 80248 Aug 26 13:04 /usr/bin/bwrap
+$ dpkg-query -W -f ${Package} ${Version}\n git bubblewrap
+  bubblewrap 0.12.0-1~deb13u1
+  git 1:2.47.3-0+deb13u1
+
+## bubblewrap as this user (the tests of probe P-16)
+
+basic    ok
+caps     ok
+nested   ok
+copy     ok
+Network interfaces inside the basic sandbox (expected: lo alone):  lo
+Seccomp state inside a sandbox given a filter (expected: Seccomp 2, Seccomp_filters 1): Seccomp: 2 Seccomp_filters: 1
+unshare  ok
+$ dmesg | grep apparmor="DENIED" | tail -n 5
+  (the kernel log is not readable without root)
+
+## How the server is reached
+
+This run is over SSH: no
+$ systemctl is-active ssh.service sshd.service ssh.socket
+  active
+  active
+  inactive
+$ ss -tln | grep :22
+  LISTEN 0      128                                   0.0.0.0:22         0.0.0.0:*
+  LISTEN 0      128                                      [::]:22            [::]:*
+
+## What the server reaches
+
+An HTTP status of any kind means the host answered; 000 means it did not.
+https://github.com                   200 in 0.319547s
+https://api.github.com               200 in 0.074666s
+https://api.anthropic.com            404 in 0.044746s
+https://index.crates.io/config.json  200 in 0.062678s
+https://static.crates.io             404 in 0.608480s
+ls-remote ok

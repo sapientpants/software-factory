@@ -997,6 +997,19 @@ The sketch found five level-3 headings, as GitHub's HTML has: no "Stop condition
 
 **What cleared the field.** The operator then opened two more links without submitting either, one that prefilled Outcome with three spaces and one that prefilled it with `hello`, and typed into Outcome in each. Their report: "both clear to show the prefill". So a field that a link prefilled goes back to the link's value after it is typed into, whatever that value is, and the clearing in #4 says nothing about the spaces. The Context field of #4, which the link left alone, kept what was typed. What sets the reset off, and after how long, was not reported, and a session could not watch it: the browser tools did not connect. Whether Create was pressed on the three spaces alone was not reported either; no fifth issue exists on the scratch repository.
 
+**In a browser, afterwards.** Once the browser tools connected, a session drove Chrome on the same form, signed in as the operator, with a script in the page logging each change of each field. It answers both questions above. The log and a screenshot are on the branch, at commit [`a7faa0a`](https://github.com/sapientpants/software-factory/tree/a7faa0a3812e9838c8519bd36b3bae41ee8426bc/crates/factory-core/prototype/issue-form/results/browser-2026-11-20.md). Nothing was created.
+
+| Tried | Seen |
+|---|---|
+| Keys sent to a `textarea` that the link prefilled, Outcome and Acceptance criteria | The text is there, and the field is back at the link's value 500 to 525 ms after the last key, in each of six tries. Three keys sent 0.3 s apart all stayed until half a second after the third |
+| Keys sent to the title, which the link also prefilled | Kept |
+| Keys sent to Spec refs and Context, which the link left empty | Kept |
+| The same after the fields were taken out of the address bar | Outcome still reset |
+| Create, on a form opened without a link, with three spaces sent to Outcome | Refused. The page stays, `Field can not be empty` appears under Outcome, and the field keeps the spaces |
+| Create, on a form whose link prefilled Outcome with three spaces | Refused with the same message |
+
+So the form does refuse a required field of spaces only, which makes the inference above an observation. And the operator's account fits the reset: what they typed into Outcome could survive only if Create was pressed within half a second of the last key, which is what they describe. Why the page resets a prefilled `textarea` was not looked into.
+
 ### Findings
 
 **The layout is regular, and the heading is the label.** Keying on heading text is enough to find the sections of a body the form made from ordinary text. Every field of #3 and #2 came back as submitted.
@@ -1028,11 +1041,12 @@ The sketch found five level-3 headings, as GitHub's HTML has: no "Stop condition
 4. WI-1b replaces the round-trip test in the probe suite: the recorded bodies are fixtures of the parser's tests, and a new submission is the operator's to make. The first paragraph of 23.2 excepts P-4 from what `sf doctor --probe` answers.
 5. The P-4 row of 23.2 carries the answer.
 6. After the fourth issue: 6.2 no longer says that the body does not end in a newline, since it ends as the last field does. WI-1b and the P-4 row count four bodies and say what the fourth showed. No rule of the parser changed.
+7. The browser run changed nothing in the spec.
 
 ### Still open
 
-- **A required field of spaces only.** The fourth issue did not settle it: the operator's account suggests the form refused, and nothing of the form's own was kept. The lint decides either way. A link that prefills the field is the wrong tool for a second try, since the field goes back to the link's value; the spaces would have to be typed.
-- **Why a prefilled field resets.** Seen by the operator in three pages and not looked into. The factory makes no such links.
+- **Why a prefilled field resets.** Seen by the operator in three pages and timed by a session in a fourth, and not looked into. The factory makes no such links.
+- **A required field emptied by an edit.** The form refuses a required field of spaces only when the issue is created. A body can still be edited afterwards, or written without the form, so the lint decides.
 - **Text pasted into a field,** from a source with carriage returns. Typed text and prefilled text were seen; pasted text was not.
 - **Which fields the form requires, and their element types.** 6.2 does not say, and the scratch form's choices were made to see empty fields. Tier 1 needs all six sections (6.1); whether the form or only the lint enforces that is undecided. It matters when the form is enforced (M3).
 - **The line format of an acceptance criterion.** The list arrives as typed, under any marker. 6.4 needs each criterion's verification method and 10.5 its id, and 6.2 gives no line format to read them from. Also M3.

@@ -839,3 +839,183 @@ The run of 18:46, without `socat`: the three `on-strict` cases gave what they ga
 - **Other CLI versions,** a changed default and a renamed key among them. One version ran.
 - **A CLI of the factory's own on the server.** The sessions ran from a copy of the operator's binary in `/tmp`.
 - **The whole stream on the server without `socat`.** Not kept. The container without `socat` stands in for it.
+
+## P-4: how an issue form renders into the issue body
+
+Answered 2026-11-20 for #14, by three issues that the operator created in the web interface of `sapientpants/sf-scratch` through the issue form of 6.2, read back with `gh` 2.104.0 on the operator's OAuth token. Report 03 (`03-specs-and-validation`) proposed the form and a body "parsed strictly"; report 07 (`07-gaps`, R7) found the layout undocumented and asked for a tolerant parser for that reason.
+
+**Answer.** The body is one block per field, in the form's order, with a blank line between blocks. A block is the line `### <label>`, a blank line, and the field's text exactly as it was submitted. A field left empty gets the text `_No response_`. That is all GitHub adds: no text before the first heading, no newline at the end, no escaping, and nothing on the issue that says a form made it.
+
+The section parser of WI-1 holds for such a body: a sketch of it read back every field of the two ordinary issues as submitted. It cannot hold for every body. A field's text goes in unescaped, so a line of it that reads `### Outcome` is the form's own heading byte for byte, and the body no longer says where the field ends. WI-1 now says what the parser accepts, and WI-1a makes a repeated section name a failure of the readiness lint.
+
+### Method
+
+The form, committed to the scratch repository's `main` as `.github/ISSUE_TEMPLATE/factory-task.yml` (commit `8829957`):
+
+```yaml
+name: Factory task
+description: A task or bug with one verifiable outcome, for the factory to implement.
+body:
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Outcome
+      description: "One or two sentences: what is true when this is done."
+    validations:
+      required: true
+  - type: input
+    id: spec-refs
+    attributes:
+      label: Spec refs
+      description: Requirement ids and the spec file path, or "none".
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Crates, modules or files likely involved; links.
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance criteria
+      description: "A list AC-1 … AC-n. Each has a statement in the form WHEN ⟨condition⟩ THE SYSTEM SHALL ⟨behaviour⟩ and a verification method: test, property, review or manual."
+    validations:
+      required: true
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope
+      description: What must not change.
+  - type: textarea
+    id: stop-conditions
+    attributes:
+      label: Stop conditions
+      description: Situations in which the agent must stop and ask.
+```
+
+6.2 names the six sections and their order. The rest is this probe's choice: one `input` among five `textarea` elements, to see both, and only the two fields that tier 0 needs (6.1) marked required, so that the others could be left empty. The form has no `labels` key (GH-3).
+
+The operator created three issues, each from a link that prefilled the form through query parameters named after the field ids, and pressed Create without changing a field. No text was typed by hand.
+
+| Issue on `sf-scratch` | Submission | Body |
+|---|---|---|
+| #3 | Every field filled: prose, nested and numbered lists, a link, a fenced block | 794 bytes |
+| #2 | Only the two required fields | 283 bytes |
+| #1 | Text chosen to look like the form's output: headings with the form's own names, a field of spaces and line breaks, a literal `_No response_`, a carriage return | 1347 bytes |
+
+Each issue was read four ways: `GET /repos/{owner}/{repo}/issues/{n}` under API versions `2026-03-10` and `2022-11-28`, the same with `Accept: application/vnd.github.full+json` for `body_html`, and `repository.issue.body` through GraphQL. The four bodies of an issue were the same bytes. The form, the links, the field values, the responses and the parser sketch are on the branch `prototype/issue-form-probe`, at commit [`f6b1898`](https://github.com/sapientpants/software-factory/tree/f6b18985242f75f51f0d2279502b12f0c5f80696/crates/factory-core/prototype/issue-form). They are throwaway code. The form and the three issues stay on the scratch repository.
+
+### The layout
+
+The whole body of #2, the issue with four empty fields. It does not end in a newline:
+
+````markdown
+### Outcome
+
+The typo in the README is fixed.
+
+### Spec refs
+
+_No response_
+
+### Context
+
+_No response_
+
+### Acceptance criteria
+
+- AC-1 (review): WHEN the README is read THE SYSTEM SHALL spell `factory` correctly.
+
+### Out of scope
+
+_No response_
+
+### Stop conditions
+
+_No response_
+````
+
+| Part | As observed |
+|---|---|
+| Heading | `### ` and the field's `label`, for the `input` as for a `textarea`. The field's `id` and `description` appear nowhere |
+| Order | The form's, with every field present, filled or not |
+| Between a heading and its text, and between blocks | One blank line, which is two line feeds |
+| An empty field | `_No response_`, the same for the `input` and a `textarea`. GitHub renders it as *No response* in italics |
+| The end of the body | The last field's text. No newline follows |
+| A list | As submitted, with its markers: `-`, `*`, `1.` and `- [ ]` all arrived unchanged, and so did the two-space indent of a nested item |
+| A fenced block, inline code, a link | As submitted |
+
+### What a field's text can carry
+
+From #1. In each row the body holds the field's text byte for byte.
+
+| Submitted | In the body | GitHub's HTML |
+|---|---|---|
+| A field of three spaces, two line feeds and two spaces | Those seven characters, between the usual blank lines. Not `_No response_` | Nothing between the two headings |
+| `_No response_`, as the text of the `input` | `_No response_` | *No response*, as for an empty field |
+| Two line feeds before the first line and three after the last | Kept, so four line feeds follow the heading and five precede the next one | One paragraph |
+| Spaces at the start and at the end of a line | Kept | Not shown |
+| A carriage return and a line feed, sent as `%0D%0A` | Kept: the body holds one `\r\n` among line feeds | A line break, as for a line feed alone |
+| A tab, accented letters, curly quotes, kanji, an emoji | Kept | As text, without the tab, which started a line |
+| `<!-- an HTML comment -->` and a `<details>` element | Kept | The comment is not rendered |
+| `### Acceptance criteria` and `### Outcome`, each on a line of the Context field | Kept, unescaped | Level-3 headings, as the form's own |
+| `### Stop conditions` inside a fenced block | Kept | Code |
+| `### outcome`, `### Outcome ###` and ` ### Outcome` | Kept | Level-3 headings reading "outcome", "Outcome" and "Outcome" |
+| `    ### Outcome`, four spaces in | Kept | Code |
+| `###Outcome` | Kept | Text. With the lines `Outcome` and `-------` after it, it became one level-2 heading |
+
+The body of #1 therefore holds five level-3 headings that read "Outcome" in one case or another and two that read "Acceptance criteria", where the form wrote one of each.
+
+Nothing else on the issue tells a form from a hand-written body. `labels` is empty, `type` is null, the timeline is empty, and GraphQL reports `lastEditedAt` null, `includesCreatedEdit` false and no content edits.
+
+### The parser sketch
+
+A line rule in Python, not a Markdown parser. A section starts at a level-3 ATX heading whose text is one of the six names, compared without case, outside a fenced code block: up to three spaces, `###`, a space or tab, the text, and an optional closing run of `#`. It ends at the next such heading. Lines of nothing but white space are dropped at either end, and a text that is then empty, or `_No response_` with or without white space around it, counts as empty.
+
+| Issue | Level-3 headings: the sketch, and `<h3>` in GitHub's HTML | Sections against the fields as submitted |
+|---|---|---|
+| #3 | 6 and 6, the same list | All six equal |
+| #2 | 6 and 6, the same list | The two filled fields equal; the four others empty |
+| #1 | 12 and 12, the same list | "Outcome" starts five sections and "Acceptance criteria" two. Context is cut after 51 of its 445 characters and Stop conditions after 62 of 146, each at a heading inside it |
+
+Two simpler parsers, which split on lines starting `### ` and keep one section per name, read #3 and #2 correctly and #1 wrongly either way. Keeping the first, the acceptance criteria are the one line `AC-9` that was typed into Context. Keeping the last, the outcome is "A second outcome.", also from Context. Neither knows fences, so the first also takes the Stop conditions from inside the fenced block.
+
+### Findings
+
+**The layout is regular, and the heading is the label.** Keying on heading text is enough to find the sections of a body the form made from ordinary text. Every field of #3 and #2 came back as submitted.
+
+**Empty is the empty string and nothing else.** A field of spaces and line breaks is kept as it is, and GitHub renders nothing for it. A field in which someone typed `_No response_` is the same bytes as an empty one. The lint asks for sections that are "present and non-empty" (6.4), so the parser has to call both empty.
+
+**The form does not escape, so a body can be ambiguous.** A heading typed into a field is the form's own heading in the body and in the page the operator reads. No rule of position recovers the field: in #1 the typed "Acceptance criteria" comes before the real one and the typed "Outcome" after the real one. A parser that picks one silently hands an agent criteria the operator did not write as criteria. So a repeated name fails the lint, and the operator rewords the issue (WI-1a). The cost is an issue that quotes one of the six headings as a heading of its own, outside a fence, which cannot be dispatched until it is reworded.
+
+**Where a heading counts has to follow what GitHub renders.** The operator approves the page, and the parser reads the source. On these three bodies the line rule and GitHub's HTML agree on every level-3 heading: the one in a fence and the one indented four spaces are code, and the ones with a leading space, a closing `###` or another case are headings. An issue about the parser itself will quote these headings, which is why the fence matters. Matching without regard to case goes with this: `### outcome` is a heading on the page, so it counts as the name and trips WI-1a.
+
+**The body keeps a carriage return it is given.** Whether a browser sends one for a line typed in a field was not seen, since every field was prefilled. The parser takes either line ending.
+
+**Nothing marks a form-made issue.** The factory cannot tell one from a body written by hand, by `gh issue create` or by the factory itself (PLAN-5), so one parser reads them all, and a body is valid by its sections and not by how it was made.
+
+**A new submission cannot be automated.** Only the web interface renders a form. The round-trip test that WI-1 put in the probe suite of `sf doctor --probe` therefore runs against these recorded bodies as fixtures, and seeing whether GitHub changed the layout takes the operator and a browser (WI-1b).
+
+### Against reports 03 and 07
+
+- Report 07 (R7): the documentation was not read again, so whether it now describes the layout is not known. What the report asked for, a tolerant parser with a lint that says what failed, stands. The tolerance that the observed layout needs is small: line endings, blank lines, the empty marker and case.
+- Report 03 proposed a body "parsed strictly". Strict by position does not work on #1, and strict on heading text alone is what WI-1 already had.
+
+### What changed in the spec
+
+1. 6.2 states the layout as observed.
+2. WI-1 says what the parser accepts: the sanitised body (SEC-4), either line ending, a level-3 ATX heading outside a fenced code block with one of the six names in any case, other headings as content, blank lines trimmed, and `_No response_` or nothing as empty. Two of these are choices and not observations: the match without regard to case, and sanitising before parsing.
+3. WI-1a is new, and a design choice that the evidence prompts but does not make: a name that starts more than one section fails the readiness lint, and no section of that body is used. 6.4 lists the rule.
+4. WI-1b replaces the round-trip test in the probe suite: the recorded bodies are fixtures of the parser's tests, and a new submission is the operator's to make. The first paragraph of 23.2 excepts P-4 from what `sf doctor --probe` answers.
+5. The P-4 row of 23.2 carries the answer.
+
+### Still open
+
+- **Text typed by hand.** All three issues were prefilled from a link. What a browser sends for a line break typed in a field was not observed.
+- **A required field of spaces only.** Not submitted, so it is not known whether the form accepts it. The lint decides either way.
+- **Space at the end of the last field.** No submission ended in any, so it is not known whether GitHub trims the end of the body.
+- **Which fields the form requires, and their element types.** 6.2 does not say, and the scratch form's choices were made to see empty fields. Tier 1 needs all six sections (6.1); whether the form or only the lint enforces that is undecided. It matters when the form is enforced (M3).
+- **The line format of an acceptance criterion.** The list arrives as typed, under any marker. 6.4 needs each criterion's verification method and 10.5 its id, and 6.2 gives no line format to read them from. Also M3.
+- **The other elements.** `dropdown`, `checkboxes`, `markdown`, `upload` and a `textarea` with `render`. The form of 6.2 uses none.
+- **A Markdown parser in place of the line rule.** The rule does not know block quotes, list items or HTML blocks, so `> ### Outcome` and `- ### Outcome` are headings on the page and content to the rule, and a heading line inside an HTML block is the reverse. 19.2 lists no Markdown crate. The agreement with GitHub's HTML was shown for three bodies, which hold one fence, of backticks and closed. A fence of tildes was not submitted, and nor was one left open, which would take the form's later headings into the field it stands in, with no name repeated.
+- **The order of sanitisation and parsing on real text.** WI-1 puts SEC-4 first, so a heading inside an HTML comment is gone before the parser runs. Neither exists yet.
+- **A body edited after creation,** and a body read with an installation token. Not tried.

@@ -156,6 +156,14 @@ if have bwrap; then
   # shellcheck disable=SC2016
   printf 'Network interfaces inside the basic sandbox (expected: lo alone): %s\n' \
     "$(bwrap "${basic[@]}" -- sed -n '3,$s/:.*//p' /proc/net/dev 2>&1 | tr -s ' \n' ' ')"
+  if have python3; then
+    # An allow-everything filter: one BPF_RET instruction that returns SECCOMP_RET_ALLOW.
+    python3 -c 'import sys, struct; sys.stdout.buffer.write(struct.pack("HBBI", 0x06, 0, 0, 0x7fff0000))' >"$tmp/allow.bpf"
+    printf 'Seccomp state inside a sandbox given a filter (expected: Seccomp 2, Seccomp_filters 1): %s\n' \
+      "$(bwrap "${basic[@]}" --seccomp 9 -- grep Seccomp /proc/self/status 9<"$tmp/allow.bpf" 2>&1 | tr -s '\t\n' ' ')"
+  else
+    echo 'python3 is not installed: the seccomp filter was not tried'
+  fi
 else
   echo 'bwrap is not installed: basic, caps, nested and copy were not run'
 fi

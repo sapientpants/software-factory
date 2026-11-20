@@ -28,6 +28,7 @@ The script here is not the one that made the first run. The one that did is at c
 - It prints no host name, no account name and no network mount, so nothing has to be redacted by hand.
 - It adds `~/.cargo/bin` and `~/.local/bin` to its `PATH` before looking for tools.
 - It says how to run the `/dev/kvm` tests as a member of group `kvm`.
+- After the second run: it gives bubblewrap an allow-everything seccomp filter and prints the seccomp state inside the sandbox. Run in a container on the Mac only.
 
 The changed script first ran in a Debian 13 container on the Mac, where `/dev/kvm` is absent and user namespaces are denied, and then made the second run on the server.
 

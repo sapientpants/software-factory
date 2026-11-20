@@ -7,10 +7,14 @@
 #
 # It changes nothing on the machine. It reads system state, starts a few short-lived
 # bubblewrap sandboxes, opens /dev/kvm, and makes HTTPS requests to the hosts the factory
-# needs. Its only write is a temporary directory, which it removes. It prints the host name
-# but no IP address.
+# needs. Its only write is a temporary directory, which it removes. It prints nothing that
+# identifies the machine: no host name, no account name, no address, no network mount.
 set -u
 export LC_ALL=C
+
+# A shell started by `ssh <server> 'bash -s'` reads no profile, so the directories that
+# rustup and the Claude Code installer add to PATH there are added here.
+PATH=$PATH:$HOME/.cargo/bin:$HOME/.local/bin
 
 have() { command -v "$1" >/dev/null 2>&1; }
 
@@ -54,7 +58,8 @@ check() {
 printf '# Server facts for issue #7\n\n'
 printf 'Collected %s as uid %s (%s).\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$(id -u)" \
   "$([ "$(id -u)" -eq 0 ] && echo 'root: run it again as an ordinary user' || echo unprivileged)"
-show id
+printf 'Member of these groups, of kvm, sudo, wheel and docker: %s\n' \
+  "$(id -Gn | tr ' ' '\n' | grep -x -E 'kvm|sudo|wheel|docker' | tr '\n' ' ')"
 
 section 'Distribution, kernel, hardware'
 if [ -r /etc/os-release ]; then
@@ -67,12 +72,13 @@ show uname -v
 show nproc
 printf '$ lscpu (selected)\n'
 if have lscpu; then
-  lscpu | grep -E '^(Architecture|CPU\(s\)|Model name|Thread\(s\) per core|Core\(s\) per socket|Socket\(s\)|Virtualization|Hypervisor vendor)' | sed 's/^/  /'
+  lscpu | grep -E '^(Architecture|CPU\(s\):|Model name|Thread\(s\) per core|Core\(s\) per socket|Socket\(s\)|Virtualization|Hypervisor vendor)' | sed 's/^/  /'
 else
   echo '  (lscpu: not installed)'
 fi
 grep -E '^(MemTotal|MemAvailable|SwapTotal):' /proc/meminfo
-show df -hT -x tmpfs -x devtmpfs -x squashfs -x overlay -x efivarfs
+show df -hT --local -x tmpfs -x devtmpfs -x squashfs -x overlay -x efivarfs
+printf 'Network filesystems mounted: %s\n' "$(grep -c -E ' (nfs|nfs4|cifs|smb3) ' /proc/mounts)"
 show lsblk -o NAME,SIZE,TYPE,FSTYPE,MOUNTPOINT
 printf '$ systemctl --version (first line)\n'
 if have systemctl; then systemctl --version | head -n 1 | sed 's/^/  /'; else echo '  (systemctl: not installed)'; fi
@@ -90,6 +96,7 @@ if [ ! -e /dev/kvm ]; then
   echo '/dev/kvm is absent: opening it was not tried'
 else
   check open sh -c 'exec 3<>/dev/kvm'
+  [ -r /dev/kvm ] || echo '  (to test as a member of group kvm: sudo -g kvm bash server-facts.sh)'
   if have python3; then
     # KVM_GET_API_VERSION is _IO(0xAE, 0x00) and KVM_CREATE_VM is _IO(0xAE, 0x01).
     # The VM is an empty file descriptor that goes away when python exits.
@@ -123,7 +130,7 @@ grep -E '^Seccomp' /proc/self/status
 section 'Installed tools'
 for tool in git bwrap curl claude rustup rustc cargo; do
   if have "$tool"; then
-    printf '%-7s %s (%s)\n' "$tool" "$("$tool" --version 2>&1 | head -n 1)" "$(command -v "$tool")"
+    printf '%-7s %s (%s)\n' "$tool" "$("$tool" --version 2>&1 | head -n 1)" "$(command -v "$tool" | sed "s|^$HOME|~|")"
   else
     printf '%-7s not installed\n' "$tool"
   fi
@@ -161,8 +168,6 @@ else
 fi
 
 section 'How the server is reached'
-show hostname
-show hostname -f
 if [ -n "${SSH_CONNECTION:-}" ]; then echo 'This run is over SSH: yes'; else echo 'This run is over SSH: no'; fi
 show systemctl is-active ssh.service sshd.service ssh.socket
 printf '$ ss -tln | grep :22\n'

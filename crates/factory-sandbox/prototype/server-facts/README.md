@@ -20,6 +20,14 @@ What is not as the script printed it:
 - **What `ssh` printed before the script started** (the address, the host key) is left out.
 - **The text was pasted from a terminal**, so tabs arrived as spaces.
 
+The script here is not the one that made that run. The one that did is at commit `82693bd` of this branch. Since then, for the next run:
+
+- It prints no host name, no account name and no network mount, so nothing has to be redacted by hand.
+- It adds `~/.cargo/bin` and `~/.local/bin` to its `PATH` before looking for tools.
+- It says how to run the `/dev/kvm` tests as a member of group `kvm`.
+
+The changed script ran in a Debian 13 container on the Mac, where `/dev/kvm` is absent and user namespaces are denied. It has not run on the server.
+
 ## What the run of 2026-11-20 does not show
 
 - **bubblewrap was not installed,** so the four tests that use it did not run. `unshare` ran.

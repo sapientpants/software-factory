@@ -152,24 +152,24 @@ At startup and daily, the factory probes each repository and records what is ava
 - The daemon runs as a dedicated system user under systemd. The operator controls it through GitHub and through `sf` over SSH; there is no remote client.
 - A run does not start when the sandbox backend for its required level is unavailable (13.3).
 
-**The operator's server.** Observed on 2026-11-20 by a script that the operator ran over SSH as their own account, without root (`docs/research/14-server-facts.md`). The server is not named here, and no address is given.
+**The operator's server.** Observed on 2026-11-20 by a script that the operator ran over SSH as their own account, without root (`docs/research/14-server-facts.md`). The server is not named here, and no address is given. An observation made later is added with its own date.
 
-| | Observed | Against the requirements |
+| | Observed | Requirement above |
 |---|---|---|
 | Distribution | Debian 13 (trixie) on bare metal, the distribution of the development VM (DEV-3). systemd 257, cgroup v2 | Met |
-| Kernel | `6.12.116+deb13-amd64` | |
+| Kernel | `6.12.116+deb13-amd64` | None stated |
 | CPU | x86-64, one Intel Core Ultra 5 125H: 14 cores, 18 logical CPUs, VT-x | Met |
-| Memory | 14.9 GiB, and 977 MiB of swap | |
-| Disk | One 931.5 GiB NVMe disk. Free: 49 GiB of 55 on `/`, 64 MiB of 22 GiB on `/var`, 792 GiB of 838 on `/srv` | `/srv` is a volume of its own for the data directory. `/var` is full |
-| `/dev/kvm` | Present as `crw-rw---- root kvm`, with `kvm_intel` loaded. Group `kvm` has no member, and the account could not open the device | Not usable by an unprivileged user. The factory's user has to be a member of `kvm`; no member has opened the device yet |
+| Memory | 14.9 GiB, and 977 MiB of swap | None stated |
+| Disk | One 931.5 GiB NVMe disk. Free: 49 GiB of 55 on `/`, 64 MiB of 22 GiB on `/var`, 792 GiB of 838 on `/srv` | Met: `/srv` is a volume of its own that can hold the data directory. `/var` is full |
+| `/dev/kvm` | Present as `crw-rw---- root kvm`, with `kvm_intel` loaded. The account is not in group `kvm` and could not open the device | Not met: no unprivileged user can open it, and nobody has opened it as a member of `kvm` (P-24) |
 | User namespaces | `kernel.unprivileged_userns_clone` is 1. AppArmor is enabled, but the kernel has no `kernel.apparmor_restrict_unprivileged_userns`, the setting that DEV-6 lifts on the hosted runners. The account created a user and a mount namespace and mounted a tmpfs in them | Met |
-| `bubblewrap` | Not installed, so none of the bubblewrap tests of P-16 has run on the server | Not met |
-| `git` | 2.47.3, one of the two versions P-7 ran on | Met |
+| `bubblewrap` | Not installed, so no bubblewrap test has run on the server (P-24) | Not met |
+| `git` | 2.47.3, a version the capture prototype ran on (P-7) | Met |
 | Agent CLI, Rust toolchain | Not found on the account's `PATH`; a copy under the home directory would have been missed | Not settled |
-| Reached | Over SSH; `sshd` listens on port 22 on every address. From the operator's home network, and over the operator's VPN from elsewhere (D-16) | |
-| Reaches | `github.com`, `api.github.com`, `api.anthropic.com`, `index.crates.io` and `static.crates.io` answered over HTTPS with no proxy, and `git ls-remote` of the scratch repository worked. No request carried a credential | |
+| Reached | Over SSH, with a listener on port 22 on every address. The operator reaches it from the home network and, over a VPN, while travelling | Met |
+| Reaches | `github.com`, `api.github.com`, `api.anthropic.com`, `index.crates.io` and `static.crates.io` answered over HTTPS with no proxy, and `git ls-remote` of the scratch repository worked. No request carried a credential | None stated |
 
-Provisioning the server (22, M0) therefore includes installing `bubblewrap`, creating the factory's system user as a member of group `kvm`, putting the data directory on `/srv`, and freeing space on `/var`. The observations that need bubblewrap or membership of `kvm` are made after that, and the table is updated then.
+Provisioning the server (22, M0) therefore includes installing `bubblewrap`, giving the factory's system user access to `/dev/kvm` (membership of group `kvm` is what the device's mode offers), putting the data directory on a volume with room, which `/srv` has and `/var` has not, and freeing space on `/var`. Probe P-24 then makes the observations that bubblewrap and `/dev/kvm` were not ready for.
 
 ---
 
@@ -1458,7 +1458,7 @@ Not scheduled: API-key credential modes and the model gateway; a second agent dr
 
 ### 23.1 Decisions
 
-Decided by the operator on 2026-11-18 (D-18 and D-20 on 2026-11-19):
+Decided by the operator on 2026-11-18 (D-18 and D-20 on 2026-11-19; the rule of D-16 about the server confirmed on 2026-11-20):
 
 | # | Decision |
 |---|---|
@@ -1470,7 +1470,7 @@ Decided by the operator on 2026-11-18 (D-18 and D-20 on 2026-11-19):
 | D-11 | The goal is lights-out operation, earned per class of work (13.6). The operator approves every issue, including each sub-issue of a feature. |
 | D-12 | The factory stops at merge. Releases and deployments stay human actions. |
 | D-13 | The factory works only on issues the operator wrote (SEC-2). |
-| D-16 | M0 and M1 are built by Claude Code sessions on the operator's Mac, one pull request per issue, each merged by the operator (BOOT-1). Every step on the server is the operator's, and no session opens a connection to it. When this was decided the server was reached only from the operator's home; the operator's VPN now reaches it from elsewhere too (4.4), and the rule stays. Linux-only code is developed in a local VM (DEV-3). Every check runs before each commit through one command (DEV-1). |
+| D-16 | M0 and M1 are built by Claude Code sessions on the operator's Mac, one pull request per issue, each merged by the operator (BOOT-1). Every step on the server is the operator's to run; a session never connects to it by itself. The server was reached only from the operator's home when this was decided. The operator now also reaches it over a VPN (4.4), and on 2026-11-20 confirmed that the rule stays. Linux-only code is developed in a local VM (DEV-3). Every check runs before each commit through one command (DEV-1). |
 | D-17 | The factory's repository, code and documents alike, is licensed `MIT OR Apache-2.0`, copyright Marc Tremblay. Every crate inherits the licence from the workspace, and the structural test (19.1) checks it. Source files carry no per-file licence header. |
 | D-18 | `SPEC.md` stays one file through M0 and M1 and keeps its ids (`INV-`, `GH-`, `SEC-` and so on); it is not split into the living-spec layout of 6.3. Issues in that period cite those ids, with `SPEC.md` as the spec file path. The spec is protected through the repository's policy (BOOT-4). |
 | D-20 | CI for the factory repository runs on GitHub-hosted runners only, with one job for x86-64 Linux and one for arm64 Linux; there is no macOS job and no self-hosted runner. Nothing that needs KVM or the Claude Code login runs in CI. Once the workflow exists, a ruleset on `main` requires both jobs and has no bypass actor; the ruleset of 20.3 replaces it at M1b (DEV-5 to DEV-8). |
@@ -1517,6 +1517,7 @@ Facts the design depends on that research could not confirm from primary sources
 | P-21 | In non-bare `claude -p` with `--setting-sources user` and `--strict-mcp-config`, which of these still load from the working directory: `CLAUDE.md`, `CLAUDE.local.md`, skills, commands, subagents, plugins, hooks? Is there a flag or setting that disables each? Answered on 2026-11-19 by live sessions of Claude Code 2.1.311 on macOS, outside the factory's sandbox: none of them, and neither `AGENTS.md`, `.claude/rules/`, the `env` blocks of the two settings files, the permission rules of `.claude/settings.local.json`, nor anything found in a subdirectory or written mid-session. `--setting-sources user` alone does this, `.mcp.json` included. Second switches exist for instruction files, for skills and commands, for hooks and for `AGENTS.md`; none for subagents or plugins. The per-execution config directory is live configuration: what a session writes there takes effect in that session. | AG-3a, AG-4 |
 | P-22 | Under subscription authentication: do `--max-turns` and `--max-budget-usd` work, what usage does the stream report, and what does the CLI emit when a plan limit is reached (event shape and reset time)? Which hosts does the CLI contact? Answered on 2026-11-19 by the same sessions, on a `claude setup-token` token, except for the plan limit, which was not reached on purpose. Both caps work and end the session with `error_max_turns` or `error_max_budget_usd` and exit code 1. The final `result` holds tokens and API-equivalent dollars per model, as running totals for the session; per-call output tokens are in `message_delta` events only. A session that completes emits one `rate_limit_event`, after its first response, with the window, its utilisation, `resetsAt` in Unix seconds and the account's usage-credit state; the event of a rejected request is known from the documentation only. `api.anthropic.com` is the one host a session needs; without `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1` the CLI also asks for a Datadog log host. | Section 14, 8.3, SEC-11, 13.5 |
 | P-23 | (M4) Can a host-side pass-through supply the subscription credential so that the worker holds none: does the CLI accept a custom base URL under subscription authentication, and is that within the plan's terms? | 13.5; would remove the token from workers before auto-merge |
+| P-24 | On the server, as the factory's user: do the bubblewrap tests of P-16 pass, does the kernel accept a seccomp filter, and can the user open `/dev/kvm`? The server's other facts were observed on 2026-11-20 (4.4). These three were not: `bubblewrap` was not installed and the account that ran the script is not in group `kvm`. | 4.4, 13.3; the exit check of M0 (22) |
 
 ### 23.3 Known weak points
 

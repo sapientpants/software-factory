@@ -520,13 +520,13 @@ The daemon is the only dispatcher for a store, enforced by an exclusive file loc
 
 1. One GraphQL read of the issue: check SEC-1 on the `state:ready` label and rule 6 of 5.3; capture the snapshot; record tier, risk and type under SEC-1. Read the default-branch head once: it is both `base_sha` and `policy_sha`. Refuse a base tree that contains a submodule entry. Run the readiness lint on the snapshot.
 2. Insert the run row carrying all of the above. A unique index on (repository, issue) for non-terminal runs makes this the authoritative local claim.
-3. Create `refs/heads/factory/issue-<n>` at `base_sha` with `POST /git/refs`. GitHub refuses the call with a 422 when the ref exists, and with a 422 for every fault in the ref name or the object that probe P-1 tried, and only an undocumented message tells them apart. A 422 from this call is therefore not a Deterministic failure under 8.6 until the claim has read the ref by its exact name, with `GET /git/ref/heads/factory/issue-<n>`:
-   - The ref exists. If its SHA equals the journalled `base_sha` of this run, it counts as created. A ref left by a `cancelled` run of this store is force-updated. Any other existing ref aborts the claim: the run row is closed as `cancelled` and the issue goes to `state:needs-human` with category `policy-denial`.
+3. Journal the attempt, then create `refs/heads/factory/issue-<n>` at `base_sha` with `POST /git/refs`. GitHub refuses the call with a 422 when the ref exists, and with a 422 for every fault in the ref name or the object that probe P-1 tried, and only an undocumented message tells them apart. A 422 from this call is therefore not a Deterministic failure under 8.6 until the claim has read the ref by its exact name, with `GET /git/ref/heads/factory/issue-<n>`:
+   - The ref exists. It counts as created only on a replay, and only if its SHA equals the journalled `base_sha` of this run. A create is a replay when an earlier create of this run may have taken effect unseen: the attempt was already journalled when the daemon started (8.4), or the earlier request ended in a Transient failure (8.6). A ref left by a `cancelled` run of this store is force-updated. Any other existing ref aborts the claim, a ref at `base_sha` that answers the first create of the run included, since this run did not make it: the run row is closed as `cancelled` and the issue goes to `state:needs-human` with category `policy-denial`.
    - The ref does not exist (404). The create was refused for another reason and is a Deterministic failure (8.6), and the escalation carries GitHub's message. One such reason is a branch whose name collides with the ref, `factory` or one under `factory/issue-<n>/`, which GitHub reports only as `Reference update failed`.
 4. Add `state:in-progress`, then remove `state:ready` and every other `state:*` label (`state:triage`, or `state:needs-human` left by a lint failure), and remove `needs:clarification` if present.
 5. Create the status comment with the complete marker.
 
-Running two daemons against one repository from different hosts is unsupported. The branch-ref step is a best-effort fence against that mistake, not a distributed lock. It stops a second daemon only when the two read different default-branch heads: a daemon that finds the ref at its own `base_sha` counts it as created (step 3), and neither GitHub's answer nor the ref says who created it (probe P-1).
+Running two daemons against one repository from different hosts is unsupported. The branch-ref step is a best-effort fence against that mistake, not a distributed lock. Neither GitHub's answer nor the ref says who created it (probe P-1), so a run that replays the create cannot tell its own ref from one that another daemon made at the same `base_sha` in the meantime.
 
 **Deadlines.** There are no leases. The supervisor owns one set of deadlines per stage kind:
 
@@ -573,7 +573,7 @@ On startup the daemon, before dispatching anything:
 
 | Side effect | Key and replay rule |
 |---|---|
-| Branch | `base_sha` is journalled before the ref is created; an existing ref equal to it counts as created (8.2). |
+| Branch | `base_sha` and the attempt are journalled before the create is sent; on a replay, an existing ref equal to `base_sha` counts as created (8.2). |
 | Candidate commit | Tree, parents, dates and message are journalled with the candidate SHA before any push. Recovery uses the journalled SHA and never rebuilds a journalled candidate. If the tree equals the previous candidate's, no new commit is made. |
 | Push | The executor reads the remote ref first. Remote head equals the candidate: pushed. Remote head equals the previously journalled head: push. Anything else: foreign commit (7.7). |
 | Pull request | Lookup of open pull requests by head branch before create. |
@@ -1475,7 +1475,7 @@ Facts the design depends on that research could not confirm from primary sources
 
 | # | Question | Design impact |
 |---|---|---|
-| P-1 | What does creating an existing ref return (409 or 422, and the message)? Answered on 2026-11-20 by calls on the scratch repository, with the operator's token and not an installation token: a 422 with the message `Reference already exists`, whatever SHA the call asks for, under API versions `2026-03-10` and `2022-11-28`. Every fault in the ref name or the object that was tried got a 422 as well, told apart by its message alone, and a branch name that collides with the ref gets the same message as an object that is not a commit. No 409 was seen. Of two creates sent at once, one succeeded and the other got this 422, in each of 40 pairs; neither the answer nor the ref says who created it. | 8.2, 20.1 |
+| P-1 | What does creating an existing ref return (409 or 422, and the message)? Answered on 2026-11-20 by calls on the scratch repository, with the operator's token and not an installation token: a 422 with the message `Reference already exists`, whatever SHA the call asks for, under API versions `2026-03-10` and `2022-11-28`. Every fault in the ref name or the object that was tried got a 422 as well, told apart by its message alone, and a branch name that collides with the ref gets the same message as an object that is not a commit. No 409 was seen. Of two creates sent at once, one succeeded and the other got this 422, in each of 40 pairs; neither the answer nor the ref says who created it. | 8.2, 8.5, 20.1 |
 | P-2 | Does an approving review from a GitHub App, or from `github-actions[bot]`, count toward required approvals under a ruleset? | Onboarding warning; PR-2 already ignores them |
 | P-3 | Can an App bot be an issue assignee? | Optional "assigned to the factory" signal |
 | P-4 | How does an issue form render into the body? | Parser of 6.2 |

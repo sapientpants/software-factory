@@ -518,7 +518,7 @@ Each session ran behind a CONNECT proxy in the harness that logs the host of eve
 
 Answered 2026-11-20 for #13, by calls to the REST API on `sapientpants/sf-scratch`, made with `gh` 2.104.0 and `curl` on the operator's OAuth token. The factory will make this call with an installation token; none exists yet. The documentary research behind the question is `04-github-integration` ("report 04" below), which found 409 and 422 both documented for the call and `422 Reference already exists` reported but unverified.
 
-**Answer.** `422 Unprocessable Entity`, with the message `Reference already exists`, whether the second call asks for the same SHA or another one. No call returned a 409. The status does not tell this apart from other failures: every fault in the ref name or the object that was tried got a 422 too, and only the message differed. One of those messages, `Reference update failed`, covers both an object that is not a commit and a branch name that collides with the new ref. So the claim cannot go by the status, and it should not go by a message GitHub does not document. It reads the ref after a 422, and the read decides (8.2 step 3). The read has a limit of its own: it cannot tell a ref the run made itself from one that another daemon made at the same SHA.
+**Answer.** `422 Unprocessable Entity`, with the message `Reference already exists`, whether the second call asks for the same SHA or another one. No call returned a 409. The status does not tell this apart from other failures: every fault in the ref name or the object that was tried got a 422 too, and only the message differed. One of those messages, `Reference update failed`, covers both an object that is not a commit and a branch name that collides with the new ref. So the claim cannot go by the status, and it should not go by a message GitHub does not document. It reads the ref after a 422, and the read decides (8.2 step 3). The read has a limit of its own: it cannot tell a ref the run made itself from one that another daemon made at the same SHA. So step 3 now takes a ref at the run's SHA for its own only when the run is replaying the create.
 
 ### Method
 
@@ -538,7 +538,7 @@ The refs follow 5.6: `refs/heads/factory/issue-9001` and its neighbours under th
 | A tree, a blob | `15b48d174e237be5af22a12a341709e02162c134`, `1f17817c69d5eb273bb9f8de2de1d6c2cfb1cf5b`, both of the base |
 | No object | `0123456789abcdef0123456789abcdef01234567` |
 
-The scratch repository has no ruleset and no branch protection. All 43 refs the probe created were deleted afterwards, and the repository again holds only `main` and `probe/p-16`. The two scripts that sent the requests are not in the repository; this section copies what they sent and what came back.
+The scratch repository has no ruleset and no branch protection. All 43 refs the probe created were deleted afterwards, and the repository again holds only `main` and `probe/p-16`. The scripts that sent the requests and the responses are on the branch `prototype/existing-ref-probe`, at commit [`c7684be`](https://github.com/sapientpants/software-factory/tree/c7684beb75c5a06ebcaea1a3ba47ecba2d401e57/crates/factory-github/prototype/existing-ref), with the response headers cut down to status, date, API version and request id. They are throwaway code.
 
 ### What the call returned
 
@@ -597,7 +597,7 @@ The first three rows were run under both API versions, the last three under `202
 
 **The message does not say whose ref it is.** It is the same for the base and for another commit, and the ref itself holds nothing but a SHA. The claim needs the read to compare that SHA, and the comparison is all it has. A ref at the run's own `base_sha` that another daemon created reads exactly like the run's own ref from before a crash.
 
-**GitHub lets one create through; step 3 lets the loser through when the SHAs match.** One 201 in each of 40 pairs, and the loser was told `Reference already exists`. That is the atomic create the fence of 8.2 is built on. In the 20 pairs where both requests asked for the same SHA, though, a read by the loser finds the ref at the SHA it asked for, and step 3 counts that as created. Two daemons that read the same default-branch head would both go on. The rule is older than this probe and is what makes the step replayable (8.5). 8.2 now says what the fence does not stop.
+**GitHub lets one create through; step 3 lets the loser through when the SHAs match.** One 201 in each of 40 pairs, and the loser was told `Reference already exists`. That is the atomic create the fence of 8.2 is built on. In the 20 pairs where both requests asked for the same SHA, though, a read by the loser finds the ref at the SHA it asked for, and step 3 counts that as created. Two daemons that read the same default-branch head would both have gone on. The rule is older than this probe, and the step needs it only to be replayable (8.5), so it now applies only on a replay.
 
 **A colliding branch name looks like a bad object.** Git cannot hold a branch `factory` next to a branch `factory/issue-9001`. All three creates of that kind were refused: `factory/issue-9001` while `factory` existed, `factory` while `factory/issue-9001` existed, and `factory/issue-9001/sub` while `factory/issue-9001` existed. The answer is `Reference update failed`, the message GitHub also gives for a tree or a blob, and a read of the ref that was asked for returns 404. A target repository with a branch named `factory` therefore fails every claim, and nothing in the response names the cause.
 
@@ -611,12 +611,13 @@ The first three rows were run under both API versions, the last three under `202
 ### What changed in the spec
 
 1. 8.2 step 3 names the call. A 422 from it is not a Deterministic failure until the ref has been read by its exact name. If the ref exists, the rules that step already had apply to its SHA. If it does not, the 422 is Deterministic and the escalation carries GitHub's message.
-2. 8.2 says what the fence does not stop: a second daemon that read the same default-branch head.
-3. The readiness report of 20.1 blocks on a branch named `factory`.
+2. Step 3 counts an existing ref at `base_sha` as created only on a replay: the attempt, which is now journalled before the create is sent, was already journalled when the daemon started, or an earlier create of the run ended in a Transient failure. A ref at `base_sha` that answers the first create of a run is foreign and aborts the claim. The operator decided this on 2026-11-20. The Branch row of 8.5 follows. The cost: a ref orphaned by a crash and the loss of the store is no longer adopted, and the issue goes to a human.
+3. 8.2 says what the fence still does not stop: a run that replays the create cannot tell its own ref from one that another daemon made at the same SHA in the meantime.
+4. The readiness report of 20.1 blocks on a branch named `factory`.
 
 ### Still open
 
-- Whether step 3 should count an existing ref at `base_sha` as created only on a replay, that is after a restart or after a request whose answer never arrived, and treat it as foreign on a first try. That would close the same-SHA case. It is a decision about the fence, and it is not taken here.
+- The replay rule itself. It is a rule for the daemon, which does not exist yet, so nothing here exercised it.
 - An installation token. Every call here used the operator's OAuth token. What the App gets when it lacks a permission was not observed, and nor was whether its answers differ in any other case.
 - A ruleset or branch protection that restricts creating `factory/**`. The scratch repository has neither.
 - What produces the documented 409.

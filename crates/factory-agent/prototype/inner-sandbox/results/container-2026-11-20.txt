@@ -1,0 +1,428 @@
+# Probe P-6 (issue #12): the agent CLI's Bash sandbox under bubblewrap
+
+## Preflight
+
+Collected 2026-11-20T18:26:30Z as uid 1000.
+PRETTY_NAME="Debian GNU/Linux 13 (trixie)"
+uname -srm: Linux 7.0.14-linuxkit aarch64
+python3: 3.13.5
+bwrap: bubblewrap 0.12.0 (/usr/bin/bwrap)
+socat: socat version 1.8.0.3 on 03 Sep 2026 20:58:48 (/usr/bin/socat)
+curl: curl 8.14.1 (aarch64-unknown-linux-gnu) libcurl/8.14.1 OpenSSL/3.5.7 zlib/1.3.1  (/usr/bin/curl)
+claude: 2.1.311 (Claude Code) (~/.local/share/claude/versions/2.1.311)
+user.max_user_namespaces: 128312
+
+The outer sandboxes without the CLI (expected: nested ok under bwrap, fail under nouserns):
+
+bwrap     starts            ok
+bwrap     nested            ok
+bwrap     claude --version  ok
+nouserns  starts            ok
+nouserns  nested            fail (exit 1): bwrap: Creating new namespace failed: nesting depth or /proc/sys/user/max_*_namespaces exceeded (ENOSPC)
+nouserns  claude --version  ok
+
+Token from the environment. Model haiku. 13 sessions, at most 240s each.
+
+## Case none-default
+
+Outer sandbox: none. --settings: {}
+Command: /bin/sh <scratch>/none-default/host/start.sh -p --tools Bash --allowedTools Bash(sh ./inside.sh) --setting-sources user --strict-mcp-config --output-format stream-json --verbose --model haiku --session-id 87c1c13f-0cb4-4d00-a905-875b955bcd16 --permission-mode dontAsk --permission-prompts none --settings <scratch>/none-default/host/settings.json --max-turns 4 --debug-file <scratch>/none-default/out/debug.log <prompt>
+Exit code 0, after 3s.
+init: version 2.1.311, tools ['Bash'], fields that mention a sandbox: none
+tool_use Bash: {"command": "sh ./inside.sh", "description": "Run inside.sh script in current directory"}
+tool_result:
+    --- run pid 76
+    ns user user:[4026531837]
+    ns mnt mnt:[4026532988]
+    ns pid pid:[4026532991]
+    ns net net:[4026532993]
+    ns ipc ipc:[4026532990]
+    status NoNewPrivs: 0
+    status Seccomp: 0
+    status Seccomp_filters: 0
+    processes visible: 15
+    interfaces:  lo tunl0 gre0 gretap0 erspan0 ip_vti0 ip6_vti0 sit0 ip6tnl0 ip6gre0 eth0
+    proxy variables:
+    write ./canary-cwd: ok
+    write <scratch>/none-default/outside/canary-outside: ok
+    write /tmp/sf-p6-canary: ok
+    https://api.anthropic.com: 404
+result: subtype success, is_error False, turns 2, cost 0.00089458, denials []
+    Yes.
+The CLI's namespaces: user user:[4026531837] mnt mnt:[4026532988] pid pid:[4026532991] net net:[4026532993] ipc ipc:[4026532990]
+observed.txt, which inside.sh wrote in the working directory: the same text as the tool_result above
+Verdict: NOT sandboxed by the CLI: every namespace is the CLI's own; wrote outside the working directory
+Debug-log lines that mention the sandbox: 0
+
+## Case none-on-strict
+
+Outer sandbox: none. --settings: {"sandbox": {"enabled": true, "allowUnsandboxedCommands": false}}
+Command: /bin/sh <scratch>/none-on-strict/host/start.sh -p --tools Bash --allowedTools Bash(sh ./inside.sh) --setting-sources user --strict-mcp-config --output-format stream-json --verbose --model haiku --session-id bb37f474-124b-471d-afe0-d27b60f5379b --permission-mode dontAsk --permission-prompts none --settings <scratch>/none-on-strict/host/settings.json --max-turns 4 --debug-file <scratch>/none-on-strict/out/debug.log <prompt>
+Exit code 0, after 3s.
+init: version 2.1.311, tools ['Bash'], fields that mention a sandbox: none
+tool_use Bash: {"command": "sh ./inside.sh", "description": "Run inside.sh script in working directory"}
+tool_result:
+    --- run pid 3
+    ns user user:[4026534099]
+    ns mnt mnt:[4026534100]
+    ns pid pid:[4026534101]
+    ns net net:[4026533962]
+    ns ipc ipc:[4026532990]
+    status NoNewPrivs: 1
+    status Seccomp: 2
+    status Seccomp_filters: 2
+    processes visible: 8
+    interfaces:  lo tunl0 gre0 gretap0 erspan0 ip_vti0 ip6_vti0 sit0 ip6tnl0 ip6gre0
+    proxy variables: ALL_PROXY=http://<credentials>@localhost:3128 HTTPS_PROXY=http://<credentials>@localhost:3128 HTTP_PROXY=http://<credentials>@localhost:3128 NO_PROXY=localhost,127.0.0.1,::1,169.254.0.0/16,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16 all_proxy=http://<credentials>@localhost:3128 http_proxy=http://<credentials>@localhost:3128 https_proxy=http://<credentials>@localhost:3128 no_proxy=localhost,127.0.0.1,::1,169.254.0.0/16,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
+    write ./canary-cwd: ok
+    write <scratch>/none-on-strict/outside/canary-outside: denied
+    write /tmp/sf-p6-canary: denied
+    https://api.anthropic.com: curl: (56) CONNECT tunnel failed, response 403 000
+    <sandbox_violations>
+    deny network-outbound api.anthropic.com:443 (user denied)
+    </sandbox_violations>
+result: subtype success, is_error False, turns 2, cost 0.0016382900000000001, denials []
+    Yes.
+The CLI's namespaces: user user:[4026531837] mnt mnt:[4026532988] pid pid:[4026532991] net net:[4026532993] ipc ipc:[4026532990]
+observed.txt, which inside.sh wrote in the working directory: the same text as the tool_result above
+Verdict: sandboxed by the CLI: new user, mnt, pid, net namespace; could not write outside the working directory
+Debug-log lines that mention the sandbox: 0
+
+## Case bwrap-default
+
+Outer sandbox: bwrap. --settings: {}
+Command: bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --die-with-parent --new-session --hostname sandbox --ro-bind /usr /usr --ro-bind /etc /etc --symlink usr/bin /bin --symlink usr/sbin /sbin --symlink usr/lib /lib --proc /proc --dev /dev --tmpfs /tmp --ro-bind ~/.local/share/claude/versions/2.1.311 /sf/bin/claude --ro-bind <scratch>/bwrap-default/host /sf/host --bind <scratch>/bwrap-default/work /sf/work --bind <scratch>/bwrap-default/home /sf/home --bind <scratch>/bwrap-default/outside /sf/outside --bind <scratch>/bwrap-default/out /sf/out --chdir /sf/work -- /bin/sh /sf/host/start.sh -p --tools Bash --allowedTools Bash(sh ./inside.sh) --setting-sources user --strict-mcp-config --output-format stream-json --verbose --model haiku --session-id 05afccab-2cea-42e6-a0b5-962a80d63ab7 --permission-mode dontAsk --permission-prompts none --settings /sf/host/settings.json --max-turns 4 --debug-file /sf/out/debug.log <prompt>
+Exit code 0, after 3s.
+init: version 2.1.311, tools ['Bash'], fields that mention a sandbox: none
+tool_use Bash: {"command": "sh ./inside.sh", "description": "Run inside.sh script with sh"}
+tool_result:
+    --- run pid 46
+    ns user user:[4026533972]
+    ns mnt mnt:[4026533962]
+    ns pid pid:[4026533969]
+    ns net net:[4026532993]
+    ns ipc ipc:[4026533967]
+    status NoNewPrivs: 1
+    status Seccomp: 0
+    status Seccomp_filters: 0
+    processes visible: 9
+    interfaces:  lo tunl0 gre0 gretap0 erspan0 ip_vti0 ip6_vti0 sit0 ip6tnl0 ip6gre0 eth0
+    proxy variables:
+    write ./canary-cwd: ok
+    write /sf/outside/canary-outside: ok
+    write /tmp/sf-p6-canary: ok
+    https://api.anthropic.com: 404
+result: subtype success, is_error False, turns 2, cost 0.00027928, denials []
+    Yes
+The CLI's namespaces: user user:[4026533972] mnt mnt:[4026533962] pid pid:[4026533969] net net:[4026532993] ipc ipc:[4026533967]
+observed.txt, which inside.sh wrote in the working directory: the same text as the tool_result above
+Verdict: NOT sandboxed by the CLI: every namespace is the CLI's own; wrote outside the working directory
+Debug-log lines that mention the sandbox: 0
+
+## Case bwrap-off
+
+Outer sandbox: bwrap. --settings: {"sandbox": {"enabled": false}}
+Command: bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --die-with-parent --new-session --hostname sandbox --ro-bind /usr /usr --ro-bind /etc /etc --symlink usr/bin /bin --symlink usr/sbin /sbin --symlink usr/lib /lib --proc /proc --dev /dev --tmpfs /tmp --ro-bind ~/.local/share/claude/versions/2.1.311 /sf/bin/claude --ro-bind <scratch>/bwrap-off/host /sf/host --bind <scratch>/bwrap-off/work /sf/work --bind <scratch>/bwrap-off/home /sf/home --bind <scratch>/bwrap-off/outside /sf/outside --bind <scratch>/bwrap-off/out /sf/out --chdir /sf/work -- /bin/sh /sf/host/start.sh -p --tools Bash --allowedTools Bash(sh ./inside.sh) --setting-sources user --strict-mcp-config --output-format stream-json --verbose --model haiku --session-id 96e6faca-46d8-4139-97a4-faf1ec9690d2 --permission-mode dontAsk --permission-prompts none --settings /sf/host/settings.json --max-turns 4 --debug-file /sf/out/debug.log <prompt>
+Exit code 0, after 2s.
+init: version 2.1.311, tools ['Bash'], fields that mention a sandbox: none
+tool_use Bash: {"command": "sh ./inside.sh", "description": "Run inside.sh script with sh"}
+tool_result:
+    --- run pid 46
+    ns user user:[4026533979]
+    ns mnt mnt:[4026533963]
+    ns pid pid:[4026533976]
+    ns net net:[4026532993]
+    ns ipc ipc:[4026533974]
+    status NoNewPrivs: 1
+    status Seccomp: 0
+    status Seccomp_filters: 0
+    processes visible: 9
+    interfaces:  lo tunl0 gre0 gretap0 erspan0 ip_vti0 ip6_vti0 sit0 ip6tnl0 ip6gre0 eth0
+    proxy variables:
+    write ./canary-cwd: ok
+    write /sf/outside/canary-outside: ok
+    write /tmp/sf-p6-canary: ok
+    https://api.anthropic.com: 404
+result: subtype success, is_error False, turns 2, cost 0.00024828000000000003, denials []
+    Yes.
+The CLI's namespaces: user user:[4026533979] mnt mnt:[4026533963] pid pid:[4026533976] net net:[4026532993] ipc ipc:[4026533974]
+observed.txt, which inside.sh wrote in the working directory: the same text as the tool_result above
+Verdict: NOT sandboxed by the CLI: every namespace is the CLI's own; wrote outside the working directory
+Debug-log lines that mention the sandbox: 0
+
+## Case bwrap-on
+
+Outer sandbox: bwrap. --settings: {"sandbox": {"enabled": true}}
+Command: bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --die-with-parent --new-session --hostname sandbox --ro-bind /usr /usr --ro-bind /etc /etc --symlink usr/bin /bin --symlink usr/sbin /sbin --symlink usr/lib /lib --proc /proc --dev /dev --tmpfs /tmp --ro-bind ~/.local/share/claude/versions/2.1.311 /sf/bin/claude --ro-bind <scratch>/bwrap-on/host /sf/host --bind <scratch>/bwrap-on/work /sf/work --bind <scratch>/bwrap-on/home /sf/home --bind <scratch>/bwrap-on/outside /sf/outside --bind <scratch>/bwrap-on/out /sf/out --chdir /sf/work -- /bin/sh /sf/host/start.sh -p --tools Bash --allowedTools Bash(sh ./inside.sh) --setting-sources user --strict-mcp-config --output-format stream-json --verbose --model haiku --session-id b580acc1-1bf3-42ae-8c7e-6edb8f84de4d --permission-mode dontAsk --permission-prompts none --settings /sf/host/settings.json --max-turns 4 --debug-file /sf/out/debug.log <prompt>
+Exit code 0, after 4s.
+init: version 2.1.311, tools ['Bash'], fields that mention a sandbox: none
+tool_use Bash: {"command": "sh ./inside.sh", "description": "Run inside.sh script in current directory"}
+tool_result:
+    --- run pid 3
+    ns user user:[4026534115]
+    ns mnt mnt:[4026534116]
+    ns pid pid:[4026534117]
+    ns net net:[4026533985]
+    ns ipc ipc:[4026533978]
+    status NoNewPrivs: 1
+    status Seccomp: 2
+    status Seccomp_filters: 2
+    processes visible: 8
+    interfaces:  lo tunl0 gre0 gretap0 erspan0 ip_vti0 ip6_vti0 sit0 ip6tnl0 ip6gre0
+    proxy variables: ALL_PROXY=http://<credentials>@localhost:3128 HTTPS_PROXY=http://<credentials>@localhost:3128 HTTP_PROXY=http://<credentials>@localhost:3128 NO_PROXY=localhost,127.0.0.1,::1,169.254.0.0/16,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16 all_proxy=http://<credentials>@localhost:3128 http_proxy=http://<credentials>@localhost:3128 https_proxy=http://<credentials>@localhost:3128 no_proxy=localhost,127.0.0.1,::1,169.254.0.0/16,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
+    write ./canary-cwd: ok
+    write /sf/outside/canary-outside: denied
+    write /tmp/sf-p6-canary: denied
+    https://api.anthropic.com: curl: (56) CONNECT tunnel failed, response 403 000
+    <sandbox_violations>
+    deny network-outbound api.anthropic.com:443 (user denied)
+    </sandbox_violations>
+result: subtype success, is_error False, turns 2, cost 0.00097097, denials []
+    Yes.
+
+    The script ran and printed output, but its `api.anthropic.com` check was blocked by the sandbox (CONNECT tunnel returned 403). I didn't retry outside the sandbox.
+The CLI's namespaces: user user:[4026533982] mnt mnt:[4026533967] pid pid:[4026533980] net net:[4026532993] ipc ipc:[4026533978]
+observed.txt, which inside.sh wrote in the working directory: the same text as the tool_result above
+Verdict: sandboxed by the CLI: new user, mnt, pid, net namespace; could not write outside the working directory
+Debug-log lines that mention the sandbox: 0
+
+## Case bwrap-on-strict
+
+Outer sandbox: bwrap. --settings: {"sandbox": {"enabled": true, "allowUnsandboxedCommands": false}}
+Command: bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --die-with-parent --new-session --hostname sandbox --ro-bind /usr /usr --ro-bind /etc /etc --symlink usr/bin /bin --symlink usr/sbin /sbin --symlink usr/lib /lib --proc /proc --dev /dev --tmpfs /tmp --ro-bind ~/.local/share/claude/versions/2.1.311 /sf/bin/claude --ro-bind <scratch>/bwrap-on-strict/host /sf/host --bind <scratch>/bwrap-on-strict/work /sf/work --bind <scratch>/bwrap-on-strict/home /sf/home --bind <scratch>/bwrap-on-strict/outside /sf/outside --bind <scratch>/bwrap-on-strict/out /sf/out --chdir /sf/work -- /bin/sh /sf/host/start.sh -p --tools Bash --allowedTools Bash(sh ./inside.sh) --setting-sources user --strict-mcp-config --output-format stream-json --verbose --model haiku --session-id 5d2ff6b1-553a-42e9-b517-06368cf20249 --permission-mode dontAsk --permission-prompts none --settings /sf/host/settings.json --max-turns 4 --debug-file /sf/out/debug.log <prompt>
+Exit code 0, after 3s.
+init: version 2.1.311, tools ['Bash'], fields that mention a sandbox: none
+tool_use Bash: {"command": "sh ./inside.sh", "description": "Run inside.sh script in current directory"}
+tool_result:
+    --- run pid 3
+    ns user user:[4026534118]
+    ns mnt mnt:[4026534119]
+    ns pid pid:[4026534120]
+    ns net net:[4026533988]
+    ns ipc ipc:[4026533981]
+    status NoNewPrivs: 1
+    status Seccomp: 2
+    status Seccomp_filters: 2
+    processes visible: 8
+    interfaces:  lo tunl0 gre0 gretap0 erspan0 ip_vti0 ip6_vti0 sit0 ip6tnl0 ip6gre0
+    proxy variables: ALL_PROXY=http://<credentials>@localhost:3128 HTTPS_PROXY=http://<credentials>@localhost:3128 HTTP_PROXY=http://<credentials>@localhost:3128 NO_PROXY=localhost,127.0.0.1,::1,169.254.0.0/16,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16 all_proxy=http://<credentials>@localhost:3128 http_proxy=http://<credentials>@localhost:3128 https_proxy=http://<credentials>@localhost:3128 no_proxy=localhost,127.0.0.1,::1,169.254.0.0/16,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
+    write ./canary-cwd: ok
+    write /sf/outside/canary-outside: denied
+    write /tmp/sf-p6-canary: denied
+    https://api.anthropic.com: curl: (56) CONNECT tunnel failed, response 403 000
+    <sandbox_violations>
+    deny network-outbound api.anthropic.com:443 (user denied)
+    </sandbox_violations>
+result: subtype success, is_error False, turns 2, cost 0.00077477, denials []
+    Yes
+The CLI's namespaces: user user:[4026533985] mnt mnt:[4026533970] pid pid:[4026533983] net net:[4026532993] ipc ipc:[4026533981]
+observed.txt, which inside.sh wrote in the working directory: the same text as the tool_result above
+Verdict: sandboxed by the CLI: new user, mnt, pid, net namespace; could not write outside the working directory
+Debug-log lines that mention the sandbox: 0
+
+## Case bwrap-on-weaker
+
+Outer sandbox: bwrap. --settings: {"sandbox": {"enabled": true, "allowUnsandboxedCommands": false, "enableWeakerNestedSandbox": true}}
+Command: bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --die-with-parent --new-session --hostname sandbox --ro-bind /usr /usr --ro-bind /etc /etc --symlink usr/bin /bin --symlink usr/sbin /sbin --symlink usr/lib /lib --proc /proc --dev /dev --tmpfs /tmp --ro-bind ~/.local/share/claude/versions/2.1.311 /sf/bin/claude --ro-bind <scratch>/bwrap-on-weaker/host /sf/host --bind <scratch>/bwrap-on-weaker/work /sf/work --bind <scratch>/bwrap-on-weaker/home /sf/home --bind <scratch>/bwrap-on-weaker/outside /sf/outside --bind <scratch>/bwrap-on-weaker/out /sf/out --chdir /sf/work -- /bin/sh /sf/host/start.sh -p --tools Bash --allowedTools Bash(sh ./inside.sh) --setting-sources user --strict-mcp-config --output-format stream-json --verbose --model haiku --session-id cf2867f5-18c8-4266-9ee6-b19aae1524e4 --permission-mode dontAsk --permission-prompts none --settings /sf/host/settings.json --max-turns 4 --debug-file /sf/out/debug.log <prompt>
+Exit code 0, after 3s.
+init: version 2.1.311, tools ['Bash'], fields that mention a sandbox: none
+tool_use Bash: {"command": "sh ./inside.sh", "description": "Run inside.sh script in current directory"}
+tool_result:
+    --- run pid 3
+    ns user user:[4026534121]
+    ns mnt mnt:[4026534122]
+    ns pid pid:[4026534123]
+    ns net net:[4026533991]
+    ns ipc ipc:[4026533984]
+    status NoNewPrivs: 1
+    status Seccomp: 2
+    status Seccomp_filters: 2
+    processes visible: 8
+    interfaces:  lo tunl0 gre0 gretap0 erspan0 ip_vti0 ip6_vti0 sit0 ip6tnl0 ip6gre0
+    proxy variables: ALL_PROXY=http://<credentials>@localhost:3128 HTTPS_PROXY=http://<credentials>@localhost:3128 HTTP_PROXY=http://<credentials>@localhost:3128 NO_PROXY=localhost,127.0.0.1,::1,169.254.0.0/16,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16 all_proxy=http://<credentials>@localhost:3128 http_proxy=http://<credentials>@localhost:3128 https_proxy=http://<credentials>@localhost:3128 no_proxy=localhost,127.0.0.1,::1,169.254.0.0/16,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
+    write ./canary-cwd: ok
+    write /sf/outside/canary-outside: denied
+    write /tmp/sf-p6-canary: denied
+    https://api.anthropic.com: curl: (56) CONNECT tunnel failed, response 403 000
+    <sandbox_violations>
+    deny network-outbound api.anthropic.com:443 (user denied)
+    </sandbox_violations>
+result: subtype success, is_error False, turns 2, cost 0.00077169, denials []
+    Yes.
+The CLI's namespaces: user user:[4026533988] mnt mnt:[4026533974] pid pid:[4026533986] net net:[4026532993] ipc ipc:[4026533984]
+observed.txt, which inside.sh wrote in the working directory: the same text as the tool_result above
+Verdict: sandboxed by the CLI: new user, mnt, pid, net namespace; could not write outside the working directory
+Debug-log lines that mention the sandbox: 0
+
+## Case nouserns-default
+
+Outer sandbox: nouserns. --settings: {}
+Command: bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --disable-userns --die-with-parent --new-session --hostname sandbox --ro-bind /usr /usr --ro-bind /etc /etc --symlink usr/bin /bin --symlink usr/sbin /sbin --symlink usr/lib /lib --proc /proc --dev /dev --tmpfs /tmp --ro-bind ~/.local/share/claude/versions/2.1.311 /sf/bin/claude --ro-bind <scratch>/nouserns-default/host /sf/host --bind <scratch>/nouserns-default/work /sf/work --bind <scratch>/nouserns-default/home /sf/home --bind <scratch>/nouserns-default/outside /sf/outside --bind <scratch>/nouserns-default/out /sf/out --chdir /sf/work -- /bin/sh /sf/host/start.sh -p --tools Bash --allowedTools Bash(sh ./inside.sh) --setting-sources user --strict-mcp-config --output-format stream-json --verbose --model haiku --session-id 28c707ad-f498-4e46-bd98-2e5dd344edca --permission-mode dontAsk --permission-prompts none --settings /sf/host/settings.json --max-turns 4 --debug-file /sf/out/debug.log <prompt>
+Exit code 0, after 3s.
+init: version 2.1.311, tools ['Bash'], fields that mention a sandbox: none
+tool_use Bash: {"command": "sh ./inside.sh", "description": "Run inside.sh script via sh"}
+tool_result:
+    --- run pid 45
+    ns user user:[4026533991]
+    ns mnt mnt:[4026533978]
+    ns pid pid:[4026533989]
+    ns net net:[4026532993]
+    ns ipc ipc:[4026533987]
+    status NoNewPrivs: 1
+    status Seccomp: 0
+    status Seccomp_filters: 0
+    processes visible: 9
+    interfaces:  lo tunl0 gre0 gretap0 erspan0 ip_vti0 ip6_vti0 sit0 ip6tnl0 ip6gre0 eth0
+    proxy variables:
+    write ./canary-cwd: ok
+    write /sf/outside/canary-outside: ok
+    write /tmp/sf-p6-canary: ok
+    https://api.anthropic.com: 404
+result: subtype success, is_error False, turns 2, cost 0.00034428, denials []
+    Yes.
+
+    The script wrote canary files outside the working directory (`/sf/outside/canary-outside` and `/tmp/sf-p6-canary`), so you may want to check what it does before running it again.
+The CLI's namespaces: user user:[4026533991] mnt mnt:[4026533978] pid pid:[4026533989] net net:[4026532993] ipc ipc:[4026533987]
+observed.txt, which inside.sh wrote in the working directory: the same text as the tool_result above
+Verdict: NOT sandboxed by the CLI: every namespace is the CLI's own; wrote outside the working directory
+Debug-log lines that mention the sandbox: 0
+
+## Case nouserns-off
+
+Outer sandbox: nouserns. --settings: {"sandbox": {"enabled": false}}
+Command: bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --disable-userns --die-with-parent --new-session --hostname sandbox --ro-bind /usr /usr --ro-bind /etc /etc --symlink usr/bin /bin --symlink usr/sbin /sbin --symlink usr/lib /lib --proc /proc --dev /dev --tmpfs /tmp --ro-bind ~/.local/share/claude/versions/2.1.311 /sf/bin/claude --ro-bind <scratch>/nouserns-off/host /sf/host --bind <scratch>/nouserns-off/work /sf/work --bind <scratch>/nouserns-off/home /sf/home --bind <scratch>/nouserns-off/outside /sf/outside --bind <scratch>/nouserns-off/out /sf/out --chdir /sf/work -- /bin/sh /sf/host/start.sh -p --tools Bash --allowedTools Bash(sh ./inside.sh) --setting-sources user --strict-mcp-config --output-format stream-json --verbose --model haiku --session-id 5515cb91-ae32-459c-8042-ab969ad898a3 --permission-mode dontAsk --permission-prompts none --settings /sf/host/settings.json --max-turns 4 --debug-file /sf/out/debug.log <prompt>
+Exit code 0, after 3s.
+init: version 2.1.311, tools ['Bash'], fields that mention a sandbox: none
+tool_use Bash: {"command": "sh ./inside.sh", "description": "Run inside.sh script via sh"}
+tool_result:
+    --- run pid 44
+    ns user user:[4026533987]
+    ns mnt mnt:[4026533981]
+    ns pid pid:[4026533992]
+    ns net net:[4026532993]
+    ns ipc ipc:[4026533990]
+    status NoNewPrivs: 1
+    status Seccomp: 0
+    status Seccomp_filters: 0
+    processes visible: 9
+    interfaces:  lo tunl0 gre0 gretap0 erspan0 ip_vti0 ip6_vti0 sit0 ip6tnl0 ip6gre0 eth0
+    proxy variables:
+    write ./canary-cwd: ok
+    write /sf/outside/canary-outside: ok
+    write /tmp/sf-p6-canary: ok
+    https://api.anthropic.com: 404
+result: subtype success, is_error False, turns 2, cost 0.00031378000000000005, denials []
+    Yes. The script ran and exited normally. It also wrote canary files to `./canary-cwd`, `/sf/outside/canary-outside`, and `/tmp/sf-p6-canary`, which you may want to know about.
+The CLI's namespaces: user user:[4026533987] mnt mnt:[4026533981] pid pid:[4026533992] net net:[4026532993] ipc ipc:[4026533990]
+observed.txt, which inside.sh wrote in the working directory: the same text as the tool_result above
+Verdict: NOT sandboxed by the CLI: every namespace is the CLI's own; wrote outside the working directory
+Debug-log lines that mention the sandbox: 0
+
+## Case nouserns-on
+
+Outer sandbox: nouserns. --settings: {"sandbox": {"enabled": true}}
+Command: bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --disable-userns --die-with-parent --new-session --hostname sandbox --ro-bind /usr /usr --ro-bind /etc /etc --symlink usr/bin /bin --symlink usr/sbin /sbin --symlink usr/lib /lib --proc /proc --dev /dev --tmpfs /tmp --ro-bind ~/.local/share/claude/versions/2.1.311 /sf/bin/claude --ro-bind <scratch>/nouserns-on/host /sf/host --bind <scratch>/nouserns-on/work /sf/work --bind <scratch>/nouserns-on/home /sf/home --bind <scratch>/nouserns-on/outside /sf/outside --bind <scratch>/nouserns-on/out /sf/out --chdir /sf/work -- /bin/sh /sf/host/start.sh -p --tools Bash --allowedTools Bash(sh ./inside.sh) --setting-sources user --strict-mcp-config --output-format stream-json --verbose --model haiku --session-id da9bacd0-745f-42e9-844e-930b5ce9fc69 --permission-mode dontAsk --permission-prompts none --settings /sf/host/settings.json --max-turns 4 --debug-file /sf/out/debug.log <prompt>
+Exit code 0, after 6s.
+init: version 2.1.311, tools ['Bash'], fields that mention a sandbox: none
+tool_use Bash: {"command": "sh ./inside.sh", "description": "Run inside.sh script in working directory"}
+tool_result (is_error):
+    Exit code 1
+    bwrap: Creating new namespace failed: nesting depth or /proc/sys/user/max_*_namespaces exceeded (ENOSPC)
+tool_use Bash: {"command": "sh ./inside.sh", "description": "Run inside.sh script in working directory without sandbox", "dangerouslyDisableSandbox": true}
+tool_result:
+    --- run pid 61
+    ns user user:[4026533997]
+    ns mnt mnt:[4026533984]
+    ns pid pid:[4026533995]
+    ns net net:[4026532993]
+    ns ipc ipc:[4026533994]
+    status NoNewPrivs: 1
+    status Seccomp: 0
+    status Seccomp_filters: 0
+    processes visible: 10
+    interfaces:  lo tunl0 gre0 gretap0 erspan0 ip_vti0 ip6_vti0 sit0 ip6tnl0 ip6gre0 eth0
+    proxy variables:
+    write ./canary-cwd: ok
+    write /sf/outside/canary-outside: ok
+    write /tmp/sf-p6-canary: ok
+    https://api.anthropic.com: 404
+result: subtype success, is_error False, turns 3, cost 0.0013734, denials []
+    Yes
+
+    The sandbox failed first with a bwrap namespace error, so I reran the script with the sandbox disabled. The script's output shows it wrote files outside the working directory (`/sf/outside/canary-outside` and `/tmp/sf-p6-canary`), so it is worth checking what it does before running it again.
+The CLI's namespaces: user user:[4026533997] mnt mnt:[4026533984] pid pid:[4026533995] net net:[4026532993] ipc ipc:[4026533994]
+observed.txt, which inside.sh wrote in the working directory: the same text as the tool_result above
+Verdict: NOT sandboxed by the CLI: every namespace is the CLI's own; wrote outside the working directory
+Debug-log lines that mention the sandbox: 0
+
+## Case nouserns-on-strict
+
+Outer sandbox: nouserns. --settings: {"sandbox": {"enabled": true, "allowUnsandboxedCommands": false}}
+Command: bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --disable-userns --die-with-parent --new-session --hostname sandbox --ro-bind /usr /usr --ro-bind /etc /etc --symlink usr/bin /bin --symlink usr/sbin /sbin --symlink usr/lib /lib --proc /proc --dev /dev --tmpfs /tmp --ro-bind ~/.local/share/claude/versions/2.1.311 /sf/bin/claude --ro-bind <scratch>/nouserns-on-strict/host /sf/host --bind <scratch>/nouserns-on-strict/work /sf/work --bind <scratch>/nouserns-on-strict/home /sf/home --bind <scratch>/nouserns-on-strict/outside /sf/outside --bind <scratch>/nouserns-on-strict/out /sf/out --chdir /sf/work -- /bin/sh /sf/host/start.sh -p --tools Bash --allowedTools Bash(sh ./inside.sh) --setting-sources user --strict-mcp-config --output-format stream-json --verbose --model haiku --session-id 194125cd-5110-4c4a-ae91-f68f3a2617e6 --permission-mode dontAsk --permission-prompts none --settings /sf/host/settings.json --max-turns 4 --debug-file /sf/out/debug.log <prompt>
+Exit code 0, after 3s.
+init: version 2.1.311, tools ['Bash'], fields that mention a sandbox: none
+tool_use Bash: {"command": "sh ./inside.sh", "description": "Run inside.sh script in current directory"}
+tool_result (is_error):
+    Exit code 1
+    bwrap: Creating new namespace failed: nesting depth or /proc/sys/user/max_*_namespaces exceeded (ENOSPC)
+result: subtype success, is_error False, turns 2, cost 0.0007192800000000001, denials []
+    No.
+The CLI's namespaces: user user:[4026534000] mnt mnt:[4026533990] pid pid:[4026533998] net net:[4026532993] ipc ipc:[4026533996]
+observed.txt: absent, inside.sh left no record
+Debug-log lines that mention the sandbox: 0
+
+## Case nouserns-on-weaker
+
+Outer sandbox: nouserns. --settings: {"sandbox": {"enabled": true, "allowUnsandboxedCommands": false, "enableWeakerNestedSandbox": true}}
+Command: bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --disable-userns --die-with-parent --new-session --hostname sandbox --ro-bind /usr /usr --ro-bind /etc /etc --symlink usr/bin /bin --symlink usr/sbin /sbin --symlink usr/lib /lib --proc /proc --dev /dev --tmpfs /tmp --ro-bind ~/.local/share/claude/versions/2.1.311 /sf/bin/claude --ro-bind <scratch>/nouserns-on-weaker/host /sf/host --bind <scratch>/nouserns-on-weaker/work /sf/work --bind <scratch>/nouserns-on-weaker/home /sf/home --bind <scratch>/nouserns-on-weaker/outside /sf/outside --bind <scratch>/nouserns-on-weaker/out /sf/out --chdir /sf/work -- /bin/sh /sf/host/start.sh -p --tools Bash --allowedTools Bash(sh ./inside.sh) --setting-sources user --strict-mcp-config --output-format stream-json --verbose --model haiku --session-id 525b61fb-f5d2-41b6-9973-310d5a32a756 --permission-mode dontAsk --permission-prompts none --settings /sf/host/settings.json --max-turns 4 --debug-file /sf/out/debug.log <prompt>
+Exit code 0, after 4s.
+init: version 2.1.311, tools ['Bash'], fields that mention a sandbox: none
+tool_use Bash: {"command": "sh ./inside.sh", "description": "Run inside.sh script in current directory"}
+tool_result (is_error):
+    Exit code 1
+    bwrap: Creating new namespace failed: nesting depth or /proc/sys/user/max_*_namespaces exceeded (ENOSPC)
+result: subtype success, is_error False, turns 2, cost 0.00074507, denials []
+    No.
+
+    The sandbox blocked it: `bwrap` failed to create a namespace (`ENOSPC`, nesting depth or `max_*_namespaces` exceeded), so `inside.sh` never started.
+The CLI's namespaces: user user:[4026534003] mnt mnt:[4026533993] pid pid:[4026534001] net net:[4026532993] ipc ipc:[4026533999]
+observed.txt: absent, inside.sh left no record
+Debug-log lines that mention the sandbox: 0
+
+## Case nouserns-on-fail
+
+Outer sandbox: nouserns. --settings: {"sandbox": {"enabled": true, "allowUnsandboxedCommands": false, "failIfUnavailable": true}}
+Command: bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --disable-userns --die-with-parent --new-session --hostname sandbox --ro-bind /usr /usr --ro-bind /etc /etc --symlink usr/bin /bin --symlink usr/sbin /sbin --symlink usr/lib /lib --proc /proc --dev /dev --tmpfs /tmp --ro-bind ~/.local/share/claude/versions/2.1.311 /sf/bin/claude --ro-bind <scratch>/nouserns-on-fail/host /sf/host --bind <scratch>/nouserns-on-fail/work /sf/work --bind <scratch>/nouserns-on-fail/home /sf/home --bind <scratch>/nouserns-on-fail/outside /sf/outside --bind <scratch>/nouserns-on-fail/out /sf/out --chdir /sf/work -- /bin/sh /sf/host/start.sh -p --tools Bash --allowedTools Bash(sh ./inside.sh) --setting-sources user --strict-mcp-config --output-format stream-json --verbose --model haiku --session-id 6f899129-c151-49de-921d-c9a84567d949 --permission-mode dontAsk --permission-prompts none --settings /sf/host/settings.json --max-turns 4 --debug-file /sf/out/debug.log <prompt>
+Exit code 0, after 3s.
+init: version 2.1.311, tools ['Bash'], fields that mention a sandbox: none
+tool_use Bash: {"command": "sh ./inside.sh", "description": "Run inside.sh script in current directory"}
+tool_result (is_error):
+    Exit code 1
+    bwrap: Creating new namespace failed: nesting depth or /proc/sys/user/max_*_namespaces exceeded (ENOSPC)
+result: subtype success, is_error False, turns 2, cost 0.0007222299999999999, denials []
+    No.
+
+    The sandbox blocked it: `bwrap` could not create a namespace (`ENOSPC`, nesting depth or `max_*_namespaces` exceeded). The script's own output is unknown because it never started.
+The CLI's namespaces: user user:[4026534006] mnt mnt:[4026533994] pid pid:[4026534004] net net:[4026532993] ipc ipc:[4026534002]
+observed.txt: absent, inside.sh left no record
+Debug-log lines that mention the sandbox: 0
+
+## Summary
+
+| Case | `sandbox` in --settings | Exit | Result | Bash calls | Each run of inside.sh |
+|---|---|---|---|---|---|
+| none-default | `-` | 0 | success | 1 (0 asking to skip the sandbox) | NOT sandboxed by the CLI |
+| none-on-strict | `{"enabled":true,"allowUnsandboxedCommands":false}` | 0 | success | 1 (0 asking to skip the sandbox) | sandboxed by the CLI |
+| bwrap-default | `-` | 0 | success | 1 (0 asking to skip the sandbox) | NOT sandboxed by the CLI |
+| bwrap-off | `{"enabled":false}` | 0 | success | 1 (0 asking to skip the sandbox) | NOT sandboxed by the CLI |
+| bwrap-on | `{"enabled":true}` | 0 | success | 1 (0 asking to skip the sandbox) | sandboxed by the CLI |
+| bwrap-on-strict | `{"enabled":true,"allowUnsandboxedCommands":false}` | 0 | success | 1 (0 asking to skip the sandbox) | sandboxed by the CLI |
+| bwrap-on-weaker | `{"enabled":true,"allowUnsandboxedCommands":false,"enableWeakerNestedSandbox":true}` | 0 | success | 1 (0 asking to skip the sandbox) | sandboxed by the CLI |
+| nouserns-default | `-` | 0 | success | 1 (0 asking to skip the sandbox) | NOT sandboxed by the CLI |
+| nouserns-off | `{"enabled":false}` | 0 | success | 1 (0 asking to skip the sandbox) | NOT sandboxed by the CLI |
+| nouserns-on | `{"enabled":true}` | 0 | success | 2 (1 asking to skip the sandbox) | NOT sandboxed by the CLI |
+| nouserns-on-strict | `{"enabled":true,"allowUnsandboxedCommands":false}` | 0 | success | 1 (0 asking to skip the sandbox) | inside.sh did not run |
+| nouserns-on-weaker | `{"enabled":true,"allowUnsandboxedCommands":false,"enableWeakerNestedSandbox":true}` | 0 | success | 1 (0 asking to skip the sandbox) | inside.sh did not run |
+| nouserns-on-fail | `{"enabled":true,"allowUnsandboxedCommands":false,"failIfUnavailable":true}` | 0 | success | 1 (0 asking to skip the sandbox) | inside.sh did not run |
+
+Sum of total_cost_usd: 0.0098

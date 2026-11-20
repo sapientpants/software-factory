@@ -703,3 +703,139 @@ What follows:
 - **Which AppArmor profiles are loaded.** Not listed in any run; it needs root.
 - **The user's home directory and shell on the server,** which no run read, and whether anything but the operator can become the user.
 - **A Claude Code session on the server,** inside bubblewrap or outside it. Probe P-6 (#12) is the first. The CLI is installed for the operator's account and not for the factory's user.
+
+## P-6: the agent CLI's Bash sandbox under bubblewrap
+
+Answered 2026-11-20 for #12, for bubblewrap, by live sessions of Claude Code 2.1.311 on the server and in a container on the Mac. The outer sandbox was a stand-in built from `bwrap` arguments; the factory's sandbox does not exist yet. The microVM half of the probe was not tried.
+
+**Answer.** It works on the server, once `socat` is installed, when the outer sandbox lets a process create a user namespace: the CLI's sandbox started inside the stand-in and confined the command further. It does not work when the outer sandbox is run with `--disable-userns`: each Bash call then fails. It does not have to be disabled in either case, because it is off unless a settings file turns it on, and with it off the Bash tool ran in the CLI's own namespaces inside both stand-ins. The setting is `sandbox.enabled`. Set to `false` in the host's `--settings` file, it turned the sandbox off on the server where the config directory had turned it on. AG-8 now sets it, since SEC-8 does not rely on that sandbox and nothing seen here is a reason to turn it on:
+
+| | With `sandbox.enabled: true` | Seen |
+|---|---|---|
+| No `socat` | The CLI starts no sandbox, says so on stderr, and runs the command unsandboxed | On the server before `socat` was installed, and in the container with `socat` moved away |
+| `socat`, and an outer sandbox in which a process can create a user namespace | The CLI's sandbox nests. The command wrote in the working directory, was denied a second directory that the outer sandbox left writable and `/tmp`, and was refused `api.anthropic.com` | On the server and in the container |
+| `socat`, and an outer sandbox run with `--disable-userns` | Each Bash call fails with a `bwrap` error. Unless `allowUnsandboxedCommands` is `false`, the model can ask for the command to run unsandboxed, and it then does | On the server and in the container |
+
+### Method
+
+One script, on the branch `prototype/inner-sandbox` at commit [`d23e6b7`](https://github.com/sapientpants/software-factory/tree/d23e6b72e805cc92ed668dde11b7f858def2a352/crates/factory-agent/prototype/inner-sandbox), with the output of five runs under `results/`. It is throwaway code. The first server run and the first container run were made by the script at commit `cbe7a0c`. The later runs were made by the script at `9fc8672`, which has two more cases and lists the lines of each stream that mention a sandbox.
+
+Each case is one `claude -p` session on a `claude setup-token` credential, on the `haiku` alias. The flags are those of AG-1 in `subscription` mode that a session of one prompt and one tool needs: `--setting-sources user`, `--strict-mcp-config`, `--output-format stream-json --verbose`, `--session-id`, `--model`, `--permission-mode dontAsk`, `--permission-prompts none`, `--tools`, `--allowedTools`, `--settings` and `--max-turns`. `--input-format stream-json`, `--mcp-config`, `--json-schema`, `--max-budget-usd`, `--append-system-prompt-file` and `--include-partial-messages` were left out. Bash is the only tool, and the permission rule allows one command, `sh ./inside.sh`, which the prompt asks for. That script prints the namespaces it runs in, its seccomp state, whether it can write in the working directory, in a second directory that the outer sandbox leaves writable and in `/tmp`, and whether `curl` reaches `https://api.anthropic.com`. It appends the same text to a file in the working directory, and the harness records the namespaces the CLI itself started in. A command is counted as sandboxed by the CLI when its namespaces differ from the CLI's, so the verdict does not rest on what the model says.
+
+A case is an outer sandbox and the `sandbox` block of the host's `--settings` file:
+
+| Outer sandbox | |
+|---|---|
+| `none` | The CLI runs as the user, with a `HOME` of its own |
+| `bwrap` | `bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try`, with the machine's `/usr` and `/etc` bound read-only, a private `/proc`, `/dev` and `/tmp`, the CLI's binary bound read-only, and four directories bound read-write. The network namespace is shared, because the proxy of SEC-10 does not exist and the CLI has to reach the model endpoint. No seccomp filter |
+| `nouserns` | The same with `--disable-userns`, after which nothing inside can create a user namespace. This is one way for an outer sandbox to forbid nested namespaces. A seccomp filter that does so was not tried |
+
+| `sandbox` block | Cases |
+|---|---|
+| None | `none-default`, `bwrap-default`, `nouserns-default` |
+| `enabled: false` | `bwrap-off`, `nouserns-off` |
+| `enabled: true` | `bwrap-on`, `nouserns-on` |
+| `enabled: true`, `allowUnsandboxedCommands: false` | `none-on-strict`, `bwrap-on-strict`, `nouserns-on-strict` |
+| The last, with `enableWeakerNestedSandbox: true` | `bwrap-on-weaker`, `nouserns-on-weaker` |
+| The last but one, with `failIfUnavailable: true` | `nouserns-on-fail` |
+| None, and `enabled: true` with `allowUnsandboxedCommands: false` in the `settings.json` of the config directory | `bwrap-user-on` |
+| `enabled: false`, and the same block in the config directory | `bwrap-user-on-host-off` |
+
+The runs, all on 2026-11-20:
+
+| | The server | The container |
+|---|---|---|
+| When, and which cases | 18:35 UTC, without `socat`: the first thirteen. 18:59, after the operator installed `socat`: all fifteen | 18:31 UTC: the first thirteen. 18:45: the two `user` cases and the six `nouserns` cases. 18:46, with `socat` moved out of the `PATH`: the three `on-strict` cases |
+| Machine | Debian 13, kernel `6.12.116+deb13-amd64`, x86-64 (4.4) | Debian 13 in Docker Desktop on the Mac, started with `--privileged`; kernel `7.0.14-linuxkit`, arm64 |
+| User | The factory's user, uid 103. The operator started the script (D-16), from a login, with `sudo -H -u sf` | A system user with no home directory |
+| CLI | A copy of the operator's Claude Code 2.1.311 binary, placed in `/tmp` for each run. The factory's user has none of its own | 2.1.311 |
+| `bubblewrap`, `socat` | 0.12.0; not installed at first, then Debian's 1.8.0.3 | 0.12.0; 1.8.0.3 |
+| Token | The operator's, given to the script on standard input and to the sessions in the environment | The same |
+
+In the output of the first server run the names of 13 network interfaces are replaced by `<13 names redacted>`; the script has since printed their number. The two server runs reported 0.005 and 0.011 API-equivalent dollars, and the three container runs 0.016 together.
+
+The documentation was read the same day, through a fetch tool: the first part of <https://code.claude.com/docs/en/sandboxing> and the index of <https://code.claude.com/docs/en/settings-reference> word for word, the rest as a summary. The quotations here are from the parts read word for word. The sandboxing page says: "The sandbox is off by default", and that it is turned on with `/sandbox` or by setting `sandbox.enabled` to `true` in a settings file; that on Linux it "relies on" `bubblewrap` and `socat`; and that "when the platform doesn't support the sandbox or the dependency check at startup fails, Claude Code runs commands without sandboxing", unless `sandbox.failIfUnavailable` is `true`, which makes it "exit at startup instead". What was read names no command-line flag and no environment variable for any of this, and does not say what happens when the dependencies are present and the sandbox cannot start.
+
+### On the server, without `socat`
+
+The CLI's sandbox started in no case. The stand-in binds the machine's `/usr`, so what the machine lacks the sandbox lacks; in the factory's sandbox that is decided by the baseline of SEC-6. The preflight ran the outer sandboxes without the CLI, in this run and the next: both start, and a second `bwrap` inside the first succeeds under `bwrap` and fails under `nouserns` with `Creating new namespace failed: nesting depth or /proc/sys/user/max_*_namespaces exceeded (ENOSPC)`.
+
+| Cases | Exit | `result` | The command |
+|---|---|---|---|
+| The three with no `sandbox` block and the two with `enabled: false` | 0 | `success` | Ran in the CLI's namespaces, wrote in all three places, and got an HTTP 404 from `api.anthropic.com`, which means the host answered. Nothing on stderr |
+| The seven with `enabled: true` and no `failIfUnavailable` | 0 | `success` | The same. On stderr, the warning below |
+| `nouserns-on-fail` | 1 | `error_during_execution`, 0 turns | Did not run: the CLI refused to start. No `system/init` message. On stderr, the error below |
+
+So twelve sessions ran and one did not start. The warning, in all seven cases:
+
+```
+⚠ Sandbox disabled: sandbox is enabled but dependencies are missing: socat not installed · install missing tools (e.g. apt install bubblewrap socat) or see https://code.claude.com/docs/en/sandboxing
+  Commands will run WITHOUT sandboxing. Network and filesystem restrictions will NOT be enforced.
+```
+
+The error:
+
+```
+Error: sandbox required but unavailable: sandbox is enabled but dependencies are missing: socat not installed · install missing tools (e.g. apt install bubblewrap socat) or see https://code.claude.com/docs/en/sandboxing
+  sandbox.failIfUnavailable is set — refusing to start without a working sandbox.
+```
+
+In the seven cases the `system/init` message had no field that mentions a sandbox, and neither the tool result nor the `result` said anything of it. The script of that run looked at those three messages only, and the streams were not kept.
+
+Under the outer sandboxes the command saw 9 processes, against 446 and 447 without one, and ran with `NoNewPrivs: 1` and no seccomp filter. That is the stand-in at work, not the CLI.
+
+### On the server, with `socat`
+
+All fifteen sessions ran, and nothing was written to stderr in any of them. The cases with no `sandbox` block and with `enabled: false` gave what they gave before. The others:
+
+| Case | The command |
+|---|---|
+| `none-on-strict`, `bwrap-on`, `bwrap-on-strict`, `bwrap-on-weaker` | Ran in a new user, mount, PID and network namespace, with `Seccomp: 2` and two filters. It saw 8 processes and no network interface but `lo`, against 13 others outside. It wrote in the working directory. Writing in the second directory and in `/tmp` was denied. `curl` got a 403 from the CLI's proxy, and the tool result carried `deny network-outbound api.anthropic.com:443` |
+| `nouserns-on` | Failed with `bwrap: Creating new namespace failed`. The model then called Bash again with `dangerouslyDisableSandbox: true`, and that call ran in the CLI's namespaces and wrote in all three places |
+| `nouserns-on-strict`, `nouserns-on-weaker`, `nouserns-on-fail` | Failed with the same `bwrap` error, as a tool result marked `is_error`, and was not run again |
+| `bwrap-user-on`: no `sandbox` block in `--settings`, and `enabled: true` with `allowUnsandboxedCommands: false` in the `settings.json` of the config directory | Sandboxed by the CLI, as `bwrap-on-strict` was |
+| `bwrap-user-on-host-off`: the same config directory, and `enabled: false` in `--settings` | Ran in the CLI's namespaces and wrote in all three places |
+
+Every one of these sessions ended with exit code 0 and a `result` of subtype `success`, the three in which no command ran included. In those three the model's answer said that the command had not run.
+
+In the stream, the `system/init` message again had no field that mentions a sandbox. Where the CLI's sandbox ran, the one line that mentions it is the tool result, which ends in a `<sandbox_violations>` block naming the refused host. Where it failed, the `bwrap` error is in the tool result and the model's answer repeats it.
+
+### In the container
+
+The run of 18:31 and the run of 18:45 gave, case for case, what the server gave with `socat`. The container is where the script was rehearsed, and it adds two things.
+
+`nouserns-on` ended with the second, unsandboxed call in five of six runs: on the server, in the two container runs that are kept, and in two of three earlier container runs whose output is not on the branch. In the other the model said it would not run, outside the sandbox, a script it had not read. Every other case gave the same result each time it ran.
+
+The run of 18:46, without `socat`: the three `on-strict` cases gave what they gave on the server without `socat`, with the same warning on stderr. Each stream had nine lines, of types `system/init`, `system/thinking_tokens`, `assistant`, `user`, `rate_limit_event` and `result`, and none of them holds the word `sandbox`, `socat` or `bwrap`.
+
+### Findings
+
+**Off is the default, and off the CLI adds nothing to the outer sandbox.** With no `sandbox` block and with `enabled: false`, the command's namespaces were the CLI's in every case, in every run. This is the state the factory runs in.
+
+**`enabled: false` in the host's file is a setting that does something.** On its own it cannot be told from the default. Against a config directory that turns the sandbox on, it turned it off, on the server. Under AG-4 the host writes both files, so this matters if the CLI's default changes or if the config directory is ever not what the host wrote.
+
+**Without `socat`, turning it on turns nothing on, and the stream does not say so.** The CLI goes on without a sandbox whatever else the block says: `allowUnsandboxedCommands: false` did not stop the command. The warning is on stderr. In the container no line of the stream mentioned it; on the server the three messages that were looked at did not.
+
+**Where it starts, it takes away part of what the outer sandbox leaves.** Nested under `bwrap` on the server, the command wrote in the working directory, was denied the two other places, and was refused the one host it tried. The documentation gives the defaults: a command "can write to the current working directory, the per-user temp directory" and directories added in settings, and hosts are checked against "allowed domains, which start empty". A stage's target directory and temporary directory (SEC-6) and the crate registry (SEC-11) are outside those limits **(inference: no build was run, and the stand-in is not the factory's sandbox)**. They could be opened in the same settings block, which would state the factory's policy a second time, in a layer SEC-8 does not rely on.
+
+**Where it cannot start, the session's result does not show it.** Under `nouserns` the dependency check passes, since `bwrap` and `socat` are both there, so `failIfUnavailable` does not stop the CLI at startup. Each Bash call fails when it is made, and the failure is in the tool result. The session still ends with `success` and exit code 0. Unless `allowUnsandboxedCommands` is `false`, the model can ask for the command to run unsandboxed, and it did so in five runs of six. `enableWeakerNestedSandbox` does not help: the settings reference describes it as the way to "run the Linux sandbox inside an unprivileged container", and the failure here is the user namespace, which that setting does not do without.
+
+**`failIfUnavailable` catches the missing dependency and not the sandbox that cannot start.** It ended the session on the server while `socat` was missing, and changed nothing once it was there.
+
+**None of this is needed to decide AG-8.** SEC-8 already says that the CLI's sandbox is not relied on. What the probe adds is that turning it on gains nothing in any state that was tried, and which setting keeps it off.
+
+### What changed in the spec
+
+1. AG-8 has the host's `--settings` file set `sandbox.enabled` to `false`, in every session. It no longer makes this depend on a conflict with the outer sandbox.
+2. SEC-8 cites AG-8 for the sandbox being off.
+3. The table of 4.4 records that sessions of the CLI ran on the server as the factory's user, and that the operator installed `socat` for the second of the two runs.
+4. The P-6 row of 23.2 carries the answer and says which parts are open.
+
+### Still open
+
+- **The microVM.** The other half of P-6. It waits for a guest (D-5, M2). AG-8 does not wait for it: the setting is the same in every session.
+- **The factory's sandbox** in place of the stand-in: its seccomp filter, its own network namespace and the proxy of SEC-10, and whether it lets a worker create user namespaces. 13.3 does not say. Nor is it known whether the in-sandbox forwarder of SEC-10 will need `socat` itself.
+- **A test that the setting holds.** A contract test (19.4) that only checks that a command runs in the CLI's namespaces passes on a machine without `socat` even if the setting is ignored. It has to start from a state in which the sandbox would otherwise be on, as `bwrap-user-on-host-off` does, and so needs `socat` where it runs. Not added to 19.4 here.
+- **Other CLI versions,** a changed default and a renamed key among them. One version ran.
+- **A CLI of the factory's own on the server.** The sessions ran from a copy of the operator's binary in `/tmp`.
+- **The whole stream on the server without `socat`.** Not kept. The container without `socat` stands in for it.

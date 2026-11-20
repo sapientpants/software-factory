@@ -54,7 +54,8 @@ TMP_CANARY = Path("/tmp/sf-p6-canary")
 ON = {"enabled": True}
 STRICT = {"enabled": True, "allowUnsandboxedCommands": False}
 
-# (name, outer sandbox, the `sandbox` block of --settings or None for no block)
+# (name, outer sandbox, the `sandbox` block of --settings or None for no block, and the
+# same for the settings.json of the config directory, which only the last two cases set)
 CASES = [
     ("none-default", "none", None),
     ("none-on-strict", "none", STRICT),
@@ -69,7 +70,10 @@ CASES = [
     ("nouserns-on-strict", "nouserns", STRICT),
     ("nouserns-on-weaker", "nouserns", {**STRICT, "enableWeakerNestedSandbox": True}),
     ("nouserns-on-fail", "nouserns", {**STRICT, "failIfUnavailable": True}),
+    ("bwrap-user-on", "bwrap", None, STRICT),
+    ("bwrap-user-on-host-off", "bwrap", {"enabled": False}, STRICT),
 ]
+CASES = [(*case, None)[:4] for case in CASES]
 
 NAMESPACES = ("user", "mnt", "pid", "net", "ipc")
 
@@ -204,7 +208,7 @@ def preflight(claude: Path, scratch: Path):
             out(f"{kind:9} {label:17} {detail}")
 
 
-def run_case(name, kind, sandbox_block, claude: Path, scratch: Path, token, model, timeout):
+def run_case(name, kind, sandbox_block, user_block, claude: Path, scratch: Path, token, model, timeout):
     run_dir = scratch / name
     for sub in ("work", "home/.claude", "host", "outside", "out", "bin"):
         (run_dir / sub).mkdir(parents=True)
@@ -213,6 +217,8 @@ def run_case(name, kind, sandbox_block, claude: Path, scratch: Path, token, mode
         (run_dir / "bin" / "claude").symlink_to(claude)
 
     settings = {} if sandbox_block is None else {"sandbox": sandbox_block}
+    if user_block is not None:
+        (run_dir / "home" / ".claude" / "settings.json").write_text(json.dumps({"sandbox": user_block}) + "\n")
     (run_dir / "host" / "settings.json").write_text(json.dumps(settings, indent=2) + "\n")
     (run_dir / "host" / "start.sh").write_text(START_SH)
     (run_dir / "work" / "inside.sh").write_text(INSIDE_SH.replace("@OUTSIDE@", str(inside["outside"])).replace("@TMP_CANARY@", str(TMP_CANARY)))
@@ -259,8 +265,8 @@ def run_case(name, kind, sandbox_block, claude: Path, scratch: Path, token, mode
         timer.cancel()
     wall = time.monotonic() - started
 
-    report(name, kind, settings, cmd, run_dir, exit_code, timed_out.is_set(), wall, token)
-    return summarise(name, kind, sandbox_block, run_dir, exit_code, timed_out.is_set())
+    report(name, kind, settings, user_block, cmd, run_dir, exit_code, timed_out.is_set(), wall, token)
+    return summarise(name, kind, sandbox_block, user_block, run_dir, exit_code, timed_out.is_set())
 
 
 def read(path: Path):
@@ -320,10 +326,12 @@ def verdict(run_dir: Path, observed):
     return f"sandboxed by the CLI: new {', '.join(new)} namespace; {wrote} outside the working directory"
 
 
-def report(name, kind, settings, cmd, run_dir: Path, exit_code, timed_out, wall, token):
+def report(name, kind, settings, user_block, cmd, run_dir: Path, exit_code, timed_out, wall, token):
     events = events_of(run_dir)
     out(f"\n## Case {name}\n")
     out(f"Outer sandbox: {kind}. --settings: {json.dumps(settings)}")
+    if user_block is not None:
+        out(f"settings.json of the config directory: {json.dumps({'sandbox': user_block})}")
     shown = [arg if arg != PROMPT else "<prompt>" for arg in cmd]
     out(f"Command: {' '.join(shown)}")
     out(f"Exit code {exit_code}{', killed at the timeout' if timed_out else ''}, after {wall:.0f}s.")
@@ -334,6 +342,11 @@ def report(name, kind, settings, cmd, run_dir: Path, exit_code, timed_out, wall,
         out(f"init: version {init.get('claude_code_version')}, tools {init.get('tools')}, fields that mention a sandbox: {json.dumps(mentions) if mentions else 'none'}")
     else:
         out("init: no system/init message")
+    # Every line of the stream, not only the messages shown below.
+    words = ("sandbox", "socat", "bwrap")
+    kinds = [f"{event.get('type')}/{event.get('subtype')}" if event.get("subtype") else str(event.get("type")) for event in events]
+    naming = [kind for kind, event in zip(kinds, events) if any(word in json.dumps(event).lower() for word in words)]
+    out(f"Stream: {len(events)} lines ({', '.join(sorted(set(kinds)))}). Lines that mention a sandbox, socat or bwrap: {', '.join(naming) or 'none'}")
 
     for event in events:  # in the order of the stream
         for block in blocks([event], "assistant", "tool_use"):
@@ -377,7 +390,7 @@ def report(name, kind, settings, cmd, run_dir: Path, exit_code, timed_out, wall,
         out(f"THE TOKEN LITERAL IS IN: {holding} (removed with the scratch directory)")
 
 
-def summarise(name, kind, sandbox_block, run_dir: Path, exit_code, timed_out):
+def summarise(name, kind, sandbox_block, user_block, run_dir: Path, exit_code, timed_out):
     events = events_of(run_dir)
     calls = list(blocks(events, "assistant", "tool_use"))
     unsandboxed = sum(1 for call in calls if (call.get("input") or {}).get("dangerouslyDisableSandbox"))
@@ -385,7 +398,8 @@ def summarise(name, kind, sandbox_block, run_dir: Path, exit_code, timed_out):
     runs = observed_runs(run_dir)
     return {
         "case": name,
-        "settings": "-" if sandbox_block is None else json.dumps(sandbox_block, separators=(",", ":")),
+        "settings": ("-" if sandbox_block is None else json.dumps(sandbox_block, separators=(",", ":")))
+        + ("" if user_block is None else "; config directory " + json.dumps(user_block, separators=(",", ":"))),
         "exit": "timeout" if timed_out else exit_code,
         "result": result.get("subtype", "none"),
         "calls": f"{len(calls)} ({unsandboxed} asking to skip the sandbox)",
@@ -407,8 +421,8 @@ def main():
 
     cases = [case for case in CASES if not args.k or args.k in case[0]]
     if args.list:
-        for name, kind, block in cases:
-            print(f"{name:20} outer {kind:9} sandbox {json.dumps(block)}")
+        for name, kind, block, user_block in cases:
+            print(f"{name:22} outer {kind:9} sandbox {json.dumps(block)}" + (f"; config directory {json.dumps(user_block)}" if user_block else ""))
         return 0
 
     REDACT.add(str(HOME), "~")
@@ -463,7 +477,7 @@ def main():
     try:
         preflight(claude, scratch)
         out(f"\nToken from {source}. Model {args.model}. {len(cases)} sessions, at most {args.timeout}s each.")
-        rows = [run_case(name, kind, block, claude, scratch, token, args.model, args.timeout) for name, kind, block in cases]
+        rows = [run_case(*case, claude, scratch, token, args.model, args.timeout) for case in cases]
     finally:
         TMP_CANARY.unlink(missing_ok=True)  # written by the cases that run outside any sandbox
         if args.keep:

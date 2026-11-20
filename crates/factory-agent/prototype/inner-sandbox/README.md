@@ -4,7 +4,7 @@ Throwaway code for issue #12 and probe P-6 (SPEC 10.3 AG-8, 13.3 SEC-8). Not for
 
 `inner_sandbox_probe.py` runs one real `claude -p` session per case, on a `claude setup-token` credential, with the flags of AG-1 in `subscription` mode and Bash as the only tool. The session is asked to run `sh ./inside.sh`, and the permission rule allows that command and no other. `inside.sh` prints its namespaces, its seccomp state, the network interfaces it sees, whether it can write in the working directory, in a second directory and in `/tmp`, and whether it reaches `api.anthropic.com`. It appends the same text to a file in the working directory, so the record does not depend on what the model reports. The harness records the namespaces the CLI itself started in and compares.
 
-A case is an outer sandbox and a `sandbox` block in the host's `--settings` file:
+A case is an outer sandbox and a `sandbox` block in the host's `--settings` file. Two cases, `bwrap-user-on` and `bwrap-user-on-host-off`, also put a `sandbox` block in the `settings.json` of the config directory:
 
 | Outer sandbox | |
 |---|---|
@@ -36,7 +36,7 @@ It needs `bwrap`, `python3`, `curl` and a native `claude` binary, and runs as an
 
 What a run leaves behind: nothing of its own. It works in `~/.cache/sf-p6-*`, or in `/var/tmp/sf-p6-*` when the user has no home directory to write in, and writes one empty file in `/tmp`, and removes both. In the two `none` cases the CLI itself makes `/tmp/claude-<uid>` and `/tmp/cc-socks` or `/tmp/cc-socks-<uid>`, as any session of that user does.
 
-Thirteen sessions of one or two turns on the `haiku` alias: a pass reported 0.01 API-equivalent dollars.
+Fifteen sessions of one or two turns on the `haiku` alias: a pass reported 0.01 API-equivalent dollars.
 
 ## Results
 
@@ -45,7 +45,10 @@ Thirteen sessions of one or two turns on the `haiku` alias: a pass reported 0.01
 | `results/server-2026-11-20.txt` | The server, at 18:35 UTC, started by the operator from a login as `sudo -H -u sf python3 /tmp/inner_sandbox_probe.py --claude /tmp/claude-p6 --token-stdin`, so as the factory's user, with a copy of the operator's Claude Code 2.1.311 binary. Debian 13, x86-64, bubblewrap 0.12.0, **no `socat`**. The script at commit `cbe7a0c` |
 | `results/container-2026-11-20.txt` | A Debian 13 container on the Mac (arm64, Docker Desktop's 7.0.14-linuxkit kernel), built from the `Dockerfile` here and started with `--privileged`. The script ran the way it is to run on the server: as a system user named `sf` with no home directory, started from a directory that user cannot read, with a copy of the binary in `/tmp` and the token on standard input. Claude Code 2.1.311, bubblewrap 0.12.0, socat 1.8.0.3. The script at commit `cbe7a0c` |
 
-In the server's file the names of 13 network interfaces are replaced by `<13 names redacted>`, on 12 lines. The repository is public and the operator chose to name nothing that identifies the server. Trailing spaces are dropped in both files. Since these runs the script prints how many interfaces there are besides `lo`, and no names.
+| `results/container-config-directory-2026-11-20.txt` | The same container image and user, at 18:45 UTC, with `-k user`: the two `user` cases and, since the text matches them too, the six `nouserns` cases. The script as it is in this directory |
+| `results/container-no-socat-2026-11-20.txt` | The same container at 18:46 UTC, after `mv /usr/bin/socat /usr/bin/socat.off`, with `-k on-strict`. The script as it is in this directory |
+
+In the server's file the names of 13 network interfaces are replaced by `<13 names redacted>`, on 12 lines. The repository is public and the operator chose to name nothing that identifies the server. Trailing spaces are dropped in every file. Since the first two runs the script prints how many interfaces there are besides `lo`, and no names; it has the two `user` cases; and for each session it lists the lines of the stream that mention a sandbox, `socat` or `bwrap`, whatever their type.
 
 P-6 asks about the server. The server has no `socat`, which the CLI's sandbox needs, so the container run is the only one in which that sandbox started.
 
@@ -78,7 +81,13 @@ CLAUDE_CODE_OAUTH_TOKEN="$(cat ~/.config/sf-probe/oauth-token)" \
 - **With `enabled: true` under `nouserns`, every Bash command fails:** `bwrap: Creating new namespace failed`. The session still ends with `success` and exit code 0. `failIfUnavailable` does not stop the CLI at startup, and `enableWeakerNestedSandbox` does not help.
 - **Unless `allowUnsandboxedCommands` is `false`, the model may run the command again outside the sandbox.** It did in three passes of four, of which the kept output is the last, with `dangerouslyDisableSandbox: true` in the tool call, and the command then ran in the CLI's namespaces.
 
-## What neither run shows
+## What the two later container runs showed
+
+- **A `sandbox` block in the config directory turns the sandbox on,** with no block in `--settings`: `bwrap-user-on` ran in new namespaces with two seccomp filters.
+- **`enabled: false` in `--settings` wins over `enabled: true` in the config directory:** `bwrap-user-on-host-off` ran in the CLI's own namespaces, with nothing on stderr.
+- **Without `socat` the container did what the server did.** The same warning on stderr, the command unsandboxed, `success`. No line of the stream mentions a sandbox, `socat` or `bwrap`: the nine lines are `system/init`, `system/thinking_tokens`, `assistant`, `user`, `rate_limit_event` and `result`.
+
+## What no run shows
 
 - **The CLI's sandbox starting on the server.** That needs `socat` there. The container has another kernel, another architecture, and Docker around the outer sandbox.
 - **The factory's sandbox.** The stand-in shares the network namespace and has no seccomp filter and no proxy.

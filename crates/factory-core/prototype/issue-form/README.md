@@ -28,6 +28,7 @@ The operator created the first three issues on 2026-11-20 in the web interface, 
 | `results/issue-<n>.rest-full.json` | The same under `2026-03-10` with `Accept: application/vnd.github.full+json`, which adds `body_html` and `body_text` |
 | `results/issue-<n>.graphql.json` | `repository.issue` through GraphQL: the body and the fields that record edits |
 | `results/section-parser.txt` | The output of `section_parser.py inputs results` |
+| `results/browser-2026-11-20.md` | What a session saw in Chrome on the new-issue form: a prefilled field resetting, and a required field of spaces refused. `results/browser-required-field-refused.jpg` is the page after the refusal |
 
 The bodies are whole and as the server sent them; read `body` from the JSON, where a carriage return is still `\r`. No response headers were kept. `GET /issues/<n>/timeline` returned an empty list for each issue and was not saved.
 

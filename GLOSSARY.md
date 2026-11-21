@@ -70,6 +70,15 @@ The exact path of a file that `author_tests` wrote for a run (11.7). A change to
 **Check tool**:
 A program that a repository's setup commands or checks run and that is no part of its toolchain (WS-7): `cargo-nextest` or `typos`, for example. WS-7a says how one reaches a worker.
 
+**Instruction set**:
+The files of a target repository that an agent session is given unasked: `AGENTS.md` and the files that the host admits by following instruction references from it, at the policy commit (AG-2a, AG-2b).
+
+**Instruction reference**:
+A name in a file of the instruction set that the host follows to another file of the repository. AG-2b says which names are one. It is not the reference of GH-5a, which is a mention of an issue or a pull request and keeps the bare word.
+
+**Repository instructions**:
+The text of the instruction set as the host gives it to an agent session (AG-2a, 10.4).
+
 **Snapshot**:
 The issue title, body and trusted comments captured at claim or resume and given to agents.
 

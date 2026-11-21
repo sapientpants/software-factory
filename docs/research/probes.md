@@ -2091,3 +2091,123 @@ The runs of the repository were listed from 20:41 to 20:45 UTC, the last time 2 
 - **Other events.** `push` and `pull_request` were tried. `schedule`, `workflow_dispatch` and `pull_request_target` were not.
 - **A merged link.** No pull request with a link was merged. The push of the same tree to the default branch was observed in its place.
 - **A link in the directory, on the default branch.** The link that is itself a workflow file was tried on another branch only.
+
+## P-31: what `pulldown-cmark` reports for a code span, a link and an HTML comment
+
+Answered 2026-11-21 for #54, on the operator's Mac: macOS 27.0.1, cargo 1.100.0 and rustc 1.100.0, by a throwaway package outside this repository that depends on `pulldown-cmark` 0.13.6 alone, with `default-features = false`. No research report covers the question. The package is not kept; the two sample texts, the program's logic and the tables below are the record.
+
+**Answer.** The crate reports a code span and a link as CommonMark defines them, and reports neither inside a code block or an HTML comment. It tells an image and an autolink apart from a link, and it hands back a link destination as written. A comment block runs through the whole line that holds its `-->`, and to the end of the text where nothing closes it.
+
+### Method
+
+The program ran `Parser::new(text)`, with no option set, over a text and printed three kinds of event: `Event::Code`, a code span, with its text; the start of `Tag::Link`, with the link type and `dest_url`; and the start of `Tag::Image`, with `dest_url`. For the second sample it used `into_offset_iter` and also printed `Event::Html`, `Event::InlineHtml`, and every `Event::Text` that held `<!--` or `-->`.
+
+The first sample:
+
+````markdown
+See `docs/a.md` and ``docs/tick`s.md`` and [inline](docs/b.md#frag) and [ref][r] and [collapsed][] and [shortcut].
+An image ![alt](docs/img.png), an autolink <https://example.com/x.md>, a bare docs/bare.md, and [esc](docs/my%20file.md?x=1).
+Angle [a](<docs/with space.md>). Up [u](../GLOSSARY.md). Root [g](/GLOSSARY.md).
+
+<!-- hidden `docs/hidden.md` and [h](docs/hidden2.md) -->
+
+```sh
+cat `docs/fenced.md` [f](docs/fenced2.md)
+```
+
+    indented `docs/indented.md`
+
+| table | cell |
+|---|---|
+| `docs/cell.md` | [c](docs/cell2.md) |
+
+[r]: docs/r.md
+[collapsed]: docs/c.md "title"
+[shortcut]: docs/s.md
+````
+
+The second sample:
+
+````markdown
+The encoder neutralises `<!--` in a span. Then [a](docs/a.md).
+
+Inline <!-- hidden `docs/h.md` --> comment, then `docs/b.md`.
+
+<!-- block
+`docs/h2.md`
+--> trailing `docs/t.md`
+
+Mid-paragraph <!-- never closed, then `docs/c.md`.
+
+```
+<!-- in a fence
+```
+
+After the fence `docs/d.md`.
+
+<!-- unclosed block
+
+`docs/e.md` and more text
+````
+
+The program was then run on `AGENTS.md` of this repository at commit `3127e8f`. The crate's dependencies were listed with `cargo tree`, and their licences read from `cargo metadata`.
+
+### What it reported for the first sample
+
+| In the text | Reported as |
+|---|---|
+| `` `docs/a.md` `` | Code span, `docs/a.md` |
+| ``` ``docs/tick`s.md`` ``` | Code span, ``docs/tick`s.md`` |
+| `[inline](docs/b.md#frag)` | Link, inline, `docs/b.md#frag` |
+| `[ref][r]`, `[collapsed][]`, `[shortcut]` | Link, of type reference, collapsed and shortcut, with the destination of its definition: `docs/r.md`, `docs/c.md`, `docs/s.md` |
+| `![alt](docs/img.png)` | Image, `docs/img.png` |
+| `<https://example.com/x.md>` | Link, of type autolink |
+| The bare `docs/bare.md` | Nothing |
+| `[esc](docs/my%20file.md?x=1)` | Link, inline, `docs/my%20file.md?x=1` |
+| `[a](<docs/with space.md>)` | Link, inline, `docs/with space.md` |
+| `[u](../GLOSSARY.md)`, `[g](/GLOSSARY.md)` | Link, inline, `../GLOSSARY.md` and `/GLOSSARY.md` |
+| The comment block, with a code span and a link inside | Nothing |
+| The fenced block, with a code span and a link inside | Nothing |
+| The indented block, with a code span inside | Nothing |
+| The table cells `` `docs/cell.md` `` and `[c](docs/cell2.md)` | Code span and inline link. No table extension was on, so the row was a paragraph |
+
+### What it reported for the second sample
+
+| In the text | Reported as |
+|---|---|
+| `` `<!--` `` in the first paragraph | Code span, `<!--` |
+| `<!-- hidden … -->` inside a paragraph | Inline HTML, from `<!--` to `-->`. The code span inside it was not reported |
+| `` `docs/b.md` `` after it in the same paragraph | Code span |
+| The block from `<!-- block` to the line `` --> trailing `docs/t.md` `` | HTML block, one event per line, the whole last line included. Neither code span in it was reported |
+| `<!-- never closed` in the middle of a paragraph | Text. The code span `docs/c.md` after it was reported |
+| `<!-- in a fence` | Text of the code block |
+| `` `docs/d.md` `` after the fence | Code span |
+| `<!-- unclosed block` at the start of a line, with nothing to close it | HTML block to the end of the text, across the blank line. The code span `docs/e.md` in it was not reported |
+
+### `AGENTS.md`, and the crate's tree
+
+The program found 44 code spans in `AGENTS.md`, 35 of them different, and no link and no image. Seven of the 35 are the path of a tracked file: `GLOSSARY.md`, `SPEC.md`, `docs/research/probes.md`, `xtask/tests/structure.rs`, and the three files under `docs/agents/`.
+
+`cargo tree` listed `pulldown-cmark` 0.13.6 with `bitflags` 2.13.2, `memchr` 2.8.3 and `unicase` 2.10.0, and nothing else. Their licences are MIT for the crate itself, `MIT OR Apache-2.0` for `bitflags` and `unicase`, and `Unlicense OR MIT` for `memchr`.
+
+### Findings
+
+**The two forms of AG-2b are events of the parser.** A code span arrives with its text and a link with its destination, a reference-style link with that of its definition. The host has no backtick or bracket to match by itself.
+
+**A destination comes back as written.** The fragment, the query and the percent-escapes are still in it, and so are `..` and a leading `/`. The host cuts, decodes and resolves a destination by AG-2b's own rules.
+
+**What AG-2b leaves out is told apart or not reported.** An image is a tag of its own and an autolink a link type of its own. A bare path is plain text. Nothing in a code block, fenced or indented, is a code span or a link.
+
+**A comment is what the parser says it is.** A `<!--` in a code span stays a code span, and one in a code block stays its text, so a file that writes about comments loses nothing. A comment block takes the rest of its last line with it, and a block that nothing closes takes the rest of the file. A `<!--` that nothing closes inside a paragraph is text, and what follows it is read as usual.
+
+### What changed in the spec
+
+1. The P-31 row of 23.2 is new and carries the answer.
+2. AG-2b, new with decision D-34 in 23.1, rests on it for what a code span, a link and an HTML comment are, and 19.2 names the crate at this pin.
+
+### Still open
+
+- **Linux.** Nothing here was run on the server. The crate reads a string and opens nothing.
+- **GitHub's dialect.** No extension was on. What the crate reports with tables, footnotes or task lists on was not looked at, and AG-2b reads a file without them. A code span in a table cell that holds a `|` may be read differently from how GitHub shows it.
+- **Text that is not UTF-8.** The parser takes a string. AG-2b leaves such a file out before it is parsed.
+- **GitHub's rendering.** That GitHub hides the same comments that the crate reports was not observed.

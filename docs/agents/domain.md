@@ -4,38 +4,18 @@ How the engineering skills should consume this repo's domain documentation when 
 
 ## Before exploring, read these
 
-- **`GLOSSARY.md`** at the repo root, or
-- **`GLOSSARY-MAP.md`** at the repo root if it exists: it points at one `GLOSSARY.md` per context. Read each one relevant to the topic.
-- **`docs/adr/`**: read ADRs that touch the area you're about to work in. In multi-context repos, also check `src/<context>/docs/adr/` for context-scoped decisions.
+- **`GLOSSARY.md`** at the repo root. It is the one home of the spec's terms (D-21).
+- **The decisions table of `SPEC.md`, section 23.1.** It is this repo's only decision record. Read the rows that touch the area you're about to work in.
 
-If any of these files don't exist, **proceed silently**. Don't flag their absence; don't suggest creating them upfront. The `/domain-modeling` skill (reached via `/grill-with-docs` and `/improve-codebase-architecture`) creates them lazily when terms or decisions actually get resolved.
+This repo is single-context: there is no `GLOSSARY-MAP.md`.
 
 ## File structure
 
-Single-context repo (most repos):
-
 ```
 /
-├── GLOSSARY.md
-├── docs/adr/
-│   ├── 0001-event-sourced-orders.md
-│   └── 0002-postgres-for-write-model.md
-└── src/
-```
-
-Multi-context repo (presence of `GLOSSARY-MAP.md` at the root):
-
-```
-/
-├── GLOSSARY-MAP.md
-├── docs/adr/                          ← system-wide decisions
-└── src/
-    ├── ordering/
-    │   ├── GLOSSARY.md
-    │   └── docs/adr/                  ← context-specific decisions
-    └── billing/
-        ├── GLOSSARY.md
-        └── docs/adr/
+├── GLOSSARY.md      ← the terms
+├── SPEC.md          ← the design; decisions in section 23.1
+└── docs/research/   ← the evidence behind the spec
 ```
 
 ## Use the glossary's vocabulary
@@ -44,8 +24,16 @@ When your output names a domain concept (in an issue title, a refactor proposal,
 
 If the concept you need isn't in the glossary yet, that's a signal: either you're inventing language the project doesn't use (reconsider) or there's a real gap (note it for `/domain-modeling`).
 
-## Flag ADR conflicts
+## Changing the glossary
 
-If your output contradicts an existing ADR, surface it explicitly rather than silently overriding:
+`GLOSSARY.md` is protected with the spec (BOOT-4), and the rules of "Editing the spec" in `AGENTS.md` apply to it. Unlike the skill's default format, a definition here cites the ids and section numbers of `SPEC.md`, so that it restates no rule.
 
-> _Contradicts ADR-0007 (event-sourced orders), but worth reopening because…_
+## Decisions go in the spec, not in ADRs
+
+This repo keeps no `docs/adr/` through M1 (D-21). When a skill would write an ADR, record the decision as a row of `SPEC.md` 23.1 and cite its id where the design depends on it.
+
+## Flag conflicts with a settled decision
+
+If your output contradicts a row of 23.1, surface it explicitly rather than silently overriding:
+
+> _Contradicts D-18 (`SPEC.md` stays one file through M1), but worth reopening because…_

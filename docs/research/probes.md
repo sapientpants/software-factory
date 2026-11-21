@@ -1943,3 +1943,111 @@ With `case_insensitive(true)`, `AGENTS.md` matched `agents.MD`. It did not match
 - **A non-UTF-8 path.** The sketch folds it with U+FFFD in place of each ill-formed sequence. `*.md` and `a?.md` then matched the bytes `a\xff.md`, and `a.md` did not. Whether capture should refuse such a path was not asked.
 - **The pinned set.** The two ICU4X crates resolved beside `reqwest` and `octocrab` in a package of their own. That the whole set of 19.2 resolves is the M0 task that 19.2 names.
 - **Cost of the matcher.** The sketch tries every split for `*` and `**` and was not measured. Pattern lists are short and paths are bounded by git, but the matcher of M1a needs a bound on its work for a pattern with many wildcards.
+
+## P-30: cargo and git on a symbolic link
+
+Answered 2026-11-21 for #63, on the operator's Mac: macOS 27.0.1 with APFS, cargo 1.100.0 and git 2.56.1, by two scripts in throwaway directories outside this repository. No research report covers the question. The scripts are not kept; the trees, the commands and the tables below are the record.
+
+**Answer.** cargo reads its configuration through a symbolic link, at `.cargo` and at `.cargo/config.toml` alike. A diff lists a symbolic link as one entry with mode `120000` on the side that holds it, whatever happened to it, and lists a change to the file a link points at under that file's own path alone.
+
+### Method
+
+**cargo.** A package of one `Cargo.toml` and one `src/main.rs`, and beside them `tools/cfg/config.toml`, which defines an alias: `[alias]` with `probe = "version"`. `cargo probe` was run in the package root in four states. It prints the version where cargo read the alias, and `error: no such command: `probe`` where it did not. In the fourth state `cargo build --offline` was run as well.
+
+**git.** A new repository with a base commit and a candidate commit, compared with `git diff-tree -r --raw --no-renames`, which reads the two trees and no work tree. The base holds `tools/cfg/config.toml`, `cfg/clippy.toml`, `deny.toml`, `docs/specs/x.md`, `old/a.toml`, a link `clippy.toml` to `cfg/clippy.toml` and a link `gone` to `tools`. The candidate makes the first six changes of the table below. A second repository holds a link `notes.md` to a file and a link `dl` to a directory in its base, and its candidate makes the last two changes. The first candidate was then exported into an empty directory with `git read-tree` into a temporary index and `git checkout-index -a`, as 9.4 does.
+
+### What cargo read
+
+| State of the package root | `cargo probe` |
+|---|---|
+| No `.cargo` | No such command |
+| `.cargo` is a link to `tools/cfg` | Ran the alias |
+| `.cargo` is a directory, and `.cargo/config.toml` a link to `../tools/cfg/config.toml` | Ran the alias |
+| `.cargo` is a link to a path that does not exist | No such command, with cargo's hints for an unknown command and no word about the link. `cargo build` built the package without a warning |
+
+### What the diff listed
+
+| Change in the candidate | Entry: old mode, new mode, status, path |
+|---|---|
+| A new link `.cargo` to `tools/cfg` | `000000 120000 A .cargo` |
+| The link `clippy.toml` pointed at `old/a.toml` | `120000 120000 M clippy.toml` |
+| The file `deny.toml` replaced by a link | `100644 120000 T deny.toml` |
+| The tracked directory `docs/specs` replaced by a link | `000000 120000 A docs/specs` and `100644 000000 D docs/specs/x.md` |
+| The link `gone` removed | `120000 000000 D gone` |
+| `cfg/clippy.toml` changed, the file that `clippy.toml` pointed at in the base | `100644 100644 M cfg/clippy.toml`, and nothing under `clippy.toml` for it |
+| The link `notes.md` replaced by a file | `120000 100644 T notes.md` |
+| The link `dl` replaced by a directory with one file | `120000 000000 D dl` and `000000 100644 A dl/a` |
+
+The blob of a link is its target as written: `git cat-file -p` of the entry `.cargo` printed `tools/cfg`. In the export, whose tree holds no `.cargo/config.toml`, that path read through the link had the bytes of `tools/cfg/config.toml`.
+
+### Findings
+
+**A link at the name of a protected directory works for the tool and is invisible to a pattern.** cargo took the alias through `.cargo`, and the diff holds `.cargo` as one path with no component below it, which `.cargo/**` does not match (VAL-5c). The configuration behind the link is in the diff as `tools/cfg/config.toml`.
+
+**The mode tells a link from everything else, on either side.** Each of the seven changes to a link that were tried left an entry with `120000` as its old or its new mode: a link added, pointed elsewhere or removed, and a link put where a file or a directory was, or a file or a directory where a link was. A rule that reads the two modes of an entry therefore sees every one of them, at any path, without reading a target.
+
+**A link that is already there hides its target from a pattern.** The change to `cfg/clippy.toml` was listed under that path only. `clippy.toml`, which a tool reads and a pattern protects, has no entry in that diff.
+
+**A link to nothing is silent.** cargo gave no warning for a `.cargo` that points at a missing path, neither when it looked for the alias nor when it built the package.
+
+### What changed in the spec
+
+1. The P-30 row of 23.2 is new and carries the answer.
+2. VAL-5f, the link rule, is new, with decision D-31 in 23.1. The table of 11.3 has a row for it, VAL-3 and VAL-5 cite it, and the sentence of VAL-5e that left the link open now points at it.
+3. Step 2 of 20.1 lists the symbolic links of the default-branch head as an advisory item, 19.4 names the examples of VAL-5f, and the M1a row of section 22 names the rule.
+
+### Still open
+
+- **Linux.** The host is a Linux server (D-3). Nothing here was run there. That a program which opens `.cargo/config.toml` is taken through a link by the kernel is not a property of macOS, but it was not observed on the server.
+- **Other tools.** clippy with `clippy.toml`, rustup with `rust-toolchain.toml` and `cargo deny` with `deny.toml` were not run on a link. A link at one of those names is a file path, which its pattern matches.
+- **Rename detection.** The diff was made with `--no-renames`. What the host's diff does with a link that is renamed was not looked at; either side of a rename carries the mode.
+
+## P-5, in part: a workflow behind a symbolic link
+
+Answered in part 2026-11-21 for #63, on the scratch repository `sapientpants/sf-scratch`, with the operator's token, which carries the `workflow` scope, and not an installation token. The factory's App does not exist yet, so every part of P-5 that asks what GitHub does to an App's push is still open. GitHub's documentation was not read again; VAL-5e quotes what it says about where workflows are stored.
+
+**Answer.** GitHub did not read a workflow through a symbolic link whose path is `.github/workflows` or `.github`: a push of a branch with such a link started no run and registered no workflow. A symbolic link that is itself a file of `.github/workflows` was registered as a workflow under its own path, and its run failed without a job.
+
+### Method
+
+One script built four commits without a parent in a throwaway repository and pushed each to a branch of its own. Each tree holds one workflow that runs on a push to `probe/p-5-*` and has one job with one `echo` step. The script is not kept; the branches are.
+
+| Branch | Tree | Commit |
+|---|---|---|
+| [`probe/p-5-control`](https://github.com/sapientpants/sf-scratch/tree/probe/p-5-control) | `.github/workflows/p5-control.yml`, a regular file | `bd8ee7d` |
+| [`probe/p-5-link-workflows`](https://github.com/sapientpants/sf-scratch/tree/probe/p-5-link-workflows) | `.github/workflows`, a link to `../ci`, and `ci/p5-link-workflows.yml` | `f63025f` |
+| [`probe/p-5-link-github`](https://github.com/sapientpants/sf-scratch/tree/probe/p-5-link-github) | `.github`, a link to `gh`, and `gh/workflows/p5-link-github.yml` | `ee10d85` |
+| [`probe/p-5-link-file`](https://github.com/sapientpants/sf-scratch/tree/probe/p-5-link-file) | `.github/workflows/p5-link-file.yml`, a link to `../../ci/p5-link-file.yml`, and that file | `a355ee8` |
+
+The four pushes were made one after another, at 20:22 UTC. The runs of each branch were listed with `gh run list --branch` twice in the minute after the last push and once more five minutes after it, with the same answer each time, and the repository's workflows with `GET /repos/{o}/{r}/actions/workflows`.
+
+### What GitHub did
+
+| Branch | Push | Runs | Registered workflow |
+|---|---|---|---|
+| `control` | Accepted | One, `push`, success | `.github/workflows/p5-control.yml`, named `p5-control` |
+| `link-workflows` | Accepted | None | None |
+| `link-github` | Accepted | None | None |
+| `link-file` | Accepted | One, `push`, failure, no job | `.github/workflows/p5-link-file.yml`, named by its path |
+
+The run of `link-file` is [44945911257](https://github.com/sapientpants/sf-scratch/actions/runs/44945911257). `gh run view` says of it: "This run likely failed because of a workflow file issue." Its job list is empty.
+
+### Findings
+
+**A link at the directory's name carries no workflow.** With `.github/workflows` or `.github` a link, GitHub found no workflow on the branch, though the file behind the link differs from the workflow that ran on the control branch only in the name it gives itself. So a candidate that adds such a link has not added a workflow, and VAL-5f flags the link without failing it.
+
+**A link in the directory is a workflow file that cannot be read.** GitHub registered the link's path and named the workflow by that path, not by the name in the file behind the link. The run failed before any job. Whether it parsed the link's target as the file's text was not established; it did not run the workflow behind the link. The pattern `/.github/workflows/**` matches such a path, so it fails the integrity check as any workflow change does (VAL-5e).
+
+**The operator's token pushed all four.** That says nothing about an App without the Workflows permission.
+
+### What changed in the spec
+
+1. The P-5 row of 23.2 carries this part of the answer and cites VAL-5f.
+2. VAL-5f rests on it where it leaves a link at `.github` or `.github/workflows` a `flag`.
+
+### Still open
+
+- **The App's push.** Whether GitHub rejects a push from an App without the Workflows permission that adds a link at `.github`, at `.github/workflows` or inside that directory. If it rejects the first two, a run meets the rejection at publish, after the integrity check let the link through with a flag.
+- **The default branch.** All four branches are other branches. A link on the default branch was not tried, since it would have replaced the scratch repository's `.github`.
+- **Other events.** Only `push` was tried. A factory pull request also raises `pull_request`, and its merge is a push to the default branch; neither was observed with a link.
+- **The rest of P-5.** A workflow directory below the root and one in another letter case can be observed the same way, without the App, and were not, since they are not part of #63.

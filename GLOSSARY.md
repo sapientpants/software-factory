@@ -17,7 +17,7 @@ The authorised actor who applied `state:ready` to an issue. With one human, this
 The trusted `sf` daemon process. Holds all credentials and performs all external writes.
 
 **Host**:
-The machine the control plane runs on, which is the operator's Linux server (D-3, 4.4). Where the specification says the host does something, the control plane does it there, outside every sandbox.
+The machine the control plane runs on: in operation, the operator's Linux server (D-3, 4.4). Where the specification has the host act, the control plane acts on that machine.
 
 **Worker**:
 The untrusted side: an agent process or build command and everything it spawns, inside a sandbox.

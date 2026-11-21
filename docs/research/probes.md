@@ -1447,26 +1447,26 @@ The subject validation of 9.4 did not change. It rejects "anything GH-5a forbids
 
 Answered 2026-11-21 for #17, by calls to the REST API on `sapientpants/sf-scratch`, made with `gh` 2.105.0 on the operator's OAuth token. The operator's account has admin permission on the scratch repository. The factory will add labels with an installation token; none exists yet. No research report covers the question. It came up when D-21 was written: none of the labels of 5.2 exists on the factory repository before its onboarding, and a first draft of the decision took that for a guard against `state:ready` being applied there by mistake.
 
-**Answer.** The REST API creates the label and applies it. Each of the four calls that take label names did so, under both API versions: the add-label endpoint, the call that replaces an issue's label set, an issue update with a `labels` key and an issue create with a `labels` key. Each answered with its ordinary success, and nothing in the response says the label is new. The new label is grey (`ededed`) and has no description. Only the `gh` command line refused: `gh issue edit --add-label` looks the name up first and stops with `'<name>' not found`. A name that differs from an existing label only in letter case applies the existing label and creates nothing.
+**Answer.** The REST API creates the label and applies it. Each of the four calls that take label names did so, under both API versions: the add-label endpoint, the call that replaces an issue's label set, an issue update with a `labels` key and an issue create with a `labels` key. Each answered with its ordinary success, and nothing in the response says the label is new. The new label is grey (`ededed`) and has no description. Only the `gh` command line refused: `gh issue edit --add-label` stops with `'<name>' not found`. In the one request that tried it, a name that differs from an existing label only in letter case applied the existing label and created nothing.
 
-So the absence of a label stops only a caller that looks the name up first. D-21 says so and does not rest on it.
+So the absence of a label stops only a caller that checks for the label before it writes. D-21 says so and does not rest on it.
 
 ### Method
 
-One script sent every request but the last. Each REST call was sent once under `X-GitHub-Api-Version: 2026-03-10`, the version GH-17 pins, and once under `2022-11-28`, and the server named the version in `X-GitHub-Api-Version-Selected` on every response. Before each call a read of the label by its name returned 404, and after it the same read was repeated.
+One script sent every request but the last. Each of the four REST calls that take label names was sent once under `X-GitHub-Api-Version: 2026-03-10`, the version GH-17 pins, and once under `2022-11-28`, and the server named the version in `X-GitHub-Api-Version-Selected` on every response. The `gh issue edit` command was run once; it takes no API version. Before each call a read of the label by its name returned 404, and after it the same read was repeated.
 
 ```sh
 gh api -i --method POST repos/sapientpants/sf-scratch/issues/<n>/labels \
   -H "X-GitHub-Api-Version: <version>" --input - <<< '{"labels":["<name>"]}'
 ```
 
-The label names are `p25:<call>-a` under the first version and `p25:<call>-b` under the second, with a colon as in the names of 5.2. The label calls were made on issue 117, which the script created; the two issue creates made issues 118 and 119. The request with the other letter case was sent by hand afterwards, while the labels still existed.
+The label names are `p25:<call>-a` under the first version and `p25:<call>-b` under the second, with a colon as in the names of 5.2. The label calls were made on issue 117, which the script created; the two issue creates made issues 118 and 119. The request with the other letter case was sent by hand afterwards, while the labels still existed: once, to the add-label endpoint, under `2026-03-10`.
 
-All eight labels the probe created were deleted afterwards and the three issues were closed, so the scratch repository again holds the labels it held before. The script and the responses are on the branch `prototype/missing-label-probe`, at commit [`4f02804`](https://github.com/sapientpants/software-factory/tree/4f028046e40041a1c563c9b90d7d3ae4d7543928/crates/factory-github/prototype/missing-label), with the response headers cut down to status, date, API version and request id. They are throwaway code.
+All eight labels the probe created were deleted afterwards and the three issues were closed, so the scratch repository again holds the labels it held before. The script and the responses are on the branch `prototype/missing-label-probe`, at commit [`74b8e31`](https://github.com/sapientpants/software-factory/tree/74b8e31a0a3cb2e50c38e375ebd32968f0dde0e9/crates/factory-github/prototype/missing-label), with the response headers cut down to status, date, API version and request id. The script printed each exit code and did not keep it; a note on the branch gives them. They are throwaway code.
 
 ### What each call did
 
-Both API versions gave the same status and the same outcome in every row.
+Both API versions gave the same status and the same outcome in each of the four rows sent under both. The first row and the last were each sent once.
 
 | Call | Status | The label afterwards |
 |---|---|---|
@@ -1481,17 +1481,17 @@ Every label the API created reads the same way: `"color": "ededed"`, `"descripti
 
 GraphQL was not asked to add a label. Its mutation takes the node id of a label, and the lookup of a label that does not exist, `repository.label(name:)`, returned `null`.
 
-The timeline of issue 117 holds one `labeled` event for each label added and one `unlabeled` event for each label that a replacing call removed, all with the operator as actor. No event records that a label was created, and a `labeled` event for a new label has the same shape as one for an old label.
+The timeline of issue 117 holds one `labeled` event for each label added and one `unlabeled` event for each label that a replacing call removed, all with the operator as actor. No event records that a label was created. The `labeled` event of the last row, for a label that already existed, has the same keys as the six for labels the call created; it is in the timeline as read again after that request.
 
 ### Findings
 
-**Absence is not a guard.** A session, a script or an App that adds `state:ready` by name through the REST API gets the label created and applied in one call. The command the skills use, `gh issue edit --add-label`, does fail, which is what the first draft of D-21 went by. What keeps an approval label off an issue is the rule in `AGENTS.md` that only the operator applies one, not the state of the repository's label set.
+**Absence is not a guard.** A caller with the operator's token that adds a label by name through the REST API gets the label created and applied in one call. That is the token a session on the operator's Mac holds, so it is the case D-21 is about. The command the skills use, `gh issue edit --add-label`, does fail, which is what the first draft of D-21 went by. What keeps an approval label off an issue is the rule in `AGENTS.md` that only the operator applies one, not the state of the repository's label set.
 
-**A write that names a label does not fail for the name.** The factory adds labels through the add-label endpoint (GH-1). If a label of 5.2 is missing from a target repository, or the factory's code spells a name wrong, the call succeeds and the repository gains a grey label. Step 5 of 20.1 creates the set after the onboarding merge; nothing observed here would report that the step was skipped.
+**A write that names a label did not fail for the name.** The factory adds labels through the add-label endpoint (GH-1), with an installation token, which was not tried. If that token is answered as the operator's was, a label of 5.2 that is missing from a target repository, or a name the factory's code spells wrong, shows as a new grey label and not as a failed call. Step 5 of 20.1 creates the set after the onboarding merge; nothing observed here would report that the step was skipped.
 
-**Nothing marks the label as new.** Neither the response nor the timeline tells a label that the call created from one that existed. A reader learns it only by having listed the labels before the call, or from the colour and the missing description.
+**Nothing that was read marks the label as new.** Neither the response nor the issue's timeline tells a label that the call created from one that existed. The colour does not either: `probe:p-8`, which an earlier probe created on purpose, is grey as well. A caller that has to know lists the labels before the call. Webhook deliveries and the audit log were not read.
 
-**Letter case does not make a second label.** A name in another case reaches the existing label, so `State:Ready` sent to a repository that has `state:ready` applies `state:ready`. The label then reads back under its existing name.
+**Letter case did not make a second label.** The one request in another case reached the existing label, which read back under its existing name and id. On that evidence `State:Ready` added to an issue of a repository that has `state:ready` applies `state:ready`.
 
 ### What changed in the spec
 
@@ -1505,5 +1505,7 @@ GH-1 and step 5 of 20.1 stand as they were.
 - **An installation token of the factory's App.** Every call here used the operator's OAuth token. Whether an App with write access to issues creates a label the same way was not observed.
 - **A caller with less permission.** The operator is an admin of the scratch repository. An account with the triage role may apply labels; whether it can create one by naming it was not tried.
 - **Whether the factory checks the label set by reading it.** Since a failed call never reports a missing label, a check would have to list the labels and compare them with 5.2. Nothing in the spec asks `sf repo check` to do that, and it is not decided here.
+- **Letter case on the other calls.** It was tried once, on the add-label endpoint under `2026-03-10`. The replacing call, the issue update and the issue create were not sent a name in another case.
+- **How `gh` decides.** Its error reads as a lookup of the name before any write. What it sends was not examined.
 - **A pull request.** Its labels go through the same issue endpoints. None was labelled here.
 - **Whether GitHub documents this.** The documentation was not read for it, so how long the behaviour holds is unknown.

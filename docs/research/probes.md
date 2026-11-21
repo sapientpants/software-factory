@@ -1231,3 +1231,214 @@ A rename is an event, and events have an order. The ids of the 87 events of #6 i
 - **A transferred issue, and one created by email.** Not tried.
 - **Which revisions can be deleted, and by whom.** One middle revision was deleted by the repository's owner. Whether the newest or the created text can be, and whether an editor without write permission can delete their own, was not looked at. The entry survived the one deletion made.
 - **What the hash of an empty body is.** REST gives `null` and GraphQL `""`. `title_body_sha256` (5.4) has to pick one reading, and the code that computes it does not exist yet.
+
+## P-15: encodings that neutralise mentions, references and closing keywords
+
+Answered 2026-11-21 for #16, by text written to `sapientpants/sf-scratch` on 2026-11-20 and 2026-11-21: 105 issues and pull requests, and 31 commits with the text in their messages. Part was written with `gh` on the operator's OAuth token. The rest was written by a workflow, whose token makes its writes those of `github-actions[bot]`, so that a mention of the operator is a mention by another account. The factory will write with an installation token of its own App; none exists yet. The question comes from the review of draft 1 (`09-spec-review`, finding K38; "report 09" below), which proposed the outbound encoder of GH-5a and asked for a probe of what it should emit.
+
+**Answer.** Two of the five candidates do nothing where there is Markdown. In a comment, an issue body and a pull request body, a backslash before the `@` or the `#`, and a numeric character reference in its place, left the mention notifying, the reference recorded and the pull request closing its issue. GitHub looks for all three in the text as rendered, and both encodings render to the character they stand for. In a commit message, which is not rendered, each stops some things by accident and neither stops all.
+
+A fenced block and a code span stop all three in a comment, an issue body and a pull request body. A commit message is not Markdown: a commit whose body held `Fixes #25` inside a fence closed that issue when it reached the default branch.
+
+A zero-width joiner (U+200D) or a zero-width space (U+200B) directly after the `@`, the `#` or the hyphen of `GH-` stops the mention, the reference and the closing on every surface tried, commit messages included. It is the only candidate that works on every surface.
+
+The fourth form of a reference, the URL, is matched by its path. `owner/repo/issues/<n>` is a reference with no scheme and no host, so a break after `https:` leaves it one. A zero-width space inside the path stops it.
+
+A closing keyword never acted by itself. It closed an issue only when the text directly after it was a live reference, and only in a pull request body or a commit message.
+
+### Method
+
+One line of text for each thing GitHub might act on, the same in every case:
+
+```text
+mention: @sapientpants wrote this.
+hash: see #12 for the first.
+gh: see GH-13 for the second.
+full: see sapientpants/sf-scratch#14 for the third.
+url: see https://github.com/sapientpants/sf-scratch/issues/15 for the fourth.
+close: Fixes #17.
+```
+
+| Encoding | What is written |
+|---|---|
+| `plain` | The lines as above |
+| `fence` | The six lines inside a fence of three backticks |
+| `code` | Each mention and reference in a code span: `` `#12` `` |
+| `backslash` | `\@sapientpants`, `\#12`, `GH\-13`, `sapientpants/sf-scratch\#14`, `https\://…` |
+| `zwj` | U+200D after the `@`, the `#`, the hyphen of `GH-` and the colon of `https:` |
+| `zwsp` | U+200B in the same places |
+| `entity` | `&#64;sapientpants`, `&#35;12`, `GH&#45;13`, `sapientpants/sf-scratch&#35;14`, `https&#58;//…` |
+
+| Surface | Who wrote it | Cases |
+|---|---|---|
+| A comment on an issue | The workflow | 7 |
+| A comment, set by an edit of an existing comment | The workflow | 7 |
+| An issue body | The workflow | 7, and 1 set by an edit |
+| An issue title | The workflow | 6: a title has no room for a fence |
+| A pull request body, at creation | The operator: the scratch repository's Actions setting does not let a workflow open pull requests | 7 |
+| A pull request body, set by an edit | The workflow, on pull requests the operator opened | 7 |
+| A commit subject | The workflow, and the same messages again by the operator | 6 and 6 |
+| A commit body | The workflow, and again by the operator | 7 and 7 |
+
+Each effect was read in more than one place.
+
+- **A mention.** The rendered HTML has a link of class `user-mention`, or not. The issue has a `mentioned` event, or not. And the operator's notifications for the repository, `GET /repos/{owner}/{repo}/notifications?all=true`, hold a thread of reason `mention`, or not. The operator does not watch the scratch repository, so a thread exists only where a mention made one. A thread belongs to an issue and not to a comment, so every case that the workflow wrote has an issue to itself.
+- **A reference.** The issue referred to has a `cross-referenced` event that names the issue or pull request the text is in. The four forms refer to four issues, which all cases share, since the event names its source. For a commit it is a `referenced` event that names the commit. The rendered HTML has a link of class `issue-link`, or not.
+- **A closing keyword.** Before the merge: `willCloseTarget` on the cross-reference, and the pull request's `closingIssuesReferences`. After it: the state of the issue, and the `closer` of its `closed` event. Each pull request and each commit has a target of its own to close.
+
+The 14 pull requests were merged with a merge commit, and `main` was fast-forwarded to the workflow's 13 commits, both by the operator. Every issue, pull request and commit was read through GraphQL and through `GET /issues/{n}/timeline` after each step, and once more seven hours later, when nothing had changed.
+
+Three later rounds followed, each written after the one before was read: text that arrives by an edit, and other spellings of a reference; the commit messages again as the operator's own; character references other than the decimal one, and a fence that the text ends.
+
+The workflow, `probe-p15.yml`, is on the branch `probe/p-15` of the scratch repository: one shell step, no actions, with `contents`, `issues` and `pull-requests` set to `write`, run four times as [44822844750](https://github.com/sapientpants/sf-scratch/actions/runs/44822844750), [44823392368](https://github.com/sapientpants/sf-scratch/actions/runs/44823392368), [44824730765](https://github.com/sapientpants/sf-scratch/actions/runs/44824730765) and [44869393490](https://github.com/sapientpants/sf-scratch/actions/runs/44869393490). The scripts, the text of every case, every response and the logs of the runs are on the branch `prototype/outbound-encoding-probe`, at commit [`36dddb0`](https://github.com/sapientpants/software-factory/tree/36dddb08b206d27f201fcc21261c89138b37174d/crates/factory-github/prototype/outbound-encodings). They are throwaway code, and the README there lists what went wrong on the way. Issues and pull requests #12 to #116, the probe's branches, and 41 commits on `main` stay on the scratch repository.
+
+### In a comment, an issue body and a pull request body
+
+The five Markdown surfaces agree in every one of their 36 cases.
+
+| Encoding | Mention | `#n`, `GH-n`, `owner/repo#n` | URL | Closing keyword |
+|---|---|---|---|---|
+| `plain` | Live | Live | Live | Live |
+| `fence` | Stopped | Stopped | Stopped | Stopped |
+| `code` | Stopped | Stopped | Stopped | Stopped |
+| `backslash` | Live | Live | Live | Live |
+| `zwj` | Stopped | Stopped | Live | Stopped |
+| `zwsp` | Stopped | Stopped | Live | Stopped |
+| `entity` | Live | Live | Live | Live |
+
+A live mention is a `user-mention` link in the HTML and, wherever the workflow wrote the text on an issue, a notification. A live reference is an `issue-link` and a `cross-referenced` event on the target. Where the table says stopped there is no link, no event and no notification, and the text shows as it was written.
+
+A live closing keyword is live only in a pull request body. There the cross-reference has `willCloseTarget`, the pull request lists the issue, and the merge closed it, with the pull request as the `closer`: six issues, for `plain`, `backslash` and `entity`, at creation and by an edit. The eight targets of the other four encodings are open. In a comment or an issue body a plain `Fixes #17` is a cross-reference without `willCloseTarget`, and the issue stays open.
+
+The URL stayed live under `zwj` and `zwsp` because the break was after the colon of `https:`. "Other spellings" below has the breaks that work.
+
+### By an edit
+
+The factory edits its status comment in place (5.4), so most of what it writes arrives by an edit. A comment whose body the workflow replaced with the text behaved in all seven encodings as a comment created with it: the same links, the same cross-references, and a notification for `plain`, `backslash` and `entity`. An issue body replaced with the plain text notified as well. A pull request body replaced with the text gave the same cross-references and closed the same issues as one created with it.
+
+An edited comment is slower to notify. The thread of a new comment or a new issue body is dated 22 to 24 seconds after the write, and that of the edited issue body 19 seconds after the edit. The threads of the three edited comments are dated 46 or 47 seconds after the edit, and on the one looked at the `mentioned` event came 26 seconds after it.
+
+### In an issue title
+
+Each title held a mention and `#16`, and neither acted. The six titles, the plain one among them, have no link in `titleHTML`, left no `mentioned` event and no notification, and made no cross-reference on the issue they name. Pull request titles were not tried.
+
+### In a commit message
+
+The workflow pushed its 13 commits to a branch. Their messages render, in `messageHeadlineHTML` and `messageBodyHTML`, as follows. A subject held the mention, `#n` and the keyword only, and rendered them as the body of its encoding did:
+
+| Encoding | Mention | `#n` | `GH-n` | `owner/repo#n` | URL | Keyword marked as closing |
+|---|---|---|---|---|---|---|
+| `plain` | Link | Link | Link | Link | Link | Yes |
+| `fence` | Link | Link | Link | Link | Link | Yes |
+| `code` | None | Link | Link | Link | A link that takes the closing backtick into its address | No |
+| `backslash` | Link | Link | None | Link | Link | No |
+| `zwj`, `zwsp` | None | None | None | None | Link | No |
+| `entity` | None | None | None | None | Link | No |
+
+When `main` was fast-forwarded to these commits, three issues closed within two seconds, each with the commit as `closer` and the operator, who pushed, as actor: the targets of the plain subject, the plain body and the fenced body. The other ten are open.
+
+Under `code` and `backslash` the reference after the keyword is still a reference, and the keyword is not marked. `Fixes #22` closes; ``Fixes `#29` `` and `Fixes \#33` do not.
+
+The `entity` row hides a second effect. In a commit message `&#64;sapientpants` is not decoded. It renders as `&`, a link to issue #64, and `;sapientpants`. `&#35;`, `&#45;` and `&#58;` became links to #35, #45 and #58 in the same way, and those four issues, which the text never meant, got six `referenced` events from the operator's two commits of those messages.
+
+None of the workflow's commits left an event anywhere but the three closings: no `referenced` event on any issue, on the branch or on `main`, that day or the next, and no notification. So the 13 messages were committed again by the operator and pushed to a branch that is never merged. Those left a `referenced` event on a target wherever the table has a link to it, and nowhere else: 27 events, and the six on the wrong issues. Three more commits by the operator narrow down why. An empty commit, a commit of a file, and a commit with the bot's name as author and committer each left its event. What leaves none is a push made with the workflow's token.
+
+### Other spellings
+
+Each in a comment, with a target of its own, and six of them also in a commit message.
+
+| Text | Reference |
+|---|---|
+| `github.com/sapientpants/sf-scratch/issues/80` | Yes |
+| `sapientpants/sf-scratch/issues/81` | Yes |
+| `gh-85` | Yes |
+| `https://github.com/sapientpants/sf-scratch/pull/47` | Yes, on the pull request. In a comment only |
+| `https://github.com/sapientpants/sf-scratch/issues/` U+200B `82` | No |
+| `https://github.com/sapientpants/sf-scratch/` U+200B `issues/83` | No |
+| `https://github.com/` U+200B `sapientpants/sf-scratch/issues/84` | No |
+| `https:` U+200B `//github.com/sapientpants/sf-scratch/issues/` U+200B `97` | No. In a comment only |
+
+The comment and the operator's commit agree on the six that both had. In a comment the three URLs with one break are still links, to an address that holds `%E2%80%8B` and names nothing. With a second break after the scheme the text is not a link at all.
+
+### Character references
+
+The decimal reference of the first round is one of several ways to write the character. Each of these was an issue body or a line of a comment by the workflow.
+
+| Text | What it did |
+|---|---|
+| `&#x40;sapientpants`, `&commat;sapientpants` | A mention, with a notification |
+| `&num;100`, `&#x23;101` | A reference |
+| `&amp;#105;` | A reference to #105: the escaped `&` leaves `#105` behind |
+| `&#x40;`, `&commat;`, `&num;` and `&#x23;` with U+200B after the `&`; `&#64;` and `&#35;` with it after the `&` and after the `#` | Nothing. The text shows as written |
+| `&#64;sapientpants` and `&#x40;sapientpants` inside a fence | Nothing |
+
+### A fence that the text ends
+
+An issue body began a fence of three backticks, and the text in it held a line of three backticks, then a plain mention and `#106`. The fence ended at that line. The mention notified and the reference was recorded. The same text inside a fence of four backticks did nothing.
+
+### What tells that a mention notified
+
+Of the 36 cases that the workflow wrote on an issue of its own, 13 notified and 23 did not, and the `user-mention` link in the HTML is there in exactly the 13.
+
+The `mentioned` event is a poorer sign. A comment that notified has one. An issue body that notified has none, in all seven such cases. And the pull requests have one without a notification: at creation the operator mentioned themself, and by the edit the workflow mentioned the author of the pull request, and neither produced a thread. Whether the edit would have notified someone other than the author was not observed.
+
+### Findings
+
+**The two encodings a programmer reaches for first do nothing where it matters.** A backslash escape and a character reference are how Markdown and HTML make a character literal. On a Markdown surface GitHub finds mentions and references after rendering, where both have become the bare character. In a commit message a backslash still left the mention, `#n` and the URL live. An encoder built on either would pass every test that compares rendered text and stop nothing.
+
+**A fence is enough where there is Markdown, and only there.** It stopped everything on five surfaces. In a commit message it is three backticks on a line, and the issue closed.
+
+**A zero-width character after the `@`, the `#` or the hyphen works everywhere.** The joiner and the space did the same in every pair of cases. It needs no fence, so it is what PLAN-5 can use for a sub-issue body. It is also invisible, and it stays in the text: a reader who copies a neutralised `#12` copies a character they cannot see.
+
+**The spec says U+200B.** The operator was told on 2026-11-21 that it would unless they preferred the joiner, and said to continue. SEC-4 already removes zero-width characters from text the factory reads, so a sub-issue body written with them is read back without them.
+
+**A URL is a reference by its path.** Removing or breaking the scheme, the usual way to stop a link, leaves `owner/repo/issues/<n>` and the cross-reference. The break has to be in the path. A second one after the scheme keeps the reader from a link that leads nowhere.
+
+**A closing keyword needs nothing of its own.** In every case with a keyword, an issue closed only where the reference after it was live, and only from a pull request body or a commit on the default branch. A keyword with a neutralised reference after it closed nothing, which is what GH-5a assumes when it lets `fix: handle empty input` pass.
+
+**A character reference is a spelling of the `@` or the `#`, not an encoding of it.** `&#64;`, `&#x40;` and `&commat;` are each a live `@` in Markdown, and `&num;` and `&#x23;` a live `#`. Escaping the `&` does not help: it leaves `#<digits>;`, a reference. A zero-width space after the `&` stopped every one. In a commit message the decimal reference is worse than useless, because `&#35;` there is a reference to issue 35.
+
+**Text that ends its fence is live.** The fence has to be longer than every run of backticks in the text it holds. With that, the fence did not fail.
+
+**An edit is a write.** Text set by an edit mentioned, referred and closed as text written new. The status comment gets no easier treatment than a new comment.
+
+**A title is safe as far as it was tried.** A mention and `#n` in an issue title did nothing. PLAN-5 still applies the insertions to a sub-issue title; whether it need not is the operator's to decide.
+
+**A push with the workflow's token leaves no reference events, and still closes.** It is the push that decides, not the name on the commit. What a push with the factory App's installation token leaves is not known.
+
+**The rendered HTML is the test.** The `user-mention` link agreed with the notification in 36 of 36 cases, and the `issue-link` with the cross-reference in every case on an issue or a pull request. A contract test of the encoder can read `bodyHTML` with one account. It cannot rely on the `mentioned` event.
+
+### Against reports 09 and 10
+
+- K38 proposed that the encoder "additionally escapes `#`, `@` and closing keywords". An escape in the usual sense, a backslash or a character reference, stops none of them.
+- K38 said that commit subjects "have no markup". That holds, and it cuts both ways: no fence or code span protects there, and a character reference is read as an issue number.
+- C30 of `10-spec-recheck` said that a closing keyword with no reference closes nothing. It closed nothing in any case here.
+- C29 of `10-spec-recheck` proposed, for the plan comment, a fence "longer than any backtick run in the body". The spec did not take that sentence. The fence that the text ended shows it is needed, and for every fence.
+
+### What changed in the spec
+
+1. GH-5a says how a mention and a reference are neutralised: a zero-width space after every `@`, after a `#` before a digit, after the hyphen of `GH-`, before the number in the path of an issue or a pull request and after the scheme, and after an `&` that could begin a character reference. It forbids a backslash escape and a character reference for the purpose.
+2. GH-5a no longer lists closing keywords among the things neutralised. A keyword is left as it is, since it acts only through the reference after it.
+3. GH-5a says that the fence is longer than every run of backticks in the text.
+4. GH-5a lists the forms of a reference once, for the insertions and for the commit subjects it rejects. The list is wider than it was: a `#` before a digit wherever it stands, which includes `&#35;`; `GH-` in any letter case; the path of an issue with or without its scheme and host; the path of a pull request.
+5. PLAN-5 says that the zero-width spaces are part of the bytes of a sub-issue body, and that SEC-4 removes them on the way back in.
+6. 9.4 builds the pull request title and the squash title from the issue title after SEC-4, with every reference of GH-5a removed. It said "any issue reference or issue URL", which was a second list of the forms.
+7. The P-15 row of 23.2 carries the answer.
+
+GH-5a still asks for both the fence and the insertions, as it did. The fence alone was enough on every Markdown surface. The insertions are what protect a sub-issue body, which has no fence. The cost of keeping both is that agent output shown in a fence carries invisible characters: a line such as `@property` or `issue #3` copied out of a status comment is not the line the agent wrote. The insertion after `&` costs more in a sub-issue body, where it shows: `&amp;` no longer renders as `&`, and a link whose address has `&b=` in it leads somewhere else.
+
+The subject validation of 9.4 did not change. It rejects "anything GH-5a forbids".
+
+### Still open
+
+- **An installation token of the factory's App.** Every write here is the operator's or the Actions App's. A push with the workflow's token left no reference events; what the factory's push leaves was not observed.
+- **A notification from a commit message.** None arrived. The only commits that mention another account were pushed with the workflow's token, whose pushes also left no reference events, so this says little. GH-5a does not reject a mention in a commit subject, and whether it should is not decided.
+- **A mention in a pull request body of someone other than its author.** The workflow may not open pull requests on the scratch repository, and its edit mentioned the author.
+- **A team mention.** `@org/team` needs an organisation. The zero-width space after the `@` should break it like any other mention; it was not seen.
+- **A second repository.** Every reference here is to the scratch repository itself. `owner/other#n` was not written, because it would have left an event on another repository.
+- **Other surfaces.** A pull request title, a review, a review comment, a commit comment and the output of a check run (5.5) were not written to.
+- **What GH-5a asks for beyond what was seen.** The break inside the path of a URL was tried in a comment and in a commit message, not in an issue body, a pull request body or an edit. A pull request URL was seen to be a reference; one with the break in it was not written. `GH-<n>` and the URL forms were in commit bodies, not in subjects. No neutralised text was set as an issue body by an edit. A title held a mention and `#n`, not the other forms or a keyword. In each of these GH-5a goes by the surface next to it.
+- **Other spellings.** `owner/repo/pull/<n>` without a host, a pull request URL in a commit message, a discussion URL, a commit SHA, and a keyword followed by a colon were not tried. The encoder's forms cover the first two on the strength of the issue path.
+- **Other characters.** The word joiner (U+2060) and the other invisible characters were not tried.
+- **The default squash message.** A squash merge that takes its message from the pull request body would carry the body's text into a commit message. The factory passes its own message (5.6), and no squash was made here.
+- **How long this holds.** None of it is documented behaviour. The encoder needs a contract test against GitHub that fails when a neutralised mention renders as a link.

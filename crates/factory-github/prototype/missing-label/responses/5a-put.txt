@@ -1,0 +1,6 @@
+HTTP/2.0 200 OK
+Date: Sat, 21 Nov 2026 07:31:15 GMT
+X-Github-Api-Version-Selected: 2026-03-10
+X-Github-Request-Id: E9F0:1733:3331C0A:4E80D8B:6B0148C2
+
+[{"id":13166349871,"node_id":"LA_kwDOVzkiD88AAAADEMaOLw","url":"https://api.github.com/repos/sapientpants/sf-scratch/labels/p25:put-a","name":"p25:put-a","color":"ededed","default":false,"description":null,"archived_at":null,"archived_by":null}]

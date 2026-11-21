@@ -1,0 +1,6 @@
+HTTP/2.0 200 OK
+Date: Sat, 21 Nov 2026 07:31:20 GMT
+X-Github-Api-Version-Selected: 2022-11-28
+X-Github-Request-Id: F558:1CDDC1:4D79293:759E2D6:6B0148C8
+
+{"id":13166350527,"node_id":"LA_kwDOVzkiD88AAAADEMaQvw","url":"https://api.github.com/repos/sapientpants/sf-scratch/labels/p25:post-b","name":"p25:post-b","color":"ededed","default":false,"description":null,"archived_at":null,"archived_by":null}

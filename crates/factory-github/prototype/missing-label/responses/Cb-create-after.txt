@@ -1,0 +1,6 @@
+HTTP/2.0 200 OK
+Date: Sat, 21 Nov 2026 07:31:26 GMT
+X-Github-Api-Version-Selected: 2022-11-28
+X-Github-Request-Id: EBC4:FE008:454E034:698FE79:6B0148CD
+
+{"id":13166351217,"node_id":"LA_kwDOVzkiD88AAAADEMaTcQ","url":"https://api.github.com/repos/sapientpants/sf-scratch/labels/p25:create-b","name":"p25:create-b","color":"ededed","default":false,"description":null,"archived_at":null,"archived_by":null}

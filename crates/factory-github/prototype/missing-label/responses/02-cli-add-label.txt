@@ -1,0 +1,2 @@
+failed to update https://github.com/sapientpants/sf-scratch/issues/117: 'p25:cli' not found
+failed to update 1 issue

@@ -1,0 +1,6 @@
+HTTP/2.0 200 OK
+Date: Sat, 21 Nov 2026 07:32:00 GMT
+X-Github-Api-Version-Selected: 2026-03-10
+X-Github-Request-Id: FE10:2D801A:4694987:6B88888:6B0148EF
+
+[{"id":13166349700,"node_id":"LA_kwDOVzkiD88AAAADEMaNhA","url":"https://api.github.com/repos/sapientpants/sf-scratch/labels/p25:post-a","name":"p25:post-a","color":"ededed","default":false,"description":null,"archived_at":null,"archived_by":null},{"id":13166351021,"node_id":"LA_kwDOVzkiD88AAAADEMaSrQ","url":"https://api.github.com/repos/sapientpants/sf-scratch/labels/p25:patch-b","name":"p25:patch-b","color":"ededed","default":false,"description":null,"archived_at":null,"archived_by":null}]

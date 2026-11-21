@@ -1,0 +1,6 @@
+HTTP/2.0 404 Not Found
+Date: Sat, 21 Nov 2026 07:31:11 GMT
+X-Github-Api-Version-Selected: 2022-11-28
+X-Github-Request-Id: F4A1:356B:4186C51:643C7AB:6B0148BF
+
+{"message":"Not Found","documentation_url":"https://docs.github.com/rest/issues/labels#get-a-label","status":"404"}gh: Not Found (HTTP 404)

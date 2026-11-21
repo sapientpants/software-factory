@@ -1,0 +1,88 @@
+git version 2.56.1
+== git commit
+git commit -m x                                                    hook ran
+git commit --no-verify -m x                                        hook skipped
+git commit -n -m x                                                 hook skipped
+git commit -nm x                                                   hook skipped
+git commit -anm x                                                  hook skipped
+git commit -qn -m x                                                hook skipped
+git commit -m x -n                                                 hook skipped
+git commit -F ../message -n                                        hook skipped
+git commit -nF ../message                                          hook skipped
+git commit --no-verif -m x                                         hook skipped
+git commit --no-veri -m x                                          hook skipped
+git commit --no-ver -m x                                           exit code 129: error: ambiguous option: no-ver (could be --no-verbose or --no-verify)
+git commit --no-ve -m x                                            exit code 129: error: ambiguous option: no-ve (could be --no-verbose or --no-verify)
+git commit --no-v -m x                                             exit code 129: error: ambiguous option: no-v (could be --no-verbose or --no-verify)
+git commit --no-verify --verify -m x                               hook ran
+git commit -m x --verify --no-verify                               hook skipped
+git commit -m x --veri                                             hook ran
+git commit -m -n                                                   hook ran
+git commit -mnaming                                                hook ran
+git commit -F../message                                            hook ran
+git commit --message -n                                            hook ran
+git commit --message=-n                                            hook ran
+git commit --mess -n                                               hook ran
+git commit -m x -- -n                                              exit code 1: error: pathspec '-n' did not match any file(s) known to git
+git -C . commit -n -m x                                            hook skipped
+/opt/homebrew/bin/git commit -n -m x                               hook skipped
+git --no-pager -c user.name=n commit -m x                          hook ran
+git commit --mess -- -n                                            hook skipped
+git commit --mes x -n                                              hook skipped
+== git commit, written for the shell
+sh -c git 2>/dev/null commit -n -m x                               hook skipped
+bash -c git commit -F <(echo message) -n                           hook skipped
+bash -c git commit -m x $'-n'                                      hook skipped
+bash -c echo $((1<<2)) >/dev/null
+git commit -n -m x               hook skipped
+bash -c N=-n; git commit $N -m x                                   hook skipped
+== core.hooksPath given for one command
+git -c core.hooksPath=/dev/null commit -m x                        hook skipped
+git -c CORE.HooksPath=/dev/null commit -m x                        hook skipped
+git --config-env=core.hooksPath=HOME commit -m x                   hook skipped
+git --config-env core.hooksPath=HOME commit -m x                   hook skipped
+env GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.hooksPath GIT_CONFIG_VALUE_0=/dev/null git commit -m x hook skipped
+env GIT_CONFIG_PARAMETERS='core.hooksPath'='/dev/null' git commit -m x hook skipped
+== git push
+git push o main                                                    hook ran
+git push -n o main                                                 hook ran
+git push --no-verify -n o main                                     hook skipped
+git push --no-veri -n o main                                       hook skipped
+git push --no-ver -n o main                                        exit code 129: error: ambiguous option: no-ver (could be --no-verbose or --no-verify)
+git push -n o main --no-verify                                     hook skipped
+git push --no-verify --verify -n o main                            hook ran
+git push -o --no-verify -n o main                                  hook ran
+git push -o -- --no-verify -n o main                               hook skipped
+git push --push-opt -- --no-verify -n o main                       hook skipped
+== what a hook is handed
+-- from the top of the work tree
+  directory: <work>/reporting
+  GIT_EDITOR=:
+  GIT_EXEC_PATH=/opt/homebrew/opt/git/libexec/git-core
+  GIT_INDEX_FILE=.git/index
+  GIT_PREFIX=
+-- from a subdirectory
+  directory: <work>/reporting
+  GIT_EDITOR=:
+  GIT_EXEC_PATH=/opt/homebrew/opt/git/libexec/git-core
+  GIT_INDEX_FILE=.git/index
+  GIT_PREFIX=sub/
+-- from a linked worktree, with the relative core.hooksPath
+  directory: <work>/linked
+  GIT_DIR=<work>/reporting/.git/worktrees/linked
+  GIT_EDITOR=:
+  GIT_EXEC_PATH=/opt/homebrew/opt/git/libexec/git-core
+  GIT_INDEX_FILE=<work>/reporting/.git/worktrees/linked/index
+  GIT_PREFIX=
+-- from the top, with a path argument
+  directory: <work>/reporting
+  GIT_EDITOR=:
+  GIT_EXEC_PATH=/opt/homebrew/opt/git/libexec/git-core
+  GIT_INDEX_FILE=<work>/reporting/.git/next-index-87923.lock
+  GIT_PREFIX=
+-- with the hook's executable bit removed
+hint: The '.githooks/pre-commit' hook was ignored because it's not set as executable.
+hint: You can disable this warning with `git config set advice.ignoredHook false`.
+  exit code 0
+-- git rev-parse --local-env-vars
+GIT_ALTERNATE_OBJECT_DIRECTORIES GIT_CONFIG GIT_CONFIG_PARAMETERS GIT_CONFIG_COUNT GIT_OBJECT_DIRECTORY GIT_DIR GIT_WORK_TREE GIT_IMPLICIT_WORK_TREE GIT_GRAFT_FILE GIT_INDEX_FILE GIT_NO_REPLACE_OBJECTS GIT_REPLACE_REF_BASE GIT_PREFIX GIT_SHALLOW_FILE GIT_COMMON_DIR 

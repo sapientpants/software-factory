@@ -32,7 +32,7 @@ nothing of a session that holds it is written to the results.
 
 Every session runs on the `haiku` alias; in one case the subagent runs on
 `sonnet`. A whole pass reported about 0.12 API-equivalent dollars (the sum of
-the last `total_cost_usd` of each session).
+the last `total_cost_usd` of each session), and the 47 kept sessions 0.26.
 
 ## Results
 
@@ -53,11 +53,11 @@ line.
 - `results/pass-2`, `results/pass-3`: the five cases in which a budget cap is
   reached while a subagent runs, again. What the stream shows there differs
   from run to run.
-- `results/first-runs`: the sessions run while the harness was written, kept
-  because they hold outcomes the passes may not repeat. The harness changed
-  between them: the chain had six files in the first, the budgets were other
-  values, and the first version slept in the read loop, so `_t` is late there
-  for lines that arrived during a pause.
+- `results/first-runs`: the 17 sessions run while the cases were being added,
+  with the same chains and budgets. They are counted with the passes. Three
+  earlier sessions, with a chain of six files and a read loop that slept, were
+  not kept.
+- `results/sums.txt`: the output of `sums.py` over all four directories.
 
 ## How a case is driven
 

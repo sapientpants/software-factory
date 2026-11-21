@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) and other coding age
 
 ## State of the repository
 
-Start of milestone M0. The repository holds a spec, its evidence and a Cargo workspace of empty crates (SPEC 19.1).
+Start of milestone M0. The repository holds a spec, its evidence and a Cargo workspace whose crates are empty, except `xtask` (SPEC 19.1).
 
 - `SPEC.md` is the single source of truth for the design. Its status row says which draft it is and whether that draft was reviewed.
 - `GLOSSARY.md` defines the spec's terms. Use each term as defined there, in code, documents and issues alike.
@@ -26,7 +26,8 @@ Where to read in `SPEC.md`:
 ## How work is done here
 
 - **One issue, one branch, one pull request** (D-16, BOOT-1). Work on a branch, open a pull request that closes the issue, and leave the merge to the operator.
-- **Checks before each commit** (DEV-1), each of which must pass: `cargo fmt --all --check`; `cargo clippy --workspace --all-targets --locked -- -D warnings`; `cargo test --workspace --locked`. The rest of the SPEC 19.5 set (DEV-2), the `cargo xtask check` command that runs it (DEV-1), the development VM (DEV-3) and the CI workflow (DEV-5) are still M0 work; add each here when it exists.
+- **`cargo xtask check` before each commit** (DEV-1); it must pass. It runs the checks of the SPEC 19.5 set (DEV-2) that are built. The rest of that set, the development VM (DEV-3) and the CI workflow (DEV-5) are still M0 work; add each here when it exists.
+- **Every commit goes through the pre-commit hook** (DEV-9), which runs the same command. When it refuses a commit, fix what it reports and commit again with the hook in place; a Claude Code session is refused a commit or a push that skips it (DEV-10). A Claude Code session points the clone at the hook when it starts; any other clone needs `git config core.hooksPath .githooks` once.
 - **The server is the operator's** (D-16). Every step on it is theirs to run: write the command or script, hand it over, and work from the output they bring back.
 - **Live GitHub runs go to the scratch repository**, `sapientpants/sf-scratch`: probes (SPEC 23.2) and development builds of `sf` (BOOT-2). This repository receives only the issue, branch and pull request of the work itself.
 

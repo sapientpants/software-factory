@@ -1,0 +1,10 @@
+#!/bin/sh
+# The pre-commit hook of this repository (SPEC DEV-9). It runs the one check
+# command of DEV-1 and holds no check of its own.
+
+# Git exports the repository and index of the commit being made (GIT_DIR,
+# GIT_INDEX_FILE and the like). Drop them, so that a test which runs git in a
+# directory of its own works on its own repository.
+unset $(git rev-parse --local-env-vars)
+
+exec cargo xtask check

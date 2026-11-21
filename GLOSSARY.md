@@ -40,6 +40,9 @@ One execution of a stage: one agent session, one capture, or one verify command 
 **Round**:
 One trip back to the implement stage after a failed gate.
 
+**Turn**:
+One model call of an agent session. A session's turn limit counts them (BUD-6).
+
 **Workspace**:
 The directory tree in which the implementer works. It lives for one attempt, or until a base update rebuilds it (12.4).
 

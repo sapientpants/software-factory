@@ -2002,13 +2002,13 @@ The blob of a link is its target as written: `git cat-file -p` of the entry `.ca
 - **Other tools.** clippy with `clippy.toml`, rustup with `rust-toolchain.toml` and `cargo deny` with `deny.toml` were not run on a link. A link at one of those names is a file path, which its pattern matches.
 - **Rename detection.** The diff was made with `--no-renames`. What the host's diff does with a link that is renamed was not looked at; either side of a rename carries the mode.
 
-## P-5, in part: a workflow behind a symbolic link
+## P-5, in part: what GitHub takes for a workflow
 
-Answered in part 2026-11-21 for #63, on the scratch repository `sapientpants/sf-scratch`, with the operator's token, which carries the `workflow` scope, and not an installation token. The factory's App does not exist yet, so every part of P-5 that asks what GitHub does to an App's push is still open. GitHub's documentation was not read again; VAL-5e quotes what it says about where workflows are stored.
+Answered in part 2026-11-21 for #63, and further for #67 the same day, on the scratch repository `sapientpants/sf-scratch`, with the operator's token, which carries the `workflow` scope, and not an installation token. The factory's App does not exist yet, so every part of P-5 that asks what GitHub does to an App's push is still open. GitHub's documentation was not read again; VAL-5e quotes what it says about where workflows are stored.
 
-**Answer.** GitHub did not read a workflow through a symbolic link whose path is `.github/workflows` or `.github`: a push of a branch with such a link started no run and registered no workflow. A symbolic link that is itself a file of `.github/workflows` was registered as a workflow under its own path, and its run failed without a job.
+**Answer.** GitHub took a file for a workflow only where its path is `.github/workflows/<name>` at the repository root, in that letter case, with no symbolic link at either directory name. It did not read a workflow through a symbolic link whose path is `.github/workflows` or `.github`: such a link started no run on a push to another branch, on a push to the default branch or for a pull request. It read none in `sub/.github/workflows`, in `.GitHub/workflows` or in `.github/Workflows`. A symbolic link that is itself a file of `.github/workflows` was registered as a workflow under its own path, and its run failed without a job.
 
-### Method
+### Method of the first run
 
 One script built four commits without a parent in a throwaway repository and pushed each to a branch of its own. Each tree holds one workflow that runs on a push to `probe/p-5-*` and has one job with one `echo` step. The script is not kept; the branches are.
 
@@ -2021,7 +2021,7 @@ One script built four commits without a parent in a throwaway repository and pus
 
 The four pushes were made one after another, at 20:22 UTC. The runs of each branch were listed with `gh run list --branch` twice in the minute after the last push and once more five minutes after it, with the same answer each time, and the repository's workflows with `GET /repos/{o}/{r}/actions/workflows`.
 
-### What GitHub did
+### What GitHub did in the first run
 
 | Branch | Push | Runs | Registered workflow |
 |---|---|---|---|
@@ -2032,22 +2032,62 @@ The four pushes were made one after another, at 20:22 UTC. The runs of each bran
 
 The run of `link-file` is [44945911257](https://github.com/sapientpants/sf-scratch/actions/runs/44945911257). `gh run view` says of it: "This run likely failed because of a workflow file issue." Its job list is empty.
 
+### The second run
+
+Made 2026-11-21 for #67, from 20:40 UTC, after the first and by the same method: three scripts, not kept, with the operator's token. It tried what the first run left open and what D-30 had taken from the documentation alone.
+
+**Other branches, a push.** Four more commits without a parent, each on a branch of its own, with a workflow that runs on a push to `probe/p-5-*`. The trees were built with `git update-index --cacheinfo`, so that the Mac's file system folded no name.
+
+| Branch | Tree | Commit | Runs |
+|---|---|---|---|
+| [`probe/p-5-control2`](https://github.com/sapientpants/sf-scratch/tree/probe/p-5-control2) | `.github/workflows/p5-control2.yml` | `7324bd9` | One, `push`, success |
+| [`probe/p-5-nested`](https://github.com/sapientpants/sf-scratch/tree/probe/p-5-nested) | `sub/.github/workflows/p5-nested.yml` | `1d7ef24` | None |
+| [`probe/p-5-case`](https://github.com/sapientpants/sf-scratch/tree/probe/p-5-case) | `.GitHub/workflows/p5-case.yml` | `73efb3d` | None |
+| [`probe/p-5-case-dir`](https://github.com/sapientpants/sf-scratch/tree/probe/p-5-case-dir) | `.github/Workflows/p5-case-dir.yml` | `541700f` | None |
+
+Of the four, `GET /repos/{o}/{r}/actions/workflows` lists `.github/workflows/p5-control2.yml` and no other.
+
+**The default branch, a push.** Four commits on `main`, each pushed by itself, 25 seconds apart, with a workflow that runs on a push to `main`. The last commit has the tree that `main` had before the first, `a05138d`.
+
+| Commit | Tree | Runs |
+|---|---|---|
+| `417a8e6` | `.github/workflows/p5-main-control.yml`, a regular file | One, `push`, success |
+| `3052c63` | `.github/workflows`, a link to `../ci`, and `ci/p5-main-link-workflows.yml` | None |
+| `0d47f4d` | `.github`, a link to `gh`, with `gh/workflows/p5-main-link-github.yml` and the issue form moved to `gh/ISSUE_TEMPLATE/` | None |
+| `54c6fb5` | The tree as it was | None |
+
+**A pull request.** Two branches off `main`, each with a workflow that runs on `pull_request`, and one pull request from each into `main`. Both were closed unmerged.
+
+| Pull request | Head | Tree adds | Runs |
+|---|---|---|---|
+| [#120](https://github.com/sapientpants/sf-scratch/pull/120) | `probe/p-5-pr-control`, `0c22cc7` | `.github/workflows/p5-pr-control.yml` | One, `pull_request`, success |
+| [#121](https://github.com/sapientpants/sf-scratch/pull/121) | `probe/p-5-pr-link`, `cca93ad` | `.github/workflows`, a link to `../ci`, and `ci/p5-pr-link.yml` | None, and no check on the pull request |
+
+The runs of the repository were listed from 20:41 to 20:45 UTC, the last time 2 minutes after the last push. In all that time they were the three in the tables.
+
 ### Findings
 
 **A link at the directory's name carries no workflow.** With `.github/workflows` or `.github` a link, GitHub found no workflow on the branch, though the file behind the link differs from the workflow that ran on the control branch only in the name it gives itself. So a candidate that adds such a link has not added a workflow, and VAL-5f flags the link without failing it.
 
 **A link in the directory is a workflow file that cannot be read.** GitHub registered the link's path and named the workflow by that path, not by the name in the file behind the link. The run failed before any job. Whether it parsed the link's target as the file's text was not established; it did not run the workflow behind the link. The pattern `/.github/workflows/**` matches such a path, so it fails the integrity check as any workflow change does (VAL-5e).
 
-**The operator's token pushed all four.** That says nothing about an App without the Workflows permission.
+**A workflow directory below the root holds no workflow.** `sub/.github/workflows/p5-nested.yml` started no run and was not registered. VAL-5e flags a change there through `.github/**` and does not fail it, on the reading of the documentation that this confirms.
+
+**Neither does one in another letter case.** GitHub took no file under `.GitHub/workflows` or under `.github/Workflows` for a workflow. VAL-5e fails a change at such a path, because the fold of VAL-5d applies to every pattern and a case-insensitive file system takes the two names for one directory. For GitHub it is a `fail` too many.
+
+**The default branch and a pull request read a link as another branch does.** With `.github/workflows` or `.github` a link on `main`, a push started no run, and a pull request whose head held such a link got no run and no check. So a factory pull request that adds one of those links brings no workflow to its own checks, and its merge brings none to the default branch.
+
+**The operator's token made every push.** That says nothing about an App without the Workflows permission.
 
 ### What changed in the spec
 
 1. The P-5 row of 23.2 carries this part of the answer and cites VAL-5f.
 2. VAL-5f rests on it where it leaves a link at `.github` or `.github/workflows` a `flag`.
+3. After the second run: the P-5 row carries the whole of this answer, VAL-5e says of a nested directory and of another letter case what was observed, and VAL-5f names the default branch and a pull request among what was observed. No outcome of a rule changed.
 
 ### Still open
 
-- **The App's push.** Whether GitHub rejects a push from an App without the Workflows permission that adds a link at `.github`, at `.github/workflows` or inside that directory. If it rejects the first two, a run meets the rejection at publish, after the integrity check let the link through with a flag.
-- **The default branch.** All four branches are other branches. A link on the default branch was not tried, since it would have replaced the scratch repository's `.github`.
-- **Other events.** Only `push` was tried. A factory pull request also raises `pull_request`, and its merge is a push to the default branch; neither was observed with a link.
-- **The rest of P-5.** A workflow directory below the root and one in another letter case can be observed the same way, without the App, and were not, since they are not part of #63.
+- **The App's push.** Whether GitHub rejects a push from an App without the Workflows permission that adds a link at `.github`, at `.github/workflows` or inside that directory, or a file in a workflow directory below the root or in another letter case. If it rejects one that the integrity check lets through with a flag, a run meets the rejection at publish.
+- **Other events.** `push` and `pull_request` were tried. `schedule`, `workflow_dispatch` and `pull_request_target` were not.
+- **A merged link.** No pull request with a link was merged. The push of the same tree to the default branch was observed in its place.
+- **A link in the directory, on the default branch.** The link that is itself a workflow file was tried on another branch only.

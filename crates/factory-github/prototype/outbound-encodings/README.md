@@ -2,7 +2,7 @@
 
 Throwaway scripts and their output for probe P-15 of SPEC 23.2 (#16). Not for merging. The record is the P-15 section of `docs/research/probes.md`; this directory is the evidence behind it.
 
-The scripts write to `sapientpants/sf-scratch` with the `gh` login of whoever runs them. They create issues, pull requests and branches and leave them there, they push a workflow to the branch `probe/p-15` of that repository, and `land.sh` puts 13 empty commits and 14 merge commits on its `main`. The workflow's writes are those of `github-actions[bot]`, so a mention of the operator in them is a mention by another account, and the operator is notified. The shell scripts are `bash` scripts.
+The scripts write to `sapientpants/sf-scratch` with the `gh` login of whoever runs them. They create issues, pull requests and branches and leave them there, they push a workflow to the branch `probe/p-15` of that repository, and `land.sh` puts 41 commits on its `main`: the workflow's 13 empty ones, and for each of the 14 pull requests its one empty commit and a merge commit. The workflow's writes are those of `github-actions[bot]`, so a mention of the operator in them is a mention by another account, and the operator is notified. The shell scripts are `bash` scripts.
 
 | File | What it does |
 |---|---|
@@ -57,4 +57,4 @@ What is not as the server sent it, and what went wrong:
 - **`obs2` has a `commits-html.json` that no script made.** The query was typed by hand and then moved into `observe.sh`. It lacks the `branch` field, and `obs1` has no such file, so the summaries of `obs1` show no rendering for commits.
 - **The `gh` binary changed under the probe.** Rounds 1 to 3 and the reads up to `obs6` ran on `gh` 2.104.0. An upgrade to 2.105.0 replaced the binary while `obs7` was being read, 40 calls failed, and that read was deleted and made again on 2.105.0.
 - **The summaries were made at the end,** by the last version of `summarise.py`, from the reads as they were taken.
-- **Nothing was cleaned up.** Issues and pull requests #12 to #116 stay on the scratch repository, 9 of the issues closed by the probe and the 14 pull requests merged. So do the branches `probe/p-15`, `probe/p-15-commits`, `probe/p-15-variants`, `probe/p-15-operator` and the 14 `probe/p-15-prc-*` and `probe/p-15-pre-*`, and the 27 commits on `main`. The operator's inbox has 13 notifications from the probe.
+- **Nothing was cleaned up.** Issues and pull requests #12 to #116 stay on the scratch repository, 9 of the issues closed by the probe and the 14 pull requests merged. So do the branches `probe/p-15`, `probe/p-15-commits`, `probe/p-15-variants`, `probe/p-15-operator` and the 14 `probe/p-15-prc-*` and `probe/p-15-pre-*`, and the 41 commits on `main`. The operator's inbox has 13 notifications from the probe.

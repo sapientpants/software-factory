@@ -59,7 +59,13 @@ A commit the host builds from the workspace (9.4). Gates run on candidates; only
 The repository-owned configuration in `.factory/` on the default branch.
 
 **Path pattern**:
-A glob that names files of a repository by their path. VAL-5b says which lists hold path patterns and how one matches, VAL-5c what a pattern may hold and VAL-5d which spellings of a path are one name.
+A glob that names files of a repository by their path. VAL-5b says which lists hold path patterns and how one matches, VAL-5c what a pattern may hold and VAL-5d which spellings of a path are one name. VAL-5e names the rules of the integrity check that use one outside those lists.
+
+**Exact path**:
+The whole path of one file from the repository root, which the host took from a tree or from a package manifest such as `Cargo.toml`. It holds no wildcard, unlike a path pattern, and it is compared with a path of a diff after the fold of VAL-5d (VAL-5e).
+
+**Locked path**:
+The exact path of a file that `author_tests` wrote for a run (11.7). A change to it by the implementer fails the integrity check (VAL-5e).
 
 **Check tool**:
 A program that a repository's setup commands or checks run and that is no part of its toolchain (WS-7): `cargo-nextest` or `typos`, for example. WS-7a says how one reaches a worker.

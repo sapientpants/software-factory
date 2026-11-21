@@ -248,6 +248,26 @@ CASES = [
         tools=SUB_TOOLS,
         env={"CLAUDE_CODE_DISABLE_BACKGROUND_TASKS": "1"},
     ),
+    # Part 2, as SPEC AG-1 and AG-11 stand after this probe: both switches together.
+    case(
+        "subagent-as-specified",
+        "CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1 and --forward-subagent-text",
+        ["sub-chain"],
+        max_turns=30,
+        tools=SUB_TOOLS,
+        extra=FORWARD,
+        env={"CLAUDE_CODE_DISABLE_BACKGROUND_TASKS": "1"},
+    ),
+    case(
+        "subagent-as-specified-max-budget",
+        "the same, with --max-budget-usd reached while the subagent runs",
+        ["sub-chain", "read"],
+        max_turns=30,
+        budget="0.0020",
+        tools=SUB_TOOLS,
+        extra=FORWARD,
+        env={"CLAUDE_CODE_DISABLE_BACKGROUND_TASKS": "1"},
+    ),
     case(
         "two-subagents-max-budget",
         "two subagents at once, with the cap reached while both run",

@@ -1390,7 +1390,7 @@ The `mentioned` event is a poorer sign. A comment that notified has one. An issu
 
 **A zero-width character after the `@`, the `#` or the hyphen works everywhere.** The joiner and the space did the same in every pair of cases. It needs no fence, so it is what PLAN-5 can use for a sub-issue body. It is also invisible, and it stays in the text: a reader who copies a neutralised `#12` copies a character they cannot see.
 
-**The spec says U+200B.** The operator was told on 2026-11-21 that it would unless they preferred the joiner, and said to continue. SEC-4 already removes zero-width characters from text the factory reads, so a sub-issue body written with them is read back without them.
+**The spec says U+200B.** The operator decided that on 2026-11-21, as the session recommended; the joiner would have done as well. SEC-4 already removes zero-width characters from text the factory reads, so a sub-issue body written with them is read back without them.
 
 **A URL is a reference by its path.** Removing or breaking the scheme, the usual way to stop a link, leaves `owner/repo/issues/<n>` and the cross-reference. The break has to be in the path. A second one after the scheme keeps the reader from a link that leads nowhere.
 
@@ -1402,7 +1402,7 @@ The `mentioned` event is a poorer sign. A comment that notified has one. An issu
 
 **An edit is a write.** Text set by an edit mentioned, referred and closed as text written new. The status comment gets no easier treatment than a new comment.
 
-**A title is safe as far as it was tried.** A mention and `#n` in an issue title did nothing. PLAN-5 still applies the insertions to a sub-issue title; whether it need not is the operator's to decide.
+**A title is safe as far as it was tried.** A mention and `#n` in an issue title did nothing. PLAN-5 still applies the insertions to a sub-issue title. The operator decided on 2026-11-21 to keep them there, as the session recommended, since the other forms and a pull request title were not tried.
 
 **A push with the workflow's token leaves no reference events, and still closes.** It is the push that decides, not the name on the commit. What a push with the factory App's installation token leaves is not known.
 
@@ -1425,14 +1425,14 @@ The `mentioned` event is a poorer sign. A comment that notified has one. An issu
 6. 9.4 builds the pull request title and the squash title from the issue title after SEC-4, with every reference of GH-5a removed. It said "any issue reference or issue URL", which was a second list of the forms.
 7. The P-15 row of 23.2 carries the answer.
 
-GH-5a still asks for both the fence and the insertions, as it did. The fence alone was enough on every Markdown surface. The insertions are what protect a sub-issue body, which has no fence. The cost of keeping both is that agent output shown in a fence carries invisible characters: a line such as `@property` or `issue #3` copied out of a status comment is not the line the agent wrote. The insertion after `&` costs more in a sub-issue body, where it shows: `&amp;` no longer renders as `&`, and a link whose address has `&b=` in it leads somewhere else.
+GH-5a still asks for both the fence and the insertions, as it did. The operator decided on 2026-11-21 to keep both, as the session recommended. The fence alone was enough on every Markdown surface. The insertions are what protect a sub-issue body, which has no fence. The cost of keeping both is that agent output shown in a fence carries invisible characters: a line such as `@property` or `issue #3` copied out of a status comment is not the line the agent wrote. The insertion after `&` costs more in a sub-issue body, where it shows: `&amp;` no longer renders as `&`, and a link whose address has `&b=` in it leads somewhere else.
 
 The subject validation of 9.4 did not change. It rejects "anything GH-5a forbids".
 
 ### Still open
 
 - **An installation token of the factory's App.** Every write here is the operator's or the Actions App's. A push with the workflow's token left no reference events; what the factory's push leaves was not observed.
-- **A notification from a commit message.** None arrived. The only commits that mention another account were pushed with the workflow's token, whose pushes also left no reference events, so this says little. GH-5a does not reject a mention in a commit subject, and whether it should is not decided.
+- **A notification from a commit message.** None arrived. The only commits that mention another account were pushed with the workflow's token, whose pushes also left no reference events, so this says little. GH-5a does not reject a mention in a commit subject. The operator decided on 2026-11-21 to leave it so, as the session recommended: nothing was seen to notify, and a rule against it would send back every subject that names a scoped package.
 - **A mention in a pull request body of someone other than its author.** The workflow may not open pull requests on the scratch repository, and its edit mentioned the author.
 - **A team mention.** `@org/team` needs an organisation. The zero-width space after the `@` should break it like any other mention; it was not seen.
 - **A second repository.** Every reference here is to the scratch repository itself. `owner/other#n` was not written, because it would have left an event on another repository.

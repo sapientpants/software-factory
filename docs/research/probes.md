@@ -1509,3 +1509,105 @@ GH-1 and step 5 of 20.1 stand as they were.
 - **How `gh` decides.** Its error reads as a lookup of the name before any write. What it sends was not examined.
 - **A pull request.** Its labels go through the same issue endpoints. None was labelled here.
 - **Whether GitHub documents this.** The documentation was not read for it, so how long the behaviour holds is unknown.
+
+## P-27: skipping a git hook, and refusing it in a session
+
+Answered 2026-11-21 for #21, on the operator's Mac: git 2.56.1 in throwaway repositories outside this one, and Claude Code 2.1.323 in the interactive session that wrote the hook. No research report covers the question. What the documentation of Claude Code says about hooks and permission rules was read the same day (`code.claude.com/docs/en/hooks.md`, `permissions.md`, `settings.md`) and is named below where an observation differs from it.
+
+**Answer.** On a commit, `--no-verify`, its abbreviations `--no-verif` and `--no-veri`, and `-n`, alone or among other short options, skip the pre-commit hook. `git push --no-verify` skips the pre-push hook. A `core.hooksPath` given on the command line or through the `GIT_CONFIG_*` variables skips every hook. A `PreToolUse` hook of Claude Code that reads the command refused each skip it was given in a live session, and let through a commit whose message names the flags. Limited by Claude Code's own `if` field to `Bash(git *)`, the hook was not run for git behind `time` or `env`, or for git named by its path; with a filter of its own it refused those too. A command inside `bash -c` went through either way.
+
+### Method
+
+**Git.** One script, run once. Its first repository has a `core.hooksPath` that names hooks which each print a line and exit 1. Each command was run with one file staged and nothing committed, and its output was read for the line: printed, the hook ran; absent with exit code 0, the hook was skipped. The pushes went to a bare repository beside it, as dry runs. Its second repository's hook prints its working directory and the `GIT_*` variables of its environment. It was committed to from the top of the work tree, from a subdirectory, from a linked worktree, with a path argument, and once with the hook's executable bit removed.
+
+The script and its output are on the branch `prototype/hook-skip-probe`, at commit [`ec55b3d`](https://github.com/sapientpants/software-factory/tree/ec55b3dcb5f7b2423556d1c227d967c6032cb519/xtask/prototype/hook-skip). They are throwaway code. The expectations the output gave are the tables of the tests in `xtask/src/hook_skip.rs`.
+
+**Claude Code.** `.claude/settings.json` of this repository was written during the session, and the session picked the hook up without a restart. The commands below were then given to the session's Bash tool by hand, each aimed at a throwaway repository with `git -C`, so that one the hook let through made an empty commit there. The settings file was written twice: first with `"if": "Bash(git *)"` on the hook, then with the filter in the hook's own command, as committed. No script of this half is kept.
+
+### What git did
+
+| Command | Hook |
+|---|---|
+| `git commit -m x` | Ran |
+| `git commit --no-verify -m x`, `-n -m x`, `-nm x`, `-anm x`, `-qn -m x`, `-m x -n`, `-F file -n`, `-nF file` | Skipped |
+| `git commit --no-verif -m x`, `--no-veri -m x` | Skipped |
+| `git commit --no-ver -m x`, `--no-ve`, `--no-v` | Exit code 129: `ambiguous option … (could be --no-verbose or --no-verify)` |
+| `git commit --no-verify --verify -m x` | Ran |
+| `git commit -m x --verify --no-verify` | Skipped |
+| `git commit -m x --veri` | Ran |
+| `git commit -m -n`, `-mnaming`, `-Ffile`, `--message -n`, `--message=-n`, `--mess -n` | Ran: the `-n` or the `n` is a value |
+| `git commit --mess -- -n` | Skipped: `--` is the message |
+| `git commit --mes x -n` | Skipped |
+| `git commit -m x -- -n` | Exit code 1: `pathspec '-n' did not match` |
+| `git -C . commit -n -m x`, `/opt/homebrew/bin/git commit -n -m x` | Skipped |
+| `git 2>/dev/null commit -n -m x`, through `sh -c` | Skipped |
+| `git commit -F <(echo message) -n`, `git commit -m x $'-n'`, through `bash -c` | Skipped |
+| `echo $((1<<2))`, then `git commit -n -m x` on the next line, through `bash -c` | Skipped |
+| `N=-n; git commit $N -m x`, through `bash -c` | Skipped |
+| `git -c core.hooksPath=/dev/null commit -m x`, the same as `CORE.HooksPath` | Skipped |
+| `git --config-env=core.hooksPath=HOME commit -m x`, and with a space for the first `=` | Skipped |
+| `GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.hooksPath GIT_CONFIG_VALUE_0=/dev/null git commit -m x` | Skipped |
+| `GIT_CONFIG_PARAMETERS="'core.hooksPath'='/dev/null'" git commit -m x` | Skipped |
+| `git push o main`, `git push -n o main` | Ran |
+| `git push --no-verify -n o main`, `--no-veri -n o main`, `-n o main --no-verify` | Skipped |
+| `git push --no-ver -n o main` | Exit code 129, ambiguous as on a commit |
+| `git push --no-verify --verify -n o main` | Ran |
+| `git push -o --no-verify -n o main` | Ran: `--no-verify` is the push option |
+| `git push -o -- --no-verify -n o main`, `--push-opt -- --no-verify -n o main` | Skipped: `--` is the push option |
+
+A hook without its executable bit was ignored: git printed `hint: The '.githooks/pre-commit' hook was ignored because it's not set as executable` and the commit went through with exit code 0.
+
+### What a hook is handed
+
+| Commit made from | Working directory of the hook | `GIT_INDEX_FILE` | `GIT_DIR` |
+|---|---|---|---|
+| The top of the work tree | The top | `.git/index` | Not set |
+| A subdirectory | The top; `GIT_PREFIX` holds the subdirectory | `.git/index` | Not set |
+| A linked worktree, with a relative `core.hooksPath` | The top of that worktree | The worktree's own index, as an absolute path | The worktree's directory under `.git/worktrees/` |
+| The top, with a path argument | The top | `.git/next-index-<pid>.lock`, as an absolute path | Not set |
+
+`GIT_INDEX_FILE` and `GIT_PREFIX` were set in every case, with `GIT_EDITOR` and `GIT_EXEC_PATH`. `git rev-parse --local-env-vars` lists `GIT_DIR`, `GIT_INDEX_FILE`, `GIT_PREFIX`, `GIT_WORK_TREE`, `GIT_CONFIG_PARAMETERS` and ten more.
+
+### What the session's hook did
+
+| Command given to the Bash tool | With `"if": "Bash(git *)"` | With the hook command's own filter |
+|---|---|---|
+| `git -C <repository> commit -n --allow-empty -m …` | Refused | Not given again |
+| `cd <repository> && git add -A && git commit -qnm …` | Refused | Not given again |
+| `FOO=1 git -C <repository> commit -q -n …` | Refused | Not given again |
+| `time git -C <repository> commit -q -n …` | Went through | Refused |
+| `env FOO=1 git -C <repository> commit -q -n …` | Went through | Refused, with git named by its path |
+| `/opt/homebrew/bin/git -C <repository> commit -q -n …` | Went through | Refused, behind `env FOO=1` |
+| `bash -c 'git -C <repository> commit -q -n …'` | Went through | Went through |
+| `git -C <repository> commit -q --allow-empty -m "$(cat <<'EOF' … EOF)"`, the message naming `--no-verify` and `git commit -n` | Went through, as it should | Not given again |
+| `git -C <repository> log` | Went through | Went through |
+| `ls -n` | Not given | Went through |
+
+A refusal reached the session as `PreToolUse:Bash hook error:` followed by the hook's command and the reason the task wrote to stderr, and the command did not run. That a command went through is read from the commit it made. The task in the session was the one of that hour: it did not yet read the forms of the rows `--mess -- -n` to `echo $((1<<2))` above, which a review found afterwards and the tests now hold. One command with two of those forms, `git 2>/dev/null -C <repository> commit -q --mess -- -n --allow-empty`, was given to the session after the task was changed, and was refused. The others were not given to it.
+
+### Findings
+
+**`-n` cannot be matched as text.** It skips the hook wherever it stands among the short options, and the same letters are a message in `-mnaming`. Telling the two apart takes the option grammar of the subcommand: which options take a value, attached or as the next word, abbreviated or not. `--` after `--mess` is a message, and the `-n` behind it is a flag again. A pattern over the command's text has none of this, which is why DEV-10 parses the command and uses no deny rule. The documentation of Claude Code says the same of its Bash rules in general: rules that constrain a command's arguments are fragile, and it points to `PreToolUse` hooks.
+
+**The `if` field missed wrapped commands.** The documentation says `time` is stripped before a rule is matched and that `env` is not. In the session neither `time git …` nor `env … git …` ran the hook, and git named by its path did not either. One observation each. So the hook command filters for itself, by passing on every event that holds the letters `git`, and the task takes each word `git` in a command as the start of a git command.
+
+**The shell decides what git is given.** The same skip can be written with a redirection between `git` and `commit`, with the flag in `$'…'`, or behind a process substitution, and the task reads those. A flag that comes out of a variable skips the hook too, and a task that expands nothing cannot see it. A string handed to an interpreter is the same case: `bash -c '…'` went through both filters in the session.
+
+**A hook's environment names the repository of the commit.** A program the hook starts inherits `GIT_INDEX_FILE` in every case and `GIT_DIR` in a linked worktree. A test that runs git in a directory of its own would then read or write the index of the commit being made. DEV-9 has the hook unset the list of `git rev-parse --local-env-vars` before it runs the check.
+
+**A lost executable bit turns the hook off without a failure.** The commit succeeds, and the hint is all that tells. `xtask/tests/hooks.rs` commits through the hook as it is checked out, so the check fails if the bit is gone.
+
+### What changed in the spec
+
+1. The P-27 row of 23.2 is new and carries the answer.
+2. DEV-9 and DEV-10 are new, with decision D-23 in 23.1. DEV-1 cites DEV-9 and says when the check command was first written and with what. The M0 row of section 22 names the hook.
+
+### Still open
+
+- **The `SessionStart` hook in a live session.** The settings file was written after this session had started, so the hook that sets `core.hooksPath` did not run in it. Its command is run through `sh` by the tests. That a `SessionStart` hook of `.claude/settings.json` runs was observed under P-21, on Claude Code 2.1.311.
+- **A subagent and a session in a worktree.** The documentation says hooks of settings files run inside subagents and that `CLAUDE_PROJECT_DIR` stays at the directory the session started in. Neither was observed.
+- **Permission modes.** The session ran in its default mode. Whether a refusal by a hook also holds when permissions are bypassed is not stated in the documentation that was read, and was not tried.
+- **Why the `if` field missed `time`.** Not examined. The shell of the session's Bash tool is zsh, where `time` is a reserved word.
+- **What else sets a hooks path or skips a hook.** `git -c include.path=<file>` with a file that sets `core.hooksPath`, an alias, a shell function and `git-commit` run from git's own directory were not run. DEV-10 lists them, or their kind, as not seen.
+- **Other subcommands.** `git merge`, `git am` and `git rebase` take `--no-verify` too, for hooks this repository does not have. They were not run and are not refused.
+- **Other agents.** Only Claude Code reads `.claude/settings.json`. A session of another coding agent has `AGENTS.md` and nothing that refuses.

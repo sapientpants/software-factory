@@ -7,7 +7,7 @@ rust-version.workspace = true
 publish.workspace = true
 license.workspace = true
 
-[dev-dependencies]
+[dependencies]
 serde_json.workspace = true
 
 # xtask is exempt from the workspace lints (SPEC 19.3).

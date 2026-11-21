@@ -1809,3 +1809,137 @@ Items 3 and 4 are this session's, drawn from the observations. The operator was 
 - **Which of the two outcomes a background subagent meets at the cap,** and why. Not examined, since the factory does not run them.
 - **A model call whose stream is cut.** Report 12 says `message_delta` "can be missing" after a dropped connection. None was.
 - **Other CLI versions.** One version, as for P-21 and P-22, and not the one those ran on.
+
+## P-29: what folds a name, and how a glob crate reads a pattern
+
+Answered 2026-11-21 for #51, on the operator's Mac: macOS 27.0.1 with APFS, git 2.56.1 and Rust 1.100.0, in throwaway directories outside this repository. No research report covers the question. Two pages of the Unicode Consortium were read the same day through a fetching agent: its stability policy (`unicode.org/policies/stability_policy.html`) and chapter 3 of the Unicode Standard 18.0.0. The agent read the first in full and quoted from it. Of the second it returned a summary of section 3.13 and not its words.
+
+**Answer.** APFS takes two names for one exactly where they are a canonical caseless match by the Unicode Standard, in each of 21 pairs tried. git folds only the letters A to Z, and it refuses the spellings of `.git` that HFS+ and NTFS take for that name, and of no other name tried. `globset` 0.4.21 matches `?` against one byte, lets a negated class match a `/`, and folds ASCII letters only. A sketch of the matcher of VAL-5c and VAL-5d on ICU4X 2.4.0 gave the answer the specification states for each of 55 pairs of pattern and path and for each of 32 patterns read for validity.
+
+### Method
+
+Four programs, each run once for the record. They and their output are on the branch `prototype/path-pattern-probe`, at commit [`65663d8`](https://github.com/sapientpants/software-factory/tree/65663d879ab32e0f88ecd5643252699a2d6da135/xtask/prototype/path-pattern). They are throwaway code.
+
+- **`apfs.py`.** For each pair it creates a file under the first name in an empty directory, asks whether the second name exists, and lists the directory. The directory was on the Mac's own volume, whose file system `diskutil` names APFS.
+- **`git.sh`.** In a new repository it adds index entries with `git update-index --add --cacheinfo`, which touches no file, under each combination of `core.protectHFS` and `core.protectNTFS` and once with neither set. It then lists four entries through a `:(icase)` pathspec, with `core.precomposeunicode` off so that git does not compose the arguments first.
+- **`glob/src/main.rs`.** It compiles patterns with `globset` 0.4.21, with `literal_separator` on and off and with `case_insensitive`, and prints what each matches. It also prints the case folding of a set of names by `caseless` 0.2.2 and by `icu_casemap` 2.4.0.
+- **`glob/src/bin/sketch.rs`.** A matcher of about 80 lines for the grammar of VAL-5c, with the fold of VAL-5d from `icu_normalizer` and `icu_casemap` 2.4.0. It runs a table of patterns and paths and counts the answers that differ from the expected one.
+
+The dependency facts come from `cargo tree` and `cargo info` on an empty package that depends on `reqwest` and `octocrab` 0.54, and from the registry's API for release dates. Their output is not kept; the table under "The crates" is the record.
+
+### What APFS took for one name
+
+| Pair | First name | Second name | One name |
+|---|---|---|---|
+| ASCII case | `AGENTS.md` | `agents.MD` | Yes |
+| Latin-1 case | `É.md` | `é.md` | Yes |
+| NFC and NFD | `é.md` (U+00E9) | `e`, U+0301, `.md` | Yes |
+| Kelvin sign | `workflows` | `wor`, U+212A, `flows` | Yes |
+| Long s | `AGENTS.md` | `AGENTſ.md` (U+017F) | Yes |
+| Sharp s, full folding | `straße` | `STRASSE` | Yes |
+| Capital sharp s | `straße` | `STRAẞE` (U+1E9E) | Yes |
+| Final sigma | `σ` | `ς` | Yes |
+| Capital sigma and final sigma | `Σ` | `ς` | Yes |
+| Titlecase digraph | `ǆ` (U+01C6) | `ǅ` (U+01C5) | Yes |
+| Ligature, full folding | `fi` | `ﬁ` (U+FB01) | Yes |
+| Iota subscript, full folding | U+1F80 | U+1F00, U+03B9 | Yes |
+| Ypogegrammeni | U+0345, `x` | U+03B9, `x` | Yes |
+| Cherokee | U+13A0 | U+AB70 | Yes |
+| Dotted capital I | `i` | `İ` (U+0130) | No |
+| Dotless i | `I` | `ı` (U+0131) | No |
+| Fullwidth letter | `a` | `ａ` (U+FF41) | No |
+| Zero-width non-joiner | `.git2` | `.g`, U+200C, `it2` | No |
+| Byte order mark | `.git3` | `.git3`, U+FEFF | No |
+| Trailing dot | `name` | `name.` | No |
+| Trailing space | `name2` | `name2` and a space | No |
+
+The directory listing showed each file under the name it was created with: APFS keeps the spelling and compares by the folded form.
+
+### What git did
+
+`git update-index --add --cacheinfo` with each path, "refused" being `error: Invalid path`:
+
+| Path | Neither set | HFS and NTFS on | HFS on only | NTFS on only | Both off |
+|---|---|---|---|---|---|
+| `.GIT/x`, `a/.Git/x` | Refused | Refused | Refused | Refused | Refused |
+| `.g`, U+200C, `it/x` | Refused | Refused | Refused | Accepted | Accepted |
+| `.git`, U+FEFF, `/x` | Not run | Refused | Refused | Accepted | Accepted |
+| `git~1/x` | Refused | Refused | Accepted | Refused | Accepted |
+| `.git /x` (a trailing space) | Refused | Refused | Accepted | Refused | Accepted |
+| `.git./x` | Not run | Refused | Accepted | Refused | Accepted |
+| `wor`, U+212A, `flows/x` | Not run | Accepted | Accepted | Accepted | Accepted |
+| `AGENTS.md`, U+200C | Not run | Accepted | Accepted | Accepted | Accepted |
+| `AGENTS.md.`, `AGENTS.md` and a space, `AGENTS~1.MD` | Not run | Accepted | Accepted | Accepted | Accepted |
+
+`a/.Git/x` was not among the paths run with neither setting. The clone had neither setting in its configuration, so the first column is what this build of git does on macOS by default.
+
+A `:(icase)` pathspec, against an index that held `AGENTS.md`, `É.md`, `straße` and `e`, U+0301, `.txt`:
+
+| Pathspec | Listed |
+|---|---|
+| `agents.MD` | `AGENTS.md` |
+| `é.md` | Nothing |
+| `STRASSE` | Nothing |
+| `é.txt` (U+00E9) | Nothing |
+| `E`, U+0301, `.txt` | `e`, U+0301, `.txt` |
+
+### How `globset` 0.4.21 read a pattern
+
+With `literal_separator(true)`, unless stated:
+
+| Pattern | Path | Match |
+|---|---|---|
+| `**/*.snap` | `a.snap` | Yes |
+| `crates/**` | `crates` | No |
+| `crates/**` | `crates/` | Yes |
+| `a/**/b` | `a/b` | Yes |
+| `*`, `a?b` | `a/b` | No; yes with `literal_separator(false)`, the default |
+| `a[!x]b`, `a[/]b` | `a/b` | Yes |
+| `a**b` | `axxb` | Yes: `**` inside a component is read as `*` |
+| `{a,b{c,d}}.rs` | `bd.rs` | Yes |
+| `?` | `é` (U+00E9) | No: two bytes |
+| `migrations/` | `migrations/001.sql` | No |
+| the empty pattern | the empty path | Yes |
+| `[a`, `{a`, `a}`, `[z-a]`, a trailing `\` | | An error |
+
+With `case_insensitive(true)`, `AGENTS.md` matched `agents.MD`. It did not match `AGENTſ.md`, and `é` did not match `É`, `straße` did not match `STRASSE`, and `workflows` did not match the spelling with the Kelvin sign.
+
+### The crates
+
+| Crate | Version, released | Unicode tables | Crates in its tree, itself included |
+|---|---|---|---|
+| `globset` | 0.4.21 | None of its own | 8 |
+| `unicode-normalization` | 0.1.26, 2026-10-16 | 18.0.0 | 2 |
+| `caseless` | 0.2.2, 2024-12-30; the release before it 2018-05-21 | `CaseFolding-16.0.0.txt` | 3 |
+| `icu_normalizer` | 2.4.0 | 18.0.0 | 37 |
+| `icu_casemap` | 2.4.0, 2026-10-22 | 18.0.0 | 40 |
+
+`icu_normalizer` 2.4.0 is in the tree of `reqwest` 0.13.5 and of `octocrab` 0.54.9, through `url` 2.5.9, `idna` 1.1.0 and `idna_adapter` 1.2.2. `icu_casemap` is not. `caseless` and `icu_casemap` gave the same case folding for each of the 18 names tried.
+
+### Findings
+
+**APFS compares names by canonical caseless matching.** Every pair that folds to the same string under toNFD, full case folding and toNFD again was one name, and no other pair was. That includes the pairs that only full case folding joins, `straße` with `STRASSE` and `ﬁ` with `fi`, and it excludes compatibility forms. So a path that differs from `AGENTS.md` by the long s is `AGENTS.md` on a checkout to the operator's Mac, and VAL-5d folds what this file system folds.
+
+**git folds less, and knows two file systems for one name.** Its case-insensitive pathspec folds A to Z and compares bytes. It refuses spellings of `.git` that HFS+ or NTFS would take for `.git`, each under its own setting, and accepted the same kind of spelling of `AGENTS.md`. The rule the scan of 9.4 follows for `.git` is therefore a different relation from the fold of VAL-5d, and neither contains the other.
+
+**`globset` does not fit the rule as it stands.** Its `?` is a byte, its negated class crosses a `/` even with `literal_separator`, and its case folding stops at ASCII. Used for VAL-5c it would need both strings folded first, every pattern outside the grammar refused first, and `?` rewritten. The sketch of the whole matcher is shorter than that wrapper.
+
+**The fold can be written with ICU4X as VAL-5d states it.** `DecomposingNormalizerBorrowed::new_nfd`, `CaseMapper::fold_string` and `ComposingNormalizerBorrowed::new_nfc`, with the compiled data, gave the expected answer in every case of the sketch, among them a ypogegrammeni written before an accent against the composed letter U+1FB4.
+
+**What the stability policy promises.** As the fetching agent reported the page: the normalisation of a string of characters assigned in two versions is the same in both, from Unicode 4.1 on. The promise for case folding, from 5.2 on, is stated for strings normalised with NFKC. The page does not say that the full case folding of an assigned character never changes.
+
+### What changed in the spec
+
+1. The P-29 row of 23.2 is new and carries the answer. The P-28 row gains the forms of VAL-5c that `CODEOWNERS` has to be observed on.
+2. VAL-5c and VAL-5d are new, with decision D-29 in 23.1. VAL-5 and VAL-5b cite them, and VAL-3a cites VAL-5d for the gap in letter case.
+3. 19.2 names the two ICU4X crates and lists `globset` as not used; 19.4 has a row for the matcher's tests.
+4. 16.3, CLI-5 and step 3 of 20.1 say what an unreadable pattern and the two warnings do. The scan of 9.4 says that its rule for `.git` is not this fold.
+5. `GLOSSARY.md` gains the term "path pattern", and 11.3, 13.6 and 16.1 use it where they said "glob". The M1a row of section 22 names the matcher, and the comment in the example policy of 16.2 names the wildcards.
+
+### Still open
+
+- **Other case-insensitive file systems.** ext4 with `casefold`, NTFS and HFS+ were not observed. What is said of HFS+ and NTFS above is what git's two settings refuse.
+- **The definitions in the Unicode Standard.** D145 and the reason for the first toNFD were read in a summary of chapter 3 and not word for word.
+- **A non-UTF-8 path.** The sketch folds it with U+FFFD in place of each ill-formed sequence. `*.md` and `a?.md` then matched the bytes `a\xff.md`, and `a.md` did not. Whether capture should refuse such a path was not asked.
+- **The pinned set.** The two ICU4X crates resolved beside `reqwest` and `octocrab` in a package of their own. That the whole set of 19.2 resolves is the M0 task that 19.2 names.
+- **Cost of the matcher.** The sketch tries every split for `*` and `**` and was not measured. Pattern lists are short and paths are bounded by git, but the matcher of M1a needs a bound on its work for a pattern with many wildcards.

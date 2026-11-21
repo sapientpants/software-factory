@@ -52,6 +52,9 @@ A commit the host builds from the workspace (9.4). Gates run on candidates; only
 **Policy**:
 The repository-owned configuration in `.factory/` on the default branch.
 
+**Check tool**:
+A program that a repository's setup commands or checks run and that is no part of its toolchain (WS-7): `cargo-nextest` or `typos`, for example. WS-7a says how one reaches a worker.
+
 **Snapshot**:
 The issue title, body and trusted comments captured at claim or resume and given to agents.
 

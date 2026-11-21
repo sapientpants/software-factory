@@ -59,7 +59,7 @@ The issue title, body and trusted comments captured at claim or resume and given
 A repository the factory is onboarded to (20) and works on.
 
 **Factory repository**:
-The repository that holds `sf` and its specification, `SPEC.md`. It is also the factory's first target repository (21.1).
+The repository that holds `sf` and its specification, `SPEC.md`. It is also a target repository, the first that an installed build of `sf` works on (BOOT-1).
 
 **Scratch repository**:
 `sapientpants/sf-scratch`, where live probes (23.2) and development builds of `sf` (BOOT-2) run.

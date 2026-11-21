@@ -2,7 +2,7 @@
 
 Measured 2026-11-21. Evidence for issue #19: the values of the session limits that M1 enforces (SPEC section 14, D-22). The decision is in SPEC 23.1; this report is the measurement behind its three numbers.
 
-Method: one script, run once on the operator's Mac, read the transcripts that Claude Code keeps of its own sessions on this repository, from 2026-11-18 to 2026-11-21. It changed nothing and sent nothing anywhere; the one outside request was a fetch of the public pricing page. The script was throwaway code and is not in the repository. This report holds aggregate figures only and nothing of what a session said.
+Method: one script, run once on the operator's Mac, read the transcripts that Claude Code keeps of its own sessions on this repository, from 2026-11-18 to 2026-11-21. It changed nothing and sent nothing anywhere; the one outside request was a fetch of the public pricing page. The scripts are on the branch `prototype/session-sizes`, at commit [`1d03ee1`](https://github.com/sapientpants/software-factory/tree/1d03ee11aa7edeccd26862348e1dce32d1fdc3ce/crates/factory-agent/prototype/session-sizes), with the transcript directory made an argument. They are throwaway code, and their output is not kept, since it holds session ids. This report holds aggregate figures only and nothing of what a session said.
 
 These were interactive sessions: the operator typed prompts and answered questions, and the work was this repository's specification, its probes and its research. No session was a headless factory session, which does not exist yet. A statement marked **(inference)** is a reading of the figures, not something they show.
 
@@ -132,4 +132,4 @@ Two facts about the caps come from elsewhere. With stream-JSON input the CLI sta
 
 The values keep their *(tunable)* mark. The first measurement of what they limit is the five issues of M1b.
 
-In the spec, the values are in the table of section 14, the rules they belong to are BUD-6 to BUD-9, the decision is D-22 in 23.1, and Appendix B lists this report. What the stream of a headless session shows of turns, subagents and usage credits is probe P-26.
+In the spec, the values are in the table of section 14, the rules they belong to are BUD-6 to BUD-10, the decision is D-22 in 23.1, and Appendix B lists this report. What the stream of a headless session shows of turns, subagents and usage credits is probe P-26.

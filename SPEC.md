@@ -56,23 +56,7 @@ These come from the practice of teams that run such systems (report 01) and each
 
 ## 2. Glossary
 
-| Term | Meaning |
-|---|---|
-| **Operator** | The person who installs and runs the factory and owns its credentials. |
-| **Authorised actor** | A GitHub account of type User whose permission on the repository is write, maintain or admin when checked (SEC-1). |
-| **Approver** | The authorised actor who applied `state:ready` to an issue. With one human, this is the operator. |
-| **Control plane** | The trusted `sf` daemon process. Holds all credentials and performs all external writes. Also called the host. |
-| **Worker** | The untrusted side: an agent process or build command and everything it spawns, inside a sandbox. |
-| **Work item** | An open GitHub issue carrying exactly one `state:*` label. |
-| **Run** | The factory's handling of one work item from claim to a terminal state. Identified by a run id (UUIDv7). Terminal states: `done` (pull request merged, or for a tier 2 parent all children closed as completed) and `cancelled` (issue closed without a merged pull request, issue moved to `state:triage` by a human, or `sf cancel`). A run in `needs-human` is not terminal. |
-| **Attempt** | One pass of a run that starts from a fresh branch off the default branch. A run has one attempt unless it is reset (7.6). |
-| **Stage** | One step of the internal pipeline (7.3). |
-| **Stage execution** | One execution of a stage: one agent session, one capture, or one verify command sequence, together with the `setup` commands that precede it (WS-4). Each gets its own sandbox instance. |
-| **Round** | One trip back to the implement stage after a failed gate. |
-| **Workspace** | The directory tree in which the implementer works. It lives for one attempt, or until a base update rebuilds it (12.4). |
-| **Candidate** | A commit the host builds from the workspace (9.4). Gates run on candidates; only candidates are pushed. |
-| **Policy** | The repository-owned configuration in `.factory/` on the default branch. |
-| **Snapshot** | The issue title, body and trusted comments captured at claim or resume and given to agents. |
+The terms this specification uses are defined once, in `GLOSSARY.md` at the root of the factory repository, and are used here as defined there (D-21). The file cites the ids and section numbers of this specification.
 
 ---
 
@@ -1378,7 +1362,7 @@ Not used: any community Claude SDK crate, `git2` for mutations, `figment`, `sled
 ### 19.5 Checks and CI for the factory repository
 
 - **DEV-1.** One command, `cargo xtask check`, runs every check of the factory repository. An agent session runs it before each commit, the pre-commit hook runs it again, and CI runs the same command, so the local set and the CI set cannot drift apart.
-- **DEV-2.** The set: `cargo fmt --check`; `cargo clippy -D warnings`; `cargo nextest run --locked`; `cargo test --doc`; `cargo doc` with warnings denied, broken intra-doc links included; `cargo deny check`; the unused-dependency check; the structural test; `typos` over code and documents; a cross-reference check that every requirement id and section number cited in `SPEC.md`, `AGENTS.md` and the code resolves; a check of local Markdown links; `cargo mutants --in-diff` on the changed code, failing on a surviving mutant; coverage with `cargo llvm-cov`, reported without a floor until there is code to measure. If commits become too slow, mutation testing moves to pre-push; no check is dropped.
+- **DEV-2.** The set: `cargo fmt --check`; `cargo clippy -D warnings`; `cargo nextest run --locked`; `cargo test --doc`; `cargo doc` with warnings denied, broken intra-doc links included; `cargo deny check`; the unused-dependency check; the structural test; `typos` over code and documents; a cross-reference check that every requirement id and section number cited in `SPEC.md`, `GLOSSARY.md`, `AGENTS.md` and the code resolves; a check of local Markdown links; `cargo mutants --in-diff` on the changed code, failing on a surviving mutant; coverage with `cargo llvm-cov`, reported without a floor until there is code to measure. If commits become too slow, mutation testing moves to pre-push; no check is dropped.
 - **DEV-3.** On macOS, `cargo xtask check` also runs clippy and the tests inside the development VM, on every run, so Linux-only code is checked whatever a change touches. The VM is Lima running the latest Debian stable on the Mac's architecture, with `vmType: vz` and nested virtualisation so that `/dev/kvm` is available. Its configuration is committed, and `cargo xtask` creates and starts it. x86-64 coverage comes from CI.
 - **DEV-4.** Development builds of `sf` run in the VM (BOOT-2). It holds the operator's Claude Code login (D-2), which shares quota with the operator's interactive sessions, and no GitHub credential beyond the one `sf` needs for the scratch repository.
 - **DEV-5.** The CI workflow follows VAL-6, except that a network namespace takes the place of the container (DEV-6). It has one job per architecture, each running `cargo xtask check` (DEV-1) on a GitHub-hosted runner: `check (x86-64)` on `ubuntu-24.04` and `check (arm64)` on `ubuntu-24.04-arm` (D-20). The labels are pinned, and `ubuntu-latest` is never used, because the setup that bubblewrap needs differs between Ubuntu releases (P-16). The workflow has no path filter, so both checks are reported on every pull request. There is no macOS job. The repository has no self-hosted runner: one would run pull-request code on the operator's own machine.
@@ -1433,7 +1417,7 @@ Required checks apply to every pull request, and the factory checks exist only o
 - **BOOT-1.** Humans (with interactive agent assistance) build M0 and M1 (D-16). Claude Code sessions on the operator's Mac write the code, one issue, branch and pull request at a time, and the operator reviews and merges every pull request. That work is tracked as issues on the factory repository, grouped under one GitHub milestone per roadmap milestone; the operator never makes them `state:ready`, so the factory never claims them. From M1 the factory is run attended on its own repository from an installed, tagged build; from M2 unattended.
 - **BOOT-2.** The binary that operates on the factory repository is always an installed, pinned release, never a build of the tree it is changing. A development build runs only against the scratch repository (`sapientpants/sf-scratch`), never against the factory repository. The factory version is recorded in every marker.
 - **BOOT-3.** From M2, upgrading the operating binary is a human action (`sf self-update`), allowed only after the eval gate passes on the candidate: the smoke eval until M3, the eval suite afterwards. The first tag, `v0.1.0`, is cut when the rest of M0 passes in CI and in the development VM; the operator installs it on the server to run M0's exit check (22). During M1 the operator installs a newer tagged build by hand; the gate is the harness tests of 19.4 passing on the tagged commit. Previous binaries and store backups are kept for rollback (18.1).
-- **BOOT-4.** The factory's own gate code, prompts, policy and this specification are protected paths in its repository and are never auto-merged. The built-in list of 11.3 covers neither `SPEC.md` nor the research records behind it, so the factory repository's policy MUST list `SPEC.md` and `docs/research/**` in `[paths] protected_extra` (16.2).
+- **BOOT-4.** The factory's own gate code, prompts, policy and this specification are protected paths in its repository and are never auto-merged. The built-in list of 11.3 covers neither `SPEC.md`, nor `GLOSSARY.md`, which holds the specification's terms (D-21), nor the research records behind the specification, so the factory repository's policy MUST list `SPEC.md`, `GLOSSARY.md` and `docs/research/**` in `[paths] protected_extra` (16.2).
 - **BOOT-5.** From M2 the factory also runs on a second, unrelated repository, so defects that self-hosting would hide become visible.
 
 ### 21.2 Evaluation
@@ -1470,7 +1454,7 @@ Not scheduled: API-key credential modes and the model gateway; a second agent dr
 
 ### 23.1 Decisions
 
-Decided by the operator on 2026-11-18 (D-18 and D-20 on 2026-11-19; the rule of D-16 about the server confirmed on 2026-11-20):
+Decided by the operator on 2026-11-18 (D-18 and D-20 on 2026-11-19; the rule of D-16 about the server confirmed on 2026-11-20; D-21 on 2026-11-21):
 
 | # | Decision |
 |---|---|
@@ -1486,6 +1470,7 @@ Decided by the operator on 2026-11-18 (D-18 and D-20 on 2026-11-19; the rule of 
 | D-17 | The factory's repository, code and documents alike, is licensed `MIT OR Apache-2.0`, copyright Marc Tremblay. Every crate inherits the licence from the workspace, and the structural test (19.1) checks it. Source files carry no per-file licence header. |
 | D-18 | `SPEC.md` stays one file through M0 and M1 and keeps its ids (`INV-`, `GH-`, `SEC-` and so on); it is not split into the living-spec layout of 6.3. Issues in that period cite those ids, with `SPEC.md` as the spec file path. The spec is protected through the repository's policy (BOOT-4). |
 | D-20 | CI for the factory repository runs on GitHub-hosted runners only, with one job for x86-64 Linux and one for arm64 Linux; there is no macOS job and no self-hosted runner. Nothing that needs KVM or the Claude Code login runs in CI. Once the workflow exists, a ruleset on `main` requires both jobs and has no bypass actor; the ruleset of 20.3 replaces it at M1b (DEV-5 to DEV-8). |
+| D-21 | The conventions of the factory repository (20.4). `GLOSSARY.md` at its root is the one home of the terms; section 2 points at it. The file is protected with the spec (BOOT-4) and its citations are checked (DEV-2). `AGENTS.md` is a map: it states a rule itself only where a session that read nothing else would do harm without it. Through M1a it is written for the interactive sessions of D-16; what a worker receives of it (AG-2a) is decided when the repository's policy is written. None of the labels of 5.2 exists on the factory repository before its onboarding: they are created at step 5 of 20.1, on the operator's instruction, and a session creates none of them before that. Their absence guards nothing by itself: the REST API creates a label that is added by name (P-25). The repository has no `docs/adr/` through M1; this table is its decision record. |
 
 Still open:
 
@@ -1530,6 +1515,7 @@ Facts the design depends on that research could not confirm from primary sources
 | P-22 | Under subscription authentication: do `--max-turns` and `--max-budget-usd` work, what usage does the stream report, and what does the CLI emit when a plan limit is reached (event shape and reset time)? Which hosts does the CLI contact? Answered on 2026-11-19 by the same sessions, on a `claude setup-token` token, except for the plan limit, which was not reached on purpose. Both caps work and end the session with `error_max_turns` or `error_max_budget_usd` and exit code 1. The final `result` holds tokens and API-equivalent dollars per model, as running totals for the session; per-call output tokens are in `message_delta` events only. A session that completes emits one `rate_limit_event`, after its first response, with the window, its utilisation, `resetsAt` in Unix seconds and the account's usage-credit state; the event of a rejected request is known from the documentation only. `api.anthropic.com` is the one host a session needs; without `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1` the CLI also asks for a Datadog log host. | Section 14, 8.3, SEC-11, 13.5 |
 | P-23 | (M4) Can a host-side pass-through supply the subscription credential so that the worker holds none: does the CLI accept a custom base URL under subscription authentication, and is that within the plan's terms? | 13.5; would remove the token from workers before auto-merge |
 | P-24 | On the server, as the factory's user: do the bubblewrap tests of P-16 pass, does the kernel accept a seccomp filter, and can the user open `/dev/kvm`? The server's other facts were observed on 2026-11-20 (4.4). These three were not: `bubblewrap` was not installed and the account that ran the script is not in group `kvm`. Answered on 2026-11-20 with the stand-in commands of P-16, not the factory's sandbox: as the factory's user, a member of group `kvm`, all five tests pass with bubblewrap 0.12.0 and no setup step, a sandbox given a seccomp filter runs under it, and `/dev/kvm` opens and answers `KVM_GET_API_VERSION` and `KVM_CREATE_VM`. No guest was booted. | 4.4, 13.3; the exit check of M0 (22) |
+| P-25 | Does adding a label that does not exist fail, or create the label? Answered on 2026-11-21 by calls on the scratch repository, with the operator's token, which has admin permission there, and not an installation token: the REST API creates the label, grey and without a description, and applies it. Each of the four calls that take label names did so (add labels, replace the label set, update an issue, create an issue), under API versions `2026-03-10` and `2022-11-28`, and each answered with its ordinary success. `gh issue edit --add-label` refuses with `'<name>' not found`. In the one request that tried it, to the add-label endpoint, a name that differs from an existing label only in letter case applied the existing label and created nothing. | GH-1, 20.1, D-21 |
 
 ### 23.3 Known weak points
 

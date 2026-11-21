@@ -1,0 +1,93 @@
+"Cargo.toml"       "crates/factory-core/Cargo.toml"   Ok(true) 
+"crates/**"        "vendor/crates/a.rs"               Ok(true) 
+"SPEC.md"          "docs/specs/billing/spec.md"       Ok(true) 
+"/SPEC.md"         "SPEC.md"                          Ok(true) 
+"/SPEC.md"         "spec.md"                          Ok(true) 
+"/SPEC.md"         "docs/SPEC.md"                     Ok(false) 
+"/crates/**"       "vendor/crates/a.rs"               Ok(false) 
+"*.snap"           "x/a.snap"                         Ok(true) 
+"/*.snap"          "x/a.snap"                         Ok(false) 
+"/*.snap"          "a.snap"                           Ok(true) 
+"**/*.snap"        "a.snap"                           Ok(true) 
+"/**/*.snap"       "a.snap"                           Ok(true) 
+"/**/*.snap"       "x/y/a.snap"                       Ok(true) 
+"crates/**"        "crates/a/b.rs"                    Ok(true) 
+"crates/**"        "crates"                           Ok(false) 
+"/crates/**"       "crates"                           Ok(false) 
+"a/**/b"           "a/b"                              Ok(true) 
+"a/**/b"           "a/x/y/b"                          Ok(true) 
+"a/**/b"           "a/x/y/c"                          Ok(false) 
+"**"               "a"                                Ok(true) 
+"/**"              "a/b"                              Ok(true) 
+"a?b"              "a/b"                              Ok(false) 
+"a?b"              "axb"                              Ok(true) 
+"a?b"              "ab"                               Ok(false) 
+"a*b"              "ab"                               Ok(true) 
+"a*b"              "a/b"                              Ok(false) 
+"*"                ".hidden"                          Ok(true) 
+"docs/*"           "docs/.hidden"                     Ok(true) 
+"docs/*"           "docs/a/b.md"                      Ok(false) 
+"app/?id?/*.tsx"   "app/[id]/page.tsx"                Ok(true) 
+"?"                "é"                                Ok(true) 
+"?"                "e\u{301}"                         Ok(true) 
+"?"                "x\u{323}\u{307}\u{301}"           Ok(false) 
+"migrations"       "migrations/001.sql"               Ok(false) 
+"migrations"       "db/migrations"                    Ok(true) 
+"migrations/**"    "migrations/001.sql"               Ok(true) 
+"migrations/**"    "db/migrations/001.sql"            Ok(true) 
+"AGENTS.md"        "agents.MD"                        Ok(true) 
+"AGENTS.md"        "AGENTſ.md"                        Ok(true) 
+".github/**"       ".GitHub/workflows/x.yml"          Ok(true) 
+".github/**"       ".github/worKflows/x.yml"          Ok(true) 
+"straße"           "STRASSE"                          Ok(true) 
+"STRASSE"          "straße"                           Ok(true) 
+"stra?e"           "straße"                           Ok(false) 
+"stra??e"          "straße"                           Ok(true) 
+"é.md"             "E\u{301}.md"                      Ok(true) 
+"fi"               "ﬁ"                                Ok(true) 
+"a"                "ａ"                                Ok(false) 
+"i"                "İ"                                Ok(false) 
+"I"                "ı"                                Ok(false) 
+"σ"                "ς"                                Ok(true) 
+"ᾀ"                "ἈΙ"                               Ok(true) 
+"α\u{345}\u{301}"  "ᾴ"                                Ok(true) 
+".git"             ".g\u{200c}it"                     Ok(false) 
+"AGENTS.md"        "AGENTS.md."                       Ok(false) 
+"*.md"             b"a\xff.md" (not UTF-8)            true
+"a?.md"            b"a\xff.md" (not UTF-8)            true
+"a.md"             b"a\xff.md" (not UTF-8)            false
+
+""                 invalid: names nothing
+"/"                invalid: names nothing
+"migrations/"      invalid: ends in '/'; write '/**' for everything below a directory
+"/migrations/"     invalid: ends in '/'; write '/**' for everything below a directory
+"a//b"             invalid: empty component
+"//a"              invalid: empty component
+"./a"              invalid: '.' or '..' component
+"a/../b"           invalid: '.' or '..' component
+"a**b"             invalid: '**' is not a whole component
+"**a"              invalid: '**' is not a whole component
+"a/***"            invalid: '**' is not a whole component
+"[a-c].rs"         invalid: reserved character
+"a]"               invalid: reserved character
+"{a,b}.rs"         invalid: reserved character
+"a}"               invalid: reserved character
+"a\\b"             invalid: reserved character
+"\\*.rs"           invalid: reserved character
+"**"               valid
+"/**"              valid
+"a/**/**/b"        valid
+"*"                valid
+"a b"              valid
+"#a"               valid
+"!a"               valid
+".factory/**"      valid
+"AGENTS.md"        valid
+"docs/specs/**"    valid
+"target/**"        valid
+"/docs/**"         valid
+"**/*.snap"        valid
+"/Cargo.lock"      valid
+"a\u{301}"         valid
+
+0 not as expected

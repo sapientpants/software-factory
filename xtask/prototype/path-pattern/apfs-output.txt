@@ -1,0 +1,25 @@
+ProductName:		macOS
+ProductVersion:		27.0.1
+BuildVersion:		26A434
+   File System Personality:   APFS
+ascii case                 AGENTS.md              agents.MD                same_name=True stored=['AGENTS.md']
+latin1 case                \xc9.md                \xe9.md                  same_name=True stored=['\\xc9.md']
+NFC vs NFD                 \xe9.md                e\u0301.md               same_name=True stored=['\\xe9.md']
+kelvin sign                workflows              wor\u212aflows           same_name=True stored=['workflows']
+long s                     AGENTS.md              AGENT\u017f.md           same_name=True stored=['AGENTS.md']
+sharp s full fold          stra\xdfe              STRASSE                  same_name=True stored=['stra\\xdfe']
+capital sharp s            stra\xdfe              STRA\u1e9eE              same_name=True stored=['stra\\xdfe']
+final sigma                \u03c3                 \u03c2                   same_name=True stored=['\\u03c3']
+capital sigma vs final     \u03a3                 \u03c2                   same_name=True stored=['\\u03a3']
+dz titlecase               \u01c6                 \u01c5                   same_name=True stored=['\\u01c6']
+dotted capital I           i                      \u0130                   same_name=False stored=['i']
+dotless i                  I                      \u0131                   same_name=False stored=['I']
+fi ligature (compat)       fi                     \ufb01                   same_name=True stored=['fi']
+fullwidth a (compat)       a                      \uff41                   same_name=False stored=['a']
+ZWNJ ignorable             .git2                  .g\u200cit2              same_name=False stored=['.git2']
+BOM ignorable              .git3                  .git3\ufeff              same_name=False stored=['.git3']
+iota subscript full fold   \u1f80                 \u1f00\u03b9             same_name=True stored=['\\u1f80']
+ypogegrammeni              \u0345x                \u03b9x                  same_name=True stored=['\\u0345x']
+cherokee                   \u13a0                 \uab70                   same_name=True stored=['\\u13a0']
+trailing dot               name                   name.                    same_name=False stored=['name']
+trailing space             name2                  name2                    same_name=False stored=['name2']

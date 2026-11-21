@@ -1,0 +1,104 @@
+unicode-normalization UNICODE_VERSION = (18, 0, 0)
+std UNICODE_VERSION = (18, 0, 0)
+
+== grammar (literal_separator=true | false), case-sensitive
+"**/*.snap"      vs "a.snap"           -> true                         | true
+"**/*.snap"      vs "x/y/a.snap"       -> true                         | true
+"*.snap"         vs "x/a.snap"         -> false                        | true
+"crates/**"      vs "crates"           -> false                        | false
+"crates/**"      vs "crates/"          -> true                         | true
+"crates/**"      vs "crates/a.rs"      -> true                         | true
+"crates/**"      vs "crates/a/b.rs"    -> true                         | true
+"a/**/b"         vs "a/b"              -> true                         | true
+"a/**/b"         vs "a/x/y/b"          -> true                         | true
+"**"             vs "a/b"              -> true                         | true
+"**"             vs ""                 -> true                         | true
+"*"              vs "a/b"              -> false                        | true
+"a?b"            vs "a/b"              -> false                        | true
+"a?b"            vs "axb"              -> true                         | true
+"a[/]b"          vs "a/b"              -> true                         | true
+"a[!x]b"         vs "a/b"              -> true                         | true
+"a**b"           vs "axxb"             -> true                         | true
+"a**b"           vs "ax/xb"            -> false                        | true
+"a/**b"          vs "a/x/yb"           -> false                        | true
+"**a"            vs "x/ya"             -> false                        | true
+"a**"            vs "a/x"              -> false                        | true
+"[a-c].rs"       vs "b.rs"             -> true                         | true
+"[!a-c].rs"      vs "d.rs"             -> true                         | true
+"[^a-c].rs"      vs "d.rs"             -> true                         | true
+"[]a].rs"        vs "].rs"             -> true                         | true
+"{a,b}.rs"       vs "a.rs"             -> true                         | true
+"{a,b{c,d}}.rs"  vs "bd.rs"            -> true                         | true
+"{a,}.rs"        vs ".rs"              -> false                        | false
+"x{a,b/c}"       vs "xb/c"             -> true                         | true
+"\\*.rs"         vs "*.rs"             -> true                         | true
+"\\*.rs"         vs "a.rs"             -> false                        | false
+"a\\"            vs "a\\"              -> ERR(dangling '\')            | ERR(dangling '\')
+""               vs ""                 -> true                         | true
+""               vs "a"                -> false                        | false
+"/"              vs "/"                -> true                         | true
+"/a"             vs "a"                -> false                        | false
+"/a"             vs "/a"               -> true                         | true
+"[a"             vs "a"                -> ERR(unclosed character class; missing ']') | ERR(unclosed character class; missing ']')
+"{a"             vs "a"                -> ERR(unclosed alternate group; missing '}' (maybe escape '{' with '[{]'?)) | ERR(unclosed alternate group; missing '}' (maybe escape '{' with '[{]'?))
+"a]"             vs "a]"               -> true                         | true
+"a}"             vs "a}"               -> ERR(unopened alternate group; missing '{' (maybe escape '}' with '[}]'?)) | ERR(unopened alternate group; missing '{' (maybe escape '}' with '[}]'?))
+"[z-a]"          vs "b"                -> ERR(invalid range; 'z' > 'a') | ERR(invalid range; 'z' > 'a')
+"[]"             vs "a"                -> ERR(unclosed character class; missing ']') | ERR(unclosed character class; missing ']')
+"[!]"            vs "a"                -> ERR(unclosed character class; missing ']') | ERR(unclosed character class; missing ']')
+"migrations"     vs "migrations/001.sql" -> false                        | false
+"migrations/"    vs "migrations/001.sql" -> false                        | false
+"migrations/"    vs "migrations/"      -> true                         | true
+"*.rs"           vs ".rs"              -> true                         | true
+"*"              vs ".hidden"          -> true                         | true
+"a/*"            vs "a/.hidden"        -> true                         | true
+"?"              vs "é"                -> false                        | false
+"?"              vs "e\u{301}"         -> false                        | false
+"a//b"           vs "a/b"              -> false                        | false
+"a/./b"          vs "a/b"              -> false                        | false
+
+== case_insensitive(true), literal_separator(true)
+"AGENTS.md"    vs "agents.MD"    -> true
+"straße"       vs "STRASSE"      -> false
+"strasse"      vs "straße"       -> false
+"ß"            vs "ẞ"            -> false
+"k"            vs "K"            -> false
+"s"            vs "ſ"            -> false
+"i"            vs "İ"            -> false
+"I"            vs "ı"            -> false
+"ǆ"            vs "ǅ"            -> false
+"σ"            vs "ς"            -> false
+"Σ"            vs "ς"            -> false
+"é"            vs "É"            -> false
+"é"            vs "e\u{301}"     -> false
+"É"            vs "e\u{301}"     -> false
+"ﬁ"            vs "fi"           -> false
+"ａ"            vs "a"            -> false
+"ΐ"            vs "ΐ"            -> false
+"[a-c]"        vs "B"            -> true
+"[!a-c]"       vs "B"            -> false
+".git"         vs ".G\u{200c}IT" -> false
+"workflows"    vs "worKflows"    -> false
+"AGENTS.md"    vs "AGENTſ.md"    -> false
+
+== folds
+"AGENTS.md"    caseless.fold="agents.md" caseless.canon="agents.md" icu.fold="agents.md" icu.canon="agents.md" icu.compat="agents.md"
+"Straße"       caseless.fold="strasse"  caseless.canon="strasse"  icu.fold="strasse"  icu.canon="strasse"  icu.compat="strasse"
+"ẞ"            caseless.fold="ss"       caseless.canon="ss"       icu.fold="ss"       icu.canon="ss"       icu.compat="ss"
+"K"            caseless.fold="k"        caseless.canon="k"        icu.fold="k"        icu.canon="k"        icu.compat="k"
+"ſ"            caseless.fold="s"        caseless.canon="s"        icu.fold="s"        icu.canon="s"        icu.compat="s"
+"İ"            caseless.fold="i\u{307}" caseless.canon="i\u{307}" icu.fold="i\u{307}" icu.canon="i\u{307}" icu.compat="i\u{307}"
+"ı"            caseless.fold="ı"        caseless.canon="ı"        icu.fold="ı"        icu.canon="ı"        icu.compat="ı"
+"ǅ"            caseless.fold="ǆ"        caseless.canon="ǆ"        icu.fold="ǆ"        icu.canon="ǆ"        icu.compat="dž"
+"ς"            caseless.fold="σ"        caseless.canon="σ"        icu.fold="σ"        icu.canon="σ"        icu.compat="σ"
+"É"            caseless.fold="é"        caseless.canon="é"        icu.fold="é"        icu.canon="é"        icu.compat="é"
+"e\u{301}"     caseless.fold="e\u{301}" caseless.canon="é"        icu.fold="e\u{301}" icu.canon="é"        icu.compat="é"
+"ﬁ"            caseless.fold="fi"       caseless.canon="fi"       icu.fold="fi"       icu.canon="fi"       icu.compat="fi"
+"ａ"            caseless.fold="ａ"        caseless.canon="ａ"        icu.fold="ａ"        icu.canon="ａ"        icu.compat="a"
+".G\u{200c}IT" caseless.fold=".g\u{200c}it" caseless.canon=".g\u{200c}it" icu.fold=".g\u{200c}it" icu.canon=".g\u{200c}it" icu.compat=".g\u{200c}it"
+"ΐ"            caseless.fold="ι\u{308}\u{301}" caseless.canon="ΐ"        icu.fold="ι\u{308}\u{301}" icu.canon="ΐ"        icu.compat="ΐ"
+"ΐ"            caseless.fold="ι\u{308}\u{301}" caseless.canon="ΐ"        icu.fold="ι\u{308}\u{301}" icu.canon="ΐ"        icu.compat="ΐ"
+"\u{345}"      caseless.fold="ι"        caseless.canon="ι"        icu.fold="ι"        icu.canon="ι"        icu.compat="ι"
+"ᾈ"            caseless.fold="ἀι"       caseless.canon="ἀι"       icu.fold="ἀι"       icu.canon="ἀι"       icu.compat="ἀι"
+canonical_caseless_match(straße, STRASSE) = true
+compat_caseless_match(.git, .G<ZWNJ>IT) = false

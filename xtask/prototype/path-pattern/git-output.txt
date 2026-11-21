@@ -1,0 +1,69 @@
+git version 2.56.1
+no setting given (this platform's defaults)
+  .GIT/x                       refused
+  .g???it/x                    refused
+  git~1/x                      refused
+  .git /x                      refused
+core.protectHFS=true core.protectNTFS=true
+  .GIT/x                       refused
+  a/.Git/x                     refused
+  .g???it/x                    refused
+  .git???/x                    refused
+  git~1/x                      refused
+  .git /x                      refused
+  .git./x                      refused
+  wor???flows/x                accepted
+  AGENTS.md???                 accepted
+  AGENTS.md.                   accepted
+  AGENTS.md                    accepted
+  AGENTS~1.MD                  accepted
+core.protectHFS=true core.protectNTFS=false
+  .GIT/x                       refused
+  a/.Git/x                     refused
+  .g???it/x                    refused
+  .git???/x                    refused
+  git~1/x                      accepted
+  .git /x                      accepted
+  .git./x                      accepted
+  wor???flows/x                accepted
+  AGENTS.md???                 accepted
+  AGENTS.md.                   accepted
+  AGENTS.md                    accepted
+  AGENTS~1.MD                  accepted
+core.protectHFS=false core.protectNTFS=true
+  .GIT/x                       refused
+  a/.Git/x                     refused
+  .g???it/x                    accepted
+  .git???/x                    accepted
+  git~1/x                      refused
+  .git /x                      refused
+  .git./x                      refused
+  wor???flows/x                accepted
+  AGENTS.md???                 accepted
+  AGENTS.md.                   accepted
+  AGENTS.md                    accepted
+  AGENTS~1.MD                  accepted
+core.protectHFS=false core.protectNTFS=false
+  .GIT/x                       refused
+  a/.Git/x                     refused
+  .g???it/x                    accepted
+  .git???/x                    accepted
+  git~1/x                      accepted
+  .git /x                      accepted
+  .git./x                      accepted
+  wor???flows/x                accepted
+  AGENTS.md???                 accepted
+  AGENTS.md.                   accepted
+  AGENTS.md                    accepted
+  AGENTS~1.MD                  accepted
+settings of this clone (empty: not set):
+  core.protectHFS=
+  core.protectNTFS=
+  core.ignorecase=true
+  core.precomposeunicode=true
+pathspec :(icase), core.precomposeunicode=false; index holds AGENTS.md, <C9>.md (NFC), stra<DF>e, e<U+0301>.txt (NFD)
+  agents.MD        -> AGENTS.md 
+  ??.md            -> 
+  STRASSE          -> 
+  ??.txt           -> 
+  E??.txt          -> "e\314\201.txt" 

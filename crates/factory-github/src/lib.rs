@@ -1,1 +1,1 @@
-//! The GitHub trait, octocrab adapter, gateway, GraphQL documents and outbound encoder (SPEC 19.1).
+//! The GitHub trait, octocrab adapter, gateway and GraphQL documents (SPEC 19.1).

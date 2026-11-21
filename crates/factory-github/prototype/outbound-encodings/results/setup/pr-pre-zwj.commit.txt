@@ -1,0 +1,6 @@
+HTTP/2.0 201 Created
+Date: Fri, 20 Nov 2026 21:43:14 GMT
+X-Github-Api-Version-Selected: 2026-03-10
+X-Github-Request-Id: EE58:63EB:4D9925:75BC5B:6B00BEF1
+
+{"sha":"abc6c10bfe46636f15e82c77a031fd392057964c","node_id":"C_kwDOVzkiD9oAKGFiYzZjMTBiZmU0NjYzNmYxNWU4MmM3N2EwMzFmZDM5MjA1Nzk2NGM","url":"https://api.github.com/repos/sapientpants/sf-scratch/git/commits/abc6c10bfe46636f15e82c77a031fd392057964c","html_url":"https://github.com/sapientpants/sf-scratch/commit/abc6c10bfe46636f15e82c77a031fd392057964c","author":{"name":"sapientpants","email":"sapientpants@users.noreply.github.com","date":"2026-11-20T21:43:13Z"},"committer":{"name":"sapientpants","email":"sapientpants@users.noreply.github.com","date":"2026-11-20T21:43:13Z"},"tree":{"sha":"a05138dabce7fa69ff924842563b19165f64f62f","url":"https://api.github.com/repos/sapientpants/sf-scratch/git/trees/a05138dabce7fa69ff924842563b19165f64f62f"},"message":"P-15 probe: an empty commit for the pull request pre, zwj","parents":[{"sha":"8829957442257c0bd1df02dad633f0c7eb084d76","url":"https://api.github.com/repos/sapientpants/sf-scratch/git/commits/8829957442257c0bd1df02dad633f0c7eb084d76","html_url":"https://github.com/sapientpants/sf-scratch/commit/8829957442257c0bd1df02dad633f0c7eb084d76"}],"verification":{"verified":false,"reason":"unsigned","signature":null,"payload":null,"verified_at":null}}

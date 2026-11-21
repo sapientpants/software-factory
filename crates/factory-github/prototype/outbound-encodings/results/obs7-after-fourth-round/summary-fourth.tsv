@@ -1,0 +1,9 @@
+case	source	mention.link	mention.note	ref.link	ref.xref
+charref-dec-z	#108	no	none	-	-
+charref-hex-raw	#109	yes	mention	-	-
+charref-hex-z	#110	no	none	-	-
+charref-in-fence	#111	no	none	-	-
+charref-named-raw	#112	yes	mention	-	-
+charref-named-z	#113	no	none	-	-
+fence-broken	#114	yes	mention	yes	yes
+fence-long	#115	no	none	no	no

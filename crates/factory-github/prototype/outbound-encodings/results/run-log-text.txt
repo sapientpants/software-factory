@@ -1,0 +1,132 @@
+write	Set up job	﻿2026-11-20T21:43:35.5456174Z Current runner version: '2.338.2'
+write	Set up job	2026-11-20T21:43:35.5478648Z ##[group]Runner Image Provisioner
+write	Set up job	2026-11-20T21:43:35.5479299Z Hosted Compute Agent
+write	Set up job	2026-11-20T21:43:35.5479736Z Version: 20261111.635
+write	Set up job	2026-11-20T21:43:35.5480132Z Commit: b8a594ea514ff44cadb5342986c68b1eac6e22ed
+write	Set up job	2026-11-20T21:43:35.5480576Z Build Date: 2026-11-11T01:49:01Z
+write	Set up job	2026-11-20T21:43:35.5481093Z Worker ID: {f934e3f9-26b0-4e5e-bf26-73bbeb3059bc}
+write	Set up job	2026-11-20T21:43:35.5481534Z Region: centralus
+write	Set up job	2026-11-20T21:43:35.5481906Z Cloud: Azure
+write	Set up job	2026-11-20T21:43:35.5482277Z ##[endgroup]
+write	Set up job	2026-11-20T21:43:35.5483384Z ##[group]Operating System
+write	Set up job	2026-11-20T21:43:35.5483869Z Ubuntu
+write	Set up job	2026-11-20T21:43:35.5484208Z 24.04.5
+write	Set up job	2026-11-20T21:43:35.5484558Z LTS
+write	Set up job	2026-11-20T21:43:35.5484903Z ##[endgroup]
+write	Set up job	2026-11-20T21:43:35.5485251Z ##[group]Runner Image
+write	Set up job	2026-11-20T21:43:35.5485690Z Image: ubuntu-24.04
+write	Set up job	2026-11-20T21:43:35.5486051Z Version: 20261116.376.1
+write	Set up job	2026-11-20T21:43:35.5486712Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261116.376/images/ubuntu/Ubuntu2404-Readme.md
+write	Set up job	2026-11-20T21:43:35.5488014Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261116.376
+write	Set up job	2026-11-20T21:43:35.5488646Z ##[endgroup]
+write	Set up job	2026-11-20T21:43:35.5489499Z ##[group]GITHUB_TOKEN Permissions
+write	Set up job	2026-11-20T21:43:35.5491189Z Contents: write
+write	Set up job	2026-11-20T21:43:35.5491574Z Issues: write
+write	Set up job	2026-11-20T21:43:35.5492040Z Metadata: read
+write	Set up job	2026-11-20T21:43:35.5492419Z PullRequests: write
+write	Set up job	2026-11-20T21:43:35.5492767Z ##[endgroup]
+write	Set up job	2026-11-20T21:43:35.5494756Z Secret source: Actions
+write	Set up job	2026-11-20T21:43:35.5495366Z Cache mode: write
+write	Set up job	2026-11-20T21:43:35.5495924Z Prepare workflow directory
+write	Set up job	2026-11-20T21:43:35.5749737Z Prepare all required actions
+write	Set up job	2026-11-20T21:43:35.5846372Z Complete job name: write
+write	Write the encoded text as github-actions[bot]	﻿2026-11-20T21:43:35.6811070Z ##[group]Run set -u
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:43:35.6812024Z ^[[36;1mset -u^[[0m
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:43:35.6812839Z ^[[36;1mgit clone --quiet "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" s^[[0m
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:43:35.6813854Z ^[[36;1mgit -C s switch --quiet probe/p-15^[[0m
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:43:35.6814540Z ^[[36;1mbash s/p15/bot.sh^[[0m
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:43:35.7063154Z shell: /usr/bin/bash -e {0}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:43:35.7064280Z env:
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:43:35.7068743Z   GH_TOKEN: ***
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:43:35.7069301Z   REPO: sapientpants/sf-scratch
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:43:35.7069981Z ##[endgroup]
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:43:36.1204244Z == plain: an issue, then the text as its one comment
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:43:36.7166406Z comment-plain=60
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:43:39.3766414Z {"created_at":"2026-11-20T21:43:39Z","id":7051334046,"user":"github-actions[bot]"}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:43:41.3808347Z == plain: an issue with the text as its body
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:43:41.9568021Z {"created_at":"2026-11-20T21:43:41Z","number":61,"title":"P-15 probe: source, body, plain","updated_at":"2026-11-20T21:43:41Z","user":"github-actions[bot]"}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:43:43.9610918Z == plain: an issue with the text in its title
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:43:44.4751697Z {"created_at":"2026-11-20T21:43:44Z","number":62,"title":"P-15 probe: source, title, plain: @sapientpants see #16","updated_at":"2026-11-20T21:43:44Z","user":"github-actions[bot]"}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:43:46.4796389Z == plain: the text as the new body of the operator's pull request
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:43:47.2491791Z {"created_at":"2026-11-20T21:43:01Z","number":53,"title":"P-15 probe: source, pull request body edited, plain","updated_at":"2026-11-20T21:43:46Z","user":"sapientpants"}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:43:49.2543090Z == fence: an issue, then the text as its one comment
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:43:49.7027568Z comment-fence=63
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:43:52.3075869Z {"created_at":"2026-11-20T21:43:52Z","id":7051338119,"user":"github-actions[bot]"}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:43:54.3122840Z == fence: an issue with the text as its body
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:43:54.7609273Z {"created_at":"2026-11-20T21:43:54Z","number":64,"title":"P-15 probe: source, body, fence","updated_at":"2026-11-20T21:43:54Z","user":"github-actions[bot]"}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:43:56.7647040Z == fence: the text as the new body of the operator's pull request
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:43:57.5022388Z {"created_at":"2026-11-20T21:43:05Z","number":54,"title":"P-15 probe: source, pull request body edited, fence","updated_at":"2026-11-20T21:43:57Z","user":"sapientpants"}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:43:59.5067146Z == code: an issue, then the text as its one comment
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:43:59.9243309Z comment-code=65
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:02.4868977Z {"created_at":"2026-11-20T21:44:02Z","id":7051341292,"user":"github-actions[bot]"}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:04.4918997Z == code: an issue with the text as its body
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:04.9429020Z {"created_at":"2026-11-20T21:44:04Z","number":66,"title":"P-15 probe: source, body, code","updated_at":"2026-11-20T21:44:04Z","user":"github-actions[bot]"}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:06.9472165Z == code: an issue with the text in its title
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:07.4361556Z {"created_at":"2026-11-20T21:44:07Z","number":67,"title":"P-15 probe: source, title, code: `@sapientpants` see `#16`","updated_at":"2026-11-20T21:44:07Z","user":"github-actions[bot]"}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:09.4405826Z == code: the text as the new body of the operator's pull request
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:10.2561605Z {"created_at":"2026-11-20T21:43:08Z","number":55,"title":"P-15 probe: source, pull request body edited, code","updated_at":"2026-11-20T21:44:09Z","user":"sapientpants"}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:12.2606494Z == backslash: an issue, then the text as its one comment
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:12.7853491Z comment-backslash=68
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:15.5850307Z {"created_at":"2026-11-20T21:44:15Z","id":7051345213,"user":"github-actions[bot]"}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:17.5905673Z == backslash: an issue with the text as its body
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:18.1379787Z {"created_at":"2026-11-20T21:44:17Z","number":69,"title":"P-15 probe: source, body, backslash","updated_at":"2026-11-20T21:44:17Z","user":"github-actions[bot]"}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:20.1427046Z == backslash: an issue with the text in its title
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:20.6117995Z {"created_at":"2026-11-20T21:44:20Z","number":70,"title":"P-15 probe: source, title, backslash: \\@sapientpants see \\#16","updated_at":"2026-11-20T21:44:20Z","user":"github-actions[bot]"}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:22.6135963Z == backslash: the text as the new body of the operator's pull request
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:23.5667137Z {"created_at":"2026-11-20T21:43:11Z","number":56,"title":"P-15 probe: source, pull request body edited, backslash","updated_at":"2026-11-20T21:44:22Z","user":"sapientpants"}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:25.5712807Z == zwj: an issue, then the text as its one comment
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:26.0368261Z comment-zwj=71
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:28.7206188Z {"created_at":"2026-11-20T21:44:28Z","id":7051349345,"user":"github-actions[bot]"}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:30.7251277Z == zwj: an issue with the text as its body
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:31.3225692Z {"created_at":"2026-11-20T21:44:31Z","number":72,"title":"P-15 probe: source, body, zwj","updated_at":"2026-11-20T21:44:31Z","user":"github-actions[bot]"}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:33.3274050Z == zwj: an issue with the text in its title
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:33.8189154Z {"created_at":"2026-11-20T21:44:33Z","number":73,"title":"P-15 probe: source, title, zwj: @‍sapientpants see #‍16","updated_at":"2026-11-20T21:44:33Z","user":"github-actions[bot]"}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:35.8175499Z == zwj: the text as the new body of the operator's pull request
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:36.7628490Z {"created_at":"2026-11-20T21:43:15Z","number":57,"title":"P-15 probe: source, pull request body edited, zwj","updated_at":"2026-11-20T21:44:36Z","user":"sapientpants"}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:38.7673251Z == zwsp: an issue, then the text as its one comment
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:39.3466157Z comment-zwsp=74
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:42.0683931Z {"created_at":"2026-11-20T21:44:41Z","id":7051353937,"user":"github-actions[bot]"}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:44.0729051Z == zwsp: an issue with the text as its body
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:44.5939682Z {"created_at":"2026-11-20T21:44:44Z","number":75,"title":"P-15 probe: source, body, zwsp","updated_at":"2026-11-20T21:44:44Z","user":"github-actions[bot]"}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:46.5983653Z == zwsp: an issue with the text in its title
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:47.1354350Z {"created_at":"2026-11-20T21:44:46Z","number":76,"title":"P-15 probe: source, title, zwsp: @​sapientpants see #​16","updated_at":"2026-11-20T21:44:46Z","user":"github-actions[bot]"}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:49.1399677Z == zwsp: the text as the new body of the operator's pull request
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:50.0189049Z {"created_at":"2026-11-20T21:43:18Z","number":58,"title":"P-15 probe: source, pull request body edited, zwsp","updated_at":"2026-11-20T21:44:49Z","user":"sapientpants"}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:52.0232103Z == entity: an issue, then the text as its one comment
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:52.5142418Z comment-entity=77
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:55.2376758Z {"created_at":"2026-11-20T21:44:54Z","id":7051358578,"user":"github-actions[bot]"}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:57.2420944Z == entity: an issue with the text as its body
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:57.7906930Z {"created_at":"2026-11-20T21:44:57Z","number":78,"title":"P-15 probe: source, body, entity","updated_at":"2026-11-20T21:44:57Z","user":"github-actions[bot]"}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:44:59.7950670Z == entity: an issue with the text in its title
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:45:00.2778450Z {"created_at":"2026-11-20T21:45:00Z","number":79,"title":"P-15 probe: source, title, entity: \u0026#64;sapientpants see \u0026#35;16","updated_at":"2026-11-20T21:45:00Z","user":"github-actions[bot]"}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:45:02.2822992Z == entity: the text as the new body of the operator's pull request
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:45:03.2256922Z {"created_at":"2026-11-20T21:43:21Z","number":59,"title":"P-15 probe: source, pull request body edited, entity","updated_at":"2026-11-20T21:45:02Z","user":"sapientpants"}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:45:05.2287625Z == the commits
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:45:05.2378798Z fatal: could not open 'payload/csubj-plain.txt' for reading: No such file or directory
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:45:05.2379857Z csubj-plain=
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:45:05.2392222Z fatal: not a valid object name 
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:45:05.2394352Z cbody-plain=
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:45:05.2407780Z fatal: not a valid object name 
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:45:05.2410051Z cbody-fence=
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:45:05.2422341Z fatal: not a valid object name 
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:45:05.2424902Z csubj-code=
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:45:05.2437083Z fatal: not a valid object name 
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:45:05.2439462Z cbody-code=
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:45:05.2451537Z fatal: not a valid object name 
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:45:05.2453863Z csubj-backslash=
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:45:05.2465864Z fatal: not a valid object name 
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:45:05.2468337Z cbody-backslash=
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:45:05.2480579Z fatal: not a valid object name 
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:45:05.2482785Z csubj-zwj=
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:45:05.2494135Z fatal: not a valid object name 
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:45:05.2496448Z cbody-zwj=
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:45:05.2507888Z fatal: not a valid object name 
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:45:05.2510255Z csubj-zwsp=
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:45:05.2521657Z fatal: not a valid object name 
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:45:05.2523995Z cbody-zwsp=
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:45:05.2536052Z fatal: not a valid object name 
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:45:05.2538762Z csubj-entity=
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:45:05.2551633Z fatal: not a valid object name 
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:45:05.2554136Z cbody-entity=
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:45:06.3990580Z 78298a30f24288a1c67727c347b1f3ad32404c36 Marc Tremblay <sapientpants@users.noreply.github.com> Probe P-15: write encoded text as github-actions[bot]
+write	Complete job	﻿2026-11-20T21:45:06.4105497Z Cleaning up orphan processes

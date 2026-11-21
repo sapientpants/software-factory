@@ -1,0 +1,27 @@
+# Probe P-15 of the software factory's spec: which encodings stop GitHub from
+# acting on a mention, an issue reference or a closing keyword? The job's token
+# belongs to the GitHub Actions App, so its writes are made as
+# github-actions[bot], and a mention of the repository's owner is a mention by
+# another account. One shell step, no actions. The text is in p15/payload/, and
+# p15/part names the half of bot.sh that this push runs.
+name: probe-p15
+on:
+  push:
+    branches: [probe/p-15]
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+jobs:
+  write:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Write the encoded text as github-actions[bot]
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -u
+          git clone --quiet "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" s
+          git -C s switch --quiet probe/p-15
+          bash s/p15/bot.sh "$(cat s/p15/part)"

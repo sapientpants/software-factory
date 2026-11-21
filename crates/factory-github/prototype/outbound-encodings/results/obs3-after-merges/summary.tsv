@@ -1,0 +1,48 @@
+surface	encoding	source	mention.link	mention.event	mention.note	hash.link	hash.xref	gh.link	gh.xref	full.link	full.xref	url.link	url.xref	close.xref	close.will	close.state
+comment	plain	#60	yes	yes	mention	yes	yes	yes	yes	yes	yes	yes	yes	yes	no	open
+comment	fence	#63	no	no	none	no	no	no	no	no	no	no	no	no	no	open
+comment	code	#65	no	no	none	no	no	no	no	no	no	no	no	no	no	open
+comment	backslash	#68	yes	yes	mention	yes	yes	yes	yes	yes	yes	yes	yes	yes	no	open
+comment	zwj	#71	no	no	none	no	no	no	no	no	no	yes	yes	no	no	open
+comment	zwsp	#74	no	no	none	no	no	no	no	no	no	yes	yes	no	no	open
+comment	entity	#77	yes	yes	mention	yes	yes	yes	yes	yes	yes	yes	yes	yes	no	open
+body	plain	#61	yes	no	mention	yes	yes	yes	yes	yes	yes	yes	yes	yes	no	open
+body	fence	#64	no	no	none	no	no	no	no	no	no	no	no	no	no	open
+body	code	#66	no	no	none	no	no	no	no	no	no	no	no	no	no	open
+body	backslash	#69	yes	no	mention	yes	yes	yes	yes	yes	yes	yes	yes	yes	no	open
+body	zwj	#72	no	no	none	no	no	no	no	no	no	yes	yes	no	no	open
+body	zwsp	#75	no	no	none	no	no	no	no	no	no	yes	yes	no	no	open
+body	entity	#78	yes	no	mention	yes	yes	yes	yes	yes	yes	yes	yes	yes	no	open
+title	plain	#62	no	no	none	no	no	-	-	-	-	-	-	-	-	-
+title	code	#67	no	no	none	no	no	-	-	-	-	-	-	-	-	-
+title	backslash	#70	no	no	none	no	no	-	-	-	-	-	-	-	-	-
+title	zwj	#73	no	no	none	no	no	-	-	-	-	-	-	-	-	-
+title	zwsp	#76	no	no	none	no	no	-	-	-	-	-	-	-	-	-
+title	entity	#79	no	no	none	no	no	-	-	-	-	-	-	-	-	-
+prc	plain	#46	yes	yes	none	yes	yes	yes	yes	yes	yes	yes	yes	yes	yes	closed by #46
+prc	fence	#47	no	no	none	no	no	no	no	no	no	no	no	no	no	open
+prc	code	#48	no	no	none	no	no	no	no	no	no	no	no	no	no	open
+prc	backslash	#49	yes	yes	none	yes	yes	yes	yes	yes	yes	yes	yes	yes	yes	closed by #49
+prc	zwj	#50	no	no	none	no	no	no	no	no	no	yes	yes	no	no	open
+prc	zwsp	#51	no	no	none	no	no	no	no	no	no	yes	yes	no	no	open
+prc	entity	#52	yes	yes	none	yes	yes	yes	yes	yes	yes	yes	yes	yes	yes	closed by #52
+pre	plain	#53	yes	yes	none	yes	yes	yes	yes	yes	yes	yes	yes	yes	yes	closed by #53
+pre	fence	#54	no	no	none	no	no	no	no	no	no	no	no	no	no	open
+pre	code	#55	no	no	none	no	no	no	no	no	no	no	no	no	no	open
+pre	backslash	#56	yes	yes	none	yes	yes	yes	yes	yes	yes	yes	yes	yes	yes	closed by #56
+pre	zwj	#57	no	no	none	no	no	no	no	no	no	yes	yes	no	no	open
+pre	zwsp	#58	no	no	none	no	no	no	no	no	no	yes	yes	no	no	open
+pre	entity	#59	yes	yes	none	yes	yes	yes	yes	yes	yes	yes	yes	yes	yes	closed by #59
+csubj	plain	fa04913	yes	-	none	yes	no	-	-	-	-	-	-	no	yes	closed by fa04913
+csubj	code	13e2719	no	-	none	yes	no	-	-	-	-	-	-	no	no	open
+csubj	backslash	5f7f6da	yes	-	none	yes	no	-	-	-	-	-	-	no	no	open
+csubj	zwj	0f07141	no	-	none	no	no	-	-	-	-	-	-	no	no	open
+csubj	zwsp	f9d4c9b	no	-	none	no	no	-	-	-	-	-	-	no	no	open
+csubj	entity	e9bd475	no	-	none	no	no	-	-	-	-	-	-	no	no	open
+cbody	plain	542673f	yes	-	none	yes	no	yes	no	yes	no	yes	no	no	yes	closed by 542673f
+cbody	fence	0efde7f	yes	-	none	yes	no	yes	no	yes	no	yes	no	no	yes	closed by 0efde7f
+cbody	code	9c14e7b	no	-	none	yes	no	yes	no	yes	no	no	no	no	no	open
+cbody	backslash	da012f2	yes	-	none	yes	no	no	no	yes	no	yes	no	no	no	open
+cbody	zwj	4e9f354	no	-	none	no	no	no	no	no	no	yes	no	no	no	open
+cbody	zwsp	8e3383a	no	-	none	no	no	no	no	no	no	yes	no	no	no	open
+cbody	entity	569d9ee	no	-	none	no	no	no	no	no	no	yes	no	no	no	open

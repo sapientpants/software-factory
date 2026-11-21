@@ -1,0 +1,8 @@
+P-15 probe: commit body, zwj
+
+mention: @‍sapientpants wrote this.
+hash: see #‍12 for the first.
+gh: see GH-‍13 for the second.
+full: see sapientpants/sf-scratch#‍14 for the third.
+url: see https:‍//github.com/sapientpants/sf-scratch/issues/15 for the fourth.
+close: Fixes #‍36.

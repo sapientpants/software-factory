@@ -1,0 +1,73 @@
+write	Set up job	﻿2026-11-20T21:56:48.4980902Z Current runner version: '2.338.2'
+write	Set up job	2026-11-20T21:56:48.5008981Z ##[group]Runner Image Provisioner
+write	Set up job	2026-11-20T21:56:48.5009929Z Hosted Compute Agent
+write	Set up job	2026-11-20T21:56:48.5010547Z Version: 20261111.635
+write	Set up job	2026-11-20T21:56:48.5011199Z Commit: b8a594ea514ff44cadb5342986c68b1eac6e22ed
+write	Set up job	2026-11-20T21:56:48.5011987Z Build Date: 2026-11-11T01:49:01Z
+write	Set up job	2026-11-20T21:56:48.5012657Z Worker ID: {352f9709-a417-4c62-a93f-243b48b9a103}
+write	Set up job	2026-11-20T21:56:48.5013367Z Region: us-east-1
+write	Set up job	2026-11-20T21:56:48.5014206Z Cloud: AWS
+write	Set up job	2026-11-20T21:56:48.5014719Z ##[endgroup]
+write	Set up job	2026-11-20T21:56:48.5016089Z ##[group]Operating System
+write	Set up job	2026-11-20T21:56:48.5016726Z Ubuntu
+write	Set up job	2026-11-20T21:56:48.5017226Z 24.04.5
+write	Set up job	2026-11-20T21:56:48.5017805Z LTS
+write	Set up job	2026-11-20T21:56:48.5018320Z ##[endgroup]
+write	Set up job	2026-11-20T21:56:48.5018886Z ##[group]Runner Image
+write	Set up job	2026-11-20T21:56:48.5019483Z Image: ubuntu-24.04
+write	Set up job	2026-11-20T21:56:48.5020026Z Version: 20261116.133.1
+write	Set up job	2026-11-20T21:56:48.5021167Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261116.133/images/ubuntu/Ubuntu2404-Readme.md
+write	Set up job	2026-11-20T21:56:48.5023047Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261116.133
+write	Set up job	2026-11-20T21:56:48.5024248Z ##[endgroup]
+write	Set up job	2026-11-20T21:56:48.5025609Z ##[group]GITHUB_TOKEN Permissions
+write	Set up job	2026-11-20T21:56:48.5028085Z Contents: write
+write	Set up job	2026-11-20T21:56:48.5028664Z Issues: write
+write	Set up job	2026-11-20T21:56:48.5029278Z Metadata: read
+write	Set up job	2026-11-20T21:56:48.5029832Z PullRequests: write
+write	Set up job	2026-11-20T21:56:48.5030782Z ##[endgroup]
+write	Set up job	2026-11-20T21:56:48.5033341Z Secret source: Actions
+write	Set up job	2026-11-20T21:56:48.5034486Z Cache mode: write
+write	Set up job	2026-11-20T21:56:48.5035351Z Prepare workflow directory
+write	Set up job	2026-11-20T21:56:48.5379909Z Prepare all required actions
+write	Set up job	2026-11-20T21:56:48.5492661Z Complete job name: write
+write	Write the encoded text as github-actions[bot]	﻿2026-11-20T21:56:48.6498418Z ##[group]Run set -u
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:56:48.6499109Z ^[[36;1mset -u^[[0m
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:56:48.6499735Z ^[[36;1mgit clone --quiet "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" s^[[0m
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:56:48.6500442Z ^[[36;1mgit -C s switch --quiet probe/p-15^[[0m
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:56:48.6501024Z ^[[36;1mbash s/p15/bot.sh "$(cat s/p15/part)"^[[0m
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:56:50.6890162Z shell: /usr/bin/bash -e {0}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:56:50.6891085Z env:
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:56:50.6893736Z   GH_TOKEN: ***
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:56:50.6894088Z   REPO: sapientpants/sf-scratch
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:56:50.6894394Z ##[endgroup]
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:56:51.6490959Z == plain: an issue and a comment, then the text as the comment's new body
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:56:54.2918378Z cedit-plain=88
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:56:59.7195171Z {"created_at":"2026-11-20T21:56:56Z","id":7051582402,"updated_at":"2026-11-20T21:56:59Z","user":"github-actions[bot]"}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:57:01.7225121Z == fence: an issue and a comment, then the text as the comment's new body
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:57:02.1278550Z cedit-fence=89
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:57:07.4208715Z {"created_at":"2026-11-20T21:57:04Z","id":7051584657,"updated_at":"2026-11-20T21:57:07Z","user":"github-actions[bot]"}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:57:09.4236848Z == code: an issue and a comment, then the text as the comment's new body
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:57:09.8353300Z cedit-code=90
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:57:15.2266153Z {"created_at":"2026-11-20T21:57:12Z","id":7051586987,"updated_at":"2026-11-20T21:57:14Z","user":"github-actions[bot]"}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:57:17.2285665Z == backslash: an issue and a comment, then the text as the comment's new body
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:57:17.6846004Z cedit-backslash=91
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:57:23.1636809Z {"created_at":"2026-11-20T21:57:20Z","id":7051589463,"updated_at":"2026-11-20T21:57:22Z","user":"github-actions[bot]"}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:57:25.1668186Z == zwj: an issue and a comment, then the text as the comment's new body
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:57:25.6069318Z cedit-zwj=92
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:57:31.0256456Z {"created_at":"2026-11-20T21:57:27Z","id":7051591968,"updated_at":"2026-11-20T21:57:30Z","user":"github-actions[bot]"}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:57:33.0280568Z == zwsp: an issue and a comment, then the text as the comment's new body
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:57:33.4820480Z cedit-zwsp=93
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:57:38.6966466Z {"created_at":"2026-11-20T21:57:35Z","id":7051594491,"updated_at":"2026-11-20T21:57:38Z","user":"github-actions[bot]"}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:57:40.7001479Z == entity: an issue and a comment, then the text as the comment's new body
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:57:41.3279933Z cedit-entity=94
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:57:46.8201943Z {"created_at":"2026-11-20T21:57:43Z","id":7051596771,"updated_at":"2026-11-20T21:57:46Z","user":"github-actions[bot]"}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:57:48.8230866Z == plain: an issue, then the text as its new body
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:57:52.0193297Z {"created_at":"2026-11-20T21:57:49Z","number":95,"title":"P-15 probe: source, body edited, plain","updated_at":"2026-11-20T21:57:51Z","user":"github-actions[bot]"}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:57:54.0224569Z == other spellings of a reference: in a comment, and in a commit on a branch
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:57:57.2389946Z {"created_at":"2026-11-20T21:57:56Z","id":7051600664,"user":"github-actions[bot]"}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:57:57.2879667Z variants-commit=6213b7b7c81d8bd138d509f946319936a19576c5
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:57:58.5255305Z remote: 
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:57:58.5257012Z remote: Create a pull request for 'probe/p-15-variants' on GitHub by visiting:        
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:57:58.5258091Z remote:      https://github.com/sapientpants/sf-scratch/pull/new/probe/p-15-variants        
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:57:58.5258720Z remote: 
+write	Complete job	﻿2026-11-20T21:57:58.5452694Z Cleaning up orphan processes

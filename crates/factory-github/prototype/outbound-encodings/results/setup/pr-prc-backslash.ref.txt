@@ -1,0 +1,6 @@
+HTTP/2.0 201 Created
+Date: Fri, 20 Nov 2026 21:42:46 GMT
+X-Github-Api-Version-Selected: 2026-03-10
+X-Github-Request-Id: E811:5F3F5:4DEC22:76C9FB:6B00BED6
+
+{"ref":"refs/heads/probe/p-15-prc-backslash","node_id":"REF_kwDOVzkiD9oAI3JlZnMvaGVhZHMvcHJvYmUvcC0xNS1wcmMtYmFja3NsYXNo","url":"https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-15-prc-backslash","object":{"sha":"df8dce20a9724e0447621f441eddcf5bc8d034c7","type":"commit","url":"https://api.github.com/repos/sapientpants/sf-scratch/git/commits/df8dce20a9724e0447621f441eddcf5bc8d034c7"}}

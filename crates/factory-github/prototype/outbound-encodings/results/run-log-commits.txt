@@ -1,0 +1,74 @@
+write	Set up job	﻿2026-11-20T21:47:22.9075859Z Current runner version: '2.338.2'
+write	Set up job	2026-11-20T21:47:22.9093957Z ##[group]Runner Image Provisioner
+write	Set up job	2026-11-20T21:47:22.9094608Z Hosted Compute Agent
+write	Set up job	2026-11-20T21:47:22.9095012Z Version: 20261111.635
+write	Set up job	2026-11-20T21:47:22.9095609Z Commit: b8a594ea514ff44cadb5342986c68b1eac6e22ed
+write	Set up job	2026-11-20T21:47:22.9096148Z Build Date: 2026-11-11T01:49:01Z
+write	Set up job	2026-11-20T21:47:22.9096648Z Worker ID: {d8361334-cbc5-4ae6-ac5b-021e32513c43}
+write	Set up job	2026-11-20T21:47:22.9097156Z Region: us-west-2
+write	Set up job	2026-11-20T21:47:22.9097533Z Cloud: AWS
+write	Set up job	2026-11-20T21:47:22.9097933Z ##[endgroup]
+write	Set up job	2026-11-20T21:47:22.9099103Z ##[group]Operating System
+write	Set up job	2026-11-20T21:47:22.9099573Z Ubuntu
+write	Set up job	2026-11-20T21:47:22.9100024Z 24.04.5
+write	Set up job	2026-11-20T21:47:22.9100394Z LTS
+write	Set up job	2026-11-20T21:47:22.9100810Z ##[endgroup]
+write	Set up job	2026-11-20T21:47:22.9101205Z ##[group]Runner Image
+write	Set up job	2026-11-20T21:47:22.9101621Z Image: ubuntu-24.04
+write	Set up job	2026-11-20T21:47:22.9102025Z Version: 20261116.133.1
+write	Set up job	2026-11-20T21:47:22.9102995Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261116.133/images/ubuntu/Ubuntu2404-Readme.md
+write	Set up job	2026-11-20T21:47:22.9104303Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261116.133
+write	Set up job	2026-11-20T21:47:22.9104993Z ##[endgroup]
+write	Set up job	2026-11-20T21:47:22.9105964Z ##[group]GITHUB_TOKEN Permissions
+write	Set up job	2026-11-20T21:47:22.9107689Z Contents: write
+write	Set up job	2026-11-20T21:47:22.9108131Z Issues: write
+write	Set up job	2026-11-20T21:47:22.9108518Z Metadata: read
+write	Set up job	2026-11-20T21:47:22.9108928Z PullRequests: write
+write	Set up job	2026-11-20T21:47:22.9109328Z ##[endgroup]
+write	Set up job	2026-11-20T21:47:22.9111031Z Secret source: Actions
+write	Set up job	2026-11-20T21:47:22.9111676Z Cache mode: write
+write	Set up job	2026-11-20T21:47:22.9112136Z Prepare workflow directory
+write	Set up job	2026-11-20T21:47:22.9338761Z Prepare all required actions
+write	Set up job	2026-11-20T21:47:22.9408596Z Complete job name: write
+write	Write the encoded text as github-actions[bot]	﻿2026-11-20T21:47:23.0141754Z ##[group]Run set -u
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:23.0142458Z ^[[36;1mset -u^[[0m
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:23.0143335Z ^[[36;1mgit clone --quiet "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" s^[[0m
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:23.0144076Z ^[[36;1mgit -C s switch --quiet probe/p-15^[[0m
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:23.0144644Z ^[[36;1mbash s/p15/bot.sh "$(cat s/p15/part)"^[[0m
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:25.1846542Z shell: /usr/bin/bash -e {0}
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:25.1847391Z env:
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:25.1849819Z   GH_TOKEN: ***
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:25.1850118Z   REPO: sapientpants/sf-scratch
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:25.1850445Z ##[endgroup]
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:26.6047014Z == the commits
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:26.6833197Z csubj-plain=fa0491335bec1f1378c0d68f45af0711ad891354
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:26.6846559Z cbody-plain=542673fce4eb77efd2d022d4e3c5c0350bb8377f
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:26.6863342Z cbody-fence=0efde7fbd14362a669819fe757cad397e3fb3ea5
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:26.6878654Z csubj-code=13e2719c4b77ebf86db0fb36adcc794afb85a4ca
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:26.6893851Z cbody-code=9c14e7bb7e4cbb56cd3152c858c5f7c8d857d6cc
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:26.6909325Z csubj-backslash=5f7f6dacb5ba0a15eb87be0da1eeb8b1cc837ae4
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:26.6924628Z cbody-backslash=da012f24144dac2441108a510a200a4db395502c
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:26.6939852Z csubj-zwj=0f07141d70ec8554ce2af20f4e0e90d000991d97
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:26.6955515Z cbody-zwj=4e9f3547f8d092bb704e09c1bce66165f85e495c
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:26.6970639Z csubj-zwsp=f9d4c9b5466e3293fde49224a4ebb9b4b3e419b2
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:26.6985810Z cbody-zwsp=8e3383a4d762e0a20e4e00120e23039d6f1a4606
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:26.7001159Z csubj-entity=e9bd4758c1117db04345afe37a308f196b041514
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:26.7016670Z cbody-entity=569d9ee402c685bae891c1063756277bbc84d21a
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:28.1857933Z remote: 
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:28.1884554Z remote: Create a pull request for 'probe/p-15-commits' on GitHub by visiting:        
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:28.1904655Z remote:      https://github.com/sapientpants/sf-scratch/pull/new/probe/p-15-commits        
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:28.1905315Z remote: 
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:28.1940573Z 569d9ee402c685bae891c1063756277bbc84d21a github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> P-15 probe: commit body, entity
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:28.1941983Z e9bd4758c1117db04345afe37a308f196b041514 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> P-15 probe: commit subject, entity: &#64;sapientpants see &#35;12, Fixes &#35;45
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:28.1943705Z 8e3383a4d762e0a20e4e00120e23039d6f1a4606 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> P-15 probe: commit body, zwsp
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:28.2421814Z f9d4c9b5466e3293fde49224a4ebb9b4b3e419b2 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> P-15 probe: commit subject, zwsp: @​sapientpants see #​12, Fixes #​41
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:28.2423211Z 4e9f3547f8d092bb704e09c1bce66165f85e495c github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> P-15 probe: commit body, zwj
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:28.2424194Z 0f07141d70ec8554ce2af20f4e0e90d000991d97 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> P-15 probe: commit subject, zwj: @‍sapientpants see #‍12, Fixes #‍37
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:28.2425177Z da012f24144dac2441108a510a200a4db395502c github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> P-15 probe: commit body, backslash
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:28.2426150Z 5f7f6dacb5ba0a15eb87be0da1eeb8b1cc837ae4 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> P-15 probe: commit subject, backslash: \@sapientpants see \#12, Fixes \#33
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:28.2427164Z 9c14e7bb7e4cbb56cd3152c858c5f7c8d857d6cc github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> P-15 probe: commit body, code
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:28.2428125Z 13e2719c4b77ebf86db0fb36adcc794afb85a4ca github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> P-15 probe: commit subject, code: `@sapientpants` see `#12`, Fixes `#29`
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:28.2429011Z 0efde7fbd14362a669819fe757cad397e3fb3ea5 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> P-15 probe: commit body, fence
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:28.2430255Z 542673fce4eb77efd2d022d4e3c5c0350bb8377f github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> P-15 probe: commit body, plain
+write	Write the encoded text as github-actions[bot]	2026-11-20T21:47:28.2431237Z fa0491335bec1f1378c0d68f45af0711ad891354 github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com> P-15 probe: commit subject, plain: @sapientpants see #12, Fixes #22
+write	Complete job	﻿2026-11-20T21:47:28.2552427Z Cleaning up orphan processes

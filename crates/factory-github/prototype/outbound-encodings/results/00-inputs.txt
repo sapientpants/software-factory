@@ -1,0 +1,33 @@
+gh version 2.104.0 (2026-11-12)
+api-version=2026-03-10
+2026-11-20T21:41:34Z
+main=8829957442257c0bd1df02dad633f0c7eb084d76
+workflow-commit-text=78298a30f24288a1c67727c347b1f3ad32404c36
+run-text=44822844750
+workflow-commit-commits=fec391488d33cdb2c7c008954c92de238ca89ec3
+run-commits=44823392368
+commits-head=569d9ee402c685bae891c1063756277bbc84d21a
+landed-at=2026-11-20T21:50:26Z
+merged-at=2026-11-20T21:53:53Z
+workflow-commit-second=2607f85ad29b1e87a22ba9ddb54306317611f8af
+run-second=44824730765
+operator-commit=1a8dd360027d367841d15a64f7c04b934aa6b4ce Marc Tremblay P-15 probe: the operator's commit of a file, see #87
+operator-commit=b7f7c3ac0b11b0d1200505d75d30a7cb69a6557c Marc Tremblay P-15 probe: the operator's empty commit, see #86
+operator-commit=e36738d710a59f2be06ddb904e3ec6dfcec3becf github-actions[bot] P-15 probe: a commit in the bot's
+operator-commit=c852b26f642669abf41cef741c1a53801b101bc8 Marc Tremblay P-15 probe: commit body, other spelling
+operator-commit=9901182a84313b0211e12d6db6f56cabe04b00cf Marc Tremblay P-15 probe: commit body, entity
+operator-commit=9a12b52d96254ad0165b362330fbbd15f37e3685 Marc Tremblay P-15 probe: commit subject, entity: &#6
+operator-commit=e3b1687a1186afdbeb4b75d45f12d993c4c04d29 Marc Tremblay P-15 probe: commit body, zwsp
+operator-commit=fbb8b6da4e97b0a0abcf1bf32102cd7b304f88f0 Marc Tremblay P-15 probe: commit subject, zwsp: @​sap
+operator-commit=6fad4c9c5d41ad20e6e95f783d224bb12a82ebb8 Marc Tremblay P-15 probe: commit body, zwj
+operator-commit=318faff883e96b13a47c8a443db194ffd27018ff Marc Tremblay P-15 probe: commit subject, zwj: @‍sapi
+operator-commit=ef70558b7d7089fa449eac661d8228923e6ef720 Marc Tremblay P-15 probe: commit body, backslash
+operator-commit=0996dadc95f16015a30e2d16b7243791d19798f5 Marc Tremblay P-15 probe: commit subject, backslash: 
+operator-commit=a52190295b858f508487dc8a1f58f657a6dc3968 Marc Tremblay P-15 probe: commit body, code
+operator-commit=5fc6774f5e0e8c5f4bfa6d52da94ba01150ce97c Marc Tremblay P-15 probe: commit subject, code: `@sap
+operator-commit=fbefed55297cfa63df7ad22f2bc42c568ed9e99b Marc Tremblay P-15 probe: commit body, fence
+operator-commit=66cef2b157545f134b1af32ff82c329d2b93a5e6 Marc Tremblay P-15 probe: commit body, plain
+operator-commit=f12443cb667f5a46f0b9cdcdf3531bdaff23ae54 Marc Tremblay P-15 probe: commit subject, plain: @sap
+workflow-commit-fourth=82240230c182182590fe8556e02ff1a7c33f9a41
+run-fourth=44869393490
+gh-at-obs7=gh version 2.105.0 (2026-11-17)

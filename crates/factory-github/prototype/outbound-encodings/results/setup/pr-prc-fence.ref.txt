@@ -1,0 +1,6 @@
+HTTP/2.0 201 Created
+Date: Fri, 20 Nov 2026 21:42:40 GMT
+X-Github-Api-Version-Selected: 2026-03-10
+X-Github-Request-Id: F543:2F58A2:4AE7A5:720820:6B00BECF
+
+{"ref":"refs/heads/probe/p-15-prc-fence","node_id":"REF_kwDOVzkiD79yZWZzL2hlYWRzL3Byb2JlL3AtMTUtcHJjLWZlbmNl","url":"https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-15-prc-fence","object":{"sha":"e284ac89e8d5896c29c2c185cf0c52087bea671e","type":"commit","url":"https://api.github.com/repos/sapientpants/sf-scratch/git/commits/e284ac89e8d5896c29c2c185cf0c52087bea671e"}}

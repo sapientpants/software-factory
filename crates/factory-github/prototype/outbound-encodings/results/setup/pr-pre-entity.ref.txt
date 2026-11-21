@@ -1,0 +1,6 @@
+HTTP/2.0 201 Created
+Date: Fri, 20 Nov 2026 21:43:21 GMT
+X-Github-Api-Version-Selected: 2026-03-10
+X-Github-Request-Id: FA24:E8514:4D9343:75F201:6B00BEF8
+
+{"ref":"refs/heads/probe/p-15-pre-entity","node_id":"REF_kwDOVzkiD9oAIHJlZnMvaGVhZHMvcHJvYmUvcC0xNS1wcmUtZW50aXR5","url":"https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-15-pre-entity","object":{"sha":"d07cd3eada290177b822c24830abaa6e0e908a46","type":"commit","url":"https://api.github.com/repos/sapientpants/sf-scratch/git/commits/d07cd3eada290177b822c24830abaa6e0e908a46"}}

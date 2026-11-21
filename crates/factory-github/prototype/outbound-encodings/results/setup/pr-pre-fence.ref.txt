@@ -1,0 +1,6 @@
+HTTP/2.0 201 Created
+Date: Fri, 20 Nov 2026 21:43:04 GMT
+X-Github-Api-Version-Selected: 2026-03-10
+X-Github-Request-Id: EBB2:1E59C5:4DF59C:7688E4:6B00BEE7
+
+{"ref":"refs/heads/probe/p-15-pre-fence","node_id":"REF_kwDOVzkiD79yZWZzL2hlYWRzL3Byb2JlL3AtMTUtcHJlLWZlbmNl","url":"https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-15-pre-fence","object":{"sha":"f4a16374fbbed3c9998f0075457fc49def850bbf","type":"commit","url":"https://api.github.com/repos/sapientpants/sf-scratch/git/commits/f4a16374fbbed3c9998f0075457fc49def850bbf"}}

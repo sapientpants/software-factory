@@ -1,0 +1,9 @@
+case	target	comment.link	comment.xref	commit.link	event.bot	event.operator
+v-noscheme	#80	yes	yes	yes	no	-
+v-nohost	#81	yes	yes	yes	no	-
+v-zwsp-number	#82	no	no	no	no	-
+v-zwsp-issues	#83	no	no	no	no	-
+v-zwsp-owner	#84	no	no	no	no	-
+v-lower-gh	#85	yes	yes	yes	no	-
+op-empty	#86	-	-	yes	-	yes
+op-file	#87	-	-	yes	-	yes

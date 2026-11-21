@@ -1,0 +1,6 @@
+HTTP/2.0 201 Created
+Date: Fri, 20 Nov 2026 21:43:14 GMT
+X-Github-Api-Version-Selected: 2026-03-10
+X-Github-Request-Id: EA83:2D801A:4B70AD:737CDE:6B00BEF2
+
+{"ref":"refs/heads/probe/p-15-pre-zwj","node_id":"REF_kwDOVzkiD71yZWZzL2hlYWRzL3Byb2JlL3AtMTUtcHJlLXp3ag","url":"https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-15-pre-zwj","object":{"sha":"abc6c10bfe46636f15e82c77a031fd392057964c","type":"commit","url":"https://api.github.com/repos/sapientpants/sf-scratch/git/commits/abc6c10bfe46636f15e82c77a031fd392057964c"}}

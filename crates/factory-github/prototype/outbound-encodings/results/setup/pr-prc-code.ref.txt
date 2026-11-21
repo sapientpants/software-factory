@@ -1,0 +1,6 @@
+HTTP/2.0 201 Created
+Date: Fri, 20 Nov 2026 21:42:43 GMT
+X-Github-Api-Version-Selected: 2026-03-10
+X-Github-Request-Id: FAAA:E0EC3:4BF287:738533:6B00BED3
+
+{"ref":"refs/heads/probe/p-15-prc-code","node_id":"REF_kwDOVzkiD75yZWZzL2hlYWRzL3Byb2JlL3AtMTUtcHJjLWNvZGU","url":"https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-15-prc-code","object":{"sha":"b4bc8cc7b912bebd8a1b7f016865cfa77f88e38f","type":"commit","url":"https://api.github.com/repos/sapientpants/sf-scratch/git/commits/b4bc8cc7b912bebd8a1b7f016865cfa77f88e38f"}}

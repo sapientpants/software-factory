@@ -1,0 +1,6 @@
+HTTP/2.0 201 Created
+Date: Fri, 20 Nov 2026 21:42:36 GMT
+X-Github-Api-Version-Selected: 2026-03-10
+X-Github-Request-Id: F0D8:2D1CF5:4CD3BC:74F506:6B00BECC
+
+{"ref":"refs/heads/probe/p-15-prc-plain","node_id":"REF_kwDOVzkiD79yZWZzL2hlYWRzL3Byb2JlL3AtMTUtcHJjLXBsYWlu","url":"https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-15-prc-plain","object":{"sha":"902090d8a9d6bd27b82c377172ab95626f59773c","type":"commit","url":"https://api.github.com/repos/sapientpants/sf-scratch/git/commits/902090d8a9d6bd27b82c377172ab95626f59773c"}}

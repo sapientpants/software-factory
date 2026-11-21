@@ -1,0 +1,6 @@
+HTTP/2.0 201 Created
+Date: Fri, 20 Nov 2026 21:42:53 GMT
+X-Github-Api-Version-Selected: 2026-03-10
+X-Github-Request-Id: F653:CD37D:4E3488:762AE3:6B00BEDD
+
+{"ref":"refs/heads/probe/p-15-prc-zwsp","node_id":"REF_kwDOVzkiD75yZWZzL2hlYWRzL3Byb2JlL3AtMTUtcHJjLXp3c3A","url":"https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-15-prc-zwsp","object":{"sha":"f1ace36d919a29657c8932aab6686f76dc83bcf8","type":"commit","url":"https://api.github.com/repos/sapientpants/sf-scratch/git/commits/f1ace36d919a29657c8932aab6686f76dc83bcf8"}}

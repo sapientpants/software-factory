@@ -1,0 +1,51 @@
+query($owner: String!, $name: String!, $n: Int!) {
+  repository(owner: $owner, name: $name) {
+    issueOrPullRequest(number: $n) {
+      __typename
+      ... on Issue {
+        number title titleHTML state stateReason createdAt
+        author { __typename login }
+        body bodyHTML
+        comments(first: 20) { nodes { createdAt author { __typename login } body bodyHTML } }
+        closedByPullRequestsReferences(first: 20, includeClosedPrs: true) { nodes { number } }
+        timelineItems(first: 100, itemTypes: [CROSS_REFERENCED_EVENT, REFERENCED_EVENT, MENTIONED_EVENT, SUBSCRIBED_EVENT, CLOSED_EVENT, CONNECTED_EVENT]) {
+          totalCount
+          nodes { ...event }
+        }
+      }
+      ... on PullRequest {
+        number title titleHTML state merged createdAt lastEditedAt
+        author { __typename login }
+        editor { __typename login }
+        body bodyHTML
+        closingIssuesReferences(first: 50) { nodes { number } }
+        timelineItems(first: 100, itemTypes: [CROSS_REFERENCED_EVENT, REFERENCED_EVENT, MENTIONED_EVENT, SUBSCRIBED_EVENT, CLOSED_EVENT, CONNECTED_EVENT, MERGED_EVENT]) {
+          totalCount
+          nodes {
+            ...event
+            ... on MergedEvent { createdAt actor { login } commit { oid } }
+          }
+        }
+      }
+    }
+  }
+}
+
+fragment event on Node {
+  __typename
+  ... on CrossReferencedEvent {
+    createdAt actor { login } isCrossRepository willCloseTarget
+    source { __typename ... on Issue { number } ... on PullRequest { number } }
+  }
+  ... on ReferencedEvent { createdAt actor { login } isDirectReference commit { oid } }
+  ... on MentionedEvent { createdAt actor { login } }
+  ... on SubscribedEvent { createdAt actor { login } }
+  ... on ClosedEvent {
+    createdAt actor { login } stateReason
+    closer { __typename ... on PullRequest { number } ... on Commit { oid } }
+  }
+  ... on ConnectedEvent {
+    createdAt actor { login }
+    source { __typename ... on Issue { number } ... on PullRequest { number } }
+  }
+}

@@ -1,0 +1,2897 @@
+[
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.",
+    "bodyHTML": "<p dir=\"auto\">A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:41:35Z",
+    "number": 12,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "createdAt": "2026-11-20T21:42:38Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "PullRequest",
+            "number": 46
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "createdAt": "2026-11-20T21:42:48Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "PullRequest",
+            "number": 49
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "createdAt": "2026-11-20T21:42:58Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "PullRequest",
+            "number": 52
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:43:40Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "Issue",
+            "number": 60
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:43:42Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "Issue",
+            "number": 61
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:43:47Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "PullRequest",
+            "number": 53
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:44:16Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "Issue",
+            "number": 68
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:44:18Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "Issue",
+            "number": 69
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:44:23Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "PullRequest",
+            "number": 56
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:44:55Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "Issue",
+            "number": 77
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:44:58Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "Issue",
+            "number": 78
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:45:03Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "PullRequest",
+            "number": 59
+          },
+          "willCloseTarget": false
+        }
+      ],
+      "totalCount": 12
+    },
+    "title": "P-15 probe: target, the form #n",
+    "titleHTML": "P-15 probe: target, the form #n"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.",
+    "bodyHTML": "<p dir=\"auto\">A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:41:36Z",
+    "number": 13,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "createdAt": "2026-11-20T21:42:38Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "PullRequest",
+            "number": 46
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "createdAt": "2026-11-20T21:42:48Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "PullRequest",
+            "number": 49
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "createdAt": "2026-11-20T21:42:58Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "PullRequest",
+            "number": 52
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:43:40Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "Issue",
+            "number": 60
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:43:42Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "Issue",
+            "number": 61
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:43:47Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "PullRequest",
+            "number": 53
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:44:16Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "Issue",
+            "number": 68
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:44:18Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "Issue",
+            "number": 69
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:44:23Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "PullRequest",
+            "number": 56
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:44:55Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "Issue",
+            "number": 77
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:44:58Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "Issue",
+            "number": 78
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:45:03Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "PullRequest",
+            "number": 59
+          },
+          "willCloseTarget": false
+        }
+      ],
+      "totalCount": 12
+    },
+    "title": "P-15 probe: target, the form GH-n",
+    "titleHTML": "P-15 probe: target, the form GH-n"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.",
+    "bodyHTML": "<p dir=\"auto\">A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:41:38Z",
+    "number": 14,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "createdAt": "2026-11-20T21:42:38Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "PullRequest",
+            "number": 46
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "createdAt": "2026-11-20T21:42:48Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "PullRequest",
+            "number": 49
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "createdAt": "2026-11-20T21:42:58Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "PullRequest",
+            "number": 52
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:43:40Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "Issue",
+            "number": 60
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:43:42Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "Issue",
+            "number": 61
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:43:47Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "PullRequest",
+            "number": 53
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:44:16Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "Issue",
+            "number": 68
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:44:18Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "Issue",
+            "number": 69
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:44:23Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "PullRequest",
+            "number": 56
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:44:55Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "Issue",
+            "number": 77
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:44:58Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "Issue",
+            "number": 78
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:45:03Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "PullRequest",
+            "number": 59
+          },
+          "willCloseTarget": false
+        }
+      ],
+      "totalCount": 12
+    },
+    "title": "P-15 probe: target, the form owner/repo#n",
+    "titleHTML": "P-15 probe: target, the form owner/repo#n"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.",
+    "bodyHTML": "<p dir=\"auto\">A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:41:40Z",
+    "number": 15,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "createdAt": "2026-11-20T21:42:38Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "PullRequest",
+            "number": 46
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "createdAt": "2026-11-20T21:42:48Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "PullRequest",
+            "number": 49
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "createdAt": "2026-11-20T21:42:51Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "PullRequest",
+            "number": 50
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "createdAt": "2026-11-20T21:42:55Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "PullRequest",
+            "number": 51
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "createdAt": "2026-11-20T21:42:58Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "PullRequest",
+            "number": 52
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:43:40Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "Issue",
+            "number": 60
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:43:42Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "Issue",
+            "number": 61
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:43:47Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "PullRequest",
+            "number": 53
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:44:16Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "Issue",
+            "number": 68
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:44:18Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "Issue",
+            "number": 69
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:44:23Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "PullRequest",
+            "number": 56
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:44:29Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "Issue",
+            "number": 71
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:44:32Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "Issue",
+            "number": 72
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:44:37Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "PullRequest",
+            "number": 57
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:44:42Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "Issue",
+            "number": 74
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:44:45Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "Issue",
+            "number": 75
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:44:50Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "PullRequest",
+            "number": 58
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:44:55Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "Issue",
+            "number": 77
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:44:58Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "Issue",
+            "number": 78
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:45:03Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "PullRequest",
+            "number": 59
+          },
+          "willCloseTarget": false
+        }
+      ],
+      "totalCount": 20
+    },
+    "title": "P-15 probe: target, the form of a URL",
+    "titleHTML": "P-15 probe: target, the form of a URL"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.",
+    "bodyHTML": "<p dir=\"auto\">A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:41:41Z",
+    "number": 16,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 0
+    },
+    "title": "P-15 probe: target, a title",
+    "titleHTML": "P-15 probe: target, a title"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.",
+    "bodyHTML": "<p dir=\"auto\">A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:41:43Z",
+    "number": 17,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:43:40Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "Issue",
+            "number": 60
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:44:16Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "Issue",
+            "number": 68
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:44:55Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "Issue",
+            "number": 77
+          },
+          "willCloseTarget": false
+        }
+      ],
+      "totalCount": 3
+    },
+    "title": "P-15 probe: target, a closing keyword in a comment",
+    "titleHTML": "P-15 probe: target, a closing keyword in a comment"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.",
+    "bodyHTML": "<p dir=\"auto\">A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:41:44Z",
+    "number": 18,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:43:42Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "Issue",
+            "number": 61
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:44:18Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "Issue",
+            "number": 69
+          },
+          "willCloseTarget": false
+        },
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:44:58Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "Issue",
+            "number": 78
+          },
+          "willCloseTarget": false
+        }
+      ],
+      "totalCount": 3
+    },
+    "title": "P-15 probe: target, a closing keyword in an issue body",
+    "titleHTML": "P-15 probe: target, a closing keyword in an issue body"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.",
+    "bodyHTML": "<p dir=\"auto\">A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": [
+        {
+          "number": 46
+        }
+      ]
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:41:46Z",
+    "number": 19,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "createdAt": "2026-11-20T21:42:38Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "PullRequest",
+            "number": 46
+          },
+          "willCloseTarget": true
+        }
+      ],
+      "totalCount": 1
+    },
+    "title": "P-15 probe: target, a closing keyword in a pull request body at creation, plain",
+    "titleHTML": "P-15 probe: target, a closing keyword in a pull request body at creation, plain"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.",
+    "bodyHTML": "<p dir=\"auto\">A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": [
+        {
+          "number": 53
+        }
+      ]
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:41:48Z",
+    "number": 20,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:43:47Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "PullRequest",
+            "number": 53
+          },
+          "willCloseTarget": true
+        }
+      ],
+      "totalCount": 1
+    },
+    "title": "P-15 probe: target, a closing keyword in an edited pull request body, plain",
+    "titleHTML": "P-15 probe: target, a closing keyword in an edited pull request body, plain"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.",
+    "bodyHTML": "<p dir=\"auto\">A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:41:49Z",
+    "number": 21,
+    "state": "CLOSED",
+    "stateReason": "COMPLETED",
+    "timelineItems": {
+      "nodes": [
+        {
+          "__typename": "ClosedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "closer": {
+            "__typename": "Commit",
+            "oid": "542673fce4eb77efd2d022d4e3c5c0350bb8377f"
+          },
+          "createdAt": "2026-11-20T21:50:27Z",
+          "stateReason": "COMPLETED"
+        }
+      ],
+      "totalCount": 1
+    },
+    "title": "P-15 probe: target, a closing keyword in a commit body, plain",
+    "titleHTML": "P-15 probe: target, a closing keyword in a commit body, plain"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.",
+    "bodyHTML": "<p dir=\"auto\">A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:41:51Z",
+    "number": 22,
+    "state": "CLOSED",
+    "stateReason": "COMPLETED",
+    "timelineItems": {
+      "nodes": [
+        {
+          "__typename": "ClosedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "closer": {
+            "__typename": "Commit",
+            "oid": "fa0491335bec1f1378c0d68f45af0711ad891354"
+          },
+          "createdAt": "2026-11-20T21:50:27Z",
+          "stateReason": "COMPLETED"
+        }
+      ],
+      "totalCount": 1
+    },
+    "title": "P-15 probe: target, a closing keyword in a commit subject, plain",
+    "titleHTML": "P-15 probe: target, a closing keyword in a commit subject, plain"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.",
+    "bodyHTML": "<p dir=\"auto\">A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:41:52Z",
+    "number": 23,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 0
+    },
+    "title": "P-15 probe: target, a closing keyword in a pull request body at creation, fence",
+    "titleHTML": "P-15 probe: target, a closing keyword in a pull request body at creation, fence"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.",
+    "bodyHTML": "<p dir=\"auto\">A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:41:54Z",
+    "number": 24,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 0
+    },
+    "title": "P-15 probe: target, a closing keyword in an edited pull request body, fence",
+    "titleHTML": "P-15 probe: target, a closing keyword in an edited pull request body, fence"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.",
+    "bodyHTML": "<p dir=\"auto\">A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:41:56Z",
+    "number": 25,
+    "state": "CLOSED",
+    "stateReason": "COMPLETED",
+    "timelineItems": {
+      "nodes": [
+        {
+          "__typename": "ClosedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "closer": {
+            "__typename": "Commit",
+            "oid": "0efde7fbd14362a669819fe757cad397e3fb3ea5"
+          },
+          "createdAt": "2026-11-20T21:50:28Z",
+          "stateReason": "COMPLETED"
+        }
+      ],
+      "totalCount": 1
+    },
+    "title": "P-15 probe: target, a closing keyword in a commit body, fence",
+    "titleHTML": "P-15 probe: target, a closing keyword in a commit body, fence"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.",
+    "bodyHTML": "<p dir=\"auto\">A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:41:57Z",
+    "number": 26,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 0
+    },
+    "title": "P-15 probe: target, a closing keyword in a pull request body at creation, code",
+    "titleHTML": "P-15 probe: target, a closing keyword in a pull request body at creation, code"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.",
+    "bodyHTML": "<p dir=\"auto\">A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:41:59Z",
+    "number": 27,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 0
+    },
+    "title": "P-15 probe: target, a closing keyword in an edited pull request body, code",
+    "titleHTML": "P-15 probe: target, a closing keyword in an edited pull request body, code"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.",
+    "bodyHTML": "<p dir=\"auto\">A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:42:01Z",
+    "number": 28,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 0
+    },
+    "title": "P-15 probe: target, a closing keyword in a commit body, code",
+    "titleHTML": "P-15 probe: target, a closing keyword in a commit body, code"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.",
+    "bodyHTML": "<p dir=\"auto\">A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:42:02Z",
+    "number": 29,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 0
+    },
+    "title": "P-15 probe: target, a closing keyword in a commit subject, code",
+    "titleHTML": "P-15 probe: target, a closing keyword in a commit subject, code"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.",
+    "bodyHTML": "<p dir=\"auto\">A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": [
+        {
+          "number": 49
+        }
+      ]
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:42:04Z",
+    "number": 30,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "createdAt": "2026-11-20T21:42:48Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "PullRequest",
+            "number": 49
+          },
+          "willCloseTarget": true
+        }
+      ],
+      "totalCount": 1
+    },
+    "title": "P-15 probe: target, a closing keyword in a pull request body at creation, backslash",
+    "titleHTML": "P-15 probe: target, a closing keyword in a pull request body at creation, backslash"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.",
+    "bodyHTML": "<p dir=\"auto\">A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": [
+        {
+          "number": 56
+        }
+      ]
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:42:05Z",
+    "number": 31,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:44:23Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "PullRequest",
+            "number": 56
+          },
+          "willCloseTarget": true
+        }
+      ],
+      "totalCount": 1
+    },
+    "title": "P-15 probe: target, a closing keyword in an edited pull request body, backslash",
+    "titleHTML": "P-15 probe: target, a closing keyword in an edited pull request body, backslash"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.",
+    "bodyHTML": "<p dir=\"auto\">A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:42:07Z",
+    "number": 32,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 0
+    },
+    "title": "P-15 probe: target, a closing keyword in a commit body, backslash",
+    "titleHTML": "P-15 probe: target, a closing keyword in a commit body, backslash"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.",
+    "bodyHTML": "<p dir=\"auto\">A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:42:09Z",
+    "number": 33,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 0
+    },
+    "title": "P-15 probe: target, a closing keyword in a commit subject, backslash",
+    "titleHTML": "P-15 probe: target, a closing keyword in a commit subject, backslash"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.",
+    "bodyHTML": "<p dir=\"auto\">A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:42:10Z",
+    "number": 34,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 0
+    },
+    "title": "P-15 probe: target, a closing keyword in a pull request body at creation, zwj",
+    "titleHTML": "P-15 probe: target, a closing keyword in a pull request body at creation, zwj"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.",
+    "bodyHTML": "<p dir=\"auto\">A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:42:12Z",
+    "number": 35,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 0
+    },
+    "title": "P-15 probe: target, a closing keyword in an edited pull request body, zwj",
+    "titleHTML": "P-15 probe: target, a closing keyword in an edited pull request body, zwj"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.",
+    "bodyHTML": "<p dir=\"auto\">A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:42:14Z",
+    "number": 36,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 0
+    },
+    "title": "P-15 probe: target, a closing keyword in a commit body, zwj",
+    "titleHTML": "P-15 probe: target, a closing keyword in a commit body, zwj"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.",
+    "bodyHTML": "<p dir=\"auto\">A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:42:15Z",
+    "number": 37,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 0
+    },
+    "title": "P-15 probe: target, a closing keyword in a commit subject, zwj",
+    "titleHTML": "P-15 probe: target, a closing keyword in a commit subject, zwj"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.",
+    "bodyHTML": "<p dir=\"auto\">A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:42:17Z",
+    "number": 38,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 0
+    },
+    "title": "P-15 probe: target, a closing keyword in a pull request body at creation, zwsp",
+    "titleHTML": "P-15 probe: target, a closing keyword in a pull request body at creation, zwsp"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.",
+    "bodyHTML": "<p dir=\"auto\">A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:42:18Z",
+    "number": 39,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 0
+    },
+    "title": "P-15 probe: target, a closing keyword in an edited pull request body, zwsp",
+    "titleHTML": "P-15 probe: target, a closing keyword in an edited pull request body, zwsp"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.",
+    "bodyHTML": "<p dir=\"auto\">A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:42:20Z",
+    "number": 40,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 0
+    },
+    "title": "P-15 probe: target, a closing keyword in a commit body, zwsp",
+    "titleHTML": "P-15 probe: target, a closing keyword in a commit body, zwsp"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.",
+    "bodyHTML": "<p dir=\"auto\">A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:42:21Z",
+    "number": 41,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 0
+    },
+    "title": "P-15 probe: target, a closing keyword in a commit subject, zwsp",
+    "titleHTML": "P-15 probe: target, a closing keyword in a commit subject, zwsp"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.",
+    "bodyHTML": "<p dir=\"auto\">A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": [
+        {
+          "number": 52
+        }
+      ]
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:42:23Z",
+    "number": 42,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "createdAt": "2026-11-20T21:42:58Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "PullRequest",
+            "number": 52
+          },
+          "willCloseTarget": true
+        }
+      ],
+      "totalCount": 1
+    },
+    "title": "P-15 probe: target, a closing keyword in a pull request body at creation, entity",
+    "titleHTML": "P-15 probe: target, a closing keyword in a pull request body at creation, entity"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.",
+    "bodyHTML": "<p dir=\"auto\">A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": [
+        {
+          "number": 59
+        }
+      ]
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:42:25Z",
+    "number": 43,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [
+        {
+          "__typename": "CrossReferencedEvent",
+          "actor": {
+            "login": "github-actions"
+          },
+          "createdAt": "2026-11-20T21:45:03Z",
+          "isCrossRepository": false,
+          "source": {
+            "__typename": "PullRequest",
+            "number": 59
+          },
+          "willCloseTarget": true
+        }
+      ],
+      "totalCount": 1
+    },
+    "title": "P-15 probe: target, a closing keyword in an edited pull request body, entity",
+    "titleHTML": "P-15 probe: target, a closing keyword in an edited pull request body, entity"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.",
+    "bodyHTML": "<p dir=\"auto\">A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:42:26Z",
+    "number": 44,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 0
+    },
+    "title": "P-15 probe: target, a closing keyword in a commit body, entity",
+    "titleHTML": "P-15 probe: target, a closing keyword in a commit body, entity"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.",
+    "bodyHTML": "<p dir=\"auto\">A target of probe P-15. Text elsewhere refers to this issue. Nothing here is a request.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:42:28Z",
+    "number": 45,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 0
+    },
+    "title": "P-15 probe: target, a closing keyword in a commit subject, entity",
+    "titleHTML": "P-15 probe: target, a closing keyword in a commit subject, entity"
+  },
+  {
+    "__typename": "PullRequest",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "Text of probe P-15 in the encoding `plain`. This line is the host's; the rest stands for agent text.\n\n- mention: @sapientpants wrote this.\n- hash: see #12 for the first.\n- gh: see GH-13 for the second.\n- full: see sapientpants/sf-scratch#14 for the third.\n- url: see https://github.com/sapientpants/sf-scratch/issues/15 for the fourth.\n- close: Fixes #19.\n",
+    "bodyHTML": "<p dir=\"auto\">Text of probe P-15 in the encoding <code class=\"notranslate\">plain</code>. This line is the host's; the rest stands for agent text.</p>\n<ul dir=\"auto\">\n<li>mention: <a class=\"user-mention notranslate\" data-hovercard-type=\"user\" data-hovercard-url=\"/users/sapientpants/hovercard\" data-octo-click=\"hovercard-link-click\" data-octo-dimensions=\"link_type:self\" href=\"https://github.com/sapientpants\">@sapientpants</a> wrote this.</li>\n<li>hash: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520140509\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/12\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/12/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/12\">#12</a> for the first.</li>\n<li>gh: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520140854\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/13\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/13/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/13\">GH-13</a> for the second.</li>\n<li>full: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520141200\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/14\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/14/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/14\">#14</a> for the third.</li>\n<li>url: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520141535\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/15\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/15/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/15\">#15</a> for the fourth.</li>\n<li>close: <span class=\"issue-keyword tooltipped tooltipped-se\" aria-label=\"This pull request closes issue #19.\">Fixes</span> <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520142849\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/19\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/19/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/19\">#19</a>.</li>\n</ul>",
+    "closingIssuesReferences": {
+      "nodes": [
+        {
+          "number": 19
+        }
+      ]
+    },
+    "createdAt": "2026-11-20T21:42:37Z",
+    "editor": null,
+    "lastEditedAt": null,
+    "merged": false,
+    "number": 46,
+    "state": "OPEN",
+    "timelineItems": {
+      "nodes": [
+        {
+          "__typename": "MentionedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "createdAt": "2026-11-20T21:42:39Z"
+        },
+        {
+          "__typename": "SubscribedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "createdAt": "2026-11-20T21:42:40Z"
+        }
+      ],
+      "totalCount": 1
+    },
+    "title": "P-15 probe: source, pull request body at creation, plain",
+    "titleHTML": "P-15 probe: source, pull request body at creation, plain"
+  },
+  {
+    "__typename": "PullRequest",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "Text of probe P-15 in the encoding `fence`. This line is the host's; the rest stands for agent text.\n\n```text\nmention: @sapientpants wrote this.\nhash: see #12 for the first.\ngh: see GH-13 for the second.\nfull: see sapientpants/sf-scratch#14 for the third.\nurl: see https://github.com/sapientpants/sf-scratch/issues/15 for the fourth.\nclose: Fixes #23.\n```\n",
+    "bodyHTML": "<p dir=\"auto\">Text of probe P-15 in the encoding <code class=\"notranslate\">fence</code>. This line is the host's; the rest stands for agent text.</p>\n<div class=\"snippet-clipboard-content notranslate position-relative overflow-auto\" data-snippet-clipboard-copy-content=\"mention: @sapientpants wrote this.\nhash: see #12 for the first.\ngh: see GH-13 for the second.\nfull: see sapientpants/sf-scratch#14 for the third.\nurl: see https://github.com/sapientpants/sf-scratch/issues/15 for the fourth.\nclose: Fixes #23.\"><pre lang=\"text\" class=\"notranslate\"><code class=\"notranslate\">mention: @sapientpants wrote this.\nhash: see #12 for the first.\ngh: see GH-13 for the second.\nfull: see sapientpants/sf-scratch#14 for the third.\nurl: see https://github.com/sapientpants/sf-scratch/issues/15 for the fourth.\nclose: Fixes #23.\n</code></pre></div>",
+    "closingIssuesReferences": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:42:40Z",
+    "editor": null,
+    "lastEditedAt": null,
+    "merged": false,
+    "number": 47,
+    "state": "OPEN",
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 1
+    },
+    "title": "P-15 probe: source, pull request body at creation, fence",
+    "titleHTML": "P-15 probe: source, pull request body at creation, fence"
+  },
+  {
+    "__typename": "PullRequest",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "Text of probe P-15 in the encoding `code`. This line is the host's; the rest stands for agent text.\n\n- mention: `@sapientpants` wrote this.\n- hash: see `#12` for the first.\n- gh: see `GH-13` for the second.\n- full: see `sapientpants/sf-scratch#14` for the third.\n- url: see `https://github.com/sapientpants/sf-scratch/issues/15` for the fourth.\n- close: Fixes `#26`.\n",
+    "bodyHTML": "<p dir=\"auto\">Text of probe P-15 in the encoding <code class=\"notranslate\">code</code>. This line is the host's; the rest stands for agent text.</p>\n<ul dir=\"auto\">\n<li>mention: <code class=\"notranslate\">@sapientpants</code> wrote this.</li>\n<li>hash: see <code class=\"notranslate\">#12</code> for the first.</li>\n<li>gh: see <code class=\"notranslate\">GH-13</code> for the second.</li>\n<li>full: see <code class=\"notranslate\">sapientpants/sf-scratch#14</code> for the third.</li>\n<li>url: see <code class=\"notranslate\">https://github.com/sapientpants/sf-scratch/issues/15</code> for the fourth.</li>\n<li>close: Fixes <code class=\"notranslate\">#26</code>.</li>\n</ul>",
+    "closingIssuesReferences": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:42:44Z",
+    "editor": null,
+    "lastEditedAt": null,
+    "merged": false,
+    "number": 48,
+    "state": "OPEN",
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 1
+    },
+    "title": "P-15 probe: source, pull request body at creation, code",
+    "titleHTML": "P-15 probe: source, pull request body at creation, code"
+  },
+  {
+    "__typename": "PullRequest",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "Text of probe P-15 in the encoding `backslash`. This line is the host's; the rest stands for agent text.\n\n- mention: \\@sapientpants wrote this.\n- hash: see \\#12 for the first.\n- gh: see GH\\-13 for the second.\n- full: see sapientpants/sf-scratch\\#14 for the third.\n- url: see https\\://github.com/sapientpants/sf-scratch/issues/15 for the fourth.\n- close: Fixes \\#30.\n",
+    "bodyHTML": "<p dir=\"auto\">Text of probe P-15 in the encoding <code class=\"notranslate\">backslash</code>. This line is the host's; the rest stands for agent text.</p>\n<ul dir=\"auto\">\n<li>mention: <a class=\"user-mention notranslate\" data-hovercard-type=\"user\" data-hovercard-url=\"/users/sapientpants/hovercard\" data-octo-click=\"hovercard-link-click\" data-octo-dimensions=\"link_type:self\" href=\"https://github.com/sapientpants\">@sapientpants</a> wrote this.</li>\n<li>hash: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520140509\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/12\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/12/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/12\">#12</a> for the first.</li>\n<li>gh: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520140854\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/13\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/13/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/13\">GH-13</a> for the second.</li>\n<li>full: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520141200\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/14\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/14/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/14\">#14</a> for the third.</li>\n<li>url: see https://github.com/<a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520141535\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/15\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/15/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/15\">/issues/15</a> for the fourth.</li>\n<li>close: <span class=\"issue-keyword tooltipped tooltipped-se\" aria-label=\"This pull request closes issue #30.\">Fixes</span> <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520146541\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/30\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/30/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/30\">#30</a>.</li>\n</ul>",
+    "closingIssuesReferences": {
+      "nodes": [
+        {
+          "number": 30
+        }
+      ]
+    },
+    "createdAt": "2026-11-20T21:42:47Z",
+    "editor": null,
+    "lastEditedAt": null,
+    "merged": false,
+    "number": 49,
+    "state": "OPEN",
+    "timelineItems": {
+      "nodes": [
+        {
+          "__typename": "MentionedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "createdAt": "2026-11-20T21:42:49Z"
+        },
+        {
+          "__typename": "SubscribedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "createdAt": "2026-11-20T21:42:49Z"
+        }
+      ],
+      "totalCount": 1
+    },
+    "title": "P-15 probe: source, pull request body at creation, backslash",
+    "titleHTML": "P-15 probe: source, pull request body at creation, backslash"
+  },
+  {
+    "__typename": "PullRequest",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "Text of probe P-15 in the encoding `zwj`. This line is the host's; the rest stands for agent text.\n\n- mention: @‍sapientpants wrote this.\n- hash: see #‍12 for the first.\n- gh: see GH-‍13 for the second.\n- full: see sapientpants/sf-scratch#‍14 for the third.\n- url: see https:‍//github.com/sapientpants/sf-scratch/issues/15 for the fourth.\n- close: Fixes #‍34.\n",
+    "bodyHTML": "<p dir=\"auto\">Text of probe P-15 in the encoding <code class=\"notranslate\">zwj</code>. This line is the host's; the rest stands for agent text.</p>\n<ul dir=\"auto\">\n<li>mention: @‍sapientpants wrote this.</li>\n<li>hash: see #‍12 for the first.</li>\n<li>gh: see GH-‍13 for the second.</li>\n<li>full: see sapientpants/sf-scratch#‍14 for the third.</li>\n<li>url: see https:‍//github.com/<a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520141535\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/15\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/15/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/15\">/issues/15</a> for the fourth.</li>\n<li>close: Fixes #‍34.</li>\n</ul>",
+    "closingIssuesReferences": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:42:50Z",
+    "editor": null,
+    "lastEditedAt": null,
+    "merged": false,
+    "number": 50,
+    "state": "OPEN",
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 1
+    },
+    "title": "P-15 probe: source, pull request body at creation, zwj",
+    "titleHTML": "P-15 probe: source, pull request body at creation, zwj"
+  },
+  {
+    "__typename": "PullRequest",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "Text of probe P-15 in the encoding `zwsp`. This line is the host's; the rest stands for agent text.\n\n- mention: @​sapientpants wrote this.\n- hash: see #​12 for the first.\n- gh: see GH-​13 for the second.\n- full: see sapientpants/sf-scratch#​14 for the third.\n- url: see https:​//github.com/sapientpants/sf-scratch/issues/15 for the fourth.\n- close: Fixes #​38.\n",
+    "bodyHTML": "<p dir=\"auto\">Text of probe P-15 in the encoding <code class=\"notranslate\">zwsp</code>. This line is the host's; the rest stands for agent text.</p>\n<ul dir=\"auto\">\n<li>mention: @​sapientpants wrote this.</li>\n<li>hash: see #​12 for the first.</li>\n<li>gh: see GH-​13 for the second.</li>\n<li>full: see sapientpants/sf-scratch#​14 for the third.</li>\n<li>url: see https:​//github.com/<a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520141535\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/15\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/15/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/15\">/issues/15</a> for the fourth.</li>\n<li>close: Fixes #​38.</li>\n</ul>",
+    "closingIssuesReferences": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:42:54Z",
+    "editor": null,
+    "lastEditedAt": null,
+    "merged": false,
+    "number": 51,
+    "state": "OPEN",
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 1
+    },
+    "title": "P-15 probe: source, pull request body at creation, zwsp",
+    "titleHTML": "P-15 probe: source, pull request body at creation, zwsp"
+  },
+  {
+    "__typename": "PullRequest",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "Text of probe P-15 in the encoding `entity`. This line is the host's; the rest stands for agent text.\n\n- mention: &#64;sapientpants wrote this.\n- hash: see &#35;12 for the first.\n- gh: see GH&#45;13 for the second.\n- full: see sapientpants/sf-scratch&#35;14 for the third.\n- url: see https&#58;//github.com/sapientpants/sf-scratch/issues/15 for the fourth.\n- close: Fixes &#35;42.\n",
+    "bodyHTML": "<p dir=\"auto\">Text of probe P-15 in the encoding <code class=\"notranslate\">entity</code>. This line is the host's; the rest stands for agent text.</p>\n<ul dir=\"auto\">\n<li>mention: <a class=\"user-mention notranslate\" data-hovercard-type=\"user\" data-hovercard-url=\"/users/sapientpants/hovercard\" data-octo-click=\"hovercard-link-click\" data-octo-dimensions=\"link_type:self\" href=\"https://github.com/sapientpants\">@sapientpants</a> wrote this.</li>\n<li>hash: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520140509\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/12\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/12/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/12\">#12</a> for the first.</li>\n<li>gh: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520140854\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/13\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/13/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/13\">GH-13</a> for the second.</li>\n<li>full: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520141200\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/14\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/14/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/14\">#14</a> for the third.</li>\n<li>url: see https://github.com/<a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520141535\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/15\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/15/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/15\">/issues/15</a> for the fourth.</li>\n<li>close: <span class=\"issue-keyword tooltipped tooltipped-se\" aria-label=\"This pull request closes issue #42.\">Fixes</span> <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520150528\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/42\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/42/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/42\">#42</a>.</li>\n</ul>",
+    "closingIssuesReferences": {
+      "nodes": [
+        {
+          "number": 42
+        }
+      ]
+    },
+    "createdAt": "2026-11-20T21:42:57Z",
+    "editor": null,
+    "lastEditedAt": null,
+    "merged": false,
+    "number": 52,
+    "state": "OPEN",
+    "timelineItems": {
+      "nodes": [
+        {
+          "__typename": "MentionedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "createdAt": "2026-11-20T21:43:00Z"
+        },
+        {
+          "__typename": "SubscribedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "createdAt": "2026-11-20T21:43:00Z"
+        }
+      ],
+      "totalCount": 1
+    },
+    "title": "P-15 probe: source, pull request body at creation, entity",
+    "titleHTML": "P-15 probe: source, pull request body at creation, entity"
+  },
+  {
+    "__typename": "PullRequest",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "Text of probe P-15 in the encoding `plain`. This line is the host's; the rest stands for agent text.\n\n- mention: @sapientpants wrote this.\n- hash: see #12 for the first.\n- gh: see GH-13 for the second.\n- full: see sapientpants/sf-scratch#14 for the third.\n- url: see https://github.com/sapientpants/sf-scratch/issues/15 for the fourth.\n- close: Fixes #20.\n",
+    "bodyHTML": "<p dir=\"auto\">Text of probe P-15 in the encoding <code class=\"notranslate\">plain</code>. This line is the host's; the rest stands for agent text.</p>\n<ul dir=\"auto\">\n<li>mention: <a class=\"user-mention notranslate\" data-hovercard-type=\"user\" data-hovercard-url=\"/users/sapientpants/hovercard\" data-octo-click=\"hovercard-link-click\" data-octo-dimensions=\"link_type:self\" href=\"https://github.com/sapientpants\">@sapientpants</a> wrote this.</li>\n<li>hash: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520140509\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/12\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/12/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/12\">#12</a> for the first.</li>\n<li>gh: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520140854\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/13\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/13/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/13\">GH-13</a> for the second.</li>\n<li>full: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520141200\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/14\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/14/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/14\">#14</a> for the third.</li>\n<li>url: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520141535\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/15\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/15/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/15\">#15</a> for the fourth.</li>\n<li>close: <span class=\"issue-keyword tooltipped tooltipped-se\" aria-label=\"This pull request closes issue #20.\">Fixes</span> <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520143176\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/20\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/20/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/20\">#20</a>.</li>\n</ul>",
+    "closingIssuesReferences": {
+      "nodes": [
+        {
+          "number": 20
+        }
+      ]
+    },
+    "createdAt": "2026-11-20T21:43:01Z",
+    "editor": {
+      "__typename": "Bot",
+      "login": "github-actions"
+    },
+    "lastEditedAt": "2026-11-20T21:43:46Z",
+    "merged": false,
+    "number": 53,
+    "state": "OPEN",
+    "timelineItems": {
+      "nodes": [
+        {
+          "__typename": "MentionedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "createdAt": "2026-11-20T21:44:07Z"
+        },
+        {
+          "__typename": "SubscribedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "createdAt": "2026-11-20T21:44:07Z"
+        }
+      ],
+      "totalCount": 1
+    },
+    "title": "P-15 probe: source, pull request body edited, plain",
+    "titleHTML": "P-15 probe: source, pull request body edited, plain"
+  },
+  {
+    "__typename": "PullRequest",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "Text of probe P-15 in the encoding `fence`. This line is the host's; the rest stands for agent text.\n\n```text\nmention: @sapientpants wrote this.\nhash: see #12 for the first.\ngh: see GH-13 for the second.\nfull: see sapientpants/sf-scratch#14 for the third.\nurl: see https://github.com/sapientpants/sf-scratch/issues/15 for the fourth.\nclose: Fixes #24.\n```\n",
+    "bodyHTML": "<p dir=\"auto\">Text of probe P-15 in the encoding <code class=\"notranslate\">fence</code>. This line is the host's; the rest stands for agent text.</p>\n<div class=\"snippet-clipboard-content notranslate position-relative overflow-auto\" data-snippet-clipboard-copy-content=\"mention: @sapientpants wrote this.\nhash: see #12 for the first.\ngh: see GH-13 for the second.\nfull: see sapientpants/sf-scratch#14 for the third.\nurl: see https://github.com/sapientpants/sf-scratch/issues/15 for the fourth.\nclose: Fixes #24.\"><pre lang=\"text\" class=\"notranslate\"><code class=\"notranslate\">mention: @sapientpants wrote this.\nhash: see #12 for the first.\ngh: see GH-13 for the second.\nfull: see sapientpants/sf-scratch#14 for the third.\nurl: see https://github.com/sapientpants/sf-scratch/issues/15 for the fourth.\nclose: Fixes #24.\n</code></pre></div>",
+    "closingIssuesReferences": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:43:05Z",
+    "editor": {
+      "__typename": "Bot",
+      "login": "github-actions"
+    },
+    "lastEditedAt": "2026-11-20T21:43:57Z",
+    "merged": false,
+    "number": 54,
+    "state": "OPEN",
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 1
+    },
+    "title": "P-15 probe: source, pull request body edited, fence",
+    "titleHTML": "P-15 probe: source, pull request body edited, fence"
+  },
+  {
+    "__typename": "PullRequest",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "Text of probe P-15 in the encoding `code`. This line is the host's; the rest stands for agent text.\n\n- mention: `@sapientpants` wrote this.\n- hash: see `#12` for the first.\n- gh: see `GH-13` for the second.\n- full: see `sapientpants/sf-scratch#14` for the third.\n- url: see `https://github.com/sapientpants/sf-scratch/issues/15` for the fourth.\n- close: Fixes `#27`.\n",
+    "bodyHTML": "<p dir=\"auto\">Text of probe P-15 in the encoding <code class=\"notranslate\">code</code>. This line is the host's; the rest stands for agent text.</p>\n<ul dir=\"auto\">\n<li>mention: <code class=\"notranslate\">@sapientpants</code> wrote this.</li>\n<li>hash: see <code class=\"notranslate\">#12</code> for the first.</li>\n<li>gh: see <code class=\"notranslate\">GH-13</code> for the second.</li>\n<li>full: see <code class=\"notranslate\">sapientpants/sf-scratch#14</code> for the third.</li>\n<li>url: see <code class=\"notranslate\">https://github.com/sapientpants/sf-scratch/issues/15</code> for the fourth.</li>\n<li>close: Fixes <code class=\"notranslate\">#27</code>.</li>\n</ul>",
+    "closingIssuesReferences": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:43:08Z",
+    "editor": {
+      "__typename": "Bot",
+      "login": "github-actions"
+    },
+    "lastEditedAt": "2026-11-20T21:44:09Z",
+    "merged": false,
+    "number": 55,
+    "state": "OPEN",
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 1
+    },
+    "title": "P-15 probe: source, pull request body edited, code",
+    "titleHTML": "P-15 probe: source, pull request body edited, code"
+  },
+  {
+    "__typename": "PullRequest",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "Text of probe P-15 in the encoding `backslash`. This line is the host's; the rest stands for agent text.\n\n- mention: \\@sapientpants wrote this.\n- hash: see \\#12 for the first.\n- gh: see GH\\-13 for the second.\n- full: see sapientpants/sf-scratch\\#14 for the third.\n- url: see https\\://github.com/sapientpants/sf-scratch/issues/15 for the fourth.\n- close: Fixes \\#31.\n",
+    "bodyHTML": "<p dir=\"auto\">Text of probe P-15 in the encoding <code class=\"notranslate\">backslash</code>. This line is the host's; the rest stands for agent text.</p>\n<ul dir=\"auto\">\n<li>mention: <a class=\"user-mention notranslate\" data-hovercard-type=\"user\" data-hovercard-url=\"/users/sapientpants/hovercard\" data-octo-click=\"hovercard-link-click\" data-octo-dimensions=\"link_type:self\" href=\"https://github.com/sapientpants\">@sapientpants</a> wrote this.</li>\n<li>hash: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520140509\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/12\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/12/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/12\">#12</a> for the first.</li>\n<li>gh: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520140854\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/13\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/13/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/13\">GH-13</a> for the second.</li>\n<li>full: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520141200\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/14\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/14/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/14\">#14</a> for the third.</li>\n<li>url: see https://github.com/<a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520141535\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/15\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/15/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/15\">/issues/15</a> for the fourth.</li>\n<li>close: <span class=\"issue-keyword tooltipped tooltipped-se\" aria-label=\"This pull request closes issue #31.\">Fixes</span> <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520146854\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/31\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/31/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/31\">#31</a>.</li>\n</ul>",
+    "closingIssuesReferences": {
+      "nodes": [
+        {
+          "number": 31
+        }
+      ]
+    },
+    "createdAt": "2026-11-20T21:43:11Z",
+    "editor": {
+      "__typename": "Bot",
+      "login": "github-actions"
+    },
+    "lastEditedAt": "2026-11-20T21:44:22Z",
+    "merged": false,
+    "number": 56,
+    "state": "OPEN",
+    "timelineItems": {
+      "nodes": [
+        {
+          "__typename": "MentionedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "createdAt": "2026-11-20T21:44:44Z"
+        },
+        {
+          "__typename": "SubscribedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "createdAt": "2026-11-20T21:44:44Z"
+        }
+      ],
+      "totalCount": 1
+    },
+    "title": "P-15 probe: source, pull request body edited, backslash",
+    "titleHTML": "P-15 probe: source, pull request body edited, backslash"
+  },
+  {
+    "__typename": "PullRequest",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "Text of probe P-15 in the encoding `zwj`. This line is the host's; the rest stands for agent text.\n\n- mention: @‍sapientpants wrote this.\n- hash: see #‍12 for the first.\n- gh: see GH-‍13 for the second.\n- full: see sapientpants/sf-scratch#‍14 for the third.\n- url: see https:‍//github.com/sapientpants/sf-scratch/issues/15 for the fourth.\n- close: Fixes #‍35.\n",
+    "bodyHTML": "<p dir=\"auto\">Text of probe P-15 in the encoding <code class=\"notranslate\">zwj</code>. This line is the host's; the rest stands for agent text.</p>\n<ul dir=\"auto\">\n<li>mention: @‍sapientpants wrote this.</li>\n<li>hash: see #‍12 for the first.</li>\n<li>gh: see GH-‍13 for the second.</li>\n<li>full: see sapientpants/sf-scratch#‍14 for the third.</li>\n<li>url: see https:‍//github.com/<a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520141535\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/15\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/15/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/15\">/issues/15</a> for the fourth.</li>\n<li>close: Fixes #‍35.</li>\n</ul>",
+    "closingIssuesReferences": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:43:15Z",
+    "editor": {
+      "__typename": "Bot",
+      "login": "github-actions"
+    },
+    "lastEditedAt": "2026-11-20T21:44:36Z",
+    "merged": false,
+    "number": 57,
+    "state": "OPEN",
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 1
+    },
+    "title": "P-15 probe: source, pull request body edited, zwj",
+    "titleHTML": "P-15 probe: source, pull request body edited, zwj"
+  },
+  {
+    "__typename": "PullRequest",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "Text of probe P-15 in the encoding `zwsp`. This line is the host's; the rest stands for agent text.\n\n- mention: @​sapientpants wrote this.\n- hash: see #​12 for the first.\n- gh: see GH-​13 for the second.\n- full: see sapientpants/sf-scratch#​14 for the third.\n- url: see https:​//github.com/sapientpants/sf-scratch/issues/15 for the fourth.\n- close: Fixes #​39.\n",
+    "bodyHTML": "<p dir=\"auto\">Text of probe P-15 in the encoding <code class=\"notranslate\">zwsp</code>. This line is the host's; the rest stands for agent text.</p>\n<ul dir=\"auto\">\n<li>mention: @​sapientpants wrote this.</li>\n<li>hash: see #​12 for the first.</li>\n<li>gh: see GH-​13 for the second.</li>\n<li>full: see sapientpants/sf-scratch#​14 for the third.</li>\n<li>url: see https:​//github.com/<a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520141535\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/15\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/15/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/15\">/issues/15</a> for the fourth.</li>\n<li>close: Fixes #​39.</li>\n</ul>",
+    "closingIssuesReferences": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:43:18Z",
+    "editor": {
+      "__typename": "Bot",
+      "login": "github-actions"
+    },
+    "lastEditedAt": "2026-11-20T21:44:49Z",
+    "merged": false,
+    "number": 58,
+    "state": "OPEN",
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 1
+    },
+    "title": "P-15 probe: source, pull request body edited, zwsp",
+    "titleHTML": "P-15 probe: source, pull request body edited, zwsp"
+  },
+  {
+    "__typename": "PullRequest",
+    "author": {
+      "__typename": "User",
+      "login": "sapientpants"
+    },
+    "body": "Text of probe P-15 in the encoding `entity`. This line is the host's; the rest stands for agent text.\n\n- mention: &#64;sapientpants wrote this.\n- hash: see &#35;12 for the first.\n- gh: see GH&#45;13 for the second.\n- full: see sapientpants/sf-scratch&#35;14 for the third.\n- url: see https&#58;//github.com/sapientpants/sf-scratch/issues/15 for the fourth.\n- close: Fixes &#35;43.\n",
+    "bodyHTML": "<p dir=\"auto\">Text of probe P-15 in the encoding <code class=\"notranslate\">entity</code>. This line is the host's; the rest stands for agent text.</p>\n<ul dir=\"auto\">\n<li>mention: <a class=\"user-mention notranslate\" data-hovercard-type=\"user\" data-hovercard-url=\"/users/sapientpants/hovercard\" data-octo-click=\"hovercard-link-click\" data-octo-dimensions=\"link_type:self\" href=\"https://github.com/sapientpants\">@sapientpants</a> wrote this.</li>\n<li>hash: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520140509\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/12\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/12/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/12\">#12</a> for the first.</li>\n<li>gh: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520140854\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/13\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/13/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/13\">GH-13</a> for the second.</li>\n<li>full: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520141200\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/14\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/14/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/14\">#14</a> for the third.</li>\n<li>url: see https://github.com/<a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520141535\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/15\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/15/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/15\">/issues/15</a> for the fourth.</li>\n<li>close: <span class=\"issue-keyword tooltipped tooltipped-se\" aria-label=\"This pull request closes issue #43.\">Fixes</span> <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520150855\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/43\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/43/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/43\">#43</a>.</li>\n</ul>",
+    "closingIssuesReferences": {
+      "nodes": [
+        {
+          "number": 43
+        }
+      ]
+    },
+    "createdAt": "2026-11-20T21:43:21Z",
+    "editor": {
+      "__typename": "Bot",
+      "login": "github-actions"
+    },
+    "lastEditedAt": "2026-11-20T21:45:02Z",
+    "merged": false,
+    "number": 59,
+    "state": "OPEN",
+    "timelineItems": {
+      "nodes": [
+        {
+          "__typename": "MentionedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "createdAt": "2026-11-20T21:45:22Z"
+        },
+        {
+          "__typename": "SubscribedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "createdAt": "2026-11-20T21:45:23Z"
+        }
+      ],
+      "totalCount": 1
+    },
+    "title": "P-15 probe: source, pull request body edited, entity",
+    "titleHTML": "P-15 probe: source, pull request body edited, entity"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "Bot",
+      "login": "github-actions"
+    },
+    "body": "An issue of probe P-15. Its one comment holds the text.",
+    "bodyHTML": "<p dir=\"auto\">An issue of probe P-15. Its one comment holds the text.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": [
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "github-actions"
+          },
+          "body": "Text of probe P-15 in the encoding `plain`. This line is the host's; the rest stands for agent text.\n\n- mention: @sapientpants wrote this.\n- hash: see #12 for the first.\n- gh: see GH-13 for the second.\n- full: see sapientpants/sf-scratch#14 for the third.\n- url: see https://github.com/sapientpants/sf-scratch/issues/15 for the fourth.\n- close: Fixes #17.\n",
+          "bodyHTML": "<p dir=\"auto\">Text of probe P-15 in the encoding <code class=\"notranslate\">plain</code>. This line is the host's; the rest stands for agent text.</p>\n<ul dir=\"auto\">\n<li>mention: <a class=\"user-mention notranslate\" data-hovercard-type=\"user\" data-hovercard-url=\"/users/sapientpants/hovercard\" data-octo-click=\"hovercard-link-click\" data-octo-dimensions=\"link_type:self\" href=\"https://github.com/sapientpants\">@sapientpants</a> wrote this.</li>\n<li>hash: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520140509\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/12\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/12/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/12\">#12</a> for the first.</li>\n<li>gh: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520140854\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/13\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/13/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/13\">GH-13</a> for the second.</li>\n<li>full: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520141200\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/14\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/14/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/14\">#14</a> for the third.</li>\n<li>url: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520141535\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/15\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/15/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/15\">#15</a> for the fourth.</li>\n<li>close: Fixes <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520142175\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/17\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/17/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/17\">#17</a>.</li>\n</ul>",
+          "createdAt": "2026-11-20T21:43:39Z"
+        }
+      ]
+    },
+    "createdAt": "2026-11-20T21:43:36Z",
+    "number": 60,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [
+        {
+          "__typename": "MentionedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "createdAt": "2026-11-20T21:43:40Z"
+        },
+        {
+          "__typename": "SubscribedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "createdAt": "2026-11-20T21:43:40Z"
+        }
+      ],
+      "totalCount": 2
+    },
+    "title": "P-15 probe: source, comment, plain",
+    "titleHTML": "P-15 probe: source, comment, plain"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "Bot",
+      "login": "github-actions"
+    },
+    "body": "Text of probe P-15 in the encoding `plain`. This line is the host's; the rest stands for agent text.\n\n- mention: @sapientpants wrote this.\n- hash: see #12 for the first.\n- gh: see GH-13 for the second.\n- full: see sapientpants/sf-scratch#14 for the third.\n- url: see https://github.com/sapientpants/sf-scratch/issues/15 for the fourth.\n- close: Fixes #18.\n",
+    "bodyHTML": "<p dir=\"auto\">Text of probe P-15 in the encoding <code class=\"notranslate\">plain</code>. This line is the host's; the rest stands for agent text.</p>\n<ul dir=\"auto\">\n<li>mention: <a class=\"user-mention notranslate\" data-hovercard-type=\"user\" data-hovercard-url=\"/users/sapientpants/hovercard\" data-octo-click=\"hovercard-link-click\" data-octo-dimensions=\"link_type:self\" href=\"https://github.com/sapientpants\">@sapientpants</a> wrote this.</li>\n<li>hash: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520140509\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/12\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/12/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/12\">#12</a> for the first.</li>\n<li>gh: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520140854\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/13\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/13/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/13\">GH-13</a> for the second.</li>\n<li>full: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520141200\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/14\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/14/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/14\">#14</a> for the third.</li>\n<li>url: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520141535\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/15\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/15/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/15\">#15</a> for the fourth.</li>\n<li>close: Fixes <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520142481\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/18\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/18/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/18\">#18</a>.</li>\n</ul>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:43:41Z",
+    "number": 61,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 0
+    },
+    "title": "P-15 probe: source, body, plain",
+    "titleHTML": "P-15 probe: source, body, plain"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "Bot",
+      "login": "github-actions"
+    },
+    "body": "An issue of probe P-15. Its title holds the text.",
+    "bodyHTML": "<p dir=\"auto\">An issue of probe P-15. Its title holds the text.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:43:44Z",
+    "number": 62,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 0
+    },
+    "title": "P-15 probe: source, title, plain: @sapientpants see #16",
+    "titleHTML": "P-15 probe: source, title, plain: @sapientpants see #16"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "Bot",
+      "login": "github-actions"
+    },
+    "body": "An issue of probe P-15. Its one comment holds the text.",
+    "bodyHTML": "<p dir=\"auto\">An issue of probe P-15. Its one comment holds the text.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": [
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "github-actions"
+          },
+          "body": "Text of probe P-15 in the encoding `fence`. This line is the host's; the rest stands for agent text.\n\n```text\nmention: @sapientpants wrote this.\nhash: see #12 for the first.\ngh: see GH-13 for the second.\nfull: see sapientpants/sf-scratch#14 for the third.\nurl: see https://github.com/sapientpants/sf-scratch/issues/15 for the fourth.\nclose: Fixes #17.\n```\n",
+          "bodyHTML": "<p dir=\"auto\">Text of probe P-15 in the encoding <code class=\"notranslate\">fence</code>. This line is the host's; the rest stands for agent text.</p>\n<div class=\"snippet-clipboard-content notranslate position-relative overflow-auto\" data-snippet-clipboard-copy-content=\"mention: @sapientpants wrote this.\nhash: see #12 for the first.\ngh: see GH-13 for the second.\nfull: see sapientpants/sf-scratch#14 for the third.\nurl: see https://github.com/sapientpants/sf-scratch/issues/15 for the fourth.\nclose: Fixes #17.\"><pre lang=\"text\" class=\"notranslate\"><code class=\"notranslate\">mention: @sapientpants wrote this.\nhash: see #12 for the first.\ngh: see GH-13 for the second.\nfull: see sapientpants/sf-scratch#14 for the third.\nurl: see https://github.com/sapientpants/sf-scratch/issues/15 for the fourth.\nclose: Fixes #17.\n</code></pre></div>",
+          "createdAt": "2026-11-20T21:43:52Z"
+        }
+      ]
+    },
+    "createdAt": "2026-11-20T21:43:49Z",
+    "number": 63,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 0
+    },
+    "title": "P-15 probe: source, comment, fence",
+    "titleHTML": "P-15 probe: source, comment, fence"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "Bot",
+      "login": "github-actions"
+    },
+    "body": "Text of probe P-15 in the encoding `fence`. This line is the host's; the rest stands for agent text.\n\n```text\nmention: @sapientpants wrote this.\nhash: see #12 for the first.\ngh: see GH-13 for the second.\nfull: see sapientpants/sf-scratch#14 for the third.\nurl: see https://github.com/sapientpants/sf-scratch/issues/15 for the fourth.\nclose: Fixes #18.\n```\n",
+    "bodyHTML": "<p dir=\"auto\">Text of probe P-15 in the encoding <code class=\"notranslate\">fence</code>. This line is the host's; the rest stands for agent text.</p>\n<div class=\"snippet-clipboard-content notranslate position-relative overflow-auto\" data-snippet-clipboard-copy-content=\"mention: @sapientpants wrote this.\nhash: see #12 for the first.\ngh: see GH-13 for the second.\nfull: see sapientpants/sf-scratch#14 for the third.\nurl: see https://github.com/sapientpants/sf-scratch/issues/15 for the fourth.\nclose: Fixes #18.\"><pre lang=\"text\" class=\"notranslate\"><code class=\"notranslate\">mention: @sapientpants wrote this.\nhash: see #12 for the first.\ngh: see GH-13 for the second.\nfull: see sapientpants/sf-scratch#14 for the third.\nurl: see https://github.com/sapientpants/sf-scratch/issues/15 for the fourth.\nclose: Fixes #18.\n</code></pre></div>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:43:54Z",
+    "number": 64,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 0
+    },
+    "title": "P-15 probe: source, body, fence",
+    "titleHTML": "P-15 probe: source, body, fence"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "Bot",
+      "login": "github-actions"
+    },
+    "body": "An issue of probe P-15. Its one comment holds the text.",
+    "bodyHTML": "<p dir=\"auto\">An issue of probe P-15. Its one comment holds the text.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": [
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "github-actions"
+          },
+          "body": "Text of probe P-15 in the encoding `code`. This line is the host's; the rest stands for agent text.\n\n- mention: `@sapientpants` wrote this.\n- hash: see `#12` for the first.\n- gh: see `GH-13` for the second.\n- full: see `sapientpants/sf-scratch#14` for the third.\n- url: see `https://github.com/sapientpants/sf-scratch/issues/15` for the fourth.\n- close: Fixes `#17`.\n",
+          "bodyHTML": "<p dir=\"auto\">Text of probe P-15 in the encoding <code class=\"notranslate\">code</code>. This line is the host's; the rest stands for agent text.</p>\n<ul dir=\"auto\">\n<li>mention: <code class=\"notranslate\">@sapientpants</code> wrote this.</li>\n<li>hash: see <code class=\"notranslate\">#12</code> for the first.</li>\n<li>gh: see <code class=\"notranslate\">GH-13</code> for the second.</li>\n<li>full: see <code class=\"notranslate\">sapientpants/sf-scratch#14</code> for the third.</li>\n<li>url: see <code class=\"notranslate\">https://github.com/sapientpants/sf-scratch/issues/15</code> for the fourth.</li>\n<li>close: Fixes <code class=\"notranslate\">#17</code>.</li>\n</ul>",
+          "createdAt": "2026-11-20T21:44:02Z"
+        }
+      ]
+    },
+    "createdAt": "2026-11-20T21:43:59Z",
+    "number": 65,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 0
+    },
+    "title": "P-15 probe: source, comment, code",
+    "titleHTML": "P-15 probe: source, comment, code"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "Bot",
+      "login": "github-actions"
+    },
+    "body": "Text of probe P-15 in the encoding `code`. This line is the host's; the rest stands for agent text.\n\n- mention: `@sapientpants` wrote this.\n- hash: see `#12` for the first.\n- gh: see `GH-13` for the second.\n- full: see `sapientpants/sf-scratch#14` for the third.\n- url: see `https://github.com/sapientpants/sf-scratch/issues/15` for the fourth.\n- close: Fixes `#18`.\n",
+    "bodyHTML": "<p dir=\"auto\">Text of probe P-15 in the encoding <code class=\"notranslate\">code</code>. This line is the host's; the rest stands for agent text.</p>\n<ul dir=\"auto\">\n<li>mention: <code class=\"notranslate\">@sapientpants</code> wrote this.</li>\n<li>hash: see <code class=\"notranslate\">#12</code> for the first.</li>\n<li>gh: see <code class=\"notranslate\">GH-13</code> for the second.</li>\n<li>full: see <code class=\"notranslate\">sapientpants/sf-scratch#14</code> for the third.</li>\n<li>url: see <code class=\"notranslate\">https://github.com/sapientpants/sf-scratch/issues/15</code> for the fourth.</li>\n<li>close: Fixes <code class=\"notranslate\">#18</code>.</li>\n</ul>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:44:04Z",
+    "number": 66,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 0
+    },
+    "title": "P-15 probe: source, body, code",
+    "titleHTML": "P-15 probe: source, body, code"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "Bot",
+      "login": "github-actions"
+    },
+    "body": "An issue of probe P-15. Its title holds the text.",
+    "bodyHTML": "<p dir=\"auto\">An issue of probe P-15. Its title holds the text.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:44:07Z",
+    "number": 67,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 0
+    },
+    "title": "P-15 probe: source, title, code: `@sapientpants` see `#16`",
+    "titleHTML": "P-15 probe: source, title, code: <code>@sapientpants</code> see <code>#16</code>"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "Bot",
+      "login": "github-actions"
+    },
+    "body": "An issue of probe P-15. Its one comment holds the text.",
+    "bodyHTML": "<p dir=\"auto\">An issue of probe P-15. Its one comment holds the text.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": [
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "github-actions"
+          },
+          "body": "Text of probe P-15 in the encoding `backslash`. This line is the host's; the rest stands for agent text.\n\n- mention: \\@sapientpants wrote this.\n- hash: see \\#12 for the first.\n- gh: see GH\\-13 for the second.\n- full: see sapientpants/sf-scratch\\#14 for the third.\n- url: see https\\://github.com/sapientpants/sf-scratch/issues/15 for the fourth.\n- close: Fixes \\#17.\n",
+          "bodyHTML": "<p dir=\"auto\">Text of probe P-15 in the encoding <code class=\"notranslate\">backslash</code>. This line is the host's; the rest stands for agent text.</p>\n<ul dir=\"auto\">\n<li>mention: <a class=\"user-mention notranslate\" data-hovercard-type=\"user\" data-hovercard-url=\"/users/sapientpants/hovercard\" data-octo-click=\"hovercard-link-click\" data-octo-dimensions=\"link_type:self\" href=\"https://github.com/sapientpants\">@sapientpants</a> wrote this.</li>\n<li>hash: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520140509\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/12\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/12/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/12\">#12</a> for the first.</li>\n<li>gh: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520140854\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/13\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/13/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/13\">GH-13</a> for the second.</li>\n<li>full: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520141200\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/14\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/14/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/14\">#14</a> for the third.</li>\n<li>url: see https://github.com/<a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520141535\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/15\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/15/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/15\">/issues/15</a> for the fourth.</li>\n<li>close: Fixes <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520142175\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/17\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/17/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/17\">#17</a>.</li>\n</ul>",
+          "createdAt": "2026-11-20T21:44:15Z"
+        }
+      ]
+    },
+    "createdAt": "2026-11-20T21:44:12Z",
+    "number": 68,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [
+        {
+          "__typename": "MentionedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "createdAt": "2026-11-20T21:44:16Z"
+        },
+        {
+          "__typename": "SubscribedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "createdAt": "2026-11-20T21:44:16Z"
+        }
+      ],
+      "totalCount": 2
+    },
+    "title": "P-15 probe: source, comment, backslash",
+    "titleHTML": "P-15 probe: source, comment, backslash"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "Bot",
+      "login": "github-actions"
+    },
+    "body": "Text of probe P-15 in the encoding `backslash`. This line is the host's; the rest stands for agent text.\n\n- mention: \\@sapientpants wrote this.\n- hash: see \\#12 for the first.\n- gh: see GH\\-13 for the second.\n- full: see sapientpants/sf-scratch\\#14 for the third.\n- url: see https\\://github.com/sapientpants/sf-scratch/issues/15 for the fourth.\n- close: Fixes \\#18.\n",
+    "bodyHTML": "<p dir=\"auto\">Text of probe P-15 in the encoding <code class=\"notranslate\">backslash</code>. This line is the host's; the rest stands for agent text.</p>\n<ul dir=\"auto\">\n<li>mention: <a class=\"user-mention notranslate\" data-hovercard-type=\"user\" data-hovercard-url=\"/users/sapientpants/hovercard\" data-octo-click=\"hovercard-link-click\" data-octo-dimensions=\"link_type:self\" href=\"https://github.com/sapientpants\">@sapientpants</a> wrote this.</li>\n<li>hash: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520140509\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/12\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/12/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/12\">#12</a> for the first.</li>\n<li>gh: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520140854\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/13\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/13/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/13\">GH-13</a> for the second.</li>\n<li>full: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520141200\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/14\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/14/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/14\">#14</a> for the third.</li>\n<li>url: see https://github.com/<a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520141535\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/15\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/15/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/15\">/issues/15</a> for the fourth.</li>\n<li>close: Fixes <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520142481\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/18\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/18/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/18\">#18</a>.</li>\n</ul>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:44:17Z",
+    "number": 69,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 0
+    },
+    "title": "P-15 probe: source, body, backslash",
+    "titleHTML": "P-15 probe: source, body, backslash"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "Bot",
+      "login": "github-actions"
+    },
+    "body": "An issue of probe P-15. Its title holds the text.",
+    "bodyHTML": "<p dir=\"auto\">An issue of probe P-15. Its title holds the text.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:44:20Z",
+    "number": 70,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 0
+    },
+    "title": "P-15 probe: source, title, backslash: \\@sapientpants see \\#16",
+    "titleHTML": "P-15 probe: source, title, backslash: \\@sapientpants see \\#16"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "Bot",
+      "login": "github-actions"
+    },
+    "body": "An issue of probe P-15. Its one comment holds the text.",
+    "bodyHTML": "<p dir=\"auto\">An issue of probe P-15. Its one comment holds the text.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": [
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "github-actions"
+          },
+          "body": "Text of probe P-15 in the encoding `zwj`. This line is the host's; the rest stands for agent text.\n\n- mention: @‍sapientpants wrote this.\n- hash: see #‍12 for the first.\n- gh: see GH-‍13 for the second.\n- full: see sapientpants/sf-scratch#‍14 for the third.\n- url: see https:‍//github.com/sapientpants/sf-scratch/issues/15 for the fourth.\n- close: Fixes #‍17.\n",
+          "bodyHTML": "<p dir=\"auto\">Text of probe P-15 in the encoding <code class=\"notranslate\">zwj</code>. This line is the host's; the rest stands for agent text.</p>\n<ul dir=\"auto\">\n<li>mention: @‍sapientpants wrote this.</li>\n<li>hash: see #‍12 for the first.</li>\n<li>gh: see GH-‍13 for the second.</li>\n<li>full: see sapientpants/sf-scratch#‍14 for the third.</li>\n<li>url: see https:‍//github.com/<a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520141535\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/15\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/15/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/15\">/issues/15</a> for the fourth.</li>\n<li>close: Fixes #‍17.</li>\n</ul>",
+          "createdAt": "2026-11-20T21:44:28Z"
+        }
+      ]
+    },
+    "createdAt": "2026-11-20T21:44:25Z",
+    "number": 71,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 0
+    },
+    "title": "P-15 probe: source, comment, zwj",
+    "titleHTML": "P-15 probe: source, comment, zwj"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "Bot",
+      "login": "github-actions"
+    },
+    "body": "Text of probe P-15 in the encoding `zwj`. This line is the host's; the rest stands for agent text.\n\n- mention: @‍sapientpants wrote this.\n- hash: see #‍12 for the first.\n- gh: see GH-‍13 for the second.\n- full: see sapientpants/sf-scratch#‍14 for the third.\n- url: see https:‍//github.com/sapientpants/sf-scratch/issues/15 for the fourth.\n- close: Fixes #‍18.\n",
+    "bodyHTML": "<p dir=\"auto\">Text of probe P-15 in the encoding <code class=\"notranslate\">zwj</code>. This line is the host's; the rest stands for agent text.</p>\n<ul dir=\"auto\">\n<li>mention: @‍sapientpants wrote this.</li>\n<li>hash: see #‍12 for the first.</li>\n<li>gh: see GH-‍13 for the second.</li>\n<li>full: see sapientpants/sf-scratch#‍14 for the third.</li>\n<li>url: see https:‍//github.com/<a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520141535\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/15\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/15/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/15\">/issues/15</a> for the fourth.</li>\n<li>close: Fixes #‍18.</li>\n</ul>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:44:31Z",
+    "number": 72,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 0
+    },
+    "title": "P-15 probe: source, body, zwj",
+    "titleHTML": "P-15 probe: source, body, zwj"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "Bot",
+      "login": "github-actions"
+    },
+    "body": "An issue of probe P-15. Its title holds the text.",
+    "bodyHTML": "<p dir=\"auto\">An issue of probe P-15. Its title holds the text.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:44:33Z",
+    "number": 73,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 0
+    },
+    "title": "P-15 probe: source, title, zwj: @‍sapientpants see #‍16",
+    "titleHTML": "P-15 probe: source, title, zwj: @‍sapientpants see #‍16"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "Bot",
+      "login": "github-actions"
+    },
+    "body": "An issue of probe P-15. Its one comment holds the text.",
+    "bodyHTML": "<p dir=\"auto\">An issue of probe P-15. Its one comment holds the text.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": [
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "github-actions"
+          },
+          "body": "Text of probe P-15 in the encoding `zwsp`. This line is the host's; the rest stands for agent text.\n\n- mention: @​sapientpants wrote this.\n- hash: see #​12 for the first.\n- gh: see GH-​13 for the second.\n- full: see sapientpants/sf-scratch#​14 for the third.\n- url: see https:​//github.com/sapientpants/sf-scratch/issues/15 for the fourth.\n- close: Fixes #​17.\n",
+          "bodyHTML": "<p dir=\"auto\">Text of probe P-15 in the encoding <code class=\"notranslate\">zwsp</code>. This line is the host's; the rest stands for agent text.</p>\n<ul dir=\"auto\">\n<li>mention: @​sapientpants wrote this.</li>\n<li>hash: see #​12 for the first.</li>\n<li>gh: see GH-​13 for the second.</li>\n<li>full: see sapientpants/sf-scratch#​14 for the third.</li>\n<li>url: see https:​//github.com/<a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520141535\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/15\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/15/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/15\">/issues/15</a> for the fourth.</li>\n<li>close: Fixes #​17.</li>\n</ul>",
+          "createdAt": "2026-11-20T21:44:41Z"
+        }
+      ]
+    },
+    "createdAt": "2026-11-20T21:44:39Z",
+    "number": 74,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 0
+    },
+    "title": "P-15 probe: source, comment, zwsp",
+    "titleHTML": "P-15 probe: source, comment, zwsp"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "Bot",
+      "login": "github-actions"
+    },
+    "body": "Text of probe P-15 in the encoding `zwsp`. This line is the host's; the rest stands for agent text.\n\n- mention: @​sapientpants wrote this.\n- hash: see #​12 for the first.\n- gh: see GH-​13 for the second.\n- full: see sapientpants/sf-scratch#​14 for the third.\n- url: see https:​//github.com/sapientpants/sf-scratch/issues/15 for the fourth.\n- close: Fixes #​18.\n",
+    "bodyHTML": "<p dir=\"auto\">Text of probe P-15 in the encoding <code class=\"notranslate\">zwsp</code>. This line is the host's; the rest stands for agent text.</p>\n<ul dir=\"auto\">\n<li>mention: @​sapientpants wrote this.</li>\n<li>hash: see #​12 for the first.</li>\n<li>gh: see GH-​13 for the second.</li>\n<li>full: see sapientpants/sf-scratch#​14 for the third.</li>\n<li>url: see https:​//github.com/<a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520141535\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/15\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/15/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/15\">/issues/15</a> for the fourth.</li>\n<li>close: Fixes #​18.</li>\n</ul>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:44:44Z",
+    "number": 75,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 0
+    },
+    "title": "P-15 probe: source, body, zwsp",
+    "titleHTML": "P-15 probe: source, body, zwsp"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "Bot",
+      "login": "github-actions"
+    },
+    "body": "An issue of probe P-15. Its title holds the text.",
+    "bodyHTML": "<p dir=\"auto\">An issue of probe P-15. Its title holds the text.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:44:46Z",
+    "number": 76,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 0
+    },
+    "title": "P-15 probe: source, title, zwsp: @​sapientpants see #​16",
+    "titleHTML": "P-15 probe: source, title, zwsp: @​sapientpants see #​16"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "Bot",
+      "login": "github-actions"
+    },
+    "body": "An issue of probe P-15. Its one comment holds the text.",
+    "bodyHTML": "<p dir=\"auto\">An issue of probe P-15. Its one comment holds the text.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": [
+        {
+          "author": {
+            "__typename": "Bot",
+            "login": "github-actions"
+          },
+          "body": "Text of probe P-15 in the encoding `entity`. This line is the host's; the rest stands for agent text.\n\n- mention: &#64;sapientpants wrote this.\n- hash: see &#35;12 for the first.\n- gh: see GH&#45;13 for the second.\n- full: see sapientpants/sf-scratch&#35;14 for the third.\n- url: see https&#58;//github.com/sapientpants/sf-scratch/issues/15 for the fourth.\n- close: Fixes &#35;17.\n",
+          "bodyHTML": "<p dir=\"auto\">Text of probe P-15 in the encoding <code class=\"notranslate\">entity</code>. This line is the host's; the rest stands for agent text.</p>\n<ul dir=\"auto\">\n<li>mention: <a class=\"user-mention notranslate\" data-hovercard-type=\"user\" data-hovercard-url=\"/users/sapientpants/hovercard\" data-octo-click=\"hovercard-link-click\" data-octo-dimensions=\"link_type:self\" href=\"https://github.com/sapientpants\">@sapientpants</a> wrote this.</li>\n<li>hash: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520140509\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/12\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/12/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/12\">#12</a> for the first.</li>\n<li>gh: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520140854\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/13\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/13/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/13\">GH-13</a> for the second.</li>\n<li>full: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520141200\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/14\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/14/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/14\">#14</a> for the third.</li>\n<li>url: see https://github.com/<a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520141535\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/15\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/15/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/15\">/issues/15</a> for the fourth.</li>\n<li>close: Fixes <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520142175\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/17\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/17/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/17\">#17</a>.</li>\n</ul>",
+          "createdAt": "2026-11-20T21:44:54Z"
+        }
+      ]
+    },
+    "createdAt": "2026-11-20T21:44:52Z",
+    "number": 77,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [
+        {
+          "__typename": "MentionedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "createdAt": "2026-11-20T21:44:56Z"
+        },
+        {
+          "__typename": "SubscribedEvent",
+          "actor": {
+            "login": "sapientpants"
+          },
+          "createdAt": "2026-11-20T21:44:57Z"
+        }
+      ],
+      "totalCount": 2
+    },
+    "title": "P-15 probe: source, comment, entity",
+    "titleHTML": "P-15 probe: source, comment, entity"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "Bot",
+      "login": "github-actions"
+    },
+    "body": "Text of probe P-15 in the encoding `entity`. This line is the host's; the rest stands for agent text.\n\n- mention: &#64;sapientpants wrote this.\n- hash: see &#35;12 for the first.\n- gh: see GH&#45;13 for the second.\n- full: see sapientpants/sf-scratch&#35;14 for the third.\n- url: see https&#58;//github.com/sapientpants/sf-scratch/issues/15 for the fourth.\n- close: Fixes &#35;18.\n",
+    "bodyHTML": "<p dir=\"auto\">Text of probe P-15 in the encoding <code class=\"notranslate\">entity</code>. This line is the host's; the rest stands for agent text.</p>\n<ul dir=\"auto\">\n<li>mention: <a class=\"user-mention notranslate\" data-hovercard-type=\"user\" data-hovercard-url=\"/users/sapientpants/hovercard\" data-octo-click=\"hovercard-link-click\" data-octo-dimensions=\"link_type:self\" href=\"https://github.com/sapientpants\">@sapientpants</a> wrote this.</li>\n<li>hash: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520140509\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/12\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/12/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/12\">#12</a> for the first.</li>\n<li>gh: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520140854\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/13\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/13/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/13\">GH-13</a> for the second.</li>\n<li>full: see <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520141200\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/14\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/14/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/14\">#14</a> for the third.</li>\n<li>url: see https://github.com/<a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520141535\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/15\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/15/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/15\">/issues/15</a> for the fourth.</li>\n<li>close: Fixes <a class=\"issue-link js-issue-link\" data-error-text=\"Failed to load title\" data-id=\"6520142481\" data-permission-text=\"Title is private\" data-url=\"https://github.com/sapientpants/sf-scratch/issues/18\" data-hovercard-type=\"issue\" data-hovercard-url=\"/sapientpants/sf-scratch/issues/18/hovercard\" href=\"https://github.com/sapientpants/sf-scratch/issues/18\">#18</a>.</li>\n</ul>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:44:57Z",
+    "number": 78,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 0
+    },
+    "title": "P-15 probe: source, body, entity",
+    "titleHTML": "P-15 probe: source, body, entity"
+  },
+  {
+    "__typename": "Issue",
+    "author": {
+      "__typename": "Bot",
+      "login": "github-actions"
+    },
+    "body": "An issue of probe P-15. Its title holds the text.",
+    "bodyHTML": "<p dir=\"auto\">An issue of probe P-15. Its title holds the text.</p>",
+    "closedByPullRequestsReferences": {
+      "nodes": []
+    },
+    "comments": {
+      "nodes": []
+    },
+    "createdAt": "2026-11-20T21:45:00Z",
+    "number": 79,
+    "state": "OPEN",
+    "stateReason": null,
+    "timelineItems": {
+      "nodes": [],
+      "totalCount": 0
+    },
+    "title": "P-15 probe: source, title, entity: &#64;sapientpants see &#35;16",
+    "titleHTML": "P-15 probe: source, title, entity: &amp;#64;sapientpants see &amp;#35;16"
+  }
+]

@@ -18,6 +18,9 @@ A session that began with the command to implement one ticket, counted with ever
 | Active minutes, gaps over 15 minutes dropped | 29.4 | 55.8 | 57.8 | 61.0 |
 | Dollars at list price, from the transcripts | 14.50 | 21.29 | 24.83 | 29.48 |
 | Dollars, raised 6% to Claude Code's own count (section 4) | 15.40 | 22.60 | 26.30 | 31.20 |
+| Dollars at the prices of `claude-opus-5-5`, raised 6% (section 4) | 9.17 | 13.25 | 15.69 | 18.72 |
+
+94% of the model calls were made on `claude-fable-5-2`, the model the operator specifies on. The operator runs implementation on `claude-opus-5-5`, so the last row is the one a spend limit is read against: the same tokens at that model's prices.
 
 Against the defaults the spec listed before D-22, each with the 10% headroom of BUD-1:
 
@@ -25,9 +28,7 @@ Against the defaults the spec listed before D-22, each with the 10% headroom of 
 |---|---:|---:|---|
 | Turns | 150 | 135 | 1, if a subagent's calls count; none, if only the main loop counts |
 | Wall clock | 60 min | 54 min | 1 under the 5-minute rule, 3 under the 15-minute rule |
-| `implement` spend | $15 | $13.50 | 9, on the transcripts' own dollars and on the raised ones alike |
-
-94% of the model calls were made on `claude-fable-5-2`, so the dollars are that model's.
+| `implement` spend | $15 | $13.50 | 2, at the prices of `claude-opus-5-5`; 9, at the prices the sessions ran at |
 
 ## 2. What was read
 
@@ -105,7 +106,7 @@ Prices in dollars per million tokens, from `https://platform.claude.com/docs/en/
 - **Share of the calls.** `claude-fable-5-2` 94.0%, `claude-opus-5-5` 5.9%, `claude-haiku-5-5` 0.2%.
 - **Where the dollars go.** Of the `claude-fable-5-2` dollars, 40% is output, 44% is cache writes (rather more than half of it at the 1-hour price), 16% is cache reads, and uncached input is nothing to speak of.
 - **Against Claude Code's own count.** A session's transcript ends with the cost Claude Code counted for it. Over the 23 sessions the dollars computed here are 94.6% of that count, between 90% and 104% for a single session. The prices are the same: one session's `claude-fable-5-2` line comes out to the cent. The difference is model calls that the transcript does not list as messages, which belong to the harness and not to a prompt **(inference)**. The cap of `--max-budget-usd` is checked against Claude Code's count (probe P-22), so a limit is read against the dollars here raised by 6%.
-- **On another model.** At the prices of `claude-opus-5-5` the same tokens cost about 58% as much: output and cache writes halve and cache reads cost the same. That is arithmetic on the shares above, and it assumes that the other model would use the same tokens **(inference)**.
+- **At the prices of `claude-opus-5-5`.** The sessions measured are dearer than the sessions to be limited, since the operator specifies on `claude-fable-5-2` and runs implementation on `claude-opus-5-5`. Each ticket was priced again with its `claude-fable-5-2` tokens at the prices of `claude-opus-5-5`: output, uncached input and cache writes halve, and cache reads cost the same. The 13 tickets that ran on `claude-fable-5-2` then cost 51% to 61% of what they did, and the two that did not keep their dollars; the 15 together cost 59%. Raised 6%, in ascending order: 0.13, 0.16, 0.47, 2.16, 2.69, 7.19, 8.88, 9.17, 9.39, 9.90, 10.62, 10.89, 11.53, 14.39 and 18.72. This assumes that the other model would use the same tokens for the same ticket **(inference)**.
 
 ## 5. What this does not show
 
@@ -123,7 +124,7 @@ Prices in dollars per million tokens, from `https://platform.claude.com/docs/en/
 |---|---:|---|
 | 200 turns | 180 | Every ticket measured is below it by either count: 137 calls with subagents, 107 without |
 | 90 minutes | 81 min | The longest ticket took 56.5 or 61.0 active minutes, by the gap rule; SPEC 8.2 lets one tool call alone run 30 minutes |
-| $30 for an `implement` session | $27 | On `claude-fable-5-2`, above the 95th percentile ($26.30) and below the one largest ticket ($31.20); about one and a half times the largest ticket as estimated at the prices of `claude-opus-5-5` |
+| $20 for an `implement` session | $18 | At the prices of `claude-opus-5-5`: above the 95th percentile ($15.69) and below the one largest ticket ($18.72); the 14 other tickets cost $14.39 or less |
 
 Two facts about the caps come from elsewhere. With stream-JSON input the CLI starts its `--max-turns` count over with each message, while its budget total runs on over the session: that is the documentation's statement, in [12-claude-code-subscription-behaviour](https://github.com/sapientpants/software-factory/blob/616f64afcb57c3654ebea670f48534fdb4a26c3e/docs/research/12-claude-code-subscription-behaviour.md) (section 2), and it was not observed. Both caps end a session under the subscription token, and the budget cap overshoots by one response: that was observed (probe P-22).
 

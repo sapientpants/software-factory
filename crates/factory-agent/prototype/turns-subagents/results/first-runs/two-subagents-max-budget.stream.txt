@@ -1,0 +1,68 @@
+   0.00  _probe  {"note":"message 1 sent (two-sub-chains)"}
+   0.43  system  {"subtype":"init"}
+   1.29  stream_event  {"parent":null,"event":"message_start","id":"Ekjqst","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":3780,"cache_read":4848,"out":17}}
+   1.82  assistant  {"parent":null,"agent_input":{"description":"Follow chain from start.txt","subagent_type":"general-purpose"},"blocks":["tool_use:Agent:HHuvUk"],"id":"Ekjqst","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":3780,"cache_read":4848,"out":17}}
+   1.83  system  {"subtype":"background_tasks_changed","keys":["tasks"],"tasks":1}
+   1.83  system  {"subtype":"task_started","keys":["description","is_backgrounded","prompt","run_id","spawn_depth","subagent_type","task_id","task_type","tool_use_id"],"is_backgrounded":true,"spawn_depth":1,"description":"Follow chain from start.txt","tool_use_id":"HHuvUk"}
+   1.84  user  {"parent":null,"blocks":["tool_result:HHuvUk"],"agent_result":{"status":"async_launched","isAsync":true,"resolvedModel":"claude-haiku-5-5"}}
+   2.18  assistant  {"parent":null,"agent_input":{"description":"Follow chain from first.txt","subagent_type":"general-purpose"},"blocks":["tool_use:Agent:iqr5j9"],"id":"Ekjqst","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":3780,"cache_read":4848,"out":17}}
+   2.19  system  {"subtype":"background_tasks_changed","keys":["tasks"],"tasks":2}
+   2.19  system  {"subtype":"task_started","keys":["description","is_backgrounded","prompt","run_id","spawn_depth","subagent_type","task_id","task_type","tool_use_id"],"is_backgrounded":true,"spawn_depth":1,"description":"Follow chain from first.txt","tool_use_id":"iqr5j9"}
+   2.20  user  {"parent":null,"blocks":["tool_result:iqr5j9"],"agent_result":{"status":"async_launched","isAsync":true,"resolvedModel":"claude-haiku-5-5"}}
+   2.21  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":3780,"cache_read":4848,"out":341},"stop_reason":"tool_use"}
+   2.21  rate_limit_event  {"rate_limit_info":{"status":"allowed","resetsAt":1795615200,"rateLimitType":"seven_day","overageStatus":"rejected","overageDisabledReason":"org_level_disabled","isUsingOverage":false,"unifiedWindows":{"seven_day":{"utilization":0.36,"resetsAt":1795615200,"status":"allowed"}}}}
+   3.08  stream_event  {"parent":null,"event":"message_start","id":"VE5dKq","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":1219,"cache_read":8628,"out":7}}
+   3.19  assistant  {"parent":"HHuvUk","blocks":["thinking"],"id":"7HjgYq","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":681,"cache_read":5151,"out":2},"subagent_type":"general-purpose","agent_id":"a1f93dcd34919f309"}
+   3.31  assistant  {"parent":null,"blocks":["text"],"id":"VE5dKq","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":1219,"cache_read":8628,"out":7}}
+   3.31  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":1219,"cache_read":8628,"out":50},"stop_reason":"end_turn"}
+   3.32  user  {"parent":null,"blocks":["text"],"isSynthetic":true}
+   3.47  assistant  {"parent":"iqr5j9","blocks":["tool_use:Read:8j31z7"],"id":"ggPb1L","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":681,"cache_read":5151,"out":16},"subagent_type":"general-purpose","agent_id":"a34e67fd41f51c70f"}
+   3.47  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":5851,"tool_uses":1,"duration_ms":1284},"last_tool_name":"Read","description":"Reading chain/first.txt","tool_use_id":"iqr5j9"}
+   3.50  assistant  {"parent":"HHuvUk","blocks":["tool_use:Read:g9VLzU"],"id":"7HjgYq","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":681,"cache_read":5151,"out":2},"subagent_type":"general-purpose","agent_id":"a1f93dcd34919f309"}
+   3.50  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":6085,"tool_uses":1,"duration_ms":1675},"last_tool_name":"Read","description":"Reading chain/start.txt","tool_use_id":"HHuvUk"}
+   3.50  user  {"parent":"iqr5j9","blocks":["tool_result:8j31z7"],"subagent_type":"general-purpose","agent_id":"a34e67fd41f51c70f"}
+   3.52  user  {"parent":"HHuvUk","blocks":["tool_result:g9VLzU"],"subagent_type":"general-purpose","agent_id":"a1f93dcd34919f309"}
+   4.16  stream_event  {"parent":null,"event":"message_start","id":"XQq8yz","model":"claude-haiku-5-5","usage":{"in":4,"cache_write":90,"cache_read":9847,"out":24}}
+   4.52  assistant  {"parent":null,"blocks":["tool_use:StructuredOutput:jBMNns"],"id":"XQq8yz","model":"claude-haiku-5-5","usage":{"in":4,"cache_write":90,"cache_read":9847,"out":24}}
+   4.52  user  {"parent":null,"blocks":["tool_result:jBMNns"]}
+   4.53  stream_event  {"parent":null,"event":"message_delta","usage":{"in":4,"cache_write":90,"cache_read":9847,"out":87},"stop_reason":"tool_use"}
+   4.53  result  {"subtype":"success","terminal_reason":"completed","num_turns":5,"total_cost_usd":0.0019690000000000003}
+   4.71  assistant  {"parent":"iqr5j9","blocks":["thinking"],"id":"77kLLN","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":775,"cache_read":5832,"out":3},"subagent_type":"general-purpose","agent_id":"a34e67fd41f51c70f"}
+   4.94  assistant  {"parent":"iqr5j9","blocks":["tool_use:Read:YrvRo7"],"id":"77kLLN","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":775,"cache_read":5832,"out":3},"subagent_type":"general-purpose","agent_id":"a34e67fd41f51c70f"}
+   4.94  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":6681,"tool_uses":2,"duration_ms":2756},"last_tool_name":"Read","description":"Reading chain/gorse.txt","tool_use_id":"iqr5j9"}
+   4.96  user  {"parent":"iqr5j9","blocks":["tool_result:YrvRo7"],"subagent_type":"general-purpose","agent_id":"a34e67fd41f51c70f"}
+   5.04  assistant  {"parent":"HHuvUk","blocks":["tool_use:Read:Wq5sb9"],"id":"VvpqQ8","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":925,"cache_read":5832,"out":17},"subagent_type":"general-purpose","agent_id":"a1f93dcd34919f309"}
+   5.04  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":6781,"tool_uses":2,"duration_ms":3216},"last_tool_name":"Read","description":"Reading chain/amber.txt","tool_use_id":"HHuvUk"}
+   5.05  user  {"parent":"HHuvUk","blocks":["tool_result:Wq5sb9"],"subagent_type":"general-purpose","agent_id":"a1f93dcd34919f309"}
+   6.04  assistant  {"parent":"iqr5j9","blocks":["tool_use:Read:SApzzp"],"id":"87jCyY","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":282,"cache_read":6607,"out":16},"subagent_type":"general-purpose","agent_id":"a34e67fd41f51c70f"}
+   6.04  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":6930,"tool_uses":3,"duration_ms":3859},"last_tool_name":"Read","description":"Reading chain/hazel.txt","tool_use_id":"iqr5j9"}
+   6.06  user  {"parent":"iqr5j9","blocks":["tool_result:SApzzp"],"subagent_type":"general-purpose","agent_id":"a34e67fd41f51c70f"}
+   6.16  assistant  {"parent":"HHuvUk","blocks":["tool_use:Read:tSs22U"],"id":"a67QWg","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":220,"cache_read":6757,"out":16},"subagent_type":"general-purpose","agent_id":"a1f93dcd34919f309"}
+   6.16  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":7017,"tool_uses":3,"duration_ms":4340},"last_tool_name":"Read","description":"Reading chain/birch.txt","tool_use_id":"HHuvUk"}
+   6.19  user  {"parent":"HHuvUk","blocks":["tool_result:tSs22U"],"subagent_type":"general-purpose","agent_id":"a1f93dcd34919f309"}
+   7.29  assistant  {"parent":"HHuvUk","blocks":["thinking"],"id":"a3i8xS","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":221,"cache_read":6977,"out":6},"subagent_type":"general-purpose","agent_id":"a1f93dcd34919f309"}
+   7.39  assistant  {"parent":"iqr5j9","blocks":["thinking"],"id":"pVfu17","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":217,"cache_read":6889,"out":6},"subagent_type":"general-purpose","agent_id":"a34e67fd41f51c70f"}
+   7.54  _probe  {"note":"3 s after result 1: process alive"}
+   7.65  assistant  {"parent":"HHuvUk","blocks":["tool_use:Read:LzZDwV"],"id":"a3i8xS","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":221,"cache_read":6977,"out":6},"subagent_type":"general-purpose","agent_id":"a1f93dcd34919f309"}
+   7.65  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":7475,"tool_uses":4,"duration_ms":5830},"last_tool_name":"Read","description":"Reading chain/cedar.txt","tool_use_id":"HHuvUk"}
+   7.68  user  {"parent":"HHuvUk","blocks":["tool_result:LzZDwV"],"subagent_type":"general-purpose","agent_id":"a1f93dcd34919f309"}
+   7.88  assistant  {"parent":"iqr5j9","blocks":["tool_use:Read:EHUQHd"],"id":"pVfu17","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":217,"cache_read":6889,"out":6},"subagent_type":"general-purpose","agent_id":"a34e67fd41f51c70f"}
+   7.89  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":7412,"tool_uses":4,"duration_ms":5701},"last_tool_name":"Read","description":"Reading chain/iris.txt","tool_use_id":"iqr5j9"}
+   7.91  user  {"parent":"iqr5j9","blocks":["tool_result:EHUQHd"],"subagent_type":"general-purpose","agent_id":"a34e67fd41f51c70f"}
+   8.76  assistant  {"parent":"HHuvUk","blocks":["tool_use:Read:ipd9Vv"],"id":"ri1joR","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":284,"cache_read":7198,"out":16},"subagent_type":"general-purpose","agent_id":"a1f93dcd34919f309"}
+   8.76  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":7550,"tool_uses":5,"duration_ms":6938},"last_tool_name":"Read","description":"Reading chain/dune.txt","tool_use_id":"HHuvUk"}
+   8.78  user  {"parent":"HHuvUk","blocks":["tool_result:ipd9Vv"],"subagent_type":"general-purpose","agent_id":"a1f93dcd34919f309"}
+   9.71  assistant  {"parent":"iqr5j9","blocks":["thinking"],"id":"gusksz","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":320,"cache_read":7106,"out":3},"subagent_type":"general-purpose","agent_id":"a34e67fd41f51c70f"}
+  10.19  assistant  {"parent":"HHuvUk","blocks":["thinking"],"id":"BgrGeL","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":220,"cache_read":7482,"out":3},"subagent_type":"general-purpose","agent_id":"a1f93dcd34919f309"}
+  10.54  assistant  {"parent":"HHuvUk","blocks":["tool_use:Read:bP5Ess"],"id":"BgrGeL","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":220,"cache_read":7482,"out":3},"subagent_type":"general-purpose","agent_id":"a1f93dcd34919f309"}
+  10.54  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":8052,"tool_uses":6,"duration_ms":8714},"last_tool_name":"Read","description":"Reading chain/ember.txt","tool_use_id":"HHuvUk"}
+  10.56  user  {"parent":"HHuvUk","blocks":["tool_result:bP5Ess"],"subagent_type":"general-purpose","agent_id":"a1f93dcd34919f309"}
+  10.58  system  {"subtype":"task_updated","keys":["patch","run_id","task_id"],"patch":{"status":"killed","end_time":1795281145812}}
+  10.58  system  {"subtype":"task_notification","keys":["output_file","run_id","status","summary","task_id","tool_use_id"],"status":"stopped","tool_use_id":"HHuvUk"}
+  10.58  system  {"subtype":"background_tasks_changed","keys":["tasks"],"tasks":1}
+  10.58  system  {"subtype":"task_updated","keys":["patch","run_id","task_id"],"patch":{"status":"killed","end_time":1795281145813}}
+  10.58  system  {"subtype":"task_notification","keys":["output_file","run_id","status","summary","task_id","tool_use_id"],"status":"stopped","tool_use_id":"iqr5j9"}
+  10.58  system  {"subtype":"background_tasks_changed","keys":["tasks"],"tasks":0}
+  10.58  user  {"parent":"iqr5j9","blocks":["text"],"subagent_type":"general-purpose","agent_id":"a34e67fd41f51c70f"}
+  10.58  user  {"parent":"HHuvUk","blocks":["text"],"subagent_type":"general-purpose","agent_id":"a1f93dcd34919f309"}
+  15.82  _probe  {"note":"standard input closed"}

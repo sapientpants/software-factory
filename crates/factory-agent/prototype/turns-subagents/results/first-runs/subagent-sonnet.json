@@ -1,0 +1,1743 @@
+{
+  "case": "subagent-sonnet",
+  "about": "the subagent on another model than the main loop, so that modelUsage tells them apart",
+  "command": [
+    "claude",
+    "-p",
+    "--setting-sources",
+    "user",
+    "--output-format",
+    "stream-json",
+    "--verbose",
+    "--input-format",
+    "stream-json",
+    "--session-id",
+    "166fff1d-59d1-4a6c-84a0-f792bf408bc2",
+    "--model",
+    "haiku",
+    "--permission-mode",
+    "dontAsk",
+    "--permission-prompts",
+    "none",
+    "--tools",
+    "Read,Glob,Grep,Agent",
+    "--allowedTools",
+    "Read,Glob,Grep,Agent",
+    "--settings",
+    "<out>/subagent-sonnet/host/settings.json",
+    "--mcp-config",
+    "<out>/subagent-sonnet/host/mcp.json",
+    "--strict-mcp-config",
+    "--json-schema",
+    "{\"type\": \"object\", \"properties\": {\"answer\": {\"type\": \"string\"}}, \"required\": [\"answer\"], \"additionalProperties\": false}",
+    "--max-turns",
+    "30",
+    "--max-budget-usd",
+    "1",
+    "--append-system-prompt-file",
+    "<out>/subagent-sonnet/host/append.md",
+    "--include-partial-messages",
+    "--debug-file",
+    "<out>/subagent-sonnet/host/debug.log"
+  ],
+  "messages": [
+    "Call the Agent tool exactly once, with subagent_type \"general-purpose\" and model \"sonnet\", and give the subagent this task word for word: 'Read the file chain/start.txt with the Read tool. Each file of the chain names the next file. Follow the chain with one Read call per response, never two in one response, until a file gives the final word. Report the final word.' Do not read any file yourself. Answer with the word the subagent reports."
+  ],
+  "init": {
+    "claude_code_version": "2.1.323",
+    "model": "claude-haiku-5-5",
+    "tools": [
+      "Task",
+      "Glob",
+      "Grep",
+      "Read",
+      "StructuredOutput"
+    ],
+    "agents": [
+      "claude",
+      "Explore",
+      "general-purpose",
+      "Plan",
+      "statusline-setup"
+    ],
+    "permissionMode": "dontAsk",
+    "apiKeySource": "none"
+  },
+  "counts": {
+    "lines": 202,
+    "main_loop_calls": 5,
+    "main_loop_output_tokens_by_message_delta": 481,
+    "main_loop_output_tokens_by_assistant_lines": 74,
+    "subagent_calls_shown": 15,
+    "subagent_output_tokens_by_assistant_lines": 325,
+    "subagent_models": [
+      "claude-sonnet-5-5"
+    ],
+    "stream_events": {
+      "main": {
+        "message_start": 5,
+        "content_block_start": 5,
+        "content_block_delta": 109,
+        "content_block_stop": 5,
+        "message_delta": 5,
+        "message_stop": 5
+      }
+    },
+    "other_lines": {
+      "system/status": 5,
+      "system/background_tasks_changed": 2,
+      "system/task_started": 1,
+      "system/task_progress": 14,
+      "system/task_updated": 1,
+      "system/task_notification": 1
+    }
+  },
+  "results": [
+    {
+      "subtype": "success",
+      "is_error": false,
+      "terminal_reason": "completed",
+      "num_turns": 4,
+      "total_cost_usd": 0.017060799999999997,
+      "usage": {
+        "input_tokens": 8,
+        "cache_creation_input_tokens": 4386,
+        "cache_read_input_tokens": 22530,
+        "output_tokens": 332,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 4386,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage": {
+        "claude-haiku-5-5": {
+          "inputTokens": 8,
+          "outputTokens": 332,
+          "cacheReadInputTokens": 22530,
+          "cacheCreationInputTokens": 4386,
+          "webSearchRequests": 0,
+          "costUSD": 0.0012693000000000001,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 0,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 4386,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        },
+        "claude-sonnet-5-5": {
+          "inputTokens": 2,
+          "outputTokens": 127,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 5807,
+          "webSearchRequests": 0,
+          "costUSD": 0.0157915,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 0,
+          "cacheCreationEphemeral5mInputTokens": 5807,
+          "cacheCreationEphemeral1hInputTokens": 0,
+          "canonicalModel": "claude-sonnet-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "model_usage_since_last_result": {
+        "claude-haiku-5-5": {
+          "inputTokens": 8,
+          "outputTokens": 332,
+          "cacheReadInputTokens": 22530,
+          "cacheCreationInputTokens": 4386,
+          "webSearchRequests": 0,
+          "costUSD": 0.0012693000000000001,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 0,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 4386,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        },
+        "claude-sonnet-5-5": {
+          "inputTokens": 2,
+          "outputTokens": 127,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 5807,
+          "webSearchRequests": 0,
+          "costUSD": 0.0157915,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 0,
+          "cacheCreationEphemeral5mInputTokens": 5807,
+          "cacheCreationEphemeral1hInputTokens": 0,
+          "canonicalModel": "claude-sonnet-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "subagent_stats": {
+        "spawned": 1,
+        "requested": {
+          "background": 0,
+          "foreground": 0,
+          "unset": 1
+        },
+        "started_in_background": 1,
+        "max_depth": 1,
+        "spawned_by_subagents": 0,
+        "completed": 0,
+        "failed": 0,
+        "killed": {
+          "parent": 0,
+          "user": 0,
+          "system": 0
+        },
+        "refused": {
+          "depth_limit": 0,
+          "concurrency_limit": 0,
+          "budget": 0
+        },
+        "by_type": {
+          "general-purpose": 1
+        }
+      },
+      "structured_output": {
+        "answer": "The subagent has been launched in the background to follow the chain/start.txt file chain, and its final word has not been received yet. I will report the word when the completion notification arrives."
+      },
+      "stop_reason": "tool_use",
+      "queued_turn_count": 0,
+      "result_index": 0,
+      "permission_denials": [],
+      "api_error_status": null,
+      "result": "{\"answer\":\"The subagent has been launched in the background to follow the chain/start.txt file chain, and its final word has not been received yet. I will report the word when the completion notification arrives.\"}"
+    },
+    {
+      "subtype": "success",
+      "is_error": false,
+      "terminal_reason": "completed",
+      "num_turns": 3,
+      "total_cost_usd": 0.05382405,
+      "usage": {
+        "input_tokens": 6,
+        "cache_creation_input_tokens": 993,
+        "cache_read_input_tokens": 19265,
+        "output_tokens": 149,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 993,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage": {
+        "claude-haiku-5-5": {
+          "inputTokens": 14,
+          "outputTokens": 481,
+          "cacheReadInputTokens": 41795,
+          "cacheCreationInputTokens": 5379,
+          "webSearchRequests": 0,
+          "costUSD": 0.00173565,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 0,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 5379,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        },
+        "claude-sonnet-5-5": {
+          "inputTokens": 30,
+          "outputTokens": 1898,
+          "cacheReadInputTokens": 105659,
+          "cacheCreationInputTokens": 8993,
+          "webSearchRequests": 0,
+          "costUSD": 0.05208840000000001,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 0,
+          "cacheCreationEphemeral5mInputTokens": 8993,
+          "cacheCreationEphemeral1hInputTokens": 0,
+          "canonicalModel": "claude-sonnet-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "model_usage_since_last_result": {
+        "claude-sonnet-5-5": {
+          "inputTokens": 28,
+          "outputTokens": 1771,
+          "cacheReadInputTokens": 105659,
+          "cacheCreationInputTokens": 3186,
+          "webSearchRequests": 0,
+          "costUSD": 0.0362969,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 0,
+          "cacheCreationEphemeral5mInputTokens": 3186,
+          "cacheCreationEphemeral1hInputTokens": 0,
+          "canonicalModel": "claude-sonnet-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        },
+        "claude-haiku-5-5": {
+          "inputTokens": 6,
+          "outputTokens": 149,
+          "cacheReadInputTokens": 19265,
+          "cacheCreationInputTokens": 993,
+          "webSearchRequests": 0,
+          "costUSD": 0.00046635000000000003,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 0,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 993,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "subagent_stats": {
+        "spawned": 1,
+        "requested": {
+          "background": 0,
+          "foreground": 0,
+          "unset": 1
+        },
+        "started_in_background": 1,
+        "max_depth": 1,
+        "spawned_by_subagents": 0,
+        "completed": 1,
+        "failed": 0,
+        "killed": {
+          "parent": 0,
+          "user": 0,
+          "system": 0
+        },
+        "refused": {
+          "depth_limit": 0,
+          "concurrency_limit": 0,
+          "budget": 0
+        },
+        "by_type": {
+          "general-purpose": 1
+        }
+      },
+      "structured_output": {
+        "answer": "HERON"
+      },
+      "stop_reason": "tool_use",
+      "queued_turn_count": 0,
+      "result_index": 1,
+      "permission_denials": [],
+      "api_error_status": null,
+      "result": "{\"answer\":\"HERON\"}"
+    }
+  ],
+  "stream": [
+    {
+      "_t": 0.0,
+      "note": "message 1 sent (sub-chain-sonnet)",
+      "type": "_probe"
+    },
+    {
+      "_t": 0.44,
+      "type": "system",
+      "subtype": "init"
+    },
+    {
+      "_t": 1.37,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_start",
+      "id": "AQ3QjM",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 3677,
+        "cache_read": 4848,
+        "out": 16
+      }
+    },
+    {
+      "_t": 1.88,
+      "type": "assistant",
+      "parent": null,
+      "agent_input": {
+        "subagent_type": "general-purpose",
+        "model": "sonnet",
+        "description": "Follow file chain"
+      },
+      "blocks": [
+        "tool_use:Agent:X9YKA5"
+      ],
+      "id": "AQ3QjM",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 3677,
+        "cache_read": 4848,
+        "out": 16
+      }
+    },
+    {
+      "_t": 1.89,
+      "type": "system",
+      "subtype": "background_tasks_changed",
+      "keys": [
+        "tasks"
+      ],
+      "tasks": 1
+    },
+    {
+      "_t": 1.89,
+      "type": "system",
+      "subtype": "task_started",
+      "keys": [
+        "description",
+        "is_backgrounded",
+        "prompt",
+        "run_id",
+        "spawn_depth",
+        "subagent_type",
+        "task_id",
+        "task_type",
+        "tool_use_id"
+      ],
+      "is_backgrounded": true,
+      "spawn_depth": 1,
+      "description": "Follow file chain",
+      "tool_use_id": "X9YKA5"
+    },
+    {
+      "_t": 1.9,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_delta",
+      "usage": {
+        "in": 2,
+        "cache_write": 3677,
+        "cache_read": 4848,
+        "out": 192
+      },
+      "stop_reason": "tool_use"
+    },
+    {
+      "_t": 1.9,
+      "type": "user",
+      "parent": null,
+      "blocks": [
+        "tool_result:X9YKA5"
+      ],
+      "agent_result": {
+        "status": "async_launched",
+        "isAsync": true,
+        "resolvedModel": "claude-sonnet-5-5"
+      }
+    },
+    {
+      "_t": 1.9,
+      "type": "rate_limit_event",
+      "rate_limit_info": {
+        "status": "allowed",
+        "resetsAt": 1795615200,
+        "rateLimitType": "seven_day",
+        "overageStatus": "rejected",
+        "overageDisabledReason": "org_level_disabled",
+        "isUsingOverage": false,
+        "unifiedWindows": {
+          "seven_day": {
+            "utilization": 0.36,
+            "resetsAt": 1795615200,
+            "status": "allowed"
+          }
+        }
+      }
+    },
+    {
+      "_t": 2.6,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_start",
+      "id": "SCrtM6",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 632,
+        "cache_read": 8525,
+        "out": 8
+      }
+    },
+    {
+      "_t": 2.75,
+      "type": "assistant",
+      "parent": null,
+      "blocks": [
+        "text"
+      ],
+      "id": "SCrtM6",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 632,
+        "cache_read": 8525,
+        "out": 8
+      }
+    },
+    {
+      "_t": 2.75,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_delta",
+      "usage": {
+        "in": 2,
+        "cache_write": 632,
+        "cache_read": 8525,
+        "out": 37
+      },
+      "stop_reason": "end_turn"
+    },
+    {
+      "_t": 2.76,
+      "type": "user",
+      "parent": null,
+      "blocks": [
+        "text"
+      ],
+      "isSynthetic": true
+    },
+    {
+      "_t": 3.03,
+      "type": "assistant",
+      "parent": "X9YKA5",
+      "blocks": [
+        "tool_use:Read:NMh4FQ"
+      ],
+      "id": "gKVaDm",
+      "model": "claude-sonnet-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 5807,
+        "cache_read": 0,
+        "out": 16
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a335899ccdc63a288"
+    },
+    {
+      "_t": 3.03,
+      "type": "system",
+      "subtype": "task_progress",
+      "keys": [
+        "description",
+        "last_tool_name",
+        "run_id",
+        "subagent_type",
+        "task_id",
+        "tool_use_id",
+        "usage"
+      ],
+      "usage": {
+        "total_tokens": 5826,
+        "tool_uses": 1,
+        "duration_ms": 1147
+      },
+      "last_tool_name": "Read",
+      "description": "Reading chain/start.txt",
+      "tool_use_id": "X9YKA5"
+    },
+    {
+      "_t": 3.05,
+      "type": "user",
+      "parent": "X9YKA5",
+      "blocks": [
+        "tool_result:NMh4FQ"
+      ],
+      "subagent_type": "general-purpose",
+      "agent_id": "a335899ccdc63a288"
+    },
+    {
+      "_t": 3.61,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_start",
+      "id": "PN23i9",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 4,
+        "cache_write": 77,
+        "cache_read": 9157,
+        "out": 24
+      }
+    },
+    {
+      "_t": 3.94,
+      "type": "assistant",
+      "parent": null,
+      "blocks": [
+        "tool_use:StructuredOutput:q1Jpur"
+      ],
+      "id": "PN23i9",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 4,
+        "cache_write": 77,
+        "cache_read": 9157,
+        "out": 24
+      }
+    },
+    {
+      "_t": 3.95,
+      "type": "user",
+      "parent": null,
+      "blocks": [
+        "tool_result:q1Jpur"
+      ]
+    },
+    {
+      "_t": 3.95,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_delta",
+      "usage": {
+        "in": 4,
+        "cache_write": 77,
+        "cache_read": 9157,
+        "out": 103
+      },
+      "stop_reason": "tool_use"
+    },
+    {
+      "_t": 3.95,
+      "type": "result",
+      "subtype": "success",
+      "is_error": false,
+      "terminal_reason": "completed",
+      "num_turns": 4,
+      "total_cost_usd": 0.017060799999999997,
+      "usage": {
+        "input_tokens": 8,
+        "cache_creation_input_tokens": 4386,
+        "cache_read_input_tokens": 22530,
+        "output_tokens": 332,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 4386,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage": {
+        "claude-haiku-5-5": {
+          "inputTokens": 8,
+          "outputTokens": 332,
+          "cacheReadInputTokens": 22530,
+          "cacheCreationInputTokens": 4386,
+          "webSearchRequests": 0,
+          "costUSD": 0.0012693000000000001,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 0,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 4386,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        },
+        "claude-sonnet-5-5": {
+          "inputTokens": 2,
+          "outputTokens": 127,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 5807,
+          "webSearchRequests": 0,
+          "costUSD": 0.0157915,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 0,
+          "cacheCreationEphemeral5mInputTokens": 5807,
+          "cacheCreationEphemeral1hInputTokens": 0,
+          "canonicalModel": "claude-sonnet-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "model_usage_since_last_result": {
+        "claude-haiku-5-5": {
+          "inputTokens": 8,
+          "outputTokens": 332,
+          "cacheReadInputTokens": 22530,
+          "cacheCreationInputTokens": 4386,
+          "webSearchRequests": 0,
+          "costUSD": 0.0012693000000000001,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 0,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 4386,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        },
+        "claude-sonnet-5-5": {
+          "inputTokens": 2,
+          "outputTokens": 127,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 5807,
+          "webSearchRequests": 0,
+          "costUSD": 0.0157915,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 0,
+          "cacheCreationEphemeral5mInputTokens": 5807,
+          "cacheCreationEphemeral1hInputTokens": 0,
+          "canonicalModel": "claude-sonnet-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "subagent_stats": {
+        "spawned": 1,
+        "requested": {
+          "background": 0,
+          "foreground": 0,
+          "unset": 1
+        },
+        "started_in_background": 1,
+        "max_depth": 1,
+        "spawned_by_subagents": 0,
+        "completed": 0,
+        "failed": 0,
+        "killed": {
+          "parent": 0,
+          "user": 0,
+          "system": 0
+        },
+        "refused": {
+          "depth_limit": 0,
+          "concurrency_limit": 0,
+          "budget": 0
+        },
+        "by_type": {
+          "general-purpose": 1
+        }
+      },
+      "structured_output": {
+        "answer": "The subagent has been launched in the background to follow the chain/start.txt file chain, and its final word has not been received yet. I will report the word when the completion notification arrives."
+      },
+      "stop_reason": "tool_use",
+      "queued_turn_count": 0,
+      "result_index": 0,
+      "permission_denials": [],
+      "api_error_status": null,
+      "result": "{\"answer\":\"The subagent has been launched in the background to follow the chain/start.txt file chain, and its final word has not been received yet. I will report the word when the completion notification arrives.\"}"
+    },
+    {
+      "_t": 4.28,
+      "type": "assistant",
+      "parent": "X9YKA5",
+      "blocks": [
+        "tool_use:Read:deu7xu"
+      ],
+      "id": "q7oDep",
+      "model": "claude-sonnet-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 746,
+        "cache_read": 5807,
+        "out": 16
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a335899ccdc63a288"
+    },
+    {
+      "_t": 4.28,
+      "type": "system",
+      "subtype": "task_progress",
+      "keys": [
+        "description",
+        "last_tool_name",
+        "run_id",
+        "subagent_type",
+        "task_id",
+        "tool_use_id",
+        "usage"
+      ],
+      "usage": {
+        "total_tokens": 6588,
+        "tool_uses": 2,
+        "duration_ms": 2395
+      },
+      "last_tool_name": "Read",
+      "description": "Reading chain/amber.txt",
+      "tool_use_id": "X9YKA5"
+    },
+    {
+      "_t": 4.3,
+      "type": "user",
+      "parent": "X9YKA5",
+      "blocks": [
+        "tool_result:deu7xu"
+      ],
+      "subagent_type": "general-purpose",
+      "agent_id": "a335899ccdc63a288"
+    },
+    {
+      "_t": 5.5,
+      "type": "assistant",
+      "parent": "X9YKA5",
+      "blocks": [
+        "tool_use:Read:QksFKW"
+      ],
+      "id": "tFyRxp",
+      "model": "claude-sonnet-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 187,
+        "cache_read": 6553,
+        "out": 16
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a335899ccdc63a288"
+    },
+    {
+      "_t": 5.5,
+      "type": "system",
+      "subtype": "task_progress",
+      "keys": [
+        "description",
+        "last_tool_name",
+        "run_id",
+        "subagent_type",
+        "task_id",
+        "tool_use_id",
+        "usage"
+      ],
+      "usage": {
+        "total_tokens": 6791,
+        "tool_uses": 3,
+        "duration_ms": 3620
+      },
+      "last_tool_name": "Read",
+      "description": "Reading chain/birch.txt",
+      "tool_use_id": "X9YKA5"
+    },
+    {
+      "_t": 5.51,
+      "type": "user",
+      "parent": "X9YKA5",
+      "blocks": [
+        "tool_result:QksFKW"
+      ],
+      "subagent_type": "general-purpose",
+      "agent_id": "a335899ccdc63a288"
+    },
+    {
+      "_t": 6.66,
+      "type": "assistant",
+      "parent": "X9YKA5",
+      "blocks": [
+        "tool_use:Read:4YWEYE"
+      ],
+      "id": "pk8T18",
+      "model": "claude-sonnet-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 188,
+        "cache_read": 6740,
+        "out": 16
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a335899ccdc63a288"
+    },
+    {
+      "_t": 6.66,
+      "type": "system",
+      "subtype": "task_progress",
+      "keys": [
+        "description",
+        "last_tool_name",
+        "run_id",
+        "subagent_type",
+        "task_id",
+        "tool_use_id",
+        "usage"
+      ],
+      "usage": {
+        "total_tokens": 6995,
+        "tool_uses": 4,
+        "duration_ms": 4780
+      },
+      "last_tool_name": "Read",
+      "description": "Reading chain/cedar.txt",
+      "tool_use_id": "X9YKA5"
+    },
+    {
+      "_t": 6.69,
+      "type": "user",
+      "parent": "X9YKA5",
+      "blocks": [
+        "tool_result:4YWEYE"
+      ],
+      "subagent_type": "general-purpose",
+      "agent_id": "a335899ccdc63a288"
+    },
+    {
+      "_t": 6.96,
+      "note": "3 s after result 1: process alive",
+      "type": "_probe"
+    },
+    {
+      "_t": 7.95,
+      "type": "assistant",
+      "parent": "X9YKA5",
+      "blocks": [
+        "tool_use:Read:NJGL21"
+      ],
+      "id": "r6PHjn",
+      "model": "claude-sonnet-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 188,
+        "cache_read": 6928,
+        "out": 16
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a335899ccdc63a288"
+    },
+    {
+      "_t": 7.95,
+      "type": "system",
+      "subtype": "task_progress",
+      "keys": [
+        "description",
+        "last_tool_name",
+        "run_id",
+        "subagent_type",
+        "task_id",
+        "tool_use_id",
+        "usage"
+      ],
+      "usage": {
+        "total_tokens": 7199,
+        "tool_uses": 5,
+        "duration_ms": 6070
+      },
+      "last_tool_name": "Read",
+      "description": "Reading chain/dune.txt",
+      "tool_use_id": "X9YKA5"
+    },
+    {
+      "_t": 7.98,
+      "type": "user",
+      "parent": "X9YKA5",
+      "blocks": [
+        "tool_result:NJGL21"
+      ],
+      "subagent_type": "general-purpose",
+      "agent_id": "a335899ccdc63a288"
+    },
+    {
+      "_t": 9.31,
+      "type": "assistant",
+      "parent": "X9YKA5",
+      "blocks": [
+        "tool_use:Read:nLZgCL"
+      ],
+      "id": "74LwNV",
+      "model": "claude-sonnet-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 187,
+        "cache_read": 7116,
+        "out": 16
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a335899ccdc63a288"
+    },
+    {
+      "_t": 9.31,
+      "type": "system",
+      "subtype": "task_progress",
+      "keys": [
+        "description",
+        "last_tool_name",
+        "run_id",
+        "subagent_type",
+        "task_id",
+        "tool_use_id",
+        "usage"
+      ],
+      "usage": {
+        "total_tokens": 7402,
+        "tool_uses": 6,
+        "duration_ms": 7424
+      },
+      "last_tool_name": "Read",
+      "description": "Reading chain/ember.txt",
+      "tool_use_id": "X9YKA5"
+    },
+    {
+      "_t": 9.33,
+      "type": "user",
+      "parent": "X9YKA5",
+      "blocks": [
+        "tool_result:nLZgCL"
+      ],
+      "subagent_type": "general-purpose",
+      "agent_id": "a335899ccdc63a288"
+    },
+    {
+      "_t": 10.53,
+      "type": "assistant",
+      "parent": "X9YKA5",
+      "blocks": [
+        "tool_use:Read:CuRT1T"
+      ],
+      "id": "YFEQMG",
+      "model": "claude-sonnet-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 191,
+        "cache_read": 7303,
+        "out": 16
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a335899ccdc63a288"
+    },
+    {
+      "_t": 10.53,
+      "type": "system",
+      "subtype": "task_progress",
+      "keys": [
+        "description",
+        "last_tool_name",
+        "run_id",
+        "subagent_type",
+        "task_id",
+        "tool_use_id",
+        "usage"
+      ],
+      "usage": {
+        "total_tokens": 7609,
+        "tool_uses": 7,
+        "duration_ms": 8646
+      },
+      "last_tool_name": "Read",
+      "description": "Reading chain/fjord.txt",
+      "tool_use_id": "X9YKA5"
+    },
+    {
+      "_t": 10.55,
+      "type": "user",
+      "parent": "X9YKA5",
+      "blocks": [
+        "tool_result:CuRT1T"
+      ],
+      "subagent_type": "general-purpose",
+      "agent_id": "a335899ccdc63a288"
+    },
+    {
+      "_t": 11.81,
+      "type": "assistant",
+      "parent": "X9YKA5",
+      "blocks": [
+        "tool_use:Read:Sp122T"
+      ],
+      "id": "1iWgYK",
+      "model": "claude-sonnet-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 187,
+        "cache_read": 7494,
+        "out": 16
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a335899ccdc63a288"
+    },
+    {
+      "_t": 11.81,
+      "type": "system",
+      "subtype": "task_progress",
+      "keys": [
+        "description",
+        "last_tool_name",
+        "run_id",
+        "subagent_type",
+        "task_id",
+        "tool_use_id",
+        "usage"
+      ],
+      "usage": {
+        "total_tokens": 7812,
+        "tool_uses": 8,
+        "duration_ms": 9927
+      },
+      "last_tool_name": "Read",
+      "description": "Reading chain/glade.txt",
+      "tool_use_id": "X9YKA5"
+    },
+    {
+      "_t": 11.83,
+      "type": "user",
+      "parent": "X9YKA5",
+      "blocks": [
+        "tool_result:Sp122T"
+      ],
+      "subagent_type": "general-purpose",
+      "agent_id": "a335899ccdc63a288"
+    },
+    {
+      "_t": 12.98,
+      "type": "assistant",
+      "parent": "X9YKA5",
+      "blocks": [
+        "tool_use:Read:sd3Abb"
+      ],
+      "id": "hdrrAL",
+      "model": "claude-sonnet-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 187,
+        "cache_read": 7681,
+        "out": 16
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a335899ccdc63a288"
+    },
+    {
+      "_t": 12.98,
+      "type": "system",
+      "subtype": "task_progress",
+      "keys": [
+        "description",
+        "last_tool_name",
+        "run_id",
+        "subagent_type",
+        "task_id",
+        "tool_use_id",
+        "usage"
+      ],
+      "usage": {
+        "total_tokens": 8015,
+        "tool_uses": 9,
+        "duration_ms": 11096
+      },
+      "last_tool_name": "Read",
+      "description": "Reading chain/heath.txt",
+      "tool_use_id": "X9YKA5"
+    },
+    {
+      "_t": 13.0,
+      "type": "user",
+      "parent": "X9YKA5",
+      "blocks": [
+        "tool_result:sd3Abb"
+      ],
+      "subagent_type": "general-purpose",
+      "agent_id": "a335899ccdc63a288"
+    },
+    {
+      "_t": 14.32,
+      "type": "assistant",
+      "parent": "X9YKA5",
+      "blocks": [
+        "tool_use:Read:K729fa"
+      ],
+      "id": "4ojZrM",
+      "model": "claude-sonnet-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 188,
+        "cache_read": 7868,
+        "out": 16
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a335899ccdc63a288"
+    },
+    {
+      "_t": 14.32,
+      "type": "system",
+      "subtype": "task_progress",
+      "keys": [
+        "description",
+        "last_tool_name",
+        "run_id",
+        "subagent_type",
+        "task_id",
+        "tool_use_id",
+        "usage"
+      ],
+      "usage": {
+        "total_tokens": 8219,
+        "tool_uses": 10,
+        "duration_ms": 12434
+      },
+      "last_tool_name": "Read",
+      "description": "Reading chain/inlet.txt",
+      "tool_use_id": "X9YKA5"
+    },
+    {
+      "_t": 14.34,
+      "type": "user",
+      "parent": "X9YKA5",
+      "blocks": [
+        "tool_result:K729fa"
+      ],
+      "subagent_type": "general-purpose",
+      "agent_id": "a335899ccdc63a288"
+    },
+    {
+      "_t": 15.53,
+      "type": "assistant",
+      "parent": "X9YKA5",
+      "blocks": [
+        "tool_use:Read:Dobvuu"
+      ],
+      "id": "GmTijQ",
+      "model": "claude-sonnet-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 189,
+        "cache_read": 8056,
+        "out": 16
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a335899ccdc63a288"
+    },
+    {
+      "_t": 15.53,
+      "type": "system",
+      "subtype": "task_progress",
+      "keys": [
+        "description",
+        "last_tool_name",
+        "run_id",
+        "subagent_type",
+        "task_id",
+        "tool_use_id",
+        "usage"
+      ],
+      "usage": {
+        "total_tokens": 8424,
+        "tool_uses": 11,
+        "duration_ms": 13649
+      },
+      "last_tool_name": "Read",
+      "description": "Reading chain/knoll.txt",
+      "tool_use_id": "X9YKA5"
+    },
+    {
+      "_t": 15.55,
+      "type": "user",
+      "parent": "X9YKA5",
+      "blocks": [
+        "tool_result:Dobvuu"
+      ],
+      "subagent_type": "general-purpose",
+      "agent_id": "a335899ccdc63a288"
+    },
+    {
+      "_t": 16.78,
+      "type": "assistant",
+      "parent": "X9YKA5",
+      "blocks": [
+        "tool_use:Read:jCXhua"
+      ],
+      "id": "h9vGrh",
+      "model": "claude-sonnet-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 189,
+        "cache_read": 8245,
+        "out": 16
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a335899ccdc63a288"
+    },
+    {
+      "_t": 16.78,
+      "type": "system",
+      "subtype": "task_progress",
+      "keys": [
+        "description",
+        "last_tool_name",
+        "run_id",
+        "subagent_type",
+        "task_id",
+        "tool_use_id",
+        "usage"
+      ],
+      "usage": {
+        "total_tokens": 8629,
+        "tool_uses": 12,
+        "duration_ms": 14892
+      },
+      "last_tool_name": "Read",
+      "description": "Reading chain/ledge.txt",
+      "tool_use_id": "X9YKA5"
+    },
+    {
+      "_t": 16.8,
+      "type": "user",
+      "parent": "X9YKA5",
+      "blocks": [
+        "tool_result:jCXhua"
+      ],
+      "subagent_type": "general-purpose",
+      "agent_id": "a335899ccdc63a288"
+    },
+    {
+      "_t": 18.0,
+      "type": "assistant",
+      "parent": "X9YKA5",
+      "blocks": [
+        "tool_use:Read:yJrnX8"
+      ],
+      "id": "fXXGrZ",
+      "model": "claude-sonnet-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 189,
+        "cache_read": 8434,
+        "out": 16
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a335899ccdc63a288"
+    },
+    {
+      "_t": 18.0,
+      "type": "system",
+      "subtype": "task_progress",
+      "keys": [
+        "description",
+        "last_tool_name",
+        "run_id",
+        "subagent_type",
+        "task_id",
+        "tool_use_id",
+        "usage"
+      ],
+      "usage": {
+        "total_tokens": 8834,
+        "tool_uses": 13,
+        "duration_ms": 16119
+      },
+      "last_tool_name": "Read",
+      "description": "Reading chain/marsh.txt",
+      "tool_use_id": "X9YKA5"
+    },
+    {
+      "_t": 18.03,
+      "type": "user",
+      "parent": "X9YKA5",
+      "blocks": [
+        "tool_result:yJrnX8"
+      ],
+      "subagent_type": "general-purpose",
+      "agent_id": "a335899ccdc63a288"
+    },
+    {
+      "_t": 19.19,
+      "type": "assistant",
+      "parent": "X9YKA5",
+      "blocks": [
+        "tool_use:Read:LHZr5A"
+      ],
+      "id": "VZjRSn",
+      "model": "claude-sonnet-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 188,
+        "cache_read": 8623,
+        "out": 16
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a335899ccdc63a288"
+    },
+    {
+      "_t": 19.19,
+      "type": "system",
+      "subtype": "task_progress",
+      "keys": [
+        "description",
+        "last_tool_name",
+        "run_id",
+        "subagent_type",
+        "task_id",
+        "tool_use_id",
+        "usage"
+      ],
+      "usage": {
+        "total_tokens": 9038,
+        "tool_uses": 14,
+        "duration_ms": 17306
+      },
+      "last_tool_name": "Read",
+      "description": "Reading chain/notch.txt",
+      "tool_use_id": "X9YKA5"
+    },
+    {
+      "_t": 19.21,
+      "type": "user",
+      "parent": "X9YKA5",
+      "blocks": [
+        "tool_result:LHZr5A"
+      ],
+      "subagent_type": "general-purpose",
+      "agent_id": "a335899ccdc63a288"
+    },
+    {
+      "_t": 20.35,
+      "type": "assistant",
+      "parent": "X9YKA5",
+      "blocks": [
+        "text"
+      ],
+      "id": "6kvp5G",
+      "model": "claude-sonnet-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 182,
+        "cache_read": 8811,
+        "out": 101
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a335899ccdc63a288"
+    },
+    {
+      "_t": 20.39,
+      "type": "system",
+      "subtype": "task_updated",
+      "keys": [
+        "patch",
+        "run_id",
+        "task_id"
+      ],
+      "patch": {
+        "status": "completed",
+        "end_time": 1795281346543
+      }
+    },
+    {
+      "_t": 20.39,
+      "type": "system",
+      "subtype": "task_notification",
+      "keys": [
+        "output_file",
+        "run_id",
+        "status",
+        "summary",
+        "task_id",
+        "tool_use_id",
+        "usage"
+      ],
+      "status": "completed",
+      "usage": {
+        "total_tokens": 9382,
+        "tool_uses": 14,
+        "duration_ms": 18505
+      },
+      "tool_use_id": "X9YKA5"
+    },
+    {
+      "_t": 20.39,
+      "type": "system",
+      "subtype": "background_tasks_changed",
+      "keys": [
+        "tasks"
+      ],
+      "tasks": 0
+    },
+    {
+      "_t": 20.44,
+      "type": "system",
+      "subtype": "init"
+    },
+    {
+      "_t": 21.36,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_start",
+      "id": "Sdqw3B",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 828,
+        "cache_read": 9234,
+        "out": 2
+      }
+    },
+    {
+      "_t": 21.57,
+      "type": "assistant",
+      "parent": null,
+      "blocks": [
+        "text"
+      ],
+      "id": "Sdqw3B",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 828,
+        "cache_read": 9234,
+        "out": 2
+      }
+    },
+    {
+      "_t": 21.57,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_delta",
+      "usage": {
+        "in": 2,
+        "cache_write": 828,
+        "cache_read": 9234,
+        "out": 95
+      },
+      "stop_reason": "end_turn"
+    },
+    {
+      "_t": 21.57,
+      "type": "user",
+      "parent": null,
+      "blocks": [
+        "text"
+      ],
+      "isSynthetic": true
+    },
+    {
+      "_t": 22.48,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_start",
+      "id": "LA6hMD",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 4,
+        "cache_write": 165,
+        "cache_read": 10031,
+        "out": 24
+      }
+    },
+    {
+      "_t": 22.63,
+      "type": "assistant",
+      "parent": null,
+      "blocks": [
+        "tool_use:StructuredOutput:HqP68d"
+      ],
+      "id": "LA6hMD",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 4,
+        "cache_write": 165,
+        "cache_read": 10031,
+        "out": 24
+      }
+    },
+    {
+      "_t": 22.64,
+      "type": "user",
+      "parent": null,
+      "blocks": [
+        "tool_result:HqP68d"
+      ]
+    },
+    {
+      "_t": 22.64,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_delta",
+      "usage": {
+        "in": 4,
+        "cache_write": 165,
+        "cache_read": 10031,
+        "out": 54
+      },
+      "stop_reason": "tool_use"
+    },
+    {
+      "_t": 22.64,
+      "type": "result",
+      "subtype": "success",
+      "is_error": false,
+      "terminal_reason": "completed",
+      "num_turns": 3,
+      "total_cost_usd": 0.05382405,
+      "usage": {
+        "input_tokens": 6,
+        "cache_creation_input_tokens": 993,
+        "cache_read_input_tokens": 19265,
+        "output_tokens": 149,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 993,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage": {
+        "claude-haiku-5-5": {
+          "inputTokens": 14,
+          "outputTokens": 481,
+          "cacheReadInputTokens": 41795,
+          "cacheCreationInputTokens": 5379,
+          "webSearchRequests": 0,
+          "costUSD": 0.00173565,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 0,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 5379,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        },
+        "claude-sonnet-5-5": {
+          "inputTokens": 30,
+          "outputTokens": 1898,
+          "cacheReadInputTokens": 105659,
+          "cacheCreationInputTokens": 8993,
+          "webSearchRequests": 0,
+          "costUSD": 0.05208840000000001,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 0,
+          "cacheCreationEphemeral5mInputTokens": 8993,
+          "cacheCreationEphemeral1hInputTokens": 0,
+          "canonicalModel": "claude-sonnet-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "model_usage_since_last_result": {
+        "claude-sonnet-5-5": {
+          "inputTokens": 28,
+          "outputTokens": 1771,
+          "cacheReadInputTokens": 105659,
+          "cacheCreationInputTokens": 3186,
+          "webSearchRequests": 0,
+          "costUSD": 0.0362969,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 0,
+          "cacheCreationEphemeral5mInputTokens": 3186,
+          "cacheCreationEphemeral1hInputTokens": 0,
+          "canonicalModel": "claude-sonnet-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        },
+        "claude-haiku-5-5": {
+          "inputTokens": 6,
+          "outputTokens": 149,
+          "cacheReadInputTokens": 19265,
+          "cacheCreationInputTokens": 993,
+          "webSearchRequests": 0,
+          "costUSD": 0.00046635000000000003,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 0,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 993,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "subagent_stats": {
+        "spawned": 1,
+        "requested": {
+          "background": 0,
+          "foreground": 0,
+          "unset": 1
+        },
+        "started_in_background": 1,
+        "max_depth": 1,
+        "spawned_by_subagents": 0,
+        "completed": 1,
+        "failed": 0,
+        "killed": {
+          "parent": 0,
+          "user": 0,
+          "system": 0
+        },
+        "refused": {
+          "depth_limit": 0,
+          "concurrency_limit": 0,
+          "budget": 0
+        },
+        "by_type": {
+          "general-purpose": 1
+        }
+      },
+      "structured_output": {
+        "answer": "HERON"
+      },
+      "stop_reason": "tool_use",
+      "queued_turn_count": 0,
+      "result_index": 1,
+      "permission_denials": [],
+      "api_error_status": null,
+      "result": "{\"answer\":\"HERON\"}"
+    },
+    {
+      "_t": 25.65,
+      "note": "3 s after result 2: process alive",
+      "type": "_probe"
+    },
+    {
+      "_t": 30.83,
+      "note": "standard input closed",
+      "type": "_probe"
+    }
+  ],
+  "exit_code": 0,
+  "timed_out": false,
+  "wall_seconds": 30.87,
+  "files_holding_the_token": [],
+  "stderr_tail": ""
+}

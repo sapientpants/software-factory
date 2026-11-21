@@ -1,0 +1,67 @@
+   0.00  _probe  {"note":"message 1 sent (read)"}
+   0.55  system  {"subtype":"init"}
+   1.46  stream_event  {"parent":null,"event":"message_start","id":"KGWEig","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":684,"cache_read":5454,"out":16}}
+   1.87  assistant  {"parent":null,"blocks":["tool_use:Read:8kQXNx"],"id":"KGWEig","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":684,"cache_read":5454,"out":16}}
+   1.88  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":684,"cache_read":5454,"out":122},"stop_reason":"tool_use"}
+   1.89  rate_limit_event  {"rate_limit_info":{"status":"allowed","resetsAt":1795615200,"rateLimitType":"seven_day","overageStatus":"rejected","overageDisabledReason":"org_level_disabled","isUsingOverage":false,"unifiedWindows":{"seven_day":{"utilization":0.36,"resetsAt":1795615200,"status":"allowed"}}}}
+   1.91  user  {"parent":null,"blocks":["tool_result:8kQXNx"]}
+   2.80  stream_event  {"parent":null,"event":"message_start","id":"AQkuvE","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":209,"cache_read":6138,"out":2}}
+   3.15  assistant  {"parent":null,"blocks":["thinking"],"id":"AQkuvE","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":209,"cache_read":6138,"out":2}}
+   3.25  assistant  {"parent":null,"blocks":["tool_use:StructuredOutput:WuNPy6"],"id":"AQkuvE","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":209,"cache_read":6138,"out":2}}
+   3.26  user  {"parent":null,"blocks":["tool_result:WuNPy6"]}
+   3.26  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":209,"cache_read":6138,"out":128},"stop_reason":"tool_use"}
+   3.27  result  {"subtype":"success","terminal_reason":"completed","num_turns":3,"total_cost_usd":0.00041992}
+   6.27  _probe  {"note":"3 s after result 1: process alive"}
+   6.28  _probe  {"note":"message 2 sent (chain)"}
+   6.30  system  {"subtype":"init"}
+   7.14  stream_event  {"parent":null,"event":"message_start","id":"NU2E3J","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":265,"cache_read":6347,"out":16}}
+   7.43  assistant  {"parent":null,"blocks":["tool_use:Read:7PXMZo"],"id":"NU2E3J","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":265,"cache_read":6347,"out":16}}
+   7.44  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":265,"cache_read":6347,"out":126},"stop_reason":"tool_use"}
+   7.45  user  {"parent":null,"blocks":["tool_result:7PXMZo"]}
+   8.25  stream_event  {"parent":null,"event":"message_start","id":"vt3vwg","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":208,"cache_read":6612,"out":2}}
+   8.47  assistant  {"parent":null,"blocks":["text"],"id":"vt3vwg","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":208,"cache_read":6612,"out":2}}
+   8.82  assistant  {"parent":null,"blocks":["tool_use:Read:rmUcxA"],"id":"vt3vwg","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":208,"cache_read":6612,"out":2}}
+   8.82  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":208,"cache_read":6612,"out":163},"stop_reason":"tool_use"}
+   8.84  user  {"parent":null,"blocks":["tool_result:rmUcxA"]}
+   9.57  stream_event  {"parent":null,"event":"message_start","id":"Es97wF","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":245,"cache_read":6820,"out":8}}
+   9.77  assistant  {"parent":null,"blocks":["text"],"id":"Es97wF","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":245,"cache_read":6820,"out":8}}
+  10.03  assistant  {"parent":null,"blocks":["tool_use:Read:cwHvqT"],"id":"Es97wF","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":245,"cache_read":6820,"out":8}}
+  10.03  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":245,"cache_read":6820,"out":160},"stop_reason":"tool_use"}
+  10.06  user  {"parent":null,"blocks":["tool_result:cwHvqT"]}
+  10.92  stream_event  {"parent":null,"event":"message_start","id":"cr2hvC","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":247,"cache_read":7065,"out":3}}
+  11.25  assistant  {"parent":null,"blocks":["thinking"],"id":"cr2hvC","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":247,"cache_read":7065,"out":3}}
+  11.42  assistant  {"parent":null,"blocks":["text"],"id":"cr2hvC","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":247,"cache_read":7065,"out":3}}
+  11.71  assistant  {"parent":null,"blocks":["tool_use:Read:8PHies"],"id":"cr2hvC","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":247,"cache_read":7065,"out":3}}
+  11.72  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":247,"cache_read":7065,"out":222},"stop_reason":"tool_use"}
+  11.74  user  {"parent":null,"blocks":["tool_result:8PHies"]}
+  12.58  stream_event  {"parent":null,"event":"message_start","id":"jngCxY","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":312,"cache_read":7312,"out":8}}
+  12.78  assistant  {"parent":null,"blocks":["text"],"id":"jngCxY","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":312,"cache_read":7312,"out":8}}
+  13.07  assistant  {"parent":null,"blocks":["tool_use:Read:7ciFA9"],"id":"jngCxY","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":312,"cache_read":7312,"out":8}}
+  13.08  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":312,"cache_read":7312,"out":161},"stop_reason":"tool_use"}
+  13.08  user  {"parent":null,"blocks":["tool_result:7ciFA9"]}
+  13.85  stream_event  {"parent":null,"event":"message_start","id":"ZpfyDN","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":251,"cache_read":7624,"out":8}}
+  14.10  assistant  {"parent":null,"blocks":["text"],"id":"ZpfyDN","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":251,"cache_read":7624,"out":8}}
+  14.28  assistant  {"parent":null,"blocks":["tool_use:Read:6MYC1Q"],"id":"ZpfyDN","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":251,"cache_read":7624,"out":8}}
+  14.29  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":251,"cache_read":7624,"out":160},"stop_reason":"tool_use"}
+  14.30  user  {"parent":null,"blocks":["tool_result:6MYC1Q"]}
+  15.13  stream_event  {"parent":null,"event":"message_start","id":"8uZFmL","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":251,"cache_read":7875,"out":9}}
+  15.45  assistant  {"parent":null,"blocks":["thinking"],"id":"8uZFmL","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":251,"cache_read":7875,"out":9}}
+  15.58  assistant  {"parent":null,"blocks":["text"],"id":"8uZFmL","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":251,"cache_read":7875,"out":9}}
+  15.91  assistant  {"parent":null,"blocks":["tool_use:Read:wHuzBH"],"id":"8uZFmL","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":251,"cache_read":7875,"out":9}}
+  15.91  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":251,"cache_read":7875,"out":233},"stop_reason":"tool_use"}
+  15.93  user  {"parent":null,"blocks":["tool_result:wHuzBH"]}
+  16.68  stream_event  {"parent":null,"event":"message_start","id":"Py1vWV","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":323,"cache_read":8126,"out":3}}
+  17.82  assistant  {"parent":null,"blocks":["thinking"],"id":"Py1vWV","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":323,"cache_read":8126,"out":3}}
+  18.72  assistant  {"parent":null,"blocks":["text"],"id":"Py1vWV","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":323,"cache_read":8126,"out":3}}
+  18.72  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":323,"cache_read":8126,"out":377},"stop_reason":"end_turn"}
+  18.72  result  {"subtype":"error_max_budget_usd","terminal_reason":"budget_exhausted","num_turns":8,"total_cost_usd":0.00222073,"errors":["Reached maximum budget ($0.0019)"]}
+  21.73  _probe  {"note":"3 s after result 2: process alive"}
+  21.73  _probe  {"note":"message 3 sent (chain)"}
+  21.75  system  {"subtype":"init"}
+  21.75  result  {"subtype":"error_max_budget_usd","terminal_reason":"budget_exhausted","num_turns":1,"total_cost_usd":0.00222073,"errors":["Reached maximum budget ($0.0019)"]}
+  24.76  _probe  {"note":"3 s after result 3: process alive"}
+  24.76  _probe  {"note":"message 4 sent (read)"}
+  24.78  system  {"subtype":"init"}
+  24.79  result  {"subtype":"error_max_budget_usd","terminal_reason":"budget_exhausted","num_turns":1,"total_cost_usd":0.00222073,"errors":["Reached maximum budget ($0.0019)"]}
+  27.79  _probe  {"note":"3 s after result 4: process alive"}
+  27.79  _probe  {"note":"standard input closed"}

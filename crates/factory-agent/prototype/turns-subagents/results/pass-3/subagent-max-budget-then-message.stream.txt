@@ -1,0 +1,50 @@
+   0.00  _probe  {"note":"message 1 sent (sub-chain)"}
+   0.37  system  {"subtype":"init"}
+   1.19  stream_event  {"parent":null,"event":"message_start","id":"BKirE4","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":1356,"cache_read":7181,"out":4}}
+   1.54  assistant  {"parent":null,"blocks":["thinking"],"id":"BKirE4","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":1356,"cache_read":7181,"out":4}}
+   2.00  assistant  {"parent":null,"agent_input":{"subagent_type":"general-purpose","description":"Follow file chain to final word","run_in_background":false},"blocks":["tool_use:Agent:RzcjNN"],"id":"BKirE4","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":1356,"cache_read":7181,"out":4}}
+   2.01  system  {"subtype":"task_started","keys":["description","is_backgrounded","prompt","run_id","spawn_depth","subagent_type","task_id","task_type","tool_use_id"],"is_backgrounded":false,"spawn_depth":1,"description":"Follow file chain to final word","tool_use_id":"RzcjNN"}
+   2.02  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":1356,"cache_read":7181,"out":255},"stop_reason":"tool_use"}
+   2.02  user  {"parent":"RzcjNN","blocks":["text"],"subagent_type":"general-purpose","agent_id":"a04323bf1798063e4"}
+   2.02  rate_limit_event  {"rate_limit_info":{"status":"allowed","resetsAt":1795615200,"rateLimitType":"seven_day","overageStatus":"rejected","overageDisabledReason":"org_level_disabled","isUsingOverage":false,"unifiedWindows":{"seven_day":{"utilization":0.36,"resetsAt":1795615200,"status":"allowed"}}}}
+   3.29  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":5853,"tool_uses":1,"duration_ms":1280},"last_tool_name":"Read","description":"Reading chain/start.txt","tool_use_id":"RzcjNN"}
+   3.29  assistant  {"parent":"RzcjNN","blocks":["tool_use:Read:kNXZvG"],"id":"DR1VzQ","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":683,"cache_read":5151,"out":16},"subagent_type":"general-purpose","agent_id":"a04323bf1798063e4"}
+   3.31  user  {"parent":"RzcjNN","blocks":["tool_result:kNXZvG"],"subagent_type":"general-purpose","agent_id":"a04323bf1798063e4"}
+   4.83  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":6870,"tool_uses":2,"duration_ms":2823},"last_tool_name":"Read","description":"Reading chain/amber.txt","tool_use_id":"RzcjNN"}
+   4.83  assistant  {"parent":"RzcjNN","blocks":["tool_use:Read:bVzKcu"],"id":"pADxZK","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":780,"cache_read":5834,"out":3},"subagent_type":"general-purpose","agent_id":"a04323bf1798063e4"}
+   4.85  user  {"parent":"RzcjNN","blocks":["tool_result:bVzKcu"],"subagent_type":"general-purpose","agent_id":"a04323bf1798063e4"}
+   6.09  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":6960,"tool_uses":3,"duration_ms":4084},"last_tool_name":"Read","description":"Reading chain/birch.txt","tool_use_id":"RzcjNN"}
+   6.09  assistant  {"parent":"RzcjNN","blocks":["tool_use:Read:BKXVuQ"],"id":"G1NcaE","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":305,"cache_read":6614,"out":16},"subagent_type":"general-purpose","agent_id":"a04323bf1798063e4"}
+   6.10  user  {"parent":"RzcjNN","blocks":["tool_result:BKXVuQ"],"subagent_type":"general-purpose","agent_id":"a04323bf1798063e4"}
+   7.22  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":7195,"tool_uses":4,"duration_ms":5213},"last_tool_name":"Read","description":"Reading chain/cedar.txt","tool_use_id":"RzcjNN"}
+   7.22  assistant  {"parent":"RzcjNN","blocks":["tool_use:Read:YD5Lkd"],"id":"opGzNG","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":219,"cache_read":6919,"out":16},"subagent_type":"general-purpose","agent_id":"a04323bf1798063e4"}
+   7.23  user  {"parent":"RzcjNN","blocks":["tool_result:YD5Lkd"],"subagent_type":"general-purpose","agent_id":"a04323bf1798063e4"}
+   8.38  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":7434,"tool_uses":5,"duration_ms":6375},"last_tool_name":"Read","description":"Reading chain/dune.txt","tool_use_id":"RzcjNN"}
+   8.39  assistant  {"parent":"RzcjNN","blocks":["tool_use:Read:x9j3yU"],"id":"TfEM3y","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":223,"cache_read":7138,"out":16},"subagent_type":"general-purpose","agent_id":"a04323bf1798063e4"}
+   8.40  user  {"parent":"RzcjNN","blocks":["tool_result:x9j3yU"],"subagent_type":"general-purpose","agent_id":"a04323bf1798063e4"}
+   9.50  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":7672,"tool_uses":6,"duration_ms":7496},"last_tool_name":"Read","description":"Reading chain/ember.txt","tool_use_id":"RzcjNN"}
+   9.51  assistant  {"parent":"RzcjNN","blocks":["tool_use:Read:CPB85h"],"id":"uBCmLA","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":222,"cache_read":7361,"out":16},"subagent_type":"general-purpose","agent_id":"a04323bf1798063e4"}
+   9.52  user  {"parent":"RzcjNN","blocks":["tool_result:CPB85h"],"subagent_type":"general-purpose","agent_id":"a04323bf1798063e4"}
+  10.95  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":8124,"tool_uses":7,"duration_ms":8942},"last_tool_name":"Read","description":"Reading chain/fjord.txt","tool_use_id":"RzcjNN"}
+  10.95  assistant  {"parent":"RzcjNN","blocks":["tool_use:Read:nyfnMw"],"id":"RozPop","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":223,"cache_read":7583,"out":5},"subagent_type":"general-purpose","agent_id":"a04323bf1798063e4"}
+  10.97  user  {"parent":"RzcjNN","blocks":["tool_result:nyfnMw"],"subagent_type":"general-purpose","agent_id":"a04323bf1798063e4"}
+  12.08  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":8183,"tool_uses":8,"duration_ms":10071},"last_tool_name":"Read","description":"Reading chain/glade.txt","tool_use_id":"RzcjNN"}
+  12.08  assistant  {"parent":"RzcjNN","blocks":["tool_use:Read:rrbAsT"],"id":"ifpyHz","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":262,"cache_read":7806,"out":16},"subagent_type":"general-purpose","agent_id":"a04323bf1798063e4"}
+  12.09  user  {"parent":"RzcjNN","blocks":["tool_result:rrbAsT"],"subagent_type":"general-purpose","agent_id":"a04323bf1798063e4"}
+  13.25  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":8421,"tool_uses":9,"duration_ms":11240},"last_tool_name":"Read","description":"Reading chain/heath.txt","tool_use_id":"RzcjNN"}
+  13.25  assistant  {"parent":"RzcjNN","blocks":["tool_use:Read:MmmapN"],"id":"sjJMaP","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":222,"cache_read":8068,"out":16},"subagent_type":"general-purpose","agent_id":"a04323bf1798063e4"}
+  13.26  user  {"parent":"RzcjNN","blocks":["tool_result:MmmapN"],"subagent_type":"general-purpose","agent_id":"a04323bf1798063e4"}
+  14.38  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":8656,"tool_uses":10,"duration_ms":12369},"last_tool_name":"Read","description":"Reading chain/inlet.txt","tool_use_id":"RzcjNN"}
+  14.38  assistant  {"parent":"RzcjNN","blocks":["tool_use:Read:phBv92"],"id":"bRKzFB","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":219,"cache_read":8290,"out":16},"subagent_type":"general-purpose","agent_id":"a04323bf1798063e4"}
+  14.39  user  {"parent":"RzcjNN","blocks":["tool_result:phBv92"],"subagent_type":"general-purpose","agent_id":"a04323bf1798063e4"}
+  17.77  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":9360,"tool_uses":11,"duration_ms":15763},"last_tool_name":"Read","description":"Reading chain/knoll.txt","tool_use_id":"RzcjNN"}
+  17.77  assistant  {"parent":"RzcjNN","blocks":["tool_use:Read:ra3Zjm"],"id":"ESJ7Ub","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":220,"cache_read":8509,"out":6},"subagent_type":"general-purpose","agent_id":"a04323bf1798063e4"}
+  17.78  result  {"subtype":"error_max_budget_usd","terminal_reason":"budget_exhausted","num_turns":1,"total_cost_usd":0.00271139,"errors":["Reached maximum budget ($0.0025)"]}
+  20.55  system  {"subtype":"task_updated","keys":["patch","run_id","task_id"],"patch":{"status":"completed","end_time":1795282169073}}
+  20.55  system  {"subtype":"task_notification","keys":["output_file","run_id","status","summary","task_id","tool_use_id","usage"],"status":"completed","usage":{"total_tokens":10011,"tool_uses":11,"duration_ms":18539},"tool_use_id":"RzcjNN"}
+  20.78  _probe  {"note":"3 s after result 1: process alive"}
+  25.95  _probe  {"note":"message 2 sent (read)"}
+  25.97  system  {"subtype":"init"}
+  25.97  result  {"subtype":"error_max_budget_usd","terminal_reason":"budget_exhausted","num_turns":1,"total_cost_usd":0.003141005,"errors":["Reached maximum budget ($0.0025)"]}
+  28.97  _probe  {"note":"3 s after result 2: process alive"}
+  34.13  _probe  {"note":"standard input closed"}

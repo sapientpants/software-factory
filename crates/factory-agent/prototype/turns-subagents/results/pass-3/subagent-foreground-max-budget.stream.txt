@@ -1,0 +1,36 @@
+   0.00  _probe  {"note":"message 1 sent (sub-chain-foreground)"}
+   0.40  system  {"subtype":"init"}
+   1.20  stream_event  {"parent":null,"event":"message_start","id":"9PDgep","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":1359,"cache_read":7181,"out":16}}
+   1.79  assistant  {"parent":null,"agent_input":{"description":"Follow file chain","subagent_type":"general-purpose","run_in_background":false},"blocks":["tool_use:Agent:udo7CA"],"id":"9PDgep","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":1359,"cache_read":7181,"out":16}}
+   1.80  system  {"subtype":"task_started","keys":["description","is_backgrounded","prompt","run_id","spawn_depth","subagent_type","task_id","task_type","tool_use_id"],"is_backgrounded":false,"spawn_depth":1,"description":"Follow file chain","tool_use_id":"udo7CA"}
+   1.81  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":1359,"cache_read":7181,"out":193},"stop_reason":"tool_use"}
+   1.81  user  {"parent":"udo7CA","blocks":["text"],"subagent_type":"general-purpose","agent_id":"ae36146e51c987d63"}
+   1.81  rate_limit_event  {"rate_limit_info":{"status":"allowed","resetsAt":1795615200,"rateLimitType":"seven_day","overageStatus":"rejected","overageDisabledReason":"org_level_disabled","isUsingOverage":false,"unifiedWindows":{"seven_day":{"utilization":0.36,"resetsAt":1795615200,"status":"allowed"}}}}
+   2.98  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":5850,"tool_uses":1,"duration_ms":1180},"last_tool_name":"Read","description":"Reading chain/start.txt","tool_use_id":"udo7CA"}
+   2.98  assistant  {"parent":"udo7CA","blocks":["tool_use:Read:ydv6t9"],"id":"8x6PAX","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":680,"cache_read":5151,"out":16},"subagent_type":"general-purpose","agent_id":"ae36146e51c987d63"}
+   3.00  user  {"parent":"udo7CA","blocks":["tool_result:ydv6t9"],"subagent_type":"general-purpose","agent_id":"ae36146e51c987d63"}
+   4.72  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":6902,"tool_uses":2,"duration_ms":2921},"last_tool_name":"Read","description":"Reading chain/amber.txt","tool_use_id":"udo7CA"}
+   4.72  assistant  {"parent":"udo7CA","blocks":["tool_use:Read:EUUNLo"],"id":"iRGsej","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":779,"cache_read":5831,"out":3},"subagent_type":"general-purpose","agent_id":"ae36146e51c987d63"}
+   4.74  user  {"parent":"udo7CA","blocks":["tool_result:EUUNLo"],"subagent_type":"general-purpose","agent_id":"ae36146e51c987d63"}
+   5.95  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":6984,"tool_uses":3,"duration_ms":4151},"last_tool_name":"Read","description":"Reading chain/birch.txt","tool_use_id":"udo7CA"}
+   5.95  assistant  {"parent":"udo7CA","blocks":["tool_use:Read:9j6aaZ"],"id":"PS6KwM","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":333,"cache_read":6610,"out":16},"subagent_type":"general-purpose","agent_id":"ae36146e51c987d63"}
+   5.96  user  {"parent":"udo7CA","blocks":["tool_result:9j6aaZ"],"subagent_type":"general-purpose","agent_id":"ae36146e51c987d63"}
+   7.09  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":7218,"tool_uses":4,"duration_ms":5290},"last_tool_name":"Read","description":"Reading chain/cedar.txt","tool_use_id":"udo7CA"}
+   7.09  assistant  {"parent":"udo7CA","blocks":["tool_use:Read:wa9A9N"],"id":"M5w33h","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":218,"cache_read":6943,"out":16},"subagent_type":"general-purpose","agent_id":"ae36146e51c987d63"}
+   7.10  user  {"parent":"udo7CA","blocks":["tool_result:wa9A9N"],"subagent_type":"general-purpose","agent_id":"ae36146e51c987d63"}
+   8.58  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":7493,"tool_uses":5,"duration_ms":6781},"last_tool_name":"Read","description":"Reading chain/dune.txt","tool_use_id":"udo7CA"}
+   8.58  assistant  {"parent":"udo7CA","blocks":["tool_use:Read:VqVQw4"],"id":"D3Gfdo","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":214,"cache_read":7161,"out":6},"subagent_type":"general-purpose","agent_id":"ae36146e51c987d63"}
+   8.60  user  {"parent":"udo7CA","blocks":["tool_result:VqVQw4"],"subagent_type":"general-purpose","agent_id":"ae36146e51c987d63"}
+   9.76  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":7731,"tool_uses":6,"duration_ms":7958},"last_tool_name":"Read","description":"Reading chain/ember.txt","tool_use_id":"udo7CA"}
+   9.76  assistant  {"parent":"udo7CA","blocks":["tool_use:Read:3WUvxA"],"id":"5m4eYb","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":271,"cache_read":7375,"out":16},"subagent_type":"general-purpose","agent_id":"ae36146e51c987d63"}
+   9.77  user  {"parent":"udo7CA","blocks":["tool_result:3WUvxA"],"subagent_type":"general-purpose","agent_id":"ae36146e51c987d63"}
+  11.17  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":8176,"tool_uses":7,"duration_ms":9374},"last_tool_name":"Read","description":"Reading chain/fjord.txt","tool_use_id":"udo7CA"}
+  11.18  assistant  {"parent":"udo7CA","blocks":["tool_use:Read:qL13Sd"],"id":"TzbfV2","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":218,"cache_read":7646,"out":3},"subagent_type":"general-purpose","agent_id":"ae36146e51c987d63"}
+  11.19  user  {"parent":"udo7CA","blocks":["tool_result:qL13Sd"],"subagent_type":"general-purpose","agent_id":"ae36146e51c987d63"}
+  13.47  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":8586,"tool_uses":8,"duration_ms":11668},"last_tool_name":"Read","description":"Reading chain/glade.txt","tool_use_id":"udo7CA"}
+  13.47  assistant  {"parent":"udo7CA","blocks":["tool_use:Read:o6HgWB"],"id":"n8gUp8","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":262,"cache_read":7864,"out":3},"subagent_type":"general-purpose","agent_id":"ae36146e51c987d63"}
+  13.48  result  {"subtype":"error_max_budget_usd","terminal_reason":"budget_exhausted","num_turns":1,"total_cost_usd":0.002113095,"errors":["Reached maximum budget ($0.002)"]}
+  15.71  system  {"subtype":"task_updated","keys":["patch","run_id","task_id"],"patch":{"status":"completed","end_time":1795282198469}}
+  15.71  system  {"subtype":"task_notification","keys":["output_file","run_id","status","summary","task_id","tool_use_id","usage"],"status":"completed","usage":{"total_tokens":9137,"tool_uses":8,"duration_ms":13911},"tool_use_id":"udo7CA"}
+  16.48  _probe  {"note":"3 s after result 1: process alive"}
+  21.65  _probe  {"note":"standard input closed"}

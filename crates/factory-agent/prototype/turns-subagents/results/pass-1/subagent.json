@@ -1,0 +1,1899 @@
+{
+  "case": "subagent",
+  "about": "one subagent that makes fifteen model calls; the whole line of AG-1",
+  "command": [
+    "claude",
+    "-p",
+    "--setting-sources",
+    "user",
+    "--output-format",
+    "stream-json",
+    "--verbose",
+    "--input-format",
+    "stream-json",
+    "--session-id",
+    "22e1a3f0-d456-4f2c-a721-9c548ca0474a",
+    "--model",
+    "haiku",
+    "--permission-mode",
+    "dontAsk",
+    "--permission-prompts",
+    "none",
+    "--tools",
+    "Read,Glob,Grep,Agent",
+    "--allowedTools",
+    "Read,Glob,Grep,Agent",
+    "--settings",
+    "<out>/subagent/host/settings.json",
+    "--mcp-config",
+    "<out>/subagent/host/mcp.json",
+    "--strict-mcp-config",
+    "--json-schema",
+    "{\"type\": \"object\", \"properties\": {\"answer\": {\"type\": \"string\"}}, \"required\": [\"answer\"], \"additionalProperties\": false}",
+    "--max-turns",
+    "30",
+    "--max-budget-usd",
+    "1",
+    "--append-system-prompt-file",
+    "<out>/subagent/host/append.md",
+    "--include-partial-messages",
+    "--debug-file",
+    "<out>/subagent/host/debug.log"
+  ],
+  "messages": [
+    "Call the Agent tool exactly once, with subagent_type \"general-purpose\", and give the subagent this task word for word: 'Read the file chain/start.txt with the Read tool. Each file of the chain names the next file. Follow the chain with one Read call per response, never two in one response, until a file gives the final word. Report the final word.' Do not read any file yourself. Answer with the word the subagent reports."
+  ],
+  "init": {
+    "claude_code_version": "2.1.323",
+    "model": "claude-haiku-5-5",
+    "tools": [
+      "Task",
+      "Glob",
+      "Grep",
+      "Read",
+      "StructuredOutput"
+    ],
+    "agents": [
+      "claude",
+      "Explore",
+      "general-purpose",
+      "Plan",
+      "statusline-setup"
+    ],
+    "permissionMode": "dontAsk",
+    "apiKeySource": "none"
+  },
+  "counts": {
+    "lines": 305,
+    "main_loop_calls": 5,
+    "main_loop_output_tokens_by_message_delta": 809,
+    "main_loop_output_tokens_by_assistant_lines": 50,
+    "subagent_calls_shown": 15,
+    "subagent_output_tokens_by_assistant_lines": 118,
+    "subagent_models": [
+      "claude-haiku-5-5"
+    ],
+    "stream_events": {
+      "main": {
+        "message_start": 5,
+        "content_block_start": 7,
+        "content_block_delta": 188,
+        "content_block_stop": 7,
+        "message_delta": 5,
+        "message_stop": 5
+      }
+    },
+    "other_lines": {
+      "system/status": 5,
+      "system/background_tasks_changed": 2,
+      "system/task_started": 1,
+      "system/task_progress": 14,
+      "system/thinking_tokens": 4,
+      "system/task_updated": 1,
+      "system/task_notification": 1
+    }
+  },
+  "results": [
+    {
+      "subtype": "success",
+      "is_error": false,
+      "terminal_reason": "completed",
+      "num_turns": 4,
+      "total_cost_usd": 0.00106602,
+      "usage": {
+        "input_tokens": 8,
+        "cache_creation_input_tokens": 2049,
+        "cache_read_input_tokens": 24771,
+        "output_tokens": 422,
+        "output_tokens_details": {
+          "thinking_tokens": 60
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 2049,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage": {
+        "claude-haiku-5-5": {
+          "inputTokens": 10,
+          "outputTokens": 544,
+          "cacheReadInputTokens": 29922,
+          "cacheCreationInputTokens": 2721,
+          "webSearchRequests": 0,
+          "costUSD": 0.00106602,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 60,
+          "cacheCreationEphemeral5mInputTokens": 672,
+          "cacheCreationEphemeral1hInputTokens": 2049,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "model_usage_since_last_result": {
+        "claude-haiku-5-5": {
+          "inputTokens": 10,
+          "outputTokens": 544,
+          "cacheReadInputTokens": 29922,
+          "cacheCreationInputTokens": 2721,
+          "webSearchRequests": 0,
+          "costUSD": 0.00106602,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 60,
+          "cacheCreationEphemeral5mInputTokens": 672,
+          "cacheCreationEphemeral1hInputTokens": 2049,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "subagent_stats": {
+        "spawned": 1,
+        "requested": {
+          "background": 0,
+          "foreground": 0,
+          "unset": 1
+        },
+        "started_in_background": 1,
+        "max_depth": 1,
+        "spawned_by_subagents": 0,
+        "completed": 0,
+        "failed": 0,
+        "killed": {
+          "parent": 0,
+          "user": 0,
+          "system": 0
+        },
+        "refused": {
+          "depth_limit": 0,
+          "concurrency_limit": 0,
+          "budget": 0
+        },
+        "by_type": {
+          "general-purpose": 1
+        }
+      },
+      "structured_output": {
+        "answer": "The word is not available yet. I launched one general-purpose subagent with the task exactly as specified, and it is still running in the background. I have not read any files myself, so I have no final word to report. I will report the word once the subagent's completion notification arrives."
+      },
+      "stop_reason": "tool_use",
+      "queued_turn_count": 0,
+      "result_index": 0,
+      "permission_denials": [],
+      "api_error_status": null,
+      "result": "{\"answer\":\"The word is not available yet. I launched one general-purpose subagent with the task exactly as specified, and it is still running in the background. I have not read any files myself, so I have no final word to report. I will report the word once the subagent's completion notification arrives.\"}"
+    },
+    {
+      "subtype": "success",
+      "is_error": false,
+      "terminal_reason": "completed",
+      "num_turns": 3,
+      "total_cost_usd": 0.00438814,
+      "usage": {
+        "input_tokens": 6,
+        "cache_creation_input_tokens": 1169,
+        "cache_read_input_tokens": 19319,
+        "output_tokens": 387,
+        "output_tokens_details": {
+          "thinking_tokens": 109
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 1169,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage": {
+        "claude-haiku-5-5": {
+          "inputTokens": 44,
+          "outputTokens": 3130,
+          "cacheReadInputTokens": 160089,
+          "cacheCreationInputTokens": 7812,
+          "webSearchRequests": 0,
+          "costUSD": 0.00438814,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 243,
+          "cacheCreationEphemeral5mInputTokens": 4594,
+          "cacheCreationEphemeral1hInputTokens": 3218,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "model_usage_since_last_result": {
+        "claude-haiku-5-5": {
+          "inputTokens": 34,
+          "outputTokens": 2586,
+          "cacheReadInputTokens": 130167,
+          "cacheCreationInputTokens": 5091,
+          "webSearchRequests": 0,
+          "costUSD": 0.0033221200000000005,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 183,
+          "cacheCreationEphemeral5mInputTokens": 3922,
+          "cacheCreationEphemeral1hInputTokens": 1169,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "subagent_stats": {
+        "spawned": 1,
+        "requested": {
+          "background": 0,
+          "foreground": 0,
+          "unset": 1
+        },
+        "started_in_background": 1,
+        "max_depth": 1,
+        "spawned_by_subagents": 0,
+        "completed": 1,
+        "failed": 0,
+        "killed": {
+          "parent": 0,
+          "user": 0,
+          "system": 0
+        },
+        "refused": {
+          "depth_limit": 0,
+          "concurrency_limit": 0,
+          "budget": 0
+        },
+        "by_type": {
+          "general-purpose": 1
+        }
+      },
+      "structured_output": {
+        "answer": "HERON. The subagent followed the chain start.txt \u2192 amber \u2192 birch \u2192 cedar \u2192 dune \u2192 ember \u2192 fjord \u2192 glade \u2192 heath \u2192 inlet \u2192 knoll \u2192 ledge \u2192 marsh \u2192 notch, and notch.txt gave the final word. My earlier structured answer, which said the word was not yet available, is superseded by this one."
+      },
+      "stop_reason": "tool_use",
+      "queued_turn_count": 0,
+      "result_index": 1,
+      "permission_denials": [],
+      "api_error_status": null,
+      "result": "{\"answer\":\"HERON. The subagent followed the chain start.txt \u2192 amber \u2192 birch \u2192 cedar \u2192 dune \u2192 ember \u2192 fjord \u2192 glade \u2192 heath \u2192 inlet \u2192 knoll \u2192 ledge \u2192 marsh \u2192 notch, and notch.txt gave the final word. My earlier structured answer, which said the word was not yet available, is superseded by this one.\"}"
+    }
+  ],
+  "stream": [
+    {
+      "_t": 0.0,
+      "note": "message 1 sent (sub-chain)",
+      "type": "_probe"
+    },
+    {
+      "_t": 0.35,
+      "type": "system",
+      "subtype": "init"
+    },
+    {
+      "_t": 1.14,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_start",
+      "id": "mYhg9x",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 1339,
+        "cache_read": 7163,
+        "out": 16
+      }
+    },
+    {
+      "_t": 1.69,
+      "type": "assistant",
+      "parent": null,
+      "agent_input": {
+        "description": "Follow file chain",
+        "subagent_type": "general-purpose"
+      },
+      "blocks": [
+        "tool_use:Agent:aocYTm"
+      ],
+      "id": "mYhg9x",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 1339,
+        "cache_read": 7163,
+        "out": 16
+      }
+    },
+    {
+      "_t": 1.71,
+      "type": "system",
+      "subtype": "background_tasks_changed",
+      "keys": [
+        "tasks"
+      ],
+      "tasks": 1
+    },
+    {
+      "_t": 1.71,
+      "type": "system",
+      "subtype": "task_started",
+      "keys": [
+        "description",
+        "is_backgrounded",
+        "prompt",
+        "run_id",
+        "spawn_depth",
+        "subagent_type",
+        "task_id",
+        "task_type",
+        "tool_use_id"
+      ],
+      "is_backgrounded": true,
+      "spawn_depth": 1,
+      "description": "Follow file chain",
+      "tool_use_id": "aocYTm"
+    },
+    {
+      "_t": 1.71,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_delta",
+      "usage": {
+        "in": 2,
+        "cache_write": 1339,
+        "cache_read": 7163,
+        "out": 168
+      },
+      "stop_reason": "tool_use"
+    },
+    {
+      "_t": 1.72,
+      "type": "user",
+      "parent": null,
+      "blocks": [
+        "tool_result:aocYTm"
+      ],
+      "agent_result": {
+        "status": "async_launched",
+        "isAsync": true,
+        "resolvedModel": "claude-haiku-5-5"
+      }
+    },
+    {
+      "_t": 1.72,
+      "type": "rate_limit_event",
+      "rate_limit_info": {
+        "status": "allowed",
+        "resetsAt": 1795615200,
+        "rateLimitType": "seven_day",
+        "overageStatus": "rejected",
+        "overageDisabledReason": "org_level_disabled",
+        "isUsingOverage": false,
+        "unifiedWindows": {
+          "seven_day": {
+            "utilization": 0.36,
+            "resetsAt": 1795615200,
+            "status": "allowed"
+          }
+        }
+      }
+    },
+    {
+      "_t": 2.54,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_start",
+      "id": "1GLcAp",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 604,
+        "cache_read": 8502,
+        "out": 1
+      }
+    },
+    {
+      "_t": 2.95,
+      "type": "assistant",
+      "parent": null,
+      "blocks": [
+        "text"
+      ],
+      "id": "1GLcAp",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 604,
+        "cache_read": 8502,
+        "out": 1
+      }
+    },
+    {
+      "_t": 2.95,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_delta",
+      "usage": {
+        "in": 2,
+        "cache_write": 604,
+        "cache_read": 8502,
+        "out": 66
+      },
+      "stop_reason": "end_turn"
+    },
+    {
+      "_t": 2.96,
+      "type": "user",
+      "parent": null,
+      "blocks": [
+        "text"
+      ],
+      "isSynthetic": true
+    },
+    {
+      "_t": 3.0,
+      "type": "assistant",
+      "parent": "aocYTm",
+      "blocks": [
+        "tool_use:Read:wQTA3g"
+      ],
+      "id": "jwtE4Z",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 672,
+        "cache_read": 5151,
+        "out": 17
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 3.0,
+      "type": "system",
+      "subtype": "task_progress",
+      "keys": [
+        "description",
+        "last_tool_name",
+        "run_id",
+        "subagent_type",
+        "task_id",
+        "tool_use_id",
+        "usage"
+      ],
+      "usage": {
+        "total_tokens": 5843,
+        "tool_uses": 1,
+        "duration_ms": 1296
+      },
+      "last_tool_name": "Read",
+      "description": "Reading chain/start.txt",
+      "tool_use_id": "aocYTm"
+    },
+    {
+      "_t": 3.03,
+      "type": "user",
+      "parent": "aocYTm",
+      "blocks": [
+        "tool_result:wQTA3g"
+      ],
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 3.76,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_start",
+      "id": "Zm3PC1",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 4,
+        "cache_write": 106,
+        "cache_read": 9106,
+        "out": 3
+      }
+    },
+    {
+      "_t": 4.11,
+      "type": "assistant",
+      "parent": null,
+      "blocks": [
+        "thinking"
+      ],
+      "id": "Zm3PC1",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 4,
+        "cache_write": 106,
+        "cache_read": 9106,
+        "out": 3
+      }
+    },
+    {
+      "_t": 4.14,
+      "type": "assistant",
+      "parent": "aocYTm",
+      "blocks": [
+        "thinking"
+      ],
+      "id": "VMsmZp",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 768,
+        "cache_read": 5823,
+        "out": 4
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 4.28,
+      "type": "assistant",
+      "parent": "aocYTm",
+      "blocks": [
+        "text"
+      ],
+      "id": "VMsmZp",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 768,
+        "cache_read": 5823,
+        "out": 4
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 4.51,
+      "type": "assistant",
+      "parent": null,
+      "blocks": [
+        "tool_use:StructuredOutput:CcBps4"
+      ],
+      "id": "Zm3PC1",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 4,
+        "cache_write": 106,
+        "cache_read": 9106,
+        "out": 3
+      }
+    },
+    {
+      "_t": 4.51,
+      "type": "user",
+      "parent": null,
+      "blocks": [
+        "tool_result:CcBps4"
+      ]
+    },
+    {
+      "_t": 4.51,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_delta",
+      "usage": {
+        "in": 4,
+        "cache_write": 106,
+        "cache_read": 9106,
+        "out": 188
+      },
+      "stop_reason": "tool_use"
+    },
+    {
+      "_t": 4.52,
+      "type": "result",
+      "subtype": "success",
+      "is_error": false,
+      "terminal_reason": "completed",
+      "num_turns": 4,
+      "total_cost_usd": 0.00106602,
+      "usage": {
+        "input_tokens": 8,
+        "cache_creation_input_tokens": 2049,
+        "cache_read_input_tokens": 24771,
+        "output_tokens": 422,
+        "output_tokens_details": {
+          "thinking_tokens": 60
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 2049,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage": {
+        "claude-haiku-5-5": {
+          "inputTokens": 10,
+          "outputTokens": 544,
+          "cacheReadInputTokens": 29922,
+          "cacheCreationInputTokens": 2721,
+          "webSearchRequests": 0,
+          "costUSD": 0.00106602,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 60,
+          "cacheCreationEphemeral5mInputTokens": 672,
+          "cacheCreationEphemeral1hInputTokens": 2049,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "model_usage_since_last_result": {
+        "claude-haiku-5-5": {
+          "inputTokens": 10,
+          "outputTokens": 544,
+          "cacheReadInputTokens": 29922,
+          "cacheCreationInputTokens": 2721,
+          "webSearchRequests": 0,
+          "costUSD": 0.00106602,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 60,
+          "cacheCreationEphemeral5mInputTokens": 672,
+          "cacheCreationEphemeral1hInputTokens": 2049,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "subagent_stats": {
+        "spawned": 1,
+        "requested": {
+          "background": 0,
+          "foreground": 0,
+          "unset": 1
+        },
+        "started_in_background": 1,
+        "max_depth": 1,
+        "spawned_by_subagents": 0,
+        "completed": 0,
+        "failed": 0,
+        "killed": {
+          "parent": 0,
+          "user": 0,
+          "system": 0
+        },
+        "refused": {
+          "depth_limit": 0,
+          "concurrency_limit": 0,
+          "budget": 0
+        },
+        "by_type": {
+          "general-purpose": 1
+        }
+      },
+      "structured_output": {
+        "answer": "The word is not available yet. I launched one general-purpose subagent with the task exactly as specified, and it is still running in the background. I have not read any files myself, so I have no final word to report. I will report the word once the subagent's completion notification arrives."
+      },
+      "stop_reason": "tool_use",
+      "queued_turn_count": 0,
+      "result_index": 0,
+      "permission_denials": [],
+      "api_error_status": null,
+      "result": "{\"answer\":\"The word is not available yet. I launched one general-purpose subagent with the task exactly as specified, and it is still running in the background. I have not read any files myself, so I have no final word to report. I will report the word once the subagent's completion notification arrives.\"}"
+    },
+    {
+      "_t": 4.57,
+      "type": "assistant",
+      "parent": "aocYTm",
+      "blocks": [
+        "tool_use:Read:2i8F9a"
+      ],
+      "id": "VMsmZp",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 768,
+        "cache_read": 5823,
+        "out": 4
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 4.57,
+      "type": "system",
+      "subtype": "task_progress",
+      "keys": [
+        "description",
+        "last_tool_name",
+        "run_id",
+        "subagent_type",
+        "task_id",
+        "tool_use_id",
+        "usage"
+      ],
+      "usage": {
+        "total_tokens": 6864,
+        "tool_uses": 2,
+        "duration_ms": 2874
+      },
+      "last_tool_name": "Read",
+      "description": "Reading chain/amber.txt",
+      "tool_use_id": "aocYTm"
+    },
+    {
+      "_t": 4.58,
+      "type": "user",
+      "parent": "aocYTm",
+      "blocks": [
+        "tool_result:2i8F9a"
+      ],
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 6.21,
+      "type": "assistant",
+      "parent": "aocYTm",
+      "blocks": [
+        "text"
+      ],
+      "id": "5AuA6D",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 299,
+        "cache_read": 6591,
+        "out": 1
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 6.53,
+      "type": "assistant",
+      "parent": "aocYTm",
+      "blocks": [
+        "tool_use:Read:ZwFk8Y"
+      ],
+      "id": "5AuA6D",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 299,
+        "cache_read": 6591,
+        "out": 1
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 6.53,
+      "type": "system",
+      "subtype": "task_progress",
+      "keys": [
+        "description",
+        "last_tool_name",
+        "run_id",
+        "subagent_type",
+        "task_id",
+        "tool_use_id",
+        "usage"
+      ],
+      "usage": {
+        "total_tokens": 6927,
+        "tool_uses": 3,
+        "duration_ms": 4825
+      },
+      "last_tool_name": "Read",
+      "description": "Reading chain/birch.txt",
+      "tool_use_id": "aocYTm"
+    },
+    {
+      "_t": 6.55,
+      "type": "user",
+      "parent": "aocYTm",
+      "blocks": [
+        "tool_result:ZwFk8Y"
+      ],
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 7.51,
+      "type": "assistant",
+      "parent": "aocYTm",
+      "blocks": [
+        "text"
+      ],
+      "id": "EL7CeC",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 240,
+        "cache_read": 6890,
+        "out": 8
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 7.53,
+      "note": "3 s after result 1: process alive",
+      "type": "_probe"
+    },
+    {
+      "_t": 7.76,
+      "type": "assistant",
+      "parent": "aocYTm",
+      "blocks": [
+        "tool_use:Read:Kn3sM5"
+      ],
+      "id": "EL7CeC",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 240,
+        "cache_read": 6890,
+        "out": 8
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 7.76,
+      "type": "system",
+      "subtype": "task_progress",
+      "keys": [
+        "description",
+        "last_tool_name",
+        "run_id",
+        "subagent_type",
+        "task_id",
+        "tool_use_id",
+        "usage"
+      ],
+      "usage": {
+        "total_tokens": 7182,
+        "tool_uses": 4,
+        "duration_ms": 6060
+      },
+      "last_tool_name": "Read",
+      "description": "Reading chain/cedar.txt",
+      "tool_use_id": "aocYTm"
+    },
+    {
+      "_t": 7.79,
+      "type": "user",
+      "parent": "aocYTm",
+      "blocks": [
+        "tool_result:Kn3sM5"
+      ],
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 8.79,
+      "type": "assistant",
+      "parent": "aocYTm",
+      "blocks": [
+        "text"
+      ],
+      "id": "P27FP9",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 241,
+        "cache_read": 7130,
+        "out": 8
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 8.99,
+      "type": "assistant",
+      "parent": "aocYTm",
+      "blocks": [
+        "tool_use:Read:aj6mdE"
+      ],
+      "id": "P27FP9",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 241,
+        "cache_read": 7130,
+        "out": 8
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 8.99,
+      "type": "system",
+      "subtype": "task_progress",
+      "keys": [
+        "description",
+        "last_tool_name",
+        "run_id",
+        "subagent_type",
+        "task_id",
+        "tool_use_id",
+        "usage"
+      ],
+      "usage": {
+        "total_tokens": 7439,
+        "tool_uses": 5,
+        "duration_ms": 7291
+      },
+      "last_tool_name": "Read",
+      "description": "Reading chain/dune.txt",
+      "tool_use_id": "aocYTm"
+    },
+    {
+      "_t": 9.03,
+      "type": "user",
+      "parent": "aocYTm",
+      "blocks": [
+        "tool_result:aj6mdE"
+      ],
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 9.88,
+      "type": "assistant",
+      "parent": "aocYTm",
+      "blocks": [
+        "text"
+      ],
+      "id": "b54JTe",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 240,
+        "cache_read": 7371,
+        "out": 8
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 10.11,
+      "type": "assistant",
+      "parent": "aocYTm",
+      "blocks": [
+        "tool_use:Read:3Gw9uM"
+      ],
+      "id": "b54JTe",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 240,
+        "cache_read": 7371,
+        "out": 8
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 10.11,
+      "type": "system",
+      "subtype": "task_progress",
+      "keys": [
+        "description",
+        "last_tool_name",
+        "run_id",
+        "subagent_type",
+        "task_id",
+        "tool_use_id",
+        "usage"
+      ],
+      "usage": {
+        "total_tokens": 7695,
+        "tool_uses": 6,
+        "duration_ms": 8406
+      },
+      "last_tool_name": "Read",
+      "description": "Reading chain/ember.txt",
+      "tool_use_id": "aocYTm"
+    },
+    {
+      "_t": 10.12,
+      "type": "user",
+      "parent": "aocYTm",
+      "blocks": [
+        "tool_result:3Gw9uM"
+      ],
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 11.13,
+      "type": "assistant",
+      "parent": "aocYTm",
+      "blocks": [
+        "text"
+      ],
+      "id": "5Zq3XD",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 236,
+        "cache_read": 7611,
+        "out": 8
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 11.4,
+      "type": "assistant",
+      "parent": "aocYTm",
+      "blocks": [
+        "tool_use:Read:Z5G67L"
+      ],
+      "id": "5Zq3XD",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 236,
+        "cache_read": 7611,
+        "out": 8
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 11.4,
+      "type": "system",
+      "subtype": "task_progress",
+      "keys": [
+        "description",
+        "last_tool_name",
+        "run_id",
+        "subagent_type",
+        "task_id",
+        "tool_use_id",
+        "usage"
+      ],
+      "usage": {
+        "total_tokens": 7947,
+        "tool_uses": 7,
+        "duration_ms": 9701
+      },
+      "last_tool_name": "Read",
+      "description": "Reading chain/fjord.txt",
+      "tool_use_id": "aocYTm"
+    },
+    {
+      "_t": 11.42,
+      "type": "user",
+      "parent": "aocYTm",
+      "blocks": [
+        "tool_result:Z5G67L"
+      ],
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 12.37,
+      "type": "assistant",
+      "parent": "aocYTm",
+      "blocks": [
+        "text"
+      ],
+      "id": "XU8Jha",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 237,
+        "cache_read": 7847,
+        "out": 8
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 12.61,
+      "type": "assistant",
+      "parent": "aocYTm",
+      "blocks": [
+        "tool_use:Read:6meu6a"
+      ],
+      "id": "XU8Jha",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 237,
+        "cache_read": 7847,
+        "out": 8
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 12.61,
+      "type": "system",
+      "subtype": "task_progress",
+      "keys": [
+        "description",
+        "last_tool_name",
+        "run_id",
+        "subagent_type",
+        "task_id",
+        "tool_use_id",
+        "usage"
+      ],
+      "usage": {
+        "total_tokens": 8200,
+        "tool_uses": 8,
+        "duration_ms": 10911
+      },
+      "last_tool_name": "Read",
+      "description": "Reading chain/glade.txt",
+      "tool_use_id": "aocYTm"
+    },
+    {
+      "_t": 12.63,
+      "type": "user",
+      "parent": "aocYTm",
+      "blocks": [
+        "tool_result:6meu6a"
+      ],
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 13.62,
+      "type": "assistant",
+      "parent": "aocYTm",
+      "blocks": [
+        "text"
+      ],
+      "id": "VSi27Z",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 236,
+        "cache_read": 8084,
+        "out": 8
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 13.81,
+      "type": "assistant",
+      "parent": "aocYTm",
+      "blocks": [
+        "tool_use:Read:2pVa1U"
+      ],
+      "id": "VSi27Z",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 236,
+        "cache_read": 8084,
+        "out": 8
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 13.81,
+      "type": "system",
+      "subtype": "task_progress",
+      "keys": [
+        "description",
+        "last_tool_name",
+        "run_id",
+        "subagent_type",
+        "task_id",
+        "tool_use_id",
+        "usage"
+      ],
+      "usage": {
+        "total_tokens": 8452,
+        "tool_uses": 9,
+        "duration_ms": 12106
+      },
+      "last_tool_name": "Read",
+      "description": "Reading chain/heath.txt",
+      "tool_use_id": "aocYTm"
+    },
+    {
+      "_t": 13.83,
+      "type": "user",
+      "parent": "aocYTm",
+      "blocks": [
+        "tool_result:2pVa1U"
+      ],
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 14.78,
+      "type": "assistant",
+      "parent": "aocYTm",
+      "blocks": [
+        "text"
+      ],
+      "id": "eazhef",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 236,
+        "cache_read": 8320,
+        "out": 8
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 15.01,
+      "type": "assistant",
+      "parent": "aocYTm",
+      "blocks": [
+        "tool_use:Read:BwPp1P"
+      ],
+      "id": "eazhef",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 236,
+        "cache_read": 8320,
+        "out": 8
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 15.01,
+      "type": "system",
+      "subtype": "task_progress",
+      "keys": [
+        "description",
+        "last_tool_name",
+        "run_id",
+        "subagent_type",
+        "task_id",
+        "tool_use_id",
+        "usage"
+      ],
+      "usage": {
+        "total_tokens": 8704,
+        "tool_uses": 10,
+        "duration_ms": 13309
+      },
+      "last_tool_name": "Read",
+      "description": "Reading chain/inlet.txt",
+      "tool_use_id": "aocYTm"
+    },
+    {
+      "_t": 15.04,
+      "type": "user",
+      "parent": "aocYTm",
+      "blocks": [
+        "tool_result:BwPp1P"
+      ],
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 15.99,
+      "type": "assistant",
+      "parent": "aocYTm",
+      "blocks": [
+        "text"
+      ],
+      "id": "zLbWKf",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 242,
+        "cache_read": 8556,
+        "out": 8
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 16.22,
+      "type": "assistant",
+      "parent": "aocYTm",
+      "blocks": [
+        "tool_use:Read:8gfSU9"
+      ],
+      "id": "zLbWKf",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 242,
+        "cache_read": 8556,
+        "out": 8
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 16.22,
+      "type": "system",
+      "subtype": "task_progress",
+      "keys": [
+        "description",
+        "last_tool_name",
+        "run_id",
+        "subagent_type",
+        "task_id",
+        "tool_use_id",
+        "usage"
+      ],
+      "usage": {
+        "total_tokens": 8962,
+        "tool_uses": 11,
+        "duration_ms": 14519
+      },
+      "last_tool_name": "Read",
+      "description": "Reading chain/knoll.txt",
+      "tool_use_id": "aocYTm"
+    },
+    {
+      "_t": 16.24,
+      "type": "user",
+      "parent": "aocYTm",
+      "blocks": [
+        "tool_result:8gfSU9"
+      ],
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 17.2,
+      "type": "assistant",
+      "parent": "aocYTm",
+      "blocks": [
+        "text"
+      ],
+      "id": "rcyJ4m",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 239,
+        "cache_read": 8798,
+        "out": 8
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 17.43,
+      "type": "assistant",
+      "parent": "aocYTm",
+      "blocks": [
+        "tool_use:Read:XN1jmR"
+      ],
+      "id": "rcyJ4m",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 239,
+        "cache_read": 8798,
+        "out": 8
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 17.43,
+      "type": "system",
+      "subtype": "task_progress",
+      "keys": [
+        "description",
+        "last_tool_name",
+        "run_id",
+        "subagent_type",
+        "task_id",
+        "tool_use_id",
+        "usage"
+      ],
+      "usage": {
+        "total_tokens": 9217,
+        "tool_uses": 12,
+        "duration_ms": 15730
+      },
+      "last_tool_name": "Read",
+      "description": "Reading chain/ledge.txt",
+      "tool_use_id": "aocYTm"
+    },
+    {
+      "_t": 17.45,
+      "type": "user",
+      "parent": "aocYTm",
+      "blocks": [
+        "tool_result:XN1jmR"
+      ],
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 18.43,
+      "type": "assistant",
+      "parent": "aocYTm",
+      "blocks": [
+        "text"
+      ],
+      "id": "H6Qi8m",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 239,
+        "cache_read": 9037,
+        "out": 8
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 18.65,
+      "type": "assistant",
+      "parent": "aocYTm",
+      "blocks": [
+        "tool_use:Read:2zb6rd"
+      ],
+      "id": "H6Qi8m",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 239,
+        "cache_read": 9037,
+        "out": 8
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 18.66,
+      "type": "system",
+      "subtype": "task_progress",
+      "keys": [
+        "description",
+        "last_tool_name",
+        "run_id",
+        "subagent_type",
+        "task_id",
+        "tool_use_id",
+        "usage"
+      ],
+      "usage": {
+        "total_tokens": 9472,
+        "tool_uses": 13,
+        "duration_ms": 16954
+      },
+      "last_tool_name": "Read",
+      "description": "Reading chain/marsh.txt",
+      "tool_use_id": "aocYTm"
+    },
+    {
+      "_t": 18.68,
+      "type": "user",
+      "parent": "aocYTm",
+      "blocks": [
+        "tool_result:2zb6rd"
+      ],
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 19.62,
+      "type": "assistant",
+      "parent": "aocYTm",
+      "blocks": [
+        "text"
+      ],
+      "id": "zncUK6",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 238,
+        "cache_read": 9276,
+        "out": 8
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 19.85,
+      "type": "assistant",
+      "parent": "aocYTm",
+      "blocks": [
+        "tool_use:Read:wzRRbE"
+      ],
+      "id": "zncUK6",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 238,
+        "cache_read": 9276,
+        "out": 8
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 19.85,
+      "type": "system",
+      "subtype": "task_progress",
+      "keys": [
+        "description",
+        "last_tool_name",
+        "run_id",
+        "subagent_type",
+        "task_id",
+        "tool_use_id",
+        "usage"
+      ],
+      "usage": {
+        "total_tokens": 9726,
+        "tool_uses": 14,
+        "duration_ms": 18150
+      },
+      "last_tool_name": "Read",
+      "description": "Reading chain/notch.txt",
+      "tool_use_id": "aocYTm"
+    },
+    {
+      "_t": 19.87,
+      "type": "user",
+      "parent": "aocYTm",
+      "blocks": [
+        "tool_result:wzRRbE"
+      ],
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 20.96,
+      "type": "assistant",
+      "parent": "aocYTm",
+      "blocks": [
+        "text"
+      ],
+      "id": "UTvZRR",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 231,
+        "cache_read": 9514,
+        "out": 8
+      },
+      "subagent_type": "general-purpose",
+      "agent_id": "a5225e8e4189d988d"
+    },
+    {
+      "_t": 21.05,
+      "type": "system",
+      "subtype": "task_updated",
+      "keys": [
+        "patch",
+        "run_id",
+        "task_id"
+      ],
+      "patch": {
+        "status": "completed",
+        "end_time": 1795281553532
+      }
+    },
+    {
+      "_t": 21.05,
+      "type": "system",
+      "subtype": "task_notification",
+      "keys": [
+        "output_file",
+        "run_id",
+        "status",
+        "summary",
+        "task_id",
+        "tool_use_id",
+        "usage"
+      ],
+      "status": "completed",
+      "usage": {
+        "total_tokens": 10016,
+        "tool_uses": 14,
+        "duration_ms": 19349
+      },
+      "tool_use_id": "aocYTm"
+    },
+    {
+      "_t": 21.05,
+      "type": "system",
+      "subtype": "background_tasks_changed",
+      "keys": [
+        "tasks"
+      ],
+      "tasks": 0
+    },
+    {
+      "_t": 21.05,
+      "type": "system",
+      "subtype": "init"
+    },
+    {
+      "_t": 21.79,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_start",
+      "id": "wMY2MG",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 895,
+        "cache_read": 9212,
+        "out": 6
+      }
+    },
+    {
+      "_t": 22.34,
+      "type": "assistant",
+      "parent": null,
+      "blocks": [
+        "thinking"
+      ],
+      "id": "wMY2MG",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 895,
+        "cache_read": 9212,
+        "out": 6
+      }
+    },
+    {
+      "_t": 22.82,
+      "type": "assistant",
+      "parent": null,
+      "blocks": [
+        "text"
+      ],
+      "id": "wMY2MG",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 895,
+        "cache_read": 9212,
+        "out": 6
+      }
+    },
+    {
+      "_t": 22.82,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_delta",
+      "usage": {
+        "in": 2,
+        "cache_write": 895,
+        "cache_read": 9212,
+        "out": 234
+      },
+      "stop_reason": "end_turn"
+    },
+    {
+      "_t": 22.82,
+      "type": "user",
+      "parent": null,
+      "blocks": [
+        "text"
+      ],
+      "isSynthetic": true
+    },
+    {
+      "_t": 23.65,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_start",
+      "id": "vAvCdu",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 4,
+        "cache_write": 274,
+        "cache_read": 10107,
+        "out": 24
+      }
+    },
+    {
+      "_t": 24.11,
+      "type": "assistant",
+      "parent": null,
+      "blocks": [
+        "tool_use:StructuredOutput:Y4qgb6"
+      ],
+      "id": "vAvCdu",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 4,
+        "cache_write": 274,
+        "cache_read": 10107,
+        "out": 24
+      }
+    },
+    {
+      "_t": 24.11,
+      "type": "user",
+      "parent": null,
+      "blocks": [
+        "tool_result:Y4qgb6"
+      ]
+    },
+    {
+      "_t": 24.11,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_delta",
+      "usage": {
+        "in": 4,
+        "cache_write": 274,
+        "cache_read": 10107,
+        "out": 153
+      },
+      "stop_reason": "tool_use"
+    },
+    {
+      "_t": 24.11,
+      "type": "result",
+      "subtype": "success",
+      "is_error": false,
+      "terminal_reason": "completed",
+      "num_turns": 3,
+      "total_cost_usd": 0.00438814,
+      "usage": {
+        "input_tokens": 6,
+        "cache_creation_input_tokens": 1169,
+        "cache_read_input_tokens": 19319,
+        "output_tokens": 387,
+        "output_tokens_details": {
+          "thinking_tokens": 109
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 1169,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage": {
+        "claude-haiku-5-5": {
+          "inputTokens": 44,
+          "outputTokens": 3130,
+          "cacheReadInputTokens": 160089,
+          "cacheCreationInputTokens": 7812,
+          "webSearchRequests": 0,
+          "costUSD": 0.00438814,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 243,
+          "cacheCreationEphemeral5mInputTokens": 4594,
+          "cacheCreationEphemeral1hInputTokens": 3218,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "model_usage_since_last_result": {
+        "claude-haiku-5-5": {
+          "inputTokens": 34,
+          "outputTokens": 2586,
+          "cacheReadInputTokens": 130167,
+          "cacheCreationInputTokens": 5091,
+          "webSearchRequests": 0,
+          "costUSD": 0.0033221200000000005,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 183,
+          "cacheCreationEphemeral5mInputTokens": 3922,
+          "cacheCreationEphemeral1hInputTokens": 1169,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "subagent_stats": {
+        "spawned": 1,
+        "requested": {
+          "background": 0,
+          "foreground": 0,
+          "unset": 1
+        },
+        "started_in_background": 1,
+        "max_depth": 1,
+        "spawned_by_subagents": 0,
+        "completed": 1,
+        "failed": 0,
+        "killed": {
+          "parent": 0,
+          "user": 0,
+          "system": 0
+        },
+        "refused": {
+          "depth_limit": 0,
+          "concurrency_limit": 0,
+          "budget": 0
+        },
+        "by_type": {
+          "general-purpose": 1
+        }
+      },
+      "structured_output": {
+        "answer": "HERON. The subagent followed the chain start.txt \u2192 amber \u2192 birch \u2192 cedar \u2192 dune \u2192 ember \u2192 fjord \u2192 glade \u2192 heath \u2192 inlet \u2192 knoll \u2192 ledge \u2192 marsh \u2192 notch, and notch.txt gave the final word. My earlier structured answer, which said the word was not yet available, is superseded by this one."
+      },
+      "stop_reason": "tool_use",
+      "queued_turn_count": 0,
+      "result_index": 1,
+      "permission_denials": [],
+      "api_error_status": null,
+      "result": "{\"answer\":\"HERON. The subagent followed the chain start.txt \u2192 amber \u2192 birch \u2192 cedar \u2192 dune \u2192 ember \u2192 fjord \u2192 glade \u2192 heath \u2192 inlet \u2192 knoll \u2192 ledge \u2192 marsh \u2192 notch, and notch.txt gave the final word. My earlier structured answer, which said the word was not yet available, is superseded by this one.\"}"
+    },
+    {
+      "_t": 27.12,
+      "note": "3 s after result 2: process alive",
+      "type": "_probe"
+    },
+    {
+      "_t": 32.29,
+      "note": "standard input closed",
+      "type": "_probe"
+    }
+  ],
+  "exit_code": 0,
+  "timed_out": false,
+  "wall_seconds": 32.32,
+  "files_holding_the_token": [],
+  "stderr_tail": ""
+}

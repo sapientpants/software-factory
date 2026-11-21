@@ -1,0 +1,56 @@
+   0.00  _probe  {"note":"message 1 sent (sub-chain)"}
+   0.36  system  {"subtype":"init"}
+   1.26  stream_event  {"parent":null,"event":"message_start","id":"UHXxNz","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":1353,"cache_read":7173,"out":16}}
+   1.79  assistant  {"parent":null,"agent_input":{"description":"Follow file chain","subagent_type":"general-purpose"},"blocks":["tool_use:Agent:fn6oGJ"],"id":"UHXxNz","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":1353,"cache_read":7173,"out":16}}
+   1.80  system  {"subtype":"background_tasks_changed","keys":["tasks"],"tasks":1}
+   1.80  system  {"subtype":"task_started","keys":["description","is_backgrounded","prompt","run_id","spawn_depth","subagent_type","task_id","task_type","tool_use_id"],"is_backgrounded":true,"spawn_depth":1,"description":"Follow file chain","tool_use_id":"fn6oGJ"}
+   1.80  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":1353,"cache_read":7173,"out":168},"stop_reason":"tool_use"}
+   1.81  user  {"parent":null,"blocks":["tool_result:fn6oGJ"],"agent_result":{"status":"async_launched","isAsync":true,"resolvedModel":"claude-haiku-5-5"}}
+   1.81  rate_limit_event  {"rate_limit_info":{"status":"allowed","resetsAt":1795615200,"rateLimitType":"seven_day","overageStatus":"rejected","overageDisabledReason":"org_level_disabled","isUsingOverage":false,"unifiedWindows":{"seven_day":{"utilization":0.36,"resetsAt":1795615200,"status":"allowed"}}}}
+   2.59  stream_event  {"parent":null,"event":"message_start","id":"Q2kNFT","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":599,"cache_read":8526,"out":1}}
+   2.77  assistant  {"parent":null,"blocks":["text"],"id":"Q2kNFT","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":599,"cache_read":8526,"out":1}}
+   2.77  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":599,"cache_read":8526,"out":40},"stop_reason":"end_turn"}
+   2.78  user  {"parent":null,"blocks":["text"],"isSynthetic":true}
+   3.03  assistant  {"parent":"fn6oGJ","blocks":["tool_use:Read:K6u4NJ"],"id":"p8a2hi","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":680,"cache_read":5151,"out":17},"subagent_type":"general-purpose","agent_id":"a00a804801056aacf"}
+   3.03  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":5851,"tool_uses":1,"duration_ms":1239},"last_tool_name":"Read","description":"Reading chain/start.txt","tool_use_id":"fn6oGJ"}
+   3.05  user  {"parent":"fn6oGJ","blocks":["tool_result:K6u4NJ"],"subagent_type":"general-purpose","agent_id":"a00a804801056aacf"}
+   3.62  stream_event  {"parent":null,"event":"message_start","id":"F2np91","model":"claude-haiku-5-5","usage":{"in":4,"cache_write":80,"cache_read":9125,"out":24}}
+   3.96  assistant  {"parent":null,"blocks":["tool_use:StructuredOutput:xwDfTR"],"id":"F2np91","model":"claude-haiku-5-5","usage":{"in":4,"cache_write":80,"cache_read":9125,"out":24}}
+   3.97  user  {"parent":null,"blocks":["tool_result:xwDfTR"]}
+   3.97  stream_event  {"parent":null,"event":"message_delta","usage":{"in":4,"cache_write":80,"cache_read":9125,"out":103},"stop_reason":"tool_use"}
+   3.98  result  {"subtype":"success","terminal_reason":"completed","num_turns":4,"total_cost_usd":0.00101115}
+   4.18  assistant  {"parent":"fn6oGJ","blocks":["thinking"],"id":"bFbUH9","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":775,"cache_read":5831,"out":2},"subagent_type":"general-purpose","agent_id":"a00a804801056aacf"}
+   4.48  assistant  {"parent":"fn6oGJ","blocks":["tool_use:Read:ssZPEd"],"id":"bFbUH9","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":775,"cache_read":5831,"out":2},"subagent_type":"general-purpose","agent_id":"a00a804801056aacf"}
+   4.48  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":6821,"tool_uses":2,"duration_ms":2684},"last_tool_name":"Read","description":"Reading chain/amber.txt","tool_use_id":"fn6oGJ"}
+   4.50  user  {"parent":"fn6oGJ","blocks":["tool_result:ssZPEd"],"subagent_type":"general-purpose","agent_id":"a00a804801056aacf"}
+   5.67  assistant  {"parent":"fn6oGJ","blocks":["tool_use:Read:uDZQrP"],"id":"g2UVck","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":252,"cache_read":6606,"out":16},"subagent_type":"general-purpose","agent_id":"a00a804801056aacf"}
+   5.67  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":6898,"tool_uses":3,"duration_ms":3871},"last_tool_name":"Read","description":"Reading chain/birch.txt","tool_use_id":"fn6oGJ"}
+   5.68  user  {"parent":"fn6oGJ","blocks":["tool_result:uDZQrP"],"subagent_type":"general-purpose","agent_id":"a00a804801056aacf"}
+   6.74  assistant  {"parent":"fn6oGJ","blocks":["thinking"],"id":"vXfWUU","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":211,"cache_read":6858,"out":5},"subagent_type":"general-purpose","agent_id":"a00a804801056aacf"}
+   6.98  _probe  {"note":"3 s after result 1: process alive"}
+   7.06  assistant  {"parent":"fn6oGJ","blocks":["tool_use:Read:VECjCd"],"id":"vXfWUU","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":211,"cache_read":6858,"out":5},"subagent_type":"general-purpose","agent_id":"a00a804801056aacf"}
+   7.06  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":7168,"tool_uses":4,"duration_ms":5261},"last_tool_name":"Read","description":"Reading chain/cedar.txt","tool_use_id":"fn6oGJ"}
+   7.07  user  {"parent":"fn6oGJ","blocks":["tool_result:VECjCd"],"subagent_type":"general-purpose","agent_id":"a00a804801056aacf"}
+   8.17  assistant  {"parent":"fn6oGJ","blocks":["tool_use:Read:TtnWy9"],"id":"NiRSER","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":263,"cache_read":7069,"out":16},"subagent_type":"general-purpose","agent_id":"a00a804801056aacf"}
+   8.17  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":7398,"tool_uses":5,"duration_ms":6376},"last_tool_name":"Read","description":"Reading chain/dune.txt","tool_use_id":"fn6oGJ"}
+   8.19  user  {"parent":"fn6oGJ","blocks":["tool_result:TtnWy9"],"subagent_type":"general-purpose","agent_id":"a00a804801056aacf"}
+   9.36  assistant  {"parent":"fn6oGJ","blocks":["thinking"],"id":"rzrejE","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":210,"cache_read":7332,"out":6},"subagent_type":"general-purpose","agent_id":"a00a804801056aacf"}
+   9.66  assistant  {"parent":"fn6oGJ","blocks":["tool_use:Read:GbEuRj"],"id":"rzrejE","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":210,"cache_read":7332,"out":6},"subagent_type":"general-purpose","agent_id":"a00a804801056aacf"}
+   9.66  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":7669,"tool_uses":6,"duration_ms":7862},"last_tool_name":"Read","description":"Reading chain/ember.txt","tool_use_id":"fn6oGJ"}
+   9.67  user  {"parent":"fn6oGJ","blocks":["tool_result:GbEuRj"],"subagent_type":"general-purpose","agent_id":"a00a804801056aacf"}
+  10.77  assistant  {"parent":"fn6oGJ","blocks":["tool_use:Read:ubUZb9"],"id":"85HM12","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":258,"cache_read":7542,"out":16},"subagent_type":"general-purpose","agent_id":"a00a804801056aacf"}
+  10.77  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":7894,"tool_uses":7,"duration_ms":8973},"last_tool_name":"Read","description":"Reading chain/fjord.txt","tool_use_id":"fn6oGJ"}
+  10.78  user  {"parent":"fn6oGJ","blocks":["tool_result:ubUZb9"],"subagent_type":"general-purpose","agent_id":"a00a804801056aacf"}
+  11.89  assistant  {"parent":"fn6oGJ","blocks":["thinking"],"id":"EzMD1z","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":215,"cache_read":7800,"out":3},"subagent_type":"general-purpose","agent_id":"a00a804801056aacf"}
+  12.16  assistant  {"parent":"fn6oGJ","blocks":["tool_use:Read:AkPhVX"],"id":"EzMD1z","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":215,"cache_read":7800,"out":3},"subagent_type":"general-purpose","agent_id":"a00a804801056aacf"}
+  12.16  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":8164,"tool_uses":8,"duration_ms":10368},"last_tool_name":"Read","description":"Reading chain/glade.txt","tool_use_id":"fn6oGJ"}
+  12.18  user  {"parent":"fn6oGJ","blocks":["tool_result:AkPhVX"],"subagent_type":"general-purpose","agent_id":"a00a804801056aacf"}
+  13.21  assistant  {"parent":"fn6oGJ","blocks":["thinking"],"id":"Sj1UGF","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":260,"cache_read":8015,"out":3},"subagent_type":"general-purpose","agent_id":"a00a804801056aacf"}
+  14.86  assistant  {"parent":"fn6oGJ","blocks":["text"],"id":"Sj1UGF","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":260,"cache_read":8015,"out":3},"subagent_type":"general-purpose","agent_id":"a00a804801056aacf"}
+  14.89  system  {"subtype":"task_updated","keys":["patch","run_id","task_id"],"patch":{"status":"completed","end_time":1795282140185}}
+  14.89  system  {"subtype":"task_notification","keys":["output_file","run_id","status","summary","task_id","tool_use_id","usage"],"status":"completed","usage":{"total_tokens":8865,"tool_uses":8,"duration_ms":13097},"tool_use_id":"fn6oGJ"}
+  14.89  system  {"subtype":"background_tasks_changed","keys":["tasks"],"tasks":0}
+  14.94  system  {"subtype":"init"}
+  14.95  result  {"subtype":"error_max_budget_usd","terminal_reason":"budget_exhausted","num_turns":1,"total_cost_usd":0.00267578,"errors":["Reached maximum budget ($0.0025)"]}
+  17.95  _probe  {"note":"3 s after result 2: process alive"}
+  23.13  _probe  {"note":"standard input closed"}

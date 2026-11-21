@@ -1,0 +1,18 @@
+   0.00  _probe  {"note":"message 1 sent (chain)"}
+   0.39  system  {"subtype":"init"}
+   1.19  stream_event  {"parent":null,"event":"message_start","id":"9fnfmn","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":3041,"cache_read":3131,"out":16}}
+   1.56  assistant  {"parent":null,"blocks":["tool_use:Read:REpa5F"],"id":"9fnfmn","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":3041,"cache_read":3131,"out":16}}
+   1.57  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":3041,"cache_read":3131,"out":126},"stop_reason":"tool_use"}
+   1.57  rate_limit_event  {"rate_limit_info":{"status":"allowed","resetsAt":1795615200,"rateLimitType":"seven_day","overageStatus":"rejected","overageDisabledReason":"org_level_disabled","isUsingOverage":false,"unifiedWindows":{"seven_day":{"utilization":0.36,"resetsAt":1795615200,"status":"allowed"}}}}
+   1.59  user  {"parent":null,"blocks":["tool_result:REpa5F"]}
+   2.35  stream_event  {"parent":null,"event":"message_start","id":"SuSpoT","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":205,"cache_read":6172,"out":16}}
+   2.67  assistant  {"parent":null,"blocks":["tool_use:Read:qFAK1C"],"id":"SuSpoT","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":205,"cache_read":6172,"out":16}}
+   2.68  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":205,"cache_read":6172,"out":127},"stop_reason":"tool_use"}
+   2.70  user  {"parent":null,"blocks":["tool_result:qFAK1C"]}
+   3.46  stream_event  {"parent":null,"event":"message_start","id":"42N4vG","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":210,"cache_read":6377,"out":16}}
+   3.75  assistant  {"parent":null,"blocks":["tool_use:Read:e2YJeV"],"id":"42N4vG","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":210,"cache_read":6377,"out":16}}
+   3.75  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":210,"cache_read":6377,"out":127},"stop_reason":"tool_use"}
+   3.77  user  {"parent":null,"blocks":["tool_result:e2YJeV"]}
+   3.78  result  {"subtype":"error_max_turns","terminal_reason":"max_turns","num_turns":4,"total_cost_usd":0.0010386000000000002,"errors":["Reached maximum number of turns (3)"]}
+   6.79  _probe  {"note":"3 s after result 1: process alive"}
+   6.79  _probe  {"note":"standard input closed"}

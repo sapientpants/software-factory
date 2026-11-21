@@ -1,0 +1,18 @@
+   0.00  _probe  {"note":"message 1 sent (chain)"}
+   0.38  system  {"subtype":"init"}
+   1.17  stream_event  {"parent":null,"event":"message_start","id":"gz4aZb","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":719,"cache_read":5454,"out":16}}
+   1.56  assistant  {"parent":null,"blocks":["tool_use:Read:jYW5gJ"],"id":"gz4aZb","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":719,"cache_read":5454,"out":16}}
+   1.57  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":719,"cache_read":5454,"out":126},"stop_reason":"tool_use"}
+   1.57  rate_limit_event  {"rate_limit_info":{"status":"allowed","resetsAt":1795615200,"rateLimitType":"seven_day","overageStatus":"rejected","overageDisabledReason":"org_level_disabled","isUsingOverage":false,"unifiedWindows":{"seven_day":{"utilization":0.36,"resetsAt":1795615200,"status":"allowed"}}}}
+   1.59  user  {"parent":null,"blocks":["tool_result:jYW5gJ"]}
+   2.47  stream_event  {"parent":null,"event":"message_start","id":"zyApmU","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":205,"cache_read":6173,"out":16}}
+   2.75  assistant  {"parent":null,"blocks":["tool_use:Read:2khAom"],"id":"zyApmU","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":205,"cache_read":6173,"out":16}}
+   2.76  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":205,"cache_read":6173,"out":127},"stop_reason":"tool_use"}
+   2.77  user  {"parent":null,"blocks":["tool_result:2khAom"]}
+   3.54  stream_event  {"parent":null,"event":"message_start","id":"HkyE6R","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":210,"cache_read":6378,"out":16}}
+   3.84  assistant  {"parent":null,"blocks":["tool_use:Read:A4EmXo"],"id":"HkyE6R","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":210,"cache_read":6378,"out":16}}
+   3.85  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":210,"cache_read":6378,"out":127},"stop_reason":"tool_use"}
+   3.87  user  {"parent":null,"blocks":["tool_result:A4EmXo"]}
+   3.87  result  {"subtype":"error_max_turns","terminal_reason":"max_turns","num_turns":4,"total_cost_usd":0.00059745,"errors":["Reached maximum number of turns (3)"]}
+   6.88  _probe  {"note":"3 s after result 1: process alive"}
+   6.88  _probe  {"note":"standard input closed"}

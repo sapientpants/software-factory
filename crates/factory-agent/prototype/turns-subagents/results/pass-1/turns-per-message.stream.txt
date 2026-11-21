@@ -1,0 +1,89 @@
+   0.00  _probe  {"note":"message 1 sent (read)"}
+   0.38  system  {"subtype":"init"}
+   1.21  stream_event  {"parent":null,"event":"message_start","id":"szCw9T","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":676,"cache_read":5452,"out":16}}
+   1.61  assistant  {"parent":null,"blocks":["tool_use:Read:drEeZX"],"id":"szCw9T","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":676,"cache_read":5452,"out":16}}
+   1.62  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":676,"cache_read":5452,"out":121},"stop_reason":"tool_use"}
+   1.63  rate_limit_event  {"rate_limit_info":{"status":"allowed","resetsAt":1795615200,"rateLimitType":"seven_day","overageStatus":"rejected","overageDisabledReason":"org_level_disabled","isUsingOverage":false,"unifiedWindows":{"seven_day":{"utilization":0.36,"resetsAt":1795615200,"status":"allowed"}}}}
+   1.66  user  {"parent":null,"blocks":["tool_result:drEeZX"]}
+   2.48  stream_event  {"parent":null,"event":"message_start","id":"GsSx7y","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":205,"cache_read":6128,"out":24}}
+   2.52  assistant  {"parent":null,"blocks":["tool_use:StructuredOutput:83mcq5"],"id":"GsSx7y","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":205,"cache_read":6128,"out":24}}
+   2.53  user  {"parent":null,"blocks":["tool_result:83mcq5"]}
+   2.53  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":205,"cache_read":6128,"out":61},"stop_reason":"tool_use"}
+   2.53  result  {"subtype":"success","terminal_reason":"completed","num_turns":3,"total_cost_usd":0.0003834}
+   5.54  _probe  {"note":"3 s after result 1: process alive"}
+   5.54  _probe  {"note":"message 2 sent (read)"}
+   5.56  system  {"subtype":"init"}
+   6.35  stream_event  {"parent":null,"event":"message_start","id":"z4SPnH","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":154,"cache_read":6333,"out":7}}
+   6.89  assistant  {"parent":null,"blocks":["thinking"],"id":"z4SPnH","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":154,"cache_read":6333,"out":7}}
+   7.20  assistant  {"parent":null,"blocks":["tool_use:Read:ahpEAz"],"id":"z4SPnH","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":154,"cache_read":6333,"out":7}}
+   7.21  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":154,"cache_read":6333,"out":214},"stop_reason":"tool_use"}
+   7.23  user  {"parent":null,"blocks":["tool_result:ahpEAz"]}
+   8.02  stream_event  {"parent":null,"event":"message_start","id":"qwP3JB","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":298,"cache_read":6487,"out":9}}
+   8.05  assistant  {"parent":null,"blocks":["text"],"id":"qwP3JB","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":298,"cache_read":6487,"out":9}}
+   8.05  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":298,"cache_read":6487,"out":12},"stop_reason":"end_turn"}
+   8.06  user  {"parent":null,"blocks":["text"],"isSynthetic":true}
+   8.83  stream_event  {"parent":null,"event":"message_start","id":"WMNmw4","model":"claude-haiku-5-5","usage":{"in":4,"cache_write":52,"cache_read":6785,"out":24}}
+   9.08  assistant  {"parent":null,"blocks":["tool_use:StructuredOutput:scqYsL"],"id":"WMNmw4","model":"claude-haiku-5-5","usage":{"in":4,"cache_write":52,"cache_read":6785,"out":24}}
+   9.09  user  {"parent":null,"blocks":["tool_result:scqYsL"]}
+   9.09  stream_event  {"parent":null,"event":"message_delta","usage":{"in":4,"cache_write":52,"cache_read":6785,"out":61},"stop_reason":"tool_use"}
+   9.09  result  {"subtype":"success","terminal_reason":"completed","num_turns":4,"total_cost_usd":0.00082455}
+  12.09  _probe  {"note":"3 s after result 2: process alive"}
+  12.09  _probe  {"note":"message 3 sent (read)"}
+  12.10  system  {"subtype":"init"}
+  12.94  stream_event  {"parent":null,"event":"message_start","id":"cz7YPF","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":156,"cache_read":6837,"out":5}}
+  13.24  assistant  {"parent":null,"blocks":["thinking"],"id":"cz7YPF","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":156,"cache_read":6837,"out":5}}
+  13.48  assistant  {"parent":null,"blocks":["tool_use:Read:B7mKiM"],"id":"cz7YPF","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":156,"cache_read":6837,"out":5}}
+  13.48  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":156,"cache_read":6837,"out":148},"stop_reason":"tool_use"}
+  13.50  user  {"parent":null,"blocks":["tool_result:B7mKiM"]}
+  14.36  stream_event  {"parent":null,"event":"message_start","id":"oNnLG3","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":232,"cache_read":6993,"out":9}}
+  14.37  assistant  {"parent":null,"blocks":["text"],"id":"oNnLG3","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":232,"cache_read":6993,"out":9}}
+  14.37  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":232,"cache_read":6993,"out":12},"stop_reason":"end_turn"}
+  14.37  user  {"parent":null,"blocks":["text"],"isSynthetic":true}
+  15.18  stream_event  {"parent":null,"event":"message_start","id":"ekduUb","model":"claude-haiku-5-5","usage":{"in":4,"cache_write":52,"cache_read":7225,"out":24}}
+  15.42  assistant  {"parent":null,"blocks":["tool_use:StructuredOutput:K45D2E"],"id":"ekduUb","model":"claude-haiku-5-5","usage":{"in":4,"cache_write":52,"cache_read":7225,"out":24}}
+  15.43  user  {"parent":null,"blocks":["tool_result:K45D2E"]}
+  15.43  stream_event  {"parent":null,"event":"message_delta","usage":{"in":4,"cache_write":52,"cache_read":7225,"out":61},"stop_reason":"tool_use"}
+  15.43  result  {"subtype":"success","terminal_reason":"completed","num_turns":4,"total_cost_usd":0.0012344}
+  18.44  _probe  {"note":"3 s after result 3: process alive"}
+  18.44  _probe  {"note":"message 4 sent (chain)"}
+  18.46  system  {"subtype":"init"}
+  19.48  stream_event  {"parent":null,"event":"message_start","id":"3c5UGM","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":197,"cache_read":7277,"out":16}}
+  19.68  assistant  {"parent":null,"blocks":["tool_use:Read:8tEa9D"],"id":"3c5UGM","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":197,"cache_read":7277,"out":16}}
+  19.69  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":197,"cache_read":7277,"out":125},"stop_reason":"tool_use"}
+  19.71  user  {"parent":null,"blocks":["tool_result:8tEa9D"]}
+  20.47  stream_event  {"parent":null,"event":"message_start","id":"wBG454","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":204,"cache_read":7474,"out":16}}
+  20.77  assistant  {"parent":null,"blocks":["tool_use:Read:XMHkjH"],"id":"wBG454","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":204,"cache_read":7474,"out":16}}
+  20.77  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":204,"cache_read":7474,"out":126},"stop_reason":"tool_use"}
+  20.79  user  {"parent":null,"blocks":["tool_result:XMHkjH"]}
+  21.57  stream_event  {"parent":null,"event":"message_start","id":"z9iPyf","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":205,"cache_read":7678,"out":16}}
+  21.87  assistant  {"parent":null,"blocks":["tool_use:Read:T3ufqP"],"id":"z9iPyf","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":205,"cache_read":7678,"out":16}}
+  21.88  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":205,"cache_read":7678,"out":126},"stop_reason":"tool_use"}
+  21.89  user  {"parent":null,"blocks":["tool_result:T3ufqP"]}
+  22.79  stream_event  {"parent":null,"event":"message_start","id":"hzZrNe","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":206,"cache_read":7883,"out":16}}
+  23.12  assistant  {"parent":null,"blocks":["tool_use:Read:U1BJTm"],"id":"hzZrNe","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":206,"cache_read":7883,"out":16}}
+  23.12  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":206,"cache_read":7883,"out":127},"stop_reason":"tool_use"}
+  23.14  user  {"parent":null,"blocks":["tool_result:U1BJTm"]}
+  24.02  stream_event  {"parent":null,"event":"message_start","id":"7rr54G","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":206,"cache_read":8089,"out":16}}
+  24.40  assistant  {"parent":null,"blocks":["tool_use:Read:hmsjZW"],"id":"7rr54G","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":206,"cache_read":8089,"out":16}}
+  24.41  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":206,"cache_read":8089,"out":126},"stop_reason":"tool_use"}
+  24.42  user  {"parent":null,"blocks":["tool_result:hmsjZW"]}
+  24.43  result  {"subtype":"error_max_turns","terminal_reason":"max_turns","num_turns":6,"total_cost_usd":0.00213801,"errors":["Reached maximum number of turns (5)"]}
+  27.44  _probe  {"note":"3 s after result 4: process alive"}
+  27.44  _probe  {"note":"message 5 sent (read)"}
+  27.46  system  {"subtype":"init"}
+  28.37  stream_event  {"parent":null,"event":"message_start","id":"p78Ge5","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":283,"cache_read":8295,"out":2}}
+  28.86  assistant  {"parent":null,"blocks":["thinking"],"id":"p78Ge5","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":283,"cache_read":8295,"out":2}}
+  29.06  assistant  {"parent":null,"blocks":["tool_use:Read:CSq68H"],"id":"p78Ge5","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":283,"cache_read":8295,"out":2}}
+  29.07  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":283,"cache_read":8295,"out":166},"stop_reason":"tool_use"}
+  29.09  user  {"parent":null,"blocks":["tool_result:CSq68H"]}
+  30.07  stream_event  {"parent":null,"event":"message_start","id":"hhDve3","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":250,"cache_read":8578,"out":8}}
+  30.09  assistant  {"parent":null,"blocks":["text"],"id":"hhDve3","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":250,"cache_read":8578,"out":8}}
+  30.09  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":250,"cache_read":8578,"out":12},"stop_reason":"end_turn"}
+  30.10  user  {"parent":null,"blocks":["text"],"isSynthetic":true}
+  30.92  stream_event  {"parent":null,"event":"message_start","id":"u9z4be","model":"claude-haiku-5-5","usage":{"in":4,"cache_write":52,"cache_read":8828,"out":24}}
+  31.28  assistant  {"parent":null,"blocks":["tool_use:StructuredOutput:HrcmLT"],"id":"u9z4be","model":"claude-haiku-5-5","usage":{"in":4,"cache_write":52,"cache_read":8828,"out":24}}
+  31.29  user  {"parent":null,"blocks":["tool_result:HrcmLT"]}
+  31.29  stream_event  {"parent":null,"event":"message_delta","usage":{"in":4,"cache_write":52,"cache_read":8828,"out":61},"stop_reason":"tool_use"}
+  31.29  result  {"subtype":"success","terminal_reason":"completed","num_turns":4,"total_cost_usd":0.0026323199999999996}
+  34.30  _probe  {"note":"3 s after result 5: process alive"}
+  34.30  _probe  {"note":"standard input closed"}

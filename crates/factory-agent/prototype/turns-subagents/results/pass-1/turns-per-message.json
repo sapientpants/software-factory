@@ -1,0 +1,2053 @@
+{
+  "case": "turns-per-message",
+  "about": "--max-turns 5; three messages that fit, one that does not, one more after the cap",
+  "command": [
+    "claude",
+    "-p",
+    "--setting-sources",
+    "user",
+    "--output-format",
+    "stream-json",
+    "--verbose",
+    "--input-format",
+    "stream-json",
+    "--session-id",
+    "cb20ec77-8bf8-49ca-9afc-09204683d6b0",
+    "--model",
+    "haiku",
+    "--permission-mode",
+    "dontAsk",
+    "--permission-prompts",
+    "none",
+    "--tools",
+    "Read,Glob,Grep",
+    "--allowedTools",
+    "Read,Glob,Grep",
+    "--settings",
+    "<out>/turns-per-message/host/settings.json",
+    "--mcp-config",
+    "<out>/turns-per-message/host/mcp.json",
+    "--strict-mcp-config",
+    "--json-schema",
+    "{\"type\": \"object\", \"properties\": {\"answer\": {\"type\": \"string\"}}, \"required\": [\"answer\"], \"additionalProperties\": false}",
+    "--max-turns",
+    "5",
+    "--max-budget-usd",
+    "1",
+    "--append-system-prompt-file",
+    "<out>/turns-per-message/host/append.md",
+    "--include-partial-messages",
+    "--debug-file",
+    "<out>/turns-per-message/host/debug.log"
+  ],
+  "messages": [
+    "Use the Read tool to read README.md in the current directory. Answer with its first line.",
+    "Use the Read tool to read README.md in the current directory. Answer with its first line.",
+    "Use the Read tool to read README.md in the current directory. Answer with its first line.",
+    "Read the file chain/start.txt with the Read tool. Each file of the chain names the next file. Follow the chain with one Read call per response, never two in one response, until a file gives the final word. Answer with the final word.",
+    "Use the Read tool to read README.md in the current directory. Answer with its first line."
+  ],
+  "init": {
+    "claude_code_version": "2.1.323",
+    "model": "claude-haiku-5-5",
+    "tools": [
+      "Glob",
+      "Grep",
+      "Read",
+      "StructuredOutput"
+    ],
+    "agents": [
+      "claude",
+      "Explore",
+      "general-purpose",
+      "Plan",
+      "statusline-setup"
+    ],
+    "permissionMode": "dontAsk",
+    "apiKeySource": "none"
+  },
+  "counts": {
+    "lines": 417,
+    "main_loop_calls": 16,
+    "main_loop_output_tokens_by_message_delta": 1559,
+    "main_loop_output_tokens_by_assistant_lines": 232,
+    "subagent_calls_shown": 0,
+    "subagent_output_tokens_by_assistant_lines": 0,
+    "subagent_models": [],
+    "stream_events": {
+      "main": {
+        "message_start": 16,
+        "content_block_start": 19,
+        "content_block_delta": 267,
+        "content_block_stop": 19,
+        "message_delta": 16,
+        "message_stop": 16
+      }
+    },
+    "other_lines": {
+      "system/status": 16,
+      "system/thinking_tokens": 2
+    }
+  },
+  "results": [
+    {
+      "subtype": "success",
+      "is_error": false,
+      "terminal_reason": "completed",
+      "num_turns": 3,
+      "total_cost_usd": 0.0003834,
+      "usage": {
+        "input_tokens": 4,
+        "cache_creation_input_tokens": 881,
+        "cache_read_input_tokens": 11580,
+        "output_tokens": 182,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 881,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage": {
+        "claude-haiku-5-5": {
+          "inputTokens": 4,
+          "outputTokens": 182,
+          "cacheReadInputTokens": 11580,
+          "cacheCreationInputTokens": 881,
+          "webSearchRequests": 0,
+          "costUSD": 0.0003834,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 0,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 881,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "model_usage_since_last_result": {
+        "claude-haiku-5-5": {
+          "inputTokens": 4,
+          "outputTokens": 182,
+          "cacheReadInputTokens": 11580,
+          "cacheCreationInputTokens": 881,
+          "webSearchRequests": 0,
+          "costUSD": 0.0003834,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 0,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 881,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "subagent_stats": {
+        "spawned": 0,
+        "requested": {
+          "background": 0,
+          "foreground": 0,
+          "unset": 0
+        },
+        "started_in_background": 0,
+        "max_depth": 0,
+        "spawned_by_subagents": 0,
+        "completed": 0,
+        "failed": 0,
+        "killed": {
+          "parent": 0,
+          "user": 0,
+          "system": 0
+        },
+        "refused": {
+          "depth_limit": 0,
+          "concurrency_limit": 0,
+          "budget": 0
+        },
+        "by_type": {}
+      },
+      "structured_output": {
+        "answer": "Probe fixture for P-26"
+      },
+      "stop_reason": "tool_use",
+      "queued_turn_count": 0,
+      "result_index": 0,
+      "permission_denials": [],
+      "api_error_status": null,
+      "result": "{\"answer\":\"Probe fixture for P-26\"}"
+    },
+    {
+      "subtype": "success",
+      "is_error": false,
+      "terminal_reason": "completed",
+      "num_turns": 4,
+      "total_cost_usd": 0.00082455,
+      "usage": {
+        "input_tokens": 8,
+        "cache_creation_input_tokens": 504,
+        "cache_read_input_tokens": 19605,
+        "output_tokens": 287,
+        "output_tokens_details": {
+          "thinking_tokens": 92
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 504,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage": {
+        "claude-haiku-5-5": {
+          "inputTokens": 12,
+          "outputTokens": 469,
+          "cacheReadInputTokens": 31185,
+          "cacheCreationInputTokens": 1385,
+          "webSearchRequests": 0,
+          "costUSD": 0.00082455,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 92,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 1385,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "model_usage_since_last_result": {
+        "claude-haiku-5-5": {
+          "inputTokens": 8,
+          "outputTokens": 287,
+          "cacheReadInputTokens": 19605,
+          "cacheCreationInputTokens": 504,
+          "webSearchRequests": 0,
+          "costUSD": 0.00044115,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 92,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 504,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "subagent_stats": {
+        "spawned": 0,
+        "requested": {
+          "background": 0,
+          "foreground": 0,
+          "unset": 0
+        },
+        "started_in_background": 0,
+        "max_depth": 0,
+        "spawned_by_subagents": 0,
+        "completed": 0,
+        "failed": 0,
+        "killed": {
+          "parent": 0,
+          "user": 0,
+          "system": 0
+        },
+        "refused": {
+          "depth_limit": 0,
+          "concurrency_limit": 0,
+          "budget": 0
+        },
+        "by_type": {}
+      },
+      "structured_output": {
+        "answer": "Probe fixture for P-26"
+      },
+      "stop_reason": "tool_use",
+      "queued_turn_count": 0,
+      "result_index": 1,
+      "permission_denials": [],
+      "api_error_status": null,
+      "result": "{\"answer\":\"Probe fixture for P-26\"}"
+    },
+    {
+      "subtype": "success",
+      "is_error": false,
+      "terminal_reason": "completed",
+      "num_turns": 4,
+      "total_cost_usd": 0.0012344,
+      "usage": {
+        "input_tokens": 8,
+        "cache_creation_input_tokens": 440,
+        "cache_read_input_tokens": 21055,
+        "output_tokens": 221,
+        "output_tokens_details": {
+          "thinking_tokens": 26
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 440,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage": {
+        "claude-haiku-5-5": {
+          "inputTokens": 20,
+          "outputTokens": 690,
+          "cacheReadInputTokens": 52240,
+          "cacheCreationInputTokens": 1825,
+          "webSearchRequests": 0,
+          "costUSD": 0.0012344,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 118,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 1825,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "model_usage_since_last_result": {
+        "claude-haiku-5-5": {
+          "inputTokens": 8,
+          "outputTokens": 221,
+          "cacheReadInputTokens": 21055,
+          "cacheCreationInputTokens": 440,
+          "webSearchRequests": 0,
+          "costUSD": 0.00040984999999999996,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 26,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 440,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "subagent_stats": {
+        "spawned": 0,
+        "requested": {
+          "background": 0,
+          "foreground": 0,
+          "unset": 0
+        },
+        "started_in_background": 0,
+        "max_depth": 0,
+        "spawned_by_subagents": 0,
+        "completed": 0,
+        "failed": 0,
+        "killed": {
+          "parent": 0,
+          "user": 0,
+          "system": 0
+        },
+        "refused": {
+          "depth_limit": 0,
+          "concurrency_limit": 0,
+          "budget": 0
+        },
+        "by_type": {}
+      },
+      "structured_output": {
+        "answer": "Probe fixture for P-26"
+      },
+      "stop_reason": "tool_use",
+      "queued_turn_count": 0,
+      "result_index": 2,
+      "permission_denials": [],
+      "api_error_status": null,
+      "result": "{\"answer\":\"Probe fixture for P-26\"}"
+    },
+    {
+      "subtype": "error_max_turns",
+      "is_error": true,
+      "terminal_reason": "max_turns",
+      "errors": [
+        "Reached maximum number of turns (5)"
+      ],
+      "num_turns": 6,
+      "total_cost_usd": 0.00213801,
+      "usage": {
+        "input_tokens": 10,
+        "cache_creation_input_tokens": 1018,
+        "cache_read_input_tokens": 38401,
+        "output_tokens": 630,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 1018,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage": {
+        "claude-haiku-5-5": {
+          "inputTokens": 30,
+          "outputTokens": 1320,
+          "cacheReadInputTokens": 90641,
+          "cacheCreationInputTokens": 2843,
+          "webSearchRequests": 0,
+          "costUSD": 0.00213801,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 118,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 2843,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "model_usage_since_last_result": {
+        "claude-haiku-5-5": {
+          "inputTokens": 10,
+          "outputTokens": 630,
+          "cacheReadInputTokens": 38401,
+          "cacheCreationInputTokens": 1018,
+          "webSearchRequests": 0,
+          "costUSD": 0.00090361,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 0,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 1018,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "subagent_stats": {
+        "spawned": 0,
+        "requested": {
+          "background": 0,
+          "foreground": 0,
+          "unset": 0
+        },
+        "started_in_background": 0,
+        "max_depth": 0,
+        "spawned_by_subagents": 0,
+        "completed": 0,
+        "failed": 0,
+        "killed": {
+          "parent": 0,
+          "user": 0,
+          "system": 0
+        },
+        "refused": {
+          "depth_limit": 0,
+          "concurrency_limit": 0,
+          "budget": 0
+        },
+        "by_type": {}
+      },
+      "stop_reason": "tool_use",
+      "queued_turn_count": 0,
+      "result_index": 3,
+      "permission_denials": []
+    },
+    {
+      "subtype": "success",
+      "is_error": false,
+      "terminal_reason": "completed",
+      "num_turns": 4,
+      "total_cost_usd": 0.0026323199999999996,
+      "usage": {
+        "input_tokens": 8,
+        "cache_creation_input_tokens": 585,
+        "cache_read_input_tokens": 25701,
+        "output_tokens": 239,
+        "output_tokens_details": {
+          "thinking_tokens": 44
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 585,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage": {
+        "claude-haiku-5-5": {
+          "inputTokens": 38,
+          "outputTokens": 1559,
+          "cacheReadInputTokens": 116342,
+          "cacheCreationInputTokens": 3428,
+          "webSearchRequests": 0,
+          "costUSD": 0.0026323199999999996,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 162,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 3428,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "model_usage_since_last_result": {
+        "claude-haiku-5-5": {
+          "inputTokens": 8,
+          "outputTokens": 239,
+          "cacheReadInputTokens": 25701,
+          "cacheCreationInputTokens": 585,
+          "webSearchRequests": 0,
+          "costUSD": 0.00049431,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 44,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 585,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "subagent_stats": {
+        "spawned": 0,
+        "requested": {
+          "background": 0,
+          "foreground": 0,
+          "unset": 0
+        },
+        "started_in_background": 0,
+        "max_depth": 0,
+        "spawned_by_subagents": 0,
+        "completed": 0,
+        "failed": 0,
+        "killed": {
+          "parent": 0,
+          "user": 0,
+          "system": 0
+        },
+        "refused": {
+          "depth_limit": 0,
+          "concurrency_limit": 0,
+          "budget": 0
+        },
+        "by_type": {}
+      },
+      "structured_output": {
+        "answer": "Probe fixture for P-26"
+      },
+      "stop_reason": "tool_use",
+      "queued_turn_count": 0,
+      "result_index": 4,
+      "permission_denials": [],
+      "api_error_status": null,
+      "result": "{\"answer\":\"Probe fixture for P-26\"}"
+    }
+  ],
+  "stream": [
+    {
+      "_t": 0.0,
+      "note": "message 1 sent (read)",
+      "type": "_probe"
+    },
+    {
+      "_t": 0.38,
+      "type": "system",
+      "subtype": "init"
+    },
+    {
+      "_t": 1.21,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_start",
+      "id": "szCw9T",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 676,
+        "cache_read": 5452,
+        "out": 16
+      }
+    },
+    {
+      "_t": 1.61,
+      "type": "assistant",
+      "parent": null,
+      "blocks": [
+        "tool_use:Read:drEeZX"
+      ],
+      "id": "szCw9T",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 676,
+        "cache_read": 5452,
+        "out": 16
+      }
+    },
+    {
+      "_t": 1.62,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_delta",
+      "usage": {
+        "in": 2,
+        "cache_write": 676,
+        "cache_read": 5452,
+        "out": 121
+      },
+      "stop_reason": "tool_use"
+    },
+    {
+      "_t": 1.63,
+      "type": "rate_limit_event",
+      "rate_limit_info": {
+        "status": "allowed",
+        "resetsAt": 1795615200,
+        "rateLimitType": "seven_day",
+        "overageStatus": "rejected",
+        "overageDisabledReason": "org_level_disabled",
+        "isUsingOverage": false,
+        "unifiedWindows": {
+          "seven_day": {
+            "utilization": 0.36,
+            "resetsAt": 1795615200,
+            "status": "allowed"
+          }
+        }
+      }
+    },
+    {
+      "_t": 1.66,
+      "type": "user",
+      "parent": null,
+      "blocks": [
+        "tool_result:drEeZX"
+      ]
+    },
+    {
+      "_t": 2.48,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_start",
+      "id": "GsSx7y",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 205,
+        "cache_read": 6128,
+        "out": 24
+      }
+    },
+    {
+      "_t": 2.52,
+      "type": "assistant",
+      "parent": null,
+      "blocks": [
+        "tool_use:StructuredOutput:83mcq5"
+      ],
+      "id": "GsSx7y",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 205,
+        "cache_read": 6128,
+        "out": 24
+      }
+    },
+    {
+      "_t": 2.53,
+      "type": "user",
+      "parent": null,
+      "blocks": [
+        "tool_result:83mcq5"
+      ]
+    },
+    {
+      "_t": 2.53,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_delta",
+      "usage": {
+        "in": 2,
+        "cache_write": 205,
+        "cache_read": 6128,
+        "out": 61
+      },
+      "stop_reason": "tool_use"
+    },
+    {
+      "_t": 2.53,
+      "type": "result",
+      "subtype": "success",
+      "is_error": false,
+      "terminal_reason": "completed",
+      "num_turns": 3,
+      "total_cost_usd": 0.0003834,
+      "usage": {
+        "input_tokens": 4,
+        "cache_creation_input_tokens": 881,
+        "cache_read_input_tokens": 11580,
+        "output_tokens": 182,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 881,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage": {
+        "claude-haiku-5-5": {
+          "inputTokens": 4,
+          "outputTokens": 182,
+          "cacheReadInputTokens": 11580,
+          "cacheCreationInputTokens": 881,
+          "webSearchRequests": 0,
+          "costUSD": 0.0003834,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 0,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 881,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "model_usage_since_last_result": {
+        "claude-haiku-5-5": {
+          "inputTokens": 4,
+          "outputTokens": 182,
+          "cacheReadInputTokens": 11580,
+          "cacheCreationInputTokens": 881,
+          "webSearchRequests": 0,
+          "costUSD": 0.0003834,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 0,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 881,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "subagent_stats": {
+        "spawned": 0,
+        "requested": {
+          "background": 0,
+          "foreground": 0,
+          "unset": 0
+        },
+        "started_in_background": 0,
+        "max_depth": 0,
+        "spawned_by_subagents": 0,
+        "completed": 0,
+        "failed": 0,
+        "killed": {
+          "parent": 0,
+          "user": 0,
+          "system": 0
+        },
+        "refused": {
+          "depth_limit": 0,
+          "concurrency_limit": 0,
+          "budget": 0
+        },
+        "by_type": {}
+      },
+      "structured_output": {
+        "answer": "Probe fixture for P-26"
+      },
+      "stop_reason": "tool_use",
+      "queued_turn_count": 0,
+      "result_index": 0,
+      "permission_denials": [],
+      "api_error_status": null,
+      "result": "{\"answer\":\"Probe fixture for P-26\"}"
+    },
+    {
+      "_t": 5.54,
+      "note": "3 s after result 1: process alive",
+      "type": "_probe"
+    },
+    {
+      "_t": 5.54,
+      "note": "message 2 sent (read)",
+      "type": "_probe"
+    },
+    {
+      "_t": 5.56,
+      "type": "system",
+      "subtype": "init"
+    },
+    {
+      "_t": 6.35,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_start",
+      "id": "z4SPnH",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 154,
+        "cache_read": 6333,
+        "out": 7
+      }
+    },
+    {
+      "_t": 6.89,
+      "type": "assistant",
+      "parent": null,
+      "blocks": [
+        "thinking"
+      ],
+      "id": "z4SPnH",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 154,
+        "cache_read": 6333,
+        "out": 7
+      }
+    },
+    {
+      "_t": 7.2,
+      "type": "assistant",
+      "parent": null,
+      "blocks": [
+        "tool_use:Read:ahpEAz"
+      ],
+      "id": "z4SPnH",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 154,
+        "cache_read": 6333,
+        "out": 7
+      }
+    },
+    {
+      "_t": 7.21,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_delta",
+      "usage": {
+        "in": 2,
+        "cache_write": 154,
+        "cache_read": 6333,
+        "out": 214
+      },
+      "stop_reason": "tool_use"
+    },
+    {
+      "_t": 7.23,
+      "type": "user",
+      "parent": null,
+      "blocks": [
+        "tool_result:ahpEAz"
+      ]
+    },
+    {
+      "_t": 8.02,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_start",
+      "id": "qwP3JB",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 298,
+        "cache_read": 6487,
+        "out": 9
+      }
+    },
+    {
+      "_t": 8.05,
+      "type": "assistant",
+      "parent": null,
+      "blocks": [
+        "text"
+      ],
+      "id": "qwP3JB",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 298,
+        "cache_read": 6487,
+        "out": 9
+      }
+    },
+    {
+      "_t": 8.05,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_delta",
+      "usage": {
+        "in": 2,
+        "cache_write": 298,
+        "cache_read": 6487,
+        "out": 12
+      },
+      "stop_reason": "end_turn"
+    },
+    {
+      "_t": 8.06,
+      "type": "user",
+      "parent": null,
+      "blocks": [
+        "text"
+      ],
+      "isSynthetic": true
+    },
+    {
+      "_t": 8.83,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_start",
+      "id": "WMNmw4",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 4,
+        "cache_write": 52,
+        "cache_read": 6785,
+        "out": 24
+      }
+    },
+    {
+      "_t": 9.08,
+      "type": "assistant",
+      "parent": null,
+      "blocks": [
+        "tool_use:StructuredOutput:scqYsL"
+      ],
+      "id": "WMNmw4",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 4,
+        "cache_write": 52,
+        "cache_read": 6785,
+        "out": 24
+      }
+    },
+    {
+      "_t": 9.09,
+      "type": "user",
+      "parent": null,
+      "blocks": [
+        "tool_result:scqYsL"
+      ]
+    },
+    {
+      "_t": 9.09,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_delta",
+      "usage": {
+        "in": 4,
+        "cache_write": 52,
+        "cache_read": 6785,
+        "out": 61
+      },
+      "stop_reason": "tool_use"
+    },
+    {
+      "_t": 9.09,
+      "type": "result",
+      "subtype": "success",
+      "is_error": false,
+      "terminal_reason": "completed",
+      "num_turns": 4,
+      "total_cost_usd": 0.00082455,
+      "usage": {
+        "input_tokens": 8,
+        "cache_creation_input_tokens": 504,
+        "cache_read_input_tokens": 19605,
+        "output_tokens": 287,
+        "output_tokens_details": {
+          "thinking_tokens": 92
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 504,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage": {
+        "claude-haiku-5-5": {
+          "inputTokens": 12,
+          "outputTokens": 469,
+          "cacheReadInputTokens": 31185,
+          "cacheCreationInputTokens": 1385,
+          "webSearchRequests": 0,
+          "costUSD": 0.00082455,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 92,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 1385,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "model_usage_since_last_result": {
+        "claude-haiku-5-5": {
+          "inputTokens": 8,
+          "outputTokens": 287,
+          "cacheReadInputTokens": 19605,
+          "cacheCreationInputTokens": 504,
+          "webSearchRequests": 0,
+          "costUSD": 0.00044115,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 92,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 504,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "subagent_stats": {
+        "spawned": 0,
+        "requested": {
+          "background": 0,
+          "foreground": 0,
+          "unset": 0
+        },
+        "started_in_background": 0,
+        "max_depth": 0,
+        "spawned_by_subagents": 0,
+        "completed": 0,
+        "failed": 0,
+        "killed": {
+          "parent": 0,
+          "user": 0,
+          "system": 0
+        },
+        "refused": {
+          "depth_limit": 0,
+          "concurrency_limit": 0,
+          "budget": 0
+        },
+        "by_type": {}
+      },
+      "structured_output": {
+        "answer": "Probe fixture for P-26"
+      },
+      "stop_reason": "tool_use",
+      "queued_turn_count": 0,
+      "result_index": 1,
+      "permission_denials": [],
+      "api_error_status": null,
+      "result": "{\"answer\":\"Probe fixture for P-26\"}"
+    },
+    {
+      "_t": 12.09,
+      "note": "3 s after result 2: process alive",
+      "type": "_probe"
+    },
+    {
+      "_t": 12.09,
+      "note": "message 3 sent (read)",
+      "type": "_probe"
+    },
+    {
+      "_t": 12.1,
+      "type": "system",
+      "subtype": "init"
+    },
+    {
+      "_t": 12.94,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_start",
+      "id": "cz7YPF",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 156,
+        "cache_read": 6837,
+        "out": 5
+      }
+    },
+    {
+      "_t": 13.24,
+      "type": "assistant",
+      "parent": null,
+      "blocks": [
+        "thinking"
+      ],
+      "id": "cz7YPF",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 156,
+        "cache_read": 6837,
+        "out": 5
+      }
+    },
+    {
+      "_t": 13.48,
+      "type": "assistant",
+      "parent": null,
+      "blocks": [
+        "tool_use:Read:B7mKiM"
+      ],
+      "id": "cz7YPF",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 156,
+        "cache_read": 6837,
+        "out": 5
+      }
+    },
+    {
+      "_t": 13.48,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_delta",
+      "usage": {
+        "in": 2,
+        "cache_write": 156,
+        "cache_read": 6837,
+        "out": 148
+      },
+      "stop_reason": "tool_use"
+    },
+    {
+      "_t": 13.5,
+      "type": "user",
+      "parent": null,
+      "blocks": [
+        "tool_result:B7mKiM"
+      ]
+    },
+    {
+      "_t": 14.36,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_start",
+      "id": "oNnLG3",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 232,
+        "cache_read": 6993,
+        "out": 9
+      }
+    },
+    {
+      "_t": 14.37,
+      "type": "assistant",
+      "parent": null,
+      "blocks": [
+        "text"
+      ],
+      "id": "oNnLG3",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 232,
+        "cache_read": 6993,
+        "out": 9
+      }
+    },
+    {
+      "_t": 14.37,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_delta",
+      "usage": {
+        "in": 2,
+        "cache_write": 232,
+        "cache_read": 6993,
+        "out": 12
+      },
+      "stop_reason": "end_turn"
+    },
+    {
+      "_t": 14.37,
+      "type": "user",
+      "parent": null,
+      "blocks": [
+        "text"
+      ],
+      "isSynthetic": true
+    },
+    {
+      "_t": 15.18,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_start",
+      "id": "ekduUb",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 4,
+        "cache_write": 52,
+        "cache_read": 7225,
+        "out": 24
+      }
+    },
+    {
+      "_t": 15.42,
+      "type": "assistant",
+      "parent": null,
+      "blocks": [
+        "tool_use:StructuredOutput:K45D2E"
+      ],
+      "id": "ekduUb",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 4,
+        "cache_write": 52,
+        "cache_read": 7225,
+        "out": 24
+      }
+    },
+    {
+      "_t": 15.43,
+      "type": "user",
+      "parent": null,
+      "blocks": [
+        "tool_result:K45D2E"
+      ]
+    },
+    {
+      "_t": 15.43,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_delta",
+      "usage": {
+        "in": 4,
+        "cache_write": 52,
+        "cache_read": 7225,
+        "out": 61
+      },
+      "stop_reason": "tool_use"
+    },
+    {
+      "_t": 15.43,
+      "type": "result",
+      "subtype": "success",
+      "is_error": false,
+      "terminal_reason": "completed",
+      "num_turns": 4,
+      "total_cost_usd": 0.0012344,
+      "usage": {
+        "input_tokens": 8,
+        "cache_creation_input_tokens": 440,
+        "cache_read_input_tokens": 21055,
+        "output_tokens": 221,
+        "output_tokens_details": {
+          "thinking_tokens": 26
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 440,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage": {
+        "claude-haiku-5-5": {
+          "inputTokens": 20,
+          "outputTokens": 690,
+          "cacheReadInputTokens": 52240,
+          "cacheCreationInputTokens": 1825,
+          "webSearchRequests": 0,
+          "costUSD": 0.0012344,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 118,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 1825,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "model_usage_since_last_result": {
+        "claude-haiku-5-5": {
+          "inputTokens": 8,
+          "outputTokens": 221,
+          "cacheReadInputTokens": 21055,
+          "cacheCreationInputTokens": 440,
+          "webSearchRequests": 0,
+          "costUSD": 0.00040984999999999996,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 26,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 440,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "subagent_stats": {
+        "spawned": 0,
+        "requested": {
+          "background": 0,
+          "foreground": 0,
+          "unset": 0
+        },
+        "started_in_background": 0,
+        "max_depth": 0,
+        "spawned_by_subagents": 0,
+        "completed": 0,
+        "failed": 0,
+        "killed": {
+          "parent": 0,
+          "user": 0,
+          "system": 0
+        },
+        "refused": {
+          "depth_limit": 0,
+          "concurrency_limit": 0,
+          "budget": 0
+        },
+        "by_type": {}
+      },
+      "structured_output": {
+        "answer": "Probe fixture for P-26"
+      },
+      "stop_reason": "tool_use",
+      "queued_turn_count": 0,
+      "result_index": 2,
+      "permission_denials": [],
+      "api_error_status": null,
+      "result": "{\"answer\":\"Probe fixture for P-26\"}"
+    },
+    {
+      "_t": 18.44,
+      "note": "3 s after result 3: process alive",
+      "type": "_probe"
+    },
+    {
+      "_t": 18.44,
+      "note": "message 4 sent (chain)",
+      "type": "_probe"
+    },
+    {
+      "_t": 18.46,
+      "type": "system",
+      "subtype": "init"
+    },
+    {
+      "_t": 19.48,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_start",
+      "id": "3c5UGM",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 197,
+        "cache_read": 7277,
+        "out": 16
+      }
+    },
+    {
+      "_t": 19.68,
+      "type": "assistant",
+      "parent": null,
+      "blocks": [
+        "tool_use:Read:8tEa9D"
+      ],
+      "id": "3c5UGM",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 197,
+        "cache_read": 7277,
+        "out": 16
+      }
+    },
+    {
+      "_t": 19.69,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_delta",
+      "usage": {
+        "in": 2,
+        "cache_write": 197,
+        "cache_read": 7277,
+        "out": 125
+      },
+      "stop_reason": "tool_use"
+    },
+    {
+      "_t": 19.71,
+      "type": "user",
+      "parent": null,
+      "blocks": [
+        "tool_result:8tEa9D"
+      ]
+    },
+    {
+      "_t": 20.47,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_start",
+      "id": "wBG454",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 204,
+        "cache_read": 7474,
+        "out": 16
+      }
+    },
+    {
+      "_t": 20.77,
+      "type": "assistant",
+      "parent": null,
+      "blocks": [
+        "tool_use:Read:XMHkjH"
+      ],
+      "id": "wBG454",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 204,
+        "cache_read": 7474,
+        "out": 16
+      }
+    },
+    {
+      "_t": 20.77,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_delta",
+      "usage": {
+        "in": 2,
+        "cache_write": 204,
+        "cache_read": 7474,
+        "out": 126
+      },
+      "stop_reason": "tool_use"
+    },
+    {
+      "_t": 20.79,
+      "type": "user",
+      "parent": null,
+      "blocks": [
+        "tool_result:XMHkjH"
+      ]
+    },
+    {
+      "_t": 21.57,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_start",
+      "id": "z9iPyf",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 205,
+        "cache_read": 7678,
+        "out": 16
+      }
+    },
+    {
+      "_t": 21.87,
+      "type": "assistant",
+      "parent": null,
+      "blocks": [
+        "tool_use:Read:T3ufqP"
+      ],
+      "id": "z9iPyf",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 205,
+        "cache_read": 7678,
+        "out": 16
+      }
+    },
+    {
+      "_t": 21.88,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_delta",
+      "usage": {
+        "in": 2,
+        "cache_write": 205,
+        "cache_read": 7678,
+        "out": 126
+      },
+      "stop_reason": "tool_use"
+    },
+    {
+      "_t": 21.89,
+      "type": "user",
+      "parent": null,
+      "blocks": [
+        "tool_result:T3ufqP"
+      ]
+    },
+    {
+      "_t": 22.79,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_start",
+      "id": "hzZrNe",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 206,
+        "cache_read": 7883,
+        "out": 16
+      }
+    },
+    {
+      "_t": 23.12,
+      "type": "assistant",
+      "parent": null,
+      "blocks": [
+        "tool_use:Read:U1BJTm"
+      ],
+      "id": "hzZrNe",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 206,
+        "cache_read": 7883,
+        "out": 16
+      }
+    },
+    {
+      "_t": 23.12,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_delta",
+      "usage": {
+        "in": 2,
+        "cache_write": 206,
+        "cache_read": 7883,
+        "out": 127
+      },
+      "stop_reason": "tool_use"
+    },
+    {
+      "_t": 23.14,
+      "type": "user",
+      "parent": null,
+      "blocks": [
+        "tool_result:U1BJTm"
+      ]
+    },
+    {
+      "_t": 24.02,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_start",
+      "id": "7rr54G",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 206,
+        "cache_read": 8089,
+        "out": 16
+      }
+    },
+    {
+      "_t": 24.4,
+      "type": "assistant",
+      "parent": null,
+      "blocks": [
+        "tool_use:Read:hmsjZW"
+      ],
+      "id": "7rr54G",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 206,
+        "cache_read": 8089,
+        "out": 16
+      }
+    },
+    {
+      "_t": 24.41,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_delta",
+      "usage": {
+        "in": 2,
+        "cache_write": 206,
+        "cache_read": 8089,
+        "out": 126
+      },
+      "stop_reason": "tool_use"
+    },
+    {
+      "_t": 24.42,
+      "type": "user",
+      "parent": null,
+      "blocks": [
+        "tool_result:hmsjZW"
+      ]
+    },
+    {
+      "_t": 24.43,
+      "type": "result",
+      "subtype": "error_max_turns",
+      "is_error": true,
+      "terminal_reason": "max_turns",
+      "errors": [
+        "Reached maximum number of turns (5)"
+      ],
+      "num_turns": 6,
+      "total_cost_usd": 0.00213801,
+      "usage": {
+        "input_tokens": 10,
+        "cache_creation_input_tokens": 1018,
+        "cache_read_input_tokens": 38401,
+        "output_tokens": 630,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 1018,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage": {
+        "claude-haiku-5-5": {
+          "inputTokens": 30,
+          "outputTokens": 1320,
+          "cacheReadInputTokens": 90641,
+          "cacheCreationInputTokens": 2843,
+          "webSearchRequests": 0,
+          "costUSD": 0.00213801,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 118,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 2843,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "model_usage_since_last_result": {
+        "claude-haiku-5-5": {
+          "inputTokens": 10,
+          "outputTokens": 630,
+          "cacheReadInputTokens": 38401,
+          "cacheCreationInputTokens": 1018,
+          "webSearchRequests": 0,
+          "costUSD": 0.00090361,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 0,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 1018,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "subagent_stats": {
+        "spawned": 0,
+        "requested": {
+          "background": 0,
+          "foreground": 0,
+          "unset": 0
+        },
+        "started_in_background": 0,
+        "max_depth": 0,
+        "spawned_by_subagents": 0,
+        "completed": 0,
+        "failed": 0,
+        "killed": {
+          "parent": 0,
+          "user": 0,
+          "system": 0
+        },
+        "refused": {
+          "depth_limit": 0,
+          "concurrency_limit": 0,
+          "budget": 0
+        },
+        "by_type": {}
+      },
+      "stop_reason": "tool_use",
+      "queued_turn_count": 0,
+      "result_index": 3,
+      "permission_denials": []
+    },
+    {
+      "_t": 27.44,
+      "note": "3 s after result 4: process alive",
+      "type": "_probe"
+    },
+    {
+      "_t": 27.44,
+      "note": "message 5 sent (read)",
+      "type": "_probe"
+    },
+    {
+      "_t": 27.46,
+      "type": "system",
+      "subtype": "init"
+    },
+    {
+      "_t": 28.37,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_start",
+      "id": "p78Ge5",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 283,
+        "cache_read": 8295,
+        "out": 2
+      }
+    },
+    {
+      "_t": 28.86,
+      "type": "assistant",
+      "parent": null,
+      "blocks": [
+        "thinking"
+      ],
+      "id": "p78Ge5",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 283,
+        "cache_read": 8295,
+        "out": 2
+      }
+    },
+    {
+      "_t": 29.06,
+      "type": "assistant",
+      "parent": null,
+      "blocks": [
+        "tool_use:Read:CSq68H"
+      ],
+      "id": "p78Ge5",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 283,
+        "cache_read": 8295,
+        "out": 2
+      }
+    },
+    {
+      "_t": 29.07,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_delta",
+      "usage": {
+        "in": 2,
+        "cache_write": 283,
+        "cache_read": 8295,
+        "out": 166
+      },
+      "stop_reason": "tool_use"
+    },
+    {
+      "_t": 29.09,
+      "type": "user",
+      "parent": null,
+      "blocks": [
+        "tool_result:CSq68H"
+      ]
+    },
+    {
+      "_t": 30.07,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_start",
+      "id": "hhDve3",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 250,
+        "cache_read": 8578,
+        "out": 8
+      }
+    },
+    {
+      "_t": 30.09,
+      "type": "assistant",
+      "parent": null,
+      "blocks": [
+        "text"
+      ],
+      "id": "hhDve3",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 250,
+        "cache_read": 8578,
+        "out": 8
+      }
+    },
+    {
+      "_t": 30.09,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_delta",
+      "usage": {
+        "in": 2,
+        "cache_write": 250,
+        "cache_read": 8578,
+        "out": 12
+      },
+      "stop_reason": "end_turn"
+    },
+    {
+      "_t": 30.1,
+      "type": "user",
+      "parent": null,
+      "blocks": [
+        "text"
+      ],
+      "isSynthetic": true
+    },
+    {
+      "_t": 30.92,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_start",
+      "id": "u9z4be",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 4,
+        "cache_write": 52,
+        "cache_read": 8828,
+        "out": 24
+      }
+    },
+    {
+      "_t": 31.28,
+      "type": "assistant",
+      "parent": null,
+      "blocks": [
+        "tool_use:StructuredOutput:HrcmLT"
+      ],
+      "id": "u9z4be",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 4,
+        "cache_write": 52,
+        "cache_read": 8828,
+        "out": 24
+      }
+    },
+    {
+      "_t": 31.29,
+      "type": "user",
+      "parent": null,
+      "blocks": [
+        "tool_result:HrcmLT"
+      ]
+    },
+    {
+      "_t": 31.29,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_delta",
+      "usage": {
+        "in": 4,
+        "cache_write": 52,
+        "cache_read": 8828,
+        "out": 61
+      },
+      "stop_reason": "tool_use"
+    },
+    {
+      "_t": 31.29,
+      "type": "result",
+      "subtype": "success",
+      "is_error": false,
+      "terminal_reason": "completed",
+      "num_turns": 4,
+      "total_cost_usd": 0.0026323199999999996,
+      "usage": {
+        "input_tokens": 8,
+        "cache_creation_input_tokens": 585,
+        "cache_read_input_tokens": 25701,
+        "output_tokens": 239,
+        "output_tokens_details": {
+          "thinking_tokens": 44
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 585,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage": {
+        "claude-haiku-5-5": {
+          "inputTokens": 38,
+          "outputTokens": 1559,
+          "cacheReadInputTokens": 116342,
+          "cacheCreationInputTokens": 3428,
+          "webSearchRequests": 0,
+          "costUSD": 0.0026323199999999996,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 162,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 3428,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "model_usage_since_last_result": {
+        "claude-haiku-5-5": {
+          "inputTokens": 8,
+          "outputTokens": 239,
+          "cacheReadInputTokens": 25701,
+          "cacheCreationInputTokens": 585,
+          "webSearchRequests": 0,
+          "costUSD": 0.00049431,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 44,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 585,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "subagent_stats": {
+        "spawned": 0,
+        "requested": {
+          "background": 0,
+          "foreground": 0,
+          "unset": 0
+        },
+        "started_in_background": 0,
+        "max_depth": 0,
+        "spawned_by_subagents": 0,
+        "completed": 0,
+        "failed": 0,
+        "killed": {
+          "parent": 0,
+          "user": 0,
+          "system": 0
+        },
+        "refused": {
+          "depth_limit": 0,
+          "concurrency_limit": 0,
+          "budget": 0
+        },
+        "by_type": {}
+      },
+      "structured_output": {
+        "answer": "Probe fixture for P-26"
+      },
+      "stop_reason": "tool_use",
+      "queued_turn_count": 0,
+      "result_index": 4,
+      "permission_denials": [],
+      "api_error_status": null,
+      "result": "{\"answer\":\"Probe fixture for P-26\"}"
+    },
+    {
+      "_t": 34.3,
+      "note": "3 s after result 5: process alive",
+      "type": "_probe"
+    },
+    {
+      "_t": 34.3,
+      "note": "standard input closed",
+      "type": "_probe"
+    }
+  ],
+  "exit_code": 0,
+  "timed_out": false,
+  "wall_seconds": 34.34,
+  "files_holding_the_token": [],
+  "stderr_tail": ""
+}

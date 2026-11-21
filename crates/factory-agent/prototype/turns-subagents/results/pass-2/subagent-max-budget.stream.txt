@@ -1,0 +1,55 @@
+   0.00  _probe  {"note":"message 1 sent (sub-chain)"}
+   0.36  system  {"subtype":"init"}
+   1.18  stream_event  {"parent":null,"event":"message_start","id":"TcKDYF","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":1351,"cache_read":7173,"out":16}}
+   1.68  assistant  {"parent":null,"agent_input":{"description":"Follow file chain","subagent_type":"general-purpose"},"blocks":["tool_use:Agent:ytckBQ"],"id":"TcKDYF","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":1351,"cache_read":7173,"out":16}}
+   1.69  system  {"subtype":"background_tasks_changed","keys":["tasks"],"tasks":1}
+   1.69  system  {"subtype":"task_started","keys":["description","is_backgrounded","prompt","run_id","spawn_depth","subagent_type","task_id","task_type","tool_use_id"],"is_backgrounded":true,"spawn_depth":1,"description":"Follow file chain","tool_use_id":"ytckBQ"}
+   1.70  user  {"parent":null,"blocks":["tool_result:ytckBQ"],"agent_result":{"status":"async_launched","isAsync":true,"resolvedModel":"claude-haiku-5-5"}}
+   1.70  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":1351,"cache_read":7173,"out":168},"stop_reason":"tool_use"}
+   1.70  rate_limit_event  {"rate_limit_info":{"status":"allowed","resetsAt":1795615200,"rateLimitType":"seven_day","overageStatus":"rejected","overageDisabledReason":"org_level_disabled","isUsingOverage":false,"unifiedWindows":{"seven_day":{"utilization":0.36,"resetsAt":1795615200,"status":"allowed"}}}}
+   2.45  stream_event  {"parent":null,"event":"message_start","id":"eV7A5L","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":607,"cache_read":8524,"out":5}}
+   2.71  assistant  {"parent":null,"blocks":["text"],"id":"eV7A5L","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":607,"cache_read":8524,"out":5}}
+   2.82  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":607,"cache_read":8524,"out":36},"stop_reason":"end_turn"}
+   2.83  user  {"parent":null,"blocks":["text"],"isSynthetic":true}
+   2.95  assistant  {"parent":"ytckBQ","blocks":["tool_use:Read:R9RFBA"],"id":"jwqPTk","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":678,"cache_read":5151,"out":17},"subagent_type":"general-purpose","agent_id":"a60830c7c6053183e"}
+   2.95  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":5849,"tool_uses":1,"duration_ms":1261},"last_tool_name":"Read","description":"Reading chain/start.txt","tool_use_id":"ytckBQ"}
+   2.97  user  {"parent":"ytckBQ","blocks":["tool_result:R9RFBA"],"subagent_type":"general-purpose","agent_id":"a60830c7c6053183e"}
+   3.70  stream_event  {"parent":null,"event":"message_start","id":"jPNHKT","model":"claude-haiku-5-5","usage":{"in":4,"cache_write":76,"cache_read":9131,"out":24}}
+   3.93  assistant  {"parent":"ytckBQ","blocks":["thinking"],"id":"K8WVo5","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":780,"cache_read":5829,"out":2},"subagent_type":"general-purpose","agent_id":"a60830c7c6053183e"}
+   4.07  assistant  {"parent":null,"blocks":["tool_use:StructuredOutput:gnGraU"],"id":"jPNHKT","model":"claude-haiku-5-5","usage":{"in":4,"cache_write":76,"cache_read":9131,"out":24}}
+   4.07  user  {"parent":null,"blocks":["tool_result:gnGraU"]}
+   4.07  stream_event  {"parent":null,"event":"message_delta","usage":{"in":4,"cache_write":76,"cache_read":9131,"out":108},"stop_reason":"tool_use"}
+   4.08  result  {"subtype":"success","terminal_reason":"completed","num_turns":4,"total_cost_usd":0.00101184}
+   4.18  assistant  {"parent":"ytckBQ","blocks":["tool_use:Read:Pf1Mnh"],"id":"K8WVo5","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":780,"cache_read":5829,"out":2},"subagent_type":"general-purpose","agent_id":"a60830c7c6053183e"}
+   4.19  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":6813,"tool_uses":2,"duration_ms":2497},"last_tool_name":"Read","description":"Reading chain/amber.txt","tool_use_id":"ytckBQ"}
+   4.19  user  {"parent":"ytckBQ","blocks":["tool_result:Pf1Mnh"],"subagent_type":"general-purpose","agent_id":"a60830c7c6053183e"}
+   5.30  assistant  {"parent":"ytckBQ","blocks":["tool_use:Read:yZLbcf"],"id":"aQLX6q","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":240,"cache_read":6609,"out":16},"subagent_type":"general-purpose","agent_id":"a60830c7c6053183e"}
+   5.30  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":6889,"tool_uses":3,"duration_ms":3615},"last_tool_name":"Read","description":"Reading chain/birch.txt","tool_use_id":"ytckBQ"}
+   5.32  user  {"parent":"ytckBQ","blocks":["tool_result:yZLbcf"],"subagent_type":"general-purpose","agent_id":"a60830c7c6053183e"}
+   6.63  assistant  {"parent":"ytckBQ","blocks":["thinking"],"id":"LbZDPG","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":215,"cache_read":6849,"out":6},"subagent_type":"general-purpose","agent_id":"a60830c7c6053183e"}
+   6.89  assistant  {"parent":"ytckBQ","blocks":["tool_use:Read:PMBRDd"],"id":"LbZDPG","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":215,"cache_read":6849,"out":6},"subagent_type":"general-purpose","agent_id":"a60830c7c6053183e"}
+   6.89  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":7345,"tool_uses":4,"duration_ms":5205},"last_tool_name":"Read","description":"Reading chain/cedar.txt","tool_use_id":"ytckBQ"}
+   6.90  user  {"parent":"ytckBQ","blocks":["tool_result:PMBRDd"],"subagent_type":"general-purpose","agent_id":"a60830c7c6053183e"}
+   7.08  _probe  {"note":"3 s after result 1: process alive"}
+   8.41  assistant  {"parent":"ytckBQ","blocks":["thinking"],"id":"nHQLox","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":277,"cache_read":7064,"out":3},"subagent_type":"general-purpose","agent_id":"a60830c7c6053183e"}
+   8.72  assistant  {"parent":"ytckBQ","blocks":["tool_use:Read:nxY32x"],"id":"nHQLox","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":277,"cache_read":7064,"out":3},"subagent_type":"general-purpose","agent_id":"a60830c7c6053183e"}
+   8.72  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":7662,"tool_uses":5,"duration_ms":7029},"last_tool_name":"Read","description":"Reading chain/dune.txt","tool_use_id":"ytckBQ"}
+   8.73  user  {"parent":"ytckBQ","blocks":["tool_result:nxY32x"],"subagent_type":"general-purpose","agent_id":"a60830c7c6053183e"}
+   9.90  assistant  {"parent":"ytckBQ","blocks":["tool_use:Read:WC967c"],"id":"u5xxut","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":358,"cache_read":7341,"out":16},"subagent_type":"general-purpose","agent_id":"a60830c7c6053183e"}
+   9.90  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":7773,"tool_uses":6,"duration_ms":8212},"last_tool_name":"Read","description":"Reading chain/ember.txt","tool_use_id":"ytckBQ"}
+   9.92  user  {"parent":"ytckBQ","blocks":["tool_result:WC967c"],"subagent_type":"general-purpose","agent_id":"a60830c7c6053183e"}
+  11.04  assistant  {"parent":"ytckBQ","blocks":["tool_use:Read:wdyCWj"],"id":"RTFkFE","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":215,"cache_read":7699,"out":16},"subagent_type":"general-purpose","agent_id":"a60830c7c6053183e"}
+  11.04  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":8004,"tool_uses":7,"duration_ms":9352},"last_tool_name":"Read","description":"Reading chain/fjord.txt","tool_use_id":"ytckBQ"}
+  11.05  user  {"parent":"ytckBQ","blocks":["tool_result:wdyCWj"],"subagent_type":"general-purpose","agent_id":"a60830c7c6053183e"}
+  12.30  assistant  {"parent":"ytckBQ","blocks":["tool_use:Read:8618WD"],"id":"MqFtUP","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":215,"cache_read":7914,"out":16},"subagent_type":"general-purpose","agent_id":"a60830c7c6053183e"}
+  12.30  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":8235,"tool_uses":8,"duration_ms":10615},"last_tool_name":"Read","description":"Reading chain/glade.txt","tool_use_id":"ytckBQ"}
+  12.32  user  {"parent":"ytckBQ","blocks":["tool_result:8618WD"],"subagent_type":"general-purpose","agent_id":"a60830c7c6053183e"}
+  13.78  assistant  {"parent":"ytckBQ","blocks":["thinking"],"id":"9oPmnr","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":214,"cache_read":8129,"out":8},"subagent_type":"general-purpose","agent_id":"a60830c7c6053183e"}
+  14.09  assistant  {"parent":"ytckBQ","blocks":["tool_use:Read:DnCqey"],"id":"9oPmnr","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":214,"cache_read":8129,"out":8},"subagent_type":"general-purpose","agent_id":"a60830c7c6053183e"}
+  14.10  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":8759,"tool_uses":9,"duration_ms":12407},"last_tool_name":"Read","description":"Reading chain/heath.txt","tool_use_id":"ytckBQ"}
+  14.11  user  {"parent":"ytckBQ","blocks":["tool_result:DnCqey"],"subagent_type":"general-purpose","agent_id":"a60830c7c6053183e"}
+  14.17  system  {"subtype":"task_updated","keys":["patch","run_id","task_id"],"patch":{"status":"killed","end_time":1795282018335}}
+  14.17  system  {"subtype":"task_notification","keys":["output_file","run_id","status","summary","task_id","tool_use_id"],"status":"stopped","tool_use_id":"ytckBQ"}
+  14.17  system  {"subtype":"background_tasks_changed","keys":["tasks"],"tasks":0}
+  14.17  user  {"parent":"ytckBQ","blocks":["text"],"subagent_type":"general-purpose","agent_id":"a60830c7c6053183e"}
+  19.30  _probe  {"note":"standard input closed"}

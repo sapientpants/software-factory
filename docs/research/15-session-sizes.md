@@ -17,7 +17,7 @@ A session that began with the command to implement one ticket, counted with ever
 | Active minutes, gaps over 5 minutes dropped | 27.1 | 49.7 | 52.3 | 56.5 |
 | Active minutes, gaps over 15 minutes dropped | 29.4 | 55.8 | 57.8 | 61.0 |
 | Dollars at list price, from the transcripts | 14.50 | 21.29 | 24.83 | 29.48 |
-| Dollars, raised 6% to Claude Code's own count (section 4) | 15.40 | 22.60 | 26.30 | 31.20 |
+| Dollars, raised 6% to Claude Code's own count (section 4) | 15.37 | 22.57 | 26.32 | 31.25 |
 | Dollars at the prices of `claude-opus-5-5`, raised 6% (section 4) | 9.17 | 13.25 | 15.69 | 18.72 |
 
 94% of the model calls were made on `claude-fable-5-2`, the model the operator specifies on. The operator runs implementation on `claude-opus-5-5`, so the last row is the one a spend limit is read against: the same tokens at that model's prices.
@@ -56,7 +56,7 @@ The work between one prompt and the next. The 105 prompts that led to fewer than
 | Input-side tokens: uncached, cache read and cache write | 3,127,011 | 7,215,703 | 17,386,049 | 26,006,791 | 37,050,638 |
 | Dollars at list price | 4.68 | 12.07 | 19.68 | 21.17 | 82.42 |
 
-The maximum in every row is one prompt that started a multi-agent workflow: 318 model calls, 97% of them by subagents, in 81 active minutes. No prompt's main loop made more than 88 calls.
+The maximum in every row but the main loop's is one prompt that started a multi-agent workflow: 318 model calls, 97% of them by subagents, in 81 active minutes. No prompt's main loop made more than 88 calls.
 
 ### 3.2 The prompt that starts a ticket
 
@@ -87,10 +87,12 @@ Subagents made 19% of the dollars of the 15 first prompts taken together.
 
 | | Median | p95 | p99 | Max |
 |---|---:|---:|---:|---:|
-| One model call (n = 1,789) | 8 s | 71 s | 202 s | 552 s |
-| One tool call (n = 2,494) | 1.4 s | 24 s | 99 s | 2,489 s |
+| One model call, from the request to the end of its answer (n = 1,789) | 8 s | 71 s | 202 s | 552 s |
+| One tool call, from the call to its result (n = 2,494) | 1.4 s | 24 s | 99 s | 2,489 s |
 
-Two prompts hold gaps of 21 to 61 minutes between a request and its answer, about 9 hours in all. The machine was asleep or the request hung **(inference)**. Both gap rules drop them.
+These two rows are over every session, the one that made the measurement included, which is why the first counts more calls than section 2.
+
+Two prompts hold gaps of 21 to 61 minutes after a request that got no answer, about 9 hours in all. They are not in the table above, which times only the calls that were answered. The machine was asleep or the request hung **(inference)**. Both gap rules drop them.
 
 ## 4. Dollars
 
@@ -113,7 +115,7 @@ Prices in dollars per million tokens, from `https://platform.claude.com/docs/en/
 - **A headless session.** A factory session gets one prompt and no answers from a human. Here the operator answered questions, approved steps and added requests, and some follow-up prompts asked for new work, so the per-ticket figures lean high for one ticket. On the other side, active time counts short waits for the operator, and a headless session has none.
 - **Code.** The repository held a specification and empty crates. A ticket that builds and tests Rust code makes longer tool calls, and may make more of them.
 - **The tail.** With 15, 27 or 10 observations a 90th or 95th percentile rests on one to three of them.
-- **What a turn is.** A turn is taken here to be one model call. Whether the CLI's own `--max-turns` counts a subagent's calls was not observed; no session of probe P-22 used a subagent.
+- **What a turn is.** A turn is taken here to be one model call. Whether the CLI's own `--max-turns` counts a subagent's calls was not observed; no session of probe P-22 used a subagent. It is now probe P-26.
 - **Caching.** 44% of the dollars are cache writes. A headless session without idle gaps, or under other cache lifetimes, would spend them differently.
 - **The plan.** Nothing here says what share of the plan's window a ticket uses. The transcripts do not hold it, and the stream gives it only as the account's utilisation (probe P-22).
 - **Other operators, other weeks.** Four days, one operator, one model for 94% of the calls.
@@ -129,3 +131,5 @@ Prices in dollars per million tokens, from `https://platform.claude.com/docs/en/
 Two facts about the caps come from elsewhere. With stream-JSON input the CLI starts its `--max-turns` count over with each message, while its budget total runs on over the session: that is the documentation's statement, in [12-claude-code-subscription-behaviour](https://github.com/sapientpants/software-factory/blob/616f64afcb57c3654ebea670f48534fdb4a26c3e/docs/research/12-claude-code-subscription-behaviour.md) (section 2), and it was not observed. Both caps end a session under the subscription token, and the budget cap overshoots by one response: that was observed (probe P-22).
 
 The values keep their *(tunable)* mark. The first measurement of what they limit is the five issues of M1b.
+
+In the spec, the values are in the table of section 14, the rules they belong to are BUD-6 to BUD-9, the decision is D-22 in 23.1, and Appendix B lists this report. What the stream of a headless session shows of turns, subagents and usage credits is probe P-26.

@@ -41,7 +41,13 @@ One execution of a stage: one agent session, one capture, or one verify command 
 One trip back to the implement stage after a failed gate.
 
 **Turn**:
-One model call of an agent session. A session's turn limit counts them (BUD-6).
+One model call of an agent session, made by its main loop or by a subagent. A session's turn limit counts them, which the agent CLI's own `--max-turns` does not (BUD-6).
+
+**Main loop**:
+The line of model calls that the agent CLI makes for the messages an agent session is given, as distinct from a subagent's.
+
+**Subagent**:
+A second line of model calls that the main loop starts through the agent CLI's Agent tool, within the same agent session (AG-20). BUD-10 says how it runs and how its calls are counted.
 
 **Workspace**:
 The directory tree in which the implementer works. It lives for one attempt, or until a base update rebuilds it (12.4).

@@ -1611,3 +1611,201 @@ A refusal reached the session as `PreToolUse:Bash hook error:` followed by the h
 - **What else sets a hooks path or skips a hook.** `git -c include.path=<file>` with a file that sets `core.hooksPath`, an alias, a shell function and `git-commit` run from git's own directory were not run. DEV-10 lists them, or their kind, as not seen.
 - **Other subcommands.** `git merge`, `git am` and `git rebase` take `--no-verify` too, for hooks this repository does not have. They were not run and are not refused.
 - **Other agents.** Only Claude Code reads `.claude/settings.json`. A session of another coding agent has `AGENTS.md` and nothing that refuses.
+
+## P-26: turns, budget and subagents on a headless stream
+
+Answered 2026-11-21 for #47, in its first two parts, by live sessions of Claude Code 2.1.323 on macOS 27.0.1, signed in with a `claude setup-token` token of the operator's Max plan and outside the factory's sandbox. The third part, which fields show usage credits switched on or in use, is not provoked and stays open (BUD-8). The harness and its output are on the branch `prototype/turns-subagents-probe`, at commit [`8341ac7`](https://github.com/sapientpants/software-factory/tree/8341ac758be662ea30511303fcb1bac7cd241224/crates/factory-agent/prototype/turns-subagents). It is throwaway code and not the contract test of SPEC 19.4. The documentary research is report 12, cited under P-22. The pages of the CLI's documentation that speak of background subagents (`code.claude.com/docs/en/sub-agents.md`, `headless.md`, `env-vars.md`, `cli-reference.md`) were read the same day and are named where an observation goes beyond them.
+
+**Answer.** With more than one message on a stream-JSON input, the CLI's `--max-turns` count starts over with each message and its budget total runs on over the session, as the documentation says. Neither cap ends the process. A subagent's model calls are `assistant` lines that carry the `parent_tool_use_id` of the Agent tool call that started it. Their input and cache counts are real and their output count is a placeholder; `--include-partial-messages` adds no event for them. The `total_cost_usd` and `modelUsage` of `result` include them. `--max-budget-usd` counts them. `--max-turns` does not: a subagent is not held to it, and runs on when the main loop reaches it. Two things the spec did not expect. A subagent starts in the background unless the model asks otherwise: the main loop then returns a `result` before the subagent has finished, a second `result` follows with no message from the host, and a budget cap reached while only background subagents run can leave no `result` at all and an exit code of 0. And the calls of a foreground subagent that hold only text or thinking are left out of the stream unless `--forward-subagent-text` is given. BUD-6 and BUD-10 are rewritten on this. The environment of an agent session gains `CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1`, under which every subagent ran in the foreground, and AG-1 gains `--forward-subagent-text`.
+
+### Method
+
+`turns_probe.py` runs one session per case. Each gets a fresh working directory, a git repository with a `README.md` and two chains of fourteen files in which each file names the next, so that following a chain takes one model call per file; its own `HOME` and an empty `CLAUDE_CONFIG_DIR`; and an environment of `PATH`, `HOME`, `CLAUDE_CONFIG_DIR`, `CLAUDE_CODE_OAUTH_TOKEN`, `TMPDIR`, `LANG` and `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1`, and nothing else. No proxy was used: the hosts are P-22's question.
+
+The command line is the whole of AG-1 as it stood, in `subscription` mode:
+
+```
+claude -p --setting-sources user --output-format stream-json --verbose --input-format stream-json
+  --session-id <uuid> --model haiku --permission-mode dontAsk --permission-prompts none
+  --tools <tools> --allowedTools <tools> --settings <host file> --mcp-config <host file> --strict-mcp-config
+  --json-schema <schema> --max-turns <n> --max-budget-usd <dollars>
+  --append-system-prompt-file <host file> --include-partial-messages
+```
+
+The tools are `Read,Glob,Grep`, with `Agent` added in the subagent cases. One case leaves `--include-partial-messages` out and four add `--forward-subagent-text`. The harness adds `--debug-file`. The subagent is the built-in `general-purpose` one, started by the model because the message asks for it.
+
+The harness sends a message, and 3 s after each `result` notes whether the process is alive and sends the next message or closes standard input. Where a session has the Agent tool it first waits until the stream has listed no background task for 5 s.
+
+There are 22 cases. One pass ran all of them. Two more passes ran again the five in which a budget cap is reached while a subagent runs, because what the stream shows there differs from run to run; the second also ran again the two cases that have the variable and the flag which the spec names after this probe. The 17 sessions run while the cases were being added are kept beside them and are counted below with the rest. That is 51 sessions, 47 of them with a subagent. A pass of all cases reported $0.12, the sum of the last `total_cost_usd` of each session; the 51 together reported $0.27.
+
+Five more sessions were run after a review of this record, in three cases of their own: the main loop reaching its turn cap beside a background subagent, three times, and a background command of the Bash tool, without and with the variable. They are named where they are used and are not in the counts below, which are those of the 51.
+
+`sums.py` adds up the token counts of each session's lines against its `result`.
+
+The budget of each cap case was set from the costs earlier sessions reported, so that the cap falls among the subagent's calls. The dollar figures below are those of the `haiku` alias and say nothing about a real session's size.
+
+### Several messages: turns
+
+`--max-turns 5`, five messages in one session. "Read" asks for one file and takes two or three model calls, the last of them the `StructuredOutput` call that `--json-schema` brings. "Chain" asks for fourteen files in fourteen calls.
+
+| Message | Model calls | `result` | `num_turns` | `total_cost_usd` |
+|---|---|---|---|---|
+| 1, read | 2 | `success` | 3 | 0.000383 |
+| 2, read | 3 | `success` | 4 | 0.000825 |
+| 3, read | 3 | `success` | 4 | 0.001234 |
+| 4, chain | 5 | `error_max_turns`, `errors: ["Reached maximum number of turns (5)"]` | 6 | 0.002138 |
+| 5, read | 3 | `success` | 4 | 0.002632 |
+
+- The count starts over with each message. The session made 16 model calls under a cap of 5, and only the message that needed more than five by itself was stopped.
+- At the cap the five calls ran, each with its tool call, and the `result` came in place of a sixth.
+- The process outlives the cap. It was alive 3 s after the `error_max_turns` result, took message 5 and completed it with a count of its own.
+- `num_turns` is each message's own figure, and it is not the number of model calls: one more than the calls in every row here.
+- `total_cost_usd` runs on through all five results.
+- The exit code follows the last result. This session exited 0 when standard input was closed. A session of one message that ended in `error_max_turns` (`--max-turns 3`, three calls) exited 1.
+
+### Several messages: budget
+
+`--max-budget-usd 0.0019` and `--max-turns 30`, four messages.
+
+| Message | Model calls | `result` | `total_cost_usd` |
+|---|---|---|---|
+| 1, read | 2 | `success` | 0.000420 |
+| 2, chain | 8 | `error_max_budget_usd`, `terminal_reason: "budget_exhausted"`, `errors: ["Reached maximum budget ($0.0019)"]` | 0.002221 |
+| 3, chain | 0 | The same result, `num_turns: 1`, 0.02 s after the message | 0.002221 |
+| 4, read | 0 | The same | 0.002221 |
+
+- The budget total runs on over the session: message 1 stayed below the cap and message 2 crossed it at its eighth call.
+- The cap is checked after a response, as P-22 found. Here it overshot by 17%, which is that response.
+- The process outlives this cap too. Every later message is answered at once by the same result, with no model call and no change in the total.
+- The exit code was 1 when standard input was closed.
+
+### A subagent on the stream
+
+A session whose main loop calls the Agent tool once, for a subagent that follows a chain in fifteen model calls: fourteen that each read a file and one that reports. The tool is `Task` in the `tools` list of `system/init` and `Agent` in the model's call.
+
+| Line | What it holds |
+|---|---|
+| `system/task_started` | `task_id`, the `tool_use_id` of the Agent call, `subagent_type`, `prompt`, `spawn_depth`, and `is_backgrounded` |
+| `assistant`, with `parent_tool_use_id` set to the Agent call's id | One content block of one model call of the subagent. Also `agent_id`, `subagent_type`, `task_description` and `request_id`. The lines of one call share a `message.id`, as in the main loop |
+| `user`, with the same marks | A tool result of the subagent. For a foreground subagent, the prompt it was given too |
+| `system/task_progress`, after each tool call of the subagent | `usage` with `total_tokens`, `tool_uses` and `duration_ms`; `last_tool_name`; a `description` |
+| `system/task_updated`, `system/task_notification` | The end: a `status`, and in the notification a `summary`, the same `usage` and an `output_file` |
+| `system/background_tasks_changed` | The list of running background tasks, at each change. Not emitted for a foreground subagent |
+
+The main loop's own lines have `parent_tool_use_id: null`.
+
+- **No partial messages.** In none of the 47 sessions with a subagent did a `stream_event` carry a `parent_tool_use_id`. So there is no `message_start` and no `message_delta` for a subagent's call, as report 12 read in the documentation. Leaving `--include-partial-messages` out changed nothing about the subagent's lines.
+- **Text and thinking.** A background subagent's lines include its `thinking` and `text` blocks. A foreground subagent's do not: its `tool_use` blocks and tool results are forwarded, and a call that holds only text, as the reporting call does, leaves no line. Fourteen of the fifteen calls were shown. With `--forward-subagent-text` all fifteen were. The documentation says as much of the flag.
+- **The Agent call's result.** For a background subagent it comes at once, `tool_use_result.status: "async_launched"`. For a foreground one it comes when the subagent has ended, with `status: "completed"`, `totalToolUseCount`, `totalTokens`, and as `usage` the counts of the subagent's last call alone, real output count included.
+
+### Token counts
+
+Per session, the counts on the `assistant` lines against `modelUsage` of the last `result`. The main loop's output is that of its `message_delta` events (BUD-4).
+
+| Session | Calls shown: main loop, subagent | Input, cache read and cache write | Output |
+|---|---|---|---|
+| Background subagent | 5, 15 | 14 + 30 = 44; 44,090 + 115,999 = 160,089; 3,218 + 4,594 = 7,812. Each sum is the figure of `modelUsage` | Main loop 809. Subagent lines 118. `modelUsage` 3,130 |
+| The same, subagent on `sonnet` | 5, 15 | Each sum is the total over both entries of `modelUsage` | `modelUsage` has two entries: `claude-haiku-5-5` with 677, the main loop's `message_delta` sum exactly, and `claude-sonnet-5-5` with 1,911 and $0.0522 of the session's $0.0536. Subagent lines 338 |
+| Foreground subagent, `--forward-subagent-text` | 3, 15 | 8 + 30 = 38; 24,837 + 114,558 = 139,395; 1,981 + 4,317 = 6,298. Each sum is the figure of `modelUsage` | Main loop 252. Subagent lines 220. `modelUsage` 2,293 |
+| Foreground subagent, without the flag | 3, 14 | Short of `modelUsage` by 2, 9,175 and 205: the call that left no line | Main loop 252. Subagent lines 198. `modelUsage` 2,254 |
+
+- **Input, cache-read and cache-write counts on a subagent's lines are real.** In 29 of the 47 sessions they add up with the main loop's to `modelUsage` exactly. In 16 they fall short of it by the calls that left no line. In the other two the lines exceed it, because the session's last `result` came before the subagent's end (see the caps).
+- **The output count is a placeholder,** as it is on the main loop's `assistant` lines (P-22), and for a subagent nothing replaces it. Fifteen calls reported 118 output tokens between them, where the remainder says they produced about 2,300.
+- **`modelUsage` and `total_cost_usd` include the subagent.** The run on another model shows it without arithmetic. `usage` of the same `result` does not: it is the main loop's own, per message.
+- **`task_progress` is no count of spend.** Its `total_tokens` is near the size of the subagent's latest request and grows by the placeholder.
+- **A subagent can run on another model than the session's.** The Agent tool takes a `model`, and the message that asked for `sonnet` got it (`resolvedModel: "claude-sonnet-5-5"`) in a session started with `--model haiku`. Its calls were priced as that model's.
+- **A subagent's cache writes are five-minute ones** (`ephemeral_5m_input_tokens`), the main loop's one-hour ones.
+
+### Background and foreground
+
+Whether a subagent runs in the background is the model's choice. The Agent tool takes `run_in_background`, and `subagent_stats` in `result` counts what was asked for: `requested: {background, foreground, unset}` and `started_in_background`. Left unset, the subagent started in the background in each of the 20 sessions that left it so without the variable below. The documentation gives that as the default.
+
+| | Background | Foreground |
+|---|---|---|
+| `task_started` | `is_backgrounded: true` | `is_backgrounded: false` |
+| The Agent call | Returns at once | Returns when the subagent has ended |
+| The main loop meanwhile | Carries on. In every such session it answered that the subagent's word was not available yet, through `StructuredOutput`, and the CLI emitted a `result` with `subtype: "success"`: 4.5 s into a session whose subagent ended at second 21 | Waits |
+| The subagent's end | A `task_notification`, a new `system/init`, further calls of the main loop and a second `result`, `result_index: 1`, with the answer. No message from the host set it going again | The `task_notification`, the Agent call's result, and the main loop goes on with the same message |
+| Results per message | Two | One |
+
+- The second `result` has its own `num_turns`: when a notification sets the main loop going again, the `--max-turns` count starts over, as it does with a message.
+- The first `result` already includes what the subagent spent up to that moment.
+- Closing standard input after the first `result` did not end the session. The subagent ran on, the second `result` came, and the process then exited 0.
+- A message that asks for `run_in_background false` got a foreground subagent, in all ten sessions that asked. Without being asked, the model set it for itself in six more.
+- With `CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1` in the environment every subagent started in the foreground: eleven sessions, in one of which the message asked for `run_in_background true`, the model passed it and the CLI ignored it. The documentation says the variable removes `run_in_background` from the Bash and subagent tools and stops the CLI from moving work to the background by itself.
+- A command of the Bash tool behaves as a subagent does, in the one session each that tried it. Asked to run `sleep 20; echo finished` with `run_in_background true`, the main loop got the tool's result at once and the CLI emitted a `result` 3 s in; the command's end at second 22 came as a `task_notification`, and a second `result` followed. With the variable set the same message got a foreground command: the tool call returned after the 20 s, the session had one `result`, and the model answered that the tool had no such parameter.
+
+### The caps and a subagent
+
+**`--max-turns` does not count a subagent's calls, and a subagent is not held to it.** With `--max-turns 6` a subagent made its fifteen calls, in the background and in the foreground, twice each, and each session completed. `num_turns` was 4 for a message on which the main loop made three calls and the subagent fifteen.
+
+**When the main loop reaches its turn cap, a subagent runs on.** Three sessions with `--max-turns 4` had the main loop follow one chain while a background subagent followed the other. The `error_max_turns` result came after the main loop's fourth call, 6 s in. In two of them the subagent then made the rest of its fifteen calls and ended 14 s and 15 s later with `status: "completed"`. Its notification set the main loop going again with a fresh count, which reached the cap a second time, and the session's total went from $0.0018 to $0.0052 and from $0.0019 to $0.0052 between the two results. In the third the subagent had ended by itself as the cap was reached, its model having stopped after two files, and the rest was the same. Each exited 1. A foreground subagent cannot meet this cap: the main loop makes no call while it waits for one.
+
+**`--max-budget-usd` counts them.** In each of the 22 sessions that reached the cap during or after a subagent's calls, the total that crossed it was made up mostly of the subagent's spend. What the stream then shows depends on where the subagent runs.
+
+| Subagent | Sessions | Stream at the cap | Exit code |
+|---|---|---|---|
+| Foreground | 14 | `result` with `subtype: "error_max_budget_usd"`. The Agent call gets no result line and the main loop makes no further call. The subagent's task ends with `status: "completed"` whether its work was done or not, and in eleven sessions it had not read its whole chain. It ends together with that `result` in five sessions, and about 2 s after it in nine | 1 |
+| Background, main loop already returned | 5 | The task ends with `status: "completed"` after 5 to 9 of its 14 tool calls. The notification sets the main loop going again, which is answered at once by the `error_max_budget_usd` result | 1 |
+| Background, main loop already returned | 3 | `task_updated` with `status: "killed"`, `task_notification` with `status: "stopped"`, a `user` line "[Request interrupted by user]" for the subagent, and on stderr `Budget limit reached ($0.00 of $0.0025); stopping background agents.` No `result` | 0, in the two that were then given no message |
+
+- **A cap can pass without a `result`.** In the last row the only `result` of the session is the early one: `success`, a total below the cap, and an answer that says the work is not done. The session that was given another message after the kill got the `error_max_budget_usd` result for it, with a total that includes the subagent's spend and `subagent_stats.killed.system: 1`.
+- **Which of the two background rows happens differs from run to run.** The same case gave one in two passes and the other in the third.
+- **A subagent spends after the `result`.** A foreground subagent stopped at the cap makes one more call. Where that call came after the `result`, as the nine tasks that ended late suggest it did, it left no line, `--forward-subagent-text` or not, and its spend is in no `result` that the message got. Three such sessions were sent a message afterwards. In two the total had grown: from $0.00271 to $0.00314 under a cap of $0.0025, and from $0.00205 to $0.00236 under a cap of $0.0020, which is 26% and 18% above the cap where the first figures were 8% and 3% above it. In the third the call had come before the `result` and the total stood.
+- **A message after the cap reads the total.** It is answered at once by the `error_max_budget_usd` result, with no model call, and that result's `total_cost_usd` and `modelUsage` are those of the moment.
+- **The overshoot,** as far as a `result` reports it: 1% to 15% above the cap over the 20 sessions whose stream holds such a `result`. That is a floor. Of the nine foreground sessions whose task ended after the `result`, only the two named above were read again, and they stood at 18% and 26%.
+- **Two subagents at once** behaved as one does. In the foreground: one `result` at the cap, both tasks ended. In the background: both killed, no `result`, exit code 0.
+- `subagent_stats.refused.budget` stayed 0: no session tried to start a subagent after the cap.
+
+### Findings
+
+**The CLI's `--max-turns` is a cap per message on the main loop.** It bounds neither a session of several messages nor anything a subagent does, and reaching it leaves a background subagent running. A session's turn limit is therefore the supervisor's count and nothing else, and for a subagent's calls that count has to come from the `assistant` lines, by message id, since no other line marks a call.
+
+**A cap result is not the end of the process.** With stream-JSON input the CLI stays alive after `error_max_turns` and after `error_max_budget_usd`, and waits for input. P-22's caps ended the process with exit code 1 because those sessions had their prompt on the command line.
+
+**With background subagents a `result` is not the end of a message's work.** The first `result` for such a message is well-formed, says `success` and holds a `structured_output`; a driver that takes it as the stage's result (AG-6) takes a placeholder for the answer. The spend that follows is in a later `result` or, after a kill, in none. So the session's dollars cannot be read from "its last `result`" (BUD-4) unless subagents run in the foreground. `CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1` gave that in every session it was set in.
+
+**The count of a subagent's calls needs `--forward-subagent-text`.** Without it a foreground subagent's text-only calls are missing from the stream, at least one per subagent, and their input-side counts with them.
+
+**The variable and the flag together gave the stream the spec now relies on.** Two sessions had both: one `result` each, all fifteen calls of the subagent on the stream, and sums that equal `modelUsage`. Two more reached the budget cap among the subagent's calls and each got the `error_max_budget_usd` result and exit code 1.
+
+**What a subagent spent is a remainder.** Its output tokens are in no line, so neither a per-call record nor a running figure between results can include them. The session's totals in `result` do, and the CLI's cap acts on those.
+
+**The transcript of a subagent is written outside `TMPDIR`.** The `output_file` of a task was under `/private/tmp/claude-<uid>/`, with `TMPDIR` set to a directory of the session's own. `system/init` likewise names a socket under `/tmp/cc-socks/`. Both are on macOS; what the CLI does inside the sandbox, whose temporary directory SEC-6 gives it, was not observed.
+
+### Against report 12 and the documentation
+
+- "The max-turns count starts over for that turn" and "the budget total keeps accumulating across messages": confirmed, the later messages' `error_max_budget_usd` results included.
+- "Stream events are emitted for the main session only": confirmed.
+- A subagent's tokens "are in `modelUsage` and `total_cost_usd` but not in the result's `usage`": confirmed.
+- "Spend from subagents counts toward the cap": confirmed. "Claude Code stops background subagents that are still running", in the CLI reference: seen in three of eight sessions; in the other five the subagent ended by itself first.
+- The overshoot of "anything that subagents still running at that moment spend before they stop": seen, as one more call after the `result`.
+- Whether a subagent's calls count toward `--max-turns` is not documented. They do not.
+- The documentation names the background default, the two results and the variable. That a cap can end a session with exit code 0 and no error `result` is not in the pages read.
+
+### What changed in the spec
+
+1. BUD-6 says how the supervisor counts a turn on the stream and what the CLI's two caps count instead: `--max-turns` is no second line for a session's turn limit.
+2. BUD-10 is rewritten from observation. The count of every subagent call stays, and so does the remainder, now one per model. New are the foreground rule and what a cap leaves unrecorded. AG-20 points at both.
+3. AG-11 sets `CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1` for agent sessions. The variable takes the background option from the Bash tool too.
+4. AG-1 gains `--forward-subagent-text`.
+5. AG-14 says why the supervisor has to end the session on a cap result, as the handling of a Budget failure already asks (8.6): the CLI does not end by itself.
+6. The contract test of 19.4 asserts the stream shapes that BUD-6 and BUD-10 rely on.
+7. The P-26 row of 23.2 carries the answer, and D-22 in 23.1 notes what followed from it.
+8. The glossary's "Turn" names both callers, and "Main loop" and "Subagent" are new entries.
+
+Items 3 and 4 are this session's, drawn from the observations. The operator was not asked about either before the pull request, and D-22 says so.
+
+### Still open
+
+- **Usage credits.** The third part of P-26. Every `rate_limit_event` here showed `overageStatus: "rejected"`.
+- **Linux, and the factory's sandbox.** Every session ran on macOS without one. Where the CLI writes a subagent's transcript there is part of this.
+- **An interrupt while a subagent runs.** The stop sequence of AG-12 was not tried. No session was sent a protocol interrupt or a signal.
+- **A subagent that starts a subagent.** `spawn_depth` and `subagent_stats.max_depth` were 1 throughout, and `refused.depth_limit` stayed 0.
+- **Other subagents.** Only the built-in `general-purpose` one ran, on the `haiku` alias and once on `sonnet`. That the variable keeps every kind of subagent in the foreground rests on eleven sessions with that one.
+- **A process the shell leaves behind.** The variable takes the Bash tool's own background option. A command that puts something in the background by itself, with `&` or `nohup`, was not tried, with or without it.
+- **The turn cap beside a foreground subagent's end.** With the variable set, the main loop makes no call while a subagent runs, so it cannot reach its turn cap then. That was reasoned from the stream and not provoked.
+- **The size of the overshoot on a real session.** The figures are those of calls that cost a fraction of a cent. One call of a model with a full context costs more, and the overshoot is counted in calls.
+- **Which of the two outcomes a background subagent meets at the cap,** and why. Not examined, since the factory does not run them.
+- **A model call whose stream is cut.** Report 12 says `message_delta` "can be missing" after a dropped connection. None was.
+- **Other CLI versions.** One version, as for P-21 and P-22, and not the one those ran on.

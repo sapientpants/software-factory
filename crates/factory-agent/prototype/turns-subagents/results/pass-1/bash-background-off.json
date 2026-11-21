@@ -1,0 +1,451 @@
+{
+  "case": "bash-background-off",
+  "about": "the same with CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1",
+  "command": [
+    "claude",
+    "-p",
+    "--setting-sources",
+    "user",
+    "--output-format",
+    "stream-json",
+    "--verbose",
+    "--input-format",
+    "stream-json",
+    "--session-id",
+    "de176e2b-749e-4dea-8c89-18c5331469b7",
+    "--model",
+    "haiku",
+    "--permission-mode",
+    "dontAsk",
+    "--permission-prompts",
+    "none",
+    "--tools",
+    "Bash,Read",
+    "--allowedTools",
+    "Bash,Read",
+    "--settings",
+    "<out>/bash-background-off/host/settings.json",
+    "--mcp-config",
+    "<out>/bash-background-off/host/mcp.json",
+    "--strict-mcp-config",
+    "--json-schema",
+    "{\"type\": \"object\", \"properties\": {\"answer\": {\"type\": \"string\"}}, \"required\": [\"answer\"], \"additionalProperties\": false}",
+    "--max-turns",
+    "10",
+    "--max-budget-usd",
+    "1",
+    "--append-system-prompt-file",
+    "<out>/bash-background-off/host/append.md",
+    "--include-partial-messages",
+    "--debug-file",
+    "<out>/bash-background-off/host/debug.log"
+  ],
+  "messages": [
+    "Call the Bash tool exactly once, with the command `sleep 20; echo finished` and run_in_background true. Do not wait for the command and do not call any other tool. Answer with the word STARTED."
+  ],
+  "init": {
+    "claude_code_version": "2.1.323",
+    "model": "claude-haiku-5-5",
+    "tools": [
+      "Bash",
+      "Read",
+      "StructuredOutput"
+    ],
+    "agents": [
+      "claude",
+      "Explore",
+      "general-purpose",
+      "Plan",
+      "statusline-setup"
+    ],
+    "permissionMode": "dontAsk",
+    "apiKeySource": "none"
+  },
+  "counts": {
+    "lines": 73,
+    "main_loop_calls": 2,
+    "main_loop_output_tokens_by_message_delta": 539,
+    "main_loop_output_tokens_by_assistant_lines": 29,
+    "subagent_calls_shown": 0,
+    "subagent_output_tokens_by_assistant_lines": 0,
+    "subagent_models": [],
+    "stream_events": {
+      "main": {
+        "message_start": 2,
+        "content_block_start": 3,
+        "content_block_delta": 48,
+        "content_block_stop": 3,
+        "message_delta": 2,
+        "message_stop": 2
+      }
+    },
+    "other_lines": {
+      "system/status": 2,
+      "system/thinking_tokens": 3
+    }
+  },
+  "results": [
+    {
+      "subtype": "success",
+      "is_error": false,
+      "terminal_reason": "completed",
+      "num_turns": 3,
+      "total_cost_usd": 0.00161641,
+      "usage": {
+        "input_tokens": 4,
+        "cache_creation_input_tokens": 6435,
+        "cache_read_input_tokens": 5951,
+        "output_tokens": 539,
+        "output_tokens_details": {
+          "thinking_tokens": 335
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 6435,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage": {
+        "claude-haiku-5-5": {
+          "inputTokens": 4,
+          "outputTokens": 539,
+          "cacheReadInputTokens": 5951,
+          "cacheCreationInputTokens": 6435,
+          "webSearchRequests": 0,
+          "costUSD": 0.00161641,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 335,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 6435,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "model_usage_since_last_result": {
+        "claude-haiku-5-5": {
+          "inputTokens": 4,
+          "outputTokens": 539,
+          "cacheReadInputTokens": 5951,
+          "cacheCreationInputTokens": 6435,
+          "webSearchRequests": 0,
+          "costUSD": 0.00161641,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 335,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 6435,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "subagent_stats": {
+        "spawned": 0,
+        "requested": {
+          "background": 0,
+          "foreground": 0,
+          "unset": 0
+        },
+        "started_in_background": 0,
+        "max_depth": 0,
+        "spawned_by_subagents": 0,
+        "completed": 0,
+        "failed": 0,
+        "killed": {
+          "parent": 0,
+          "user": 0,
+          "system": 0
+        },
+        "refused": {
+          "depth_limit": 0,
+          "concurrency_limit": 0,
+          "budget": 0
+        },
+        "by_type": {}
+      },
+      "structured_output": {
+        "answer": "STARTED. Caveat: the Bash tool here has no run_in_background parameter, so I could not set it. The command ran in the foreground and returned \"finished\" after the 20-second sleep."
+      },
+      "stop_reason": "tool_use",
+      "queued_turn_count": 0,
+      "result_index": 0,
+      "permission_denials": [],
+      "api_error_status": null,
+      "result": "{\"answer\":\"STARTED. Caveat: the Bash tool here has no run_in_background parameter, so I could not set it. The command ran in the foreground and returned \\\"finished\\\" after the 20-second sleep.\"}"
+    }
+  ],
+  "stream": [
+    {
+      "_t": 0.0,
+      "note": "message 1 sent (bash-background)",
+      "type": "_probe"
+    },
+    {
+      "_t": 0.36,
+      "type": "system",
+      "subtype": "init"
+    },
+    {
+      "_t": 1.23,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_start",
+      "id": "qbbsgT",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 5951,
+        "cache_read": 0,
+        "out": 4
+      }
+    },
+    {
+      "_t": 3.0,
+      "type": "assistant",
+      "parent": null,
+      "blocks": [
+        "thinking"
+      ],
+      "id": "qbbsgT",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 5951,
+        "cache_read": 0,
+        "out": 4
+      }
+    },
+    {
+      "_t": 3.23,
+      "type": "assistant",
+      "parent": null,
+      "blocks": [
+        "tool_use:Bash:83Lamw"
+      ],
+      "id": "qbbsgT",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 5951,
+        "cache_read": 0,
+        "out": 4
+      }
+    },
+    {
+      "_t": 3.25,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_delta",
+      "usage": {
+        "in": 2,
+        "cache_write": 5951,
+        "cache_read": 0,
+        "out": 427
+      },
+      "stop_reason": "tool_use"
+    },
+    {
+      "_t": 3.25,
+      "type": "rate_limit_event",
+      "rate_limit_info": {
+        "status": "allowed",
+        "resetsAt": 1795615200,
+        "rateLimitType": "seven_day",
+        "overageStatus": "rejected",
+        "overageDisabledReason": "org_level_disabled",
+        "isUsingOverage": false,
+        "unifiedWindows": {
+          "seven_day": {
+            "utilization": 0.37,
+            "resetsAt": 1795615200,
+            "status": "allowed"
+          }
+        }
+      }
+    },
+    {
+      "_t": 23.29,
+      "type": "user",
+      "parent": null,
+      "blocks": [
+        "tool_result:83Lamw"
+      ]
+    },
+    {
+      "_t": 24.18,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_start",
+      "id": "ERrHSJ",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 484,
+        "cache_read": 5951,
+        "out": 25
+      }
+    },
+    {
+      "_t": 24.42,
+      "type": "assistant",
+      "parent": null,
+      "blocks": [
+        "tool_use:StructuredOutput:SapNgQ"
+      ],
+      "id": "ERrHSJ",
+      "model": "claude-haiku-5-5",
+      "usage": {
+        "in": 2,
+        "cache_write": 484,
+        "cache_read": 5951,
+        "out": 25
+      }
+    },
+    {
+      "_t": 24.43,
+      "type": "user",
+      "parent": null,
+      "blocks": [
+        "tool_result:SapNgQ"
+      ]
+    },
+    {
+      "_t": 24.43,
+      "type": "stream_event",
+      "parent": null,
+      "event": "message_delta",
+      "usage": {
+        "in": 2,
+        "cache_write": 484,
+        "cache_read": 5951,
+        "out": 112
+      },
+      "stop_reason": "tool_use"
+    },
+    {
+      "_t": 24.43,
+      "type": "result",
+      "subtype": "success",
+      "is_error": false,
+      "terminal_reason": "completed",
+      "num_turns": 3,
+      "total_cost_usd": 0.00161641,
+      "usage": {
+        "input_tokens": 4,
+        "cache_creation_input_tokens": 6435,
+        "cache_read_input_tokens": 5951,
+        "output_tokens": 539,
+        "output_tokens_details": {
+          "thinking_tokens": 335
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 6435,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "global",
+        "iterations": [],
+        "speed": "standard",
+        "fallback_credit": null
+      },
+      "modelUsage": {
+        "claude-haiku-5-5": {
+          "inputTokens": 4,
+          "outputTokens": 539,
+          "cacheReadInputTokens": 5951,
+          "cacheCreationInputTokens": 6435,
+          "webSearchRequests": 0,
+          "costUSD": 0.00161641,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 335,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 6435,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "model_usage_since_last_result": {
+        "claude-haiku-5-5": {
+          "inputTokens": 4,
+          "outputTokens": 539,
+          "cacheReadInputTokens": 5951,
+          "cacheCreationInputTokens": 6435,
+          "webSearchRequests": 0,
+          "costUSD": 0.00161641,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 335,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 6435,
+          "canonicalModel": "claude-haiku-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "subagent_stats": {
+        "spawned": 0,
+        "requested": {
+          "background": 0,
+          "foreground": 0,
+          "unset": 0
+        },
+        "started_in_background": 0,
+        "max_depth": 0,
+        "spawned_by_subagents": 0,
+        "completed": 0,
+        "failed": 0,
+        "killed": {
+          "parent": 0,
+          "user": 0,
+          "system": 0
+        },
+        "refused": {
+          "depth_limit": 0,
+          "concurrency_limit": 0,
+          "budget": 0
+        },
+        "by_type": {}
+      },
+      "structured_output": {
+        "answer": "STARTED. Caveat: the Bash tool here has no run_in_background parameter, so I could not set it. The command ran in the foreground and returned \"finished\" after the 20-second sleep."
+      },
+      "stop_reason": "tool_use",
+      "queued_turn_count": 0,
+      "result_index": 0,
+      "permission_denials": [],
+      "api_error_status": null,
+      "result": "{\"answer\":\"STARTED. Caveat: the Bash tool here has no run_in_background parameter, so I could not set it. The command ran in the foreground and returned \\\"finished\\\" after the 20-second sleep.\"}"
+    },
+    {
+      "_t": 27.44,
+      "note": "3 s after result 1: process alive",
+      "type": "_probe"
+    },
+    {
+      "_t": 32.59,
+      "note": "standard input closed",
+      "type": "_probe"
+    }
+  ],
+  "exit_code": 0,
+  "timed_out": false,
+  "wall_seconds": 32.62,
+  "files_holding_the_token": [],
+  "stderr_tail": ""
+}

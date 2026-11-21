@@ -62,6 +62,17 @@ PROMPTS = {
         "run_in_background true, and give the subagent this task word for word: '" + CHAIN_TASK + " "
         "Report the final word.' Do not read any file yourself. Answer with the word the subagent reports."
     ),
+    "sub-chain-and-own-chain": (
+        "First call the Agent tool exactly once, with subagent_type \"general-purpose\" and "
+        "run_in_background true, and give the subagent this task word for word: '" + CHAIN_TASK_B + " "
+        "Report the final word.' Then do this yourself, without waiting for the subagent: " + CHAIN_TASK + " "
+        "Answer with the final word of your own chain."
+    ),
+    "bash-background": (
+        "Call the Bash tool exactly once, with the command `sleep 20; echo finished` and "
+        "run_in_background true. Do not wait for the command and do not call any other tool. "
+        "Answer with the word STARTED."
+    ),
     "sub-chain-sonnet": (
         "Call the Agent tool exactly once, with subagent_type \"general-purpose\" and model "
         "\"sonnet\", and give the subagent this task word for word: '" + CHAIN_TASK + " Report "
@@ -77,6 +88,7 @@ PROMPTS = {
 }
 
 MAIN_TOOLS = "Read,Glob,Grep"
+BASH_TOOLS = "Bash,Read"
 SUB_TOOLS = "Read,Glob,Grep,Agent"
 
 
@@ -93,7 +105,7 @@ def case(name, about, messages, *, max_turns, budget="1", tools=MAIN_TOOLS, part
         "env": env or {},
         # Wait for the background tasks the stream lists before the next message or the end
         # of input. By default: wherever the session has the Agent tool.
-        "wait_for_tasks": (tools == SUB_TOOLS) if wait is None else wait,
+        "wait_for_tasks": (tools in (SUB_TOOLS, BASH_TOOLS)) if wait is None else wait,
         "timeout": timeout,
     }
 
@@ -199,6 +211,29 @@ CASES = [
         ["two-sub-chains"],
         max_turns=30,
         tools=SUB_TOOLS,
+    ),
+    case(
+        "subagent-main-loop-max-turns",
+        "--max-turns 4, reached by the main loop while a background subagent runs",
+        ["sub-chain-and-own-chain"],
+        max_turns=4,
+        tools=SUB_TOOLS,
+    ),
+    # Beside the question: the variable of the cases above and a background shell command.
+    case(
+        "bash-background",
+        "a Bash command that the message asks to run in the background",
+        ["bash-background"],
+        max_turns=10,
+        tools=BASH_TOOLS,
+    ),
+    case(
+        "bash-background-off",
+        "the same with CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1",
+        ["bash-background"],
+        max_turns=10,
+        tools=BASH_TOOLS,
+        env={"CLAUDE_CODE_DISABLE_BACKGROUND_TASKS": "1"},
     ),
     # Part 2, the caps.
     case(

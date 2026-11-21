@@ -1,0 +1,15 @@
+   0.00  _probe  {"note":"message 1 sent (bash-background)"}
+   0.36  system  {"subtype":"init"}
+   1.23  stream_event  {"parent":null,"event":"message_start","id":"qbbsgT","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":5951,"cache_read":0,"out":4}}
+   3.00  assistant  {"parent":null,"blocks":["thinking"],"id":"qbbsgT","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":5951,"cache_read":0,"out":4}}
+   3.23  assistant  {"parent":null,"blocks":["tool_use:Bash:83Lamw"],"id":"qbbsgT","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":5951,"cache_read":0,"out":4}}
+   3.25  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":5951,"cache_read":0,"out":427},"stop_reason":"tool_use"}
+   3.25  rate_limit_event  {"rate_limit_info":{"status":"allowed","resetsAt":1795615200,"rateLimitType":"seven_day","overageStatus":"rejected","overageDisabledReason":"org_level_disabled","isUsingOverage":false,"unifiedWindows":{"seven_day":{"utilization":0.37,"resetsAt":1795615200,"status":"allowed"}}}}
+  23.29  user  {"parent":null,"blocks":["tool_result:83Lamw"]}
+  24.18  stream_event  {"parent":null,"event":"message_start","id":"ERrHSJ","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":484,"cache_read":5951,"out":25}}
+  24.42  assistant  {"parent":null,"blocks":["tool_use:StructuredOutput:SapNgQ"],"id":"ERrHSJ","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":484,"cache_read":5951,"out":25}}
+  24.43  user  {"parent":null,"blocks":["tool_result:SapNgQ"]}
+  24.43  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":484,"cache_read":5951,"out":112},"stop_reason":"tool_use"}
+  24.43  result  {"subtype":"success","terminal_reason":"completed","num_turns":3,"total_cost_usd":0.00161641}
+  27.44  _probe  {"note":"3 s after result 1: process alive"}
+  32.59  _probe  {"note":"standard input closed"}

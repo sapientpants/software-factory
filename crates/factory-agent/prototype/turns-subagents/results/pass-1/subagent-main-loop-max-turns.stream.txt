@@ -1,0 +1,58 @@
+   0.00  _probe  {"note":"message 1 sent (sub-chain-and-own-chain)"}
+   0.46  system  {"subtype":"init"}
+   1.46  stream_event  {"parent":null,"event":"message_start","id":"u1m2tH","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":3761,"cache_read":4848,"out":17}}
+   2.03  assistant  {"parent":null,"agent_input":{"description":"Follow file chain first.txt","subagent_type":"general-purpose","run_in_background":true},"blocks":["tool_use:Agent:QkGYhp"],"id":"u1m2tH","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":3761,"cache_read":4848,"out":17}}
+   2.04  system  {"subtype":"background_tasks_changed","keys":["tasks"],"tasks":1}
+   2.04  system  {"subtype":"task_started","keys":["description","is_backgrounded","prompt","run_id","spawn_depth","subagent_type","task_id","task_type","tool_use_id"],"is_backgrounded":true,"spawn_depth":1,"description":"Follow file chain first.txt","tool_use_id":"QkGYhp"}
+   2.05  user  {"parent":null,"blocks":["tool_result:QkGYhp"],"agent_result":{"status":"async_launched","isAsync":true,"resolvedModel":"claude-haiku-5-5"}}
+   2.33  assistant  {"parent":null,"blocks":["tool_use:Read:8SgxnE"],"id":"u1m2tH","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":3761,"cache_read":4848,"out":17}}
+   2.33  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":3761,"cache_read":4848,"out":326},"stop_reason":"tool_use"}
+   2.34  rate_limit_event  {"rate_limit_info":{"status":"allowed","resetsAt":1795615200,"rateLimitType":"seven_day","overageStatus":"rejected","overageDisabledReason":"org_level_disabled","isUsingOverage":false,"unifiedWindows":{"seven_day":{"utilization":0.37,"resetsAt":1795615200,"status":"allowed"}}}}
+   2.35  user  {"parent":null,"blocks":["tool_result:8SgxnE"]}
+   3.12  stream_event  {"parent":null,"event":"message_start","id":"cDaoCq","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":841,"cache_read":8609,"out":3}}
+   3.31  assistant  {"parent":"QkGYhp","blocks":["tool_use:Read:P9LLMW"],"id":"Q5QQZB","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":5835,"cache_read":0,"out":16},"subagent_type":"general-purpose","agent_id":"a44941ae0da87665e"}
+   3.31  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":5854,"tool_uses":1,"duration_ms":1272},"last_tool_name":"Read","description":"Reading chain/first.txt","tool_use_id":"QkGYhp"}
+   3.32  user  {"parent":"QkGYhp","blocks":["tool_result:P9LLMW"],"subagent_type":"general-purpose","agent_id":"a44941ae0da87665e"}
+   3.37  assistant  {"parent":null,"blocks":["thinking"],"id":"cDaoCq","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":841,"cache_read":8609,"out":3}}
+   3.60  assistant  {"parent":null,"blocks":["tool_use:Read:mxCQg2"],"id":"cDaoCq","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":841,"cache_read":8609,"out":3}}
+   3.60  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":841,"cache_read":8609,"out":158},"stop_reason":"tool_use"}
+   3.61  user  {"parent":null,"blocks":["tool_result:mxCQg2"]}
+   4.38  stream_event  {"parent":null,"event":"message_start","id":"GV3KFf","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":237,"cache_read":9450,"out":16}}
+   4.61  assistant  {"parent":"QkGYhp","blocks":["thinking"],"id":"sc3saY","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":775,"cache_read":5835,"out":2},"subagent_type":"general-purpose","agent_id":"a44941ae0da87665e"}
+   4.74  assistant  {"parent":null,"blocks":["tool_use:Read:gXiiLj"],"id":"GV3KFf","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":237,"cache_read":9450,"out":16}}
+   4.74  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":237,"cache_read":9450,"out":133},"stop_reason":"tool_use"}
+   4.75  user  {"parent":null,"blocks":["tool_result:gXiiLj"]}
+   4.86  assistant  {"parent":"QkGYhp","blocks":["tool_use:Read:zpBTdH"],"id":"sc3saY","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":775,"cache_read":5835,"out":2},"subagent_type":"general-purpose","agent_id":"a44941ae0da87665e"}
+   4.86  system  {"subtype":"task_progress","keys":["description","last_tool_name","run_id","subagent_type","task_id","tool_use_id","usage"],"usage":{"total_tokens":6682,"tool_uses":2,"duration_ms":2824},"last_tool_name":"Read","description":"Reading chain/gorse.txt","tool_use_id":"QkGYhp"}
+   4.87  user  {"parent":"QkGYhp","blocks":["tool_result:zpBTdH"],"subagent_type":"general-purpose","agent_id":"a44941ae0da87665e"}
+   5.50  stream_event  {"parent":null,"event":"message_start","id":"72rEte","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":217,"cache_read":9687,"out":16}}
+   5.84  assistant  {"parent":null,"blocks":["tool_use:Read:JH7Fc7"],"id":"72rEte","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":217,"cache_read":9687,"out":16}}
+   5.85  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":217,"cache_read":9687,"out":134},"stop_reason":"tool_use"}
+   5.85  user  {"parent":null,"blocks":["tool_result:JH7Fc7"]}
+   5.86  result  {"subtype":"error_max_turns","terminal_reason":"max_turns","num_turns":5,"total_cost_usd":0.00275944,"errors":["Reached maximum number of turns (4)"]}
+   6.12  assistant  {"parent":"QkGYhp","blocks":["text"],"id":"te27uc","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":270,"cache_read":6610,"out":1},"subagent_type":"general-purpose","agent_id":"a44941ae0da87665e"}
+   6.15  system  {"subtype":"task_updated","keys":["patch","run_id","task_id"],"patch":{"status":"completed","end_time":1795283276096}}
+   6.15  system  {"subtype":"task_notification","keys":["output_file","run_id","status","summary","task_id","tool_use_id","usage"],"status":"completed","usage":{"total_tokens":7032,"tool_uses":2,"duration_ms":4118},"tool_use_id":"QkGYhp"}
+   6.16  system  {"subtype":"background_tasks_changed","keys":["tasks"],"tasks":0}
+   6.17  system  {"subtype":"init"}
+   6.98  stream_event  {"parent":null,"event":"message_start","id":"TDVYCw","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":931,"cache_read":9904,"out":3}}
+   7.63  assistant  {"parent":null,"blocks":["thinking"],"id":"TDVYCw","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":931,"cache_read":9904,"out":3}}
+   8.01  assistant  {"parent":null,"blocks":["tool_use:Read:inzUCV"],"id":"TDVYCw","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":931,"cache_read":9904,"out":3}}
+   8.02  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":931,"cache_read":9904,"out":258},"stop_reason":"tool_use"}
+   8.03  user  {"parent":null,"blocks":["tool_result:inzUCV"]}
+   8.83  stream_event  {"parent":null,"event":"message_start","id":"eGrfZc","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":337,"cache_read":10835,"out":16}}
+   8.87  _probe  {"note":"3 s after result 1: process alive"}
+   9.19  assistant  {"parent":null,"blocks":["tool_use:Read:CP38MQ"],"id":"eGrfZc","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":337,"cache_read":10835,"out":16}}
+   9.20  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":337,"cache_read":10835,"out":133},"stop_reason":"tool_use"}
+   9.20  user  {"parent":null,"blocks":["tool_result:CP38MQ"]}
+  10.17  stream_event  {"parent":null,"event":"message_start","id":"fneAKa","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":213,"cache_read":11172,"out":16}}
+  10.47  assistant  {"parent":null,"blocks":["tool_use:Read:EGBi8u"],"id":"fneAKa","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":213,"cache_read":11172,"out":16}}
+  10.47  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":213,"cache_read":11172,"out":134},"stop_reason":"tool_use"}
+  10.48  user  {"parent":null,"blocks":["tool_result:EGBi8u"]}
+  11.24  stream_event  {"parent":null,"event":"message_start","id":"qvAmfh","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":213,"cache_read":11385,"out":16}}
+  11.61  assistant  {"parent":null,"blocks":["tool_use:Read:c9ySZR"],"id":"qvAmfh","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":213,"cache_read":11385,"out":16}}
+  11.62  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":213,"cache_read":11385,"out":133},"stop_reason":"tool_use"}
+  11.63  user  {"parent":null,"blocks":["tool_result:c9ySZR"]}
+  11.63  result  {"subtype":"error_max_turns","terminal_reason":"max_turns","num_turns":5,"total_cost_usd":0.00403605,"errors":["Reached maximum number of turns (4)"]}
+  14.64  _probe  {"note":"3 s after result 2: process alive"}
+  19.79  _probe  {"note":"standard input closed"}

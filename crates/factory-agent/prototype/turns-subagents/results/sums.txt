@@ -1,5 +1,24 @@
 ## results/pass-1
 
+bash-background-off: exit 0
+  result 0: success, num_turns 3, total_cost_usd 0.001616, subagents completed 0 killed {'parent': 0, 'user': 0, 'system': 0}
+  model calls shown: main loop 2, subagents 0; tasks: none
+  input      : main loop 4 + subagent lines 0 = 4; modelUsage of the last result 4
+  cache read : main loop 5951 + subagent lines 0 = 5951; modelUsage of the last result 5951
+  cache write: main loop 6435 + subagent lines 0 = 6435; modelUsage of the last result 6435
+  output     : main loop by message_delta 539; subagent lines 0; modelUsage 539; remainder 0
+  modelUsage (output tokens, dollars): {'claude-haiku-5-5': (539, 0.001616)}; subagent models []
+
+bash-background: exit 0
+  result 0: success, num_turns 3, total_cost_usd 0.001468, subagents completed 0 killed {'parent': 0, 'user': 0, 'system': 0}
+  result 1: success, num_turns 3, total_cost_usd 0.001833, subagents completed 0 killed {'parent': 0, 'user': 0, 'system': 0}
+  model calls shown: main loop 4, subagents 0; tasks: started background, updated completed, notification completed
+  input      : main loop 10 + subagent lines 0 = 10; modelUsage of the last result 10
+  cache read : main loop 19684 + subagent lines 0 = 19684; modelUsage of the last result 19684
+  cache write: main loop 7214 + subagent lines 0 = 7214; modelUsage of the last result 7214
+  output     : main loop by message_delta 384; subagent lines 0; modelUsage 384; remainder 0
+  modelUsage (output tokens, dollars): {'claude-haiku-5-5': (384, 0.001833)}; subagent models []
+
 budget-across-messages: exit 1
   result 0: success, num_turns 3, total_cost_usd 0.000420, subagents completed 0 killed {'parent': 0, 'user': 0, 'system': 0}
   result 1: error_max_budget_usd, num_turns 8, total_cost_usd 0.002221, subagents completed 0 killed {'parent': 0, 'user': 0, 'system': 0}
@@ -113,6 +132,16 @@ subagent-input-closed: exit 0
   cache write: main loop 3305 + subagent lines 4317 = 7622; modelUsage of the last result 7622
   output     : main loop by message_delta 834; subagent lines 220; modelUsage 2898; remainder 2064
   modelUsage (output tokens, dollars): {'claude-haiku-5-5': (2898, 0.004245)}; subagent models ['claude-haiku-5-5']
+
+subagent-main-loop-max-turns: exit 1
+  result 0: error_max_turns, num_turns 5, total_cost_usd 0.002759, subagents completed 0 killed {'parent': 0, 'user': 0, 'system': 0}
+  result 1: error_max_turns, num_turns 5, total_cost_usd 0.004036, subagents completed 1 killed {'parent': 0, 'user': 0, 'system': 0}
+  model calls shown: main loop 8, subagents 3; tasks: started background, updated completed, notification completed tool_uses=2
+  input      : main loop 16 + subagent lines 6 = 22; modelUsage of the last result 22
+  cache read : main loop 75890 + subagent lines 12445 = 88335; modelUsage of the last result 88335
+  cache write: main loop 6750 + subagent lines 6880 = 13630; modelUsage of the last result 13630
+  output     : main loop by message_delta 1409; subagent lines 19; modelUsage 1881; remainder 472
+  modelUsage (output tokens, dollars): {'claude-haiku-5-5': (1881, 0.004036)}; subagent models ['claude-haiku-5-5']
 
 subagent-max-budget-then-message: exit 1
   result 0: success, num_turns 4, total_cost_usd 0.001403, subagents completed 0 killed {'parent': 0, 'user': 0, 'system': 0}
@@ -254,6 +283,16 @@ subagent-foreground-max-budget: exit 1
   output     : main loop by message_delta 193; subagent lines 83; modelUsage 1582; remainder 1389
   modelUsage (output tokens, dollars): {'claude-haiku-5-5': (1582, 0.002076)}; subagent models ['claude-haiku-5-5']
 
+subagent-main-loop-max-turns: exit 1
+  result 0: error_max_turns, num_turns 5, total_cost_usd 0.001805, subagents completed 0 killed {'parent': 0, 'user': 0, 'system': 0}
+  result 1: error_max_turns, num_turns 5, total_cost_usd 0.005198, subagents completed 1 killed {'parent': 0, 'user': 0, 'system': 0}
+  model calls shown: main loop 8, subagents 15; tasks: started background, updated completed, notification completed tool_uses=14
+  input      : main loop 16 + subagent lines 30 = 46; modelUsage of the last result 46
+  cache read : main loop 78886 + subagent lines 114688 = 193574; modelUsage of the last result 193574
+  cache write: main loop 4531 + subagent lines 4333 = 8864; modelUsage of the last result 8864
+  output     : main loop by message_delta 1489; subagent lines 223; modelUsage 3620; remainder 2131
+  modelUsage (output tokens, dollars): {'claude-haiku-5-5': (3620, 0.005198)}; subagent models ['claude-haiku-5-5']
+
 subagent-max-budget-then-message: exit 1
   result 0: success, num_turns 4, total_cost_usd 0.001062, subagents completed 0 killed {'parent': 0, 'user': 0, 'system': 0}
   result 1: error_max_budget_usd, num_turns 1, total_cost_usd 0.002758, subagents completed 1 killed {'parent': 0, 'user': 0, 'system': 0}
@@ -302,6 +341,16 @@ subagent-foreground-max-budget: exit 1
   cache write: main loop 1359 + subagent lines 2975 = 4334; modelUsage of the last result 4334
   output     : main loop by message_delta 193; subagent lines 79; modelUsage 1700; remainder 1507
   modelUsage (output tokens, dollars): {'claude-haiku-5-5': (1700, 0.002113)}; subagent models ['claude-haiku-5-5']
+
+subagent-main-loop-max-turns: exit 1
+  result 0: error_max_turns, num_turns 5, total_cost_usd 0.001945, subagents completed 0 killed {'parent': 0, 'user': 0, 'system': 0}
+  result 1: error_max_turns, num_turns 5, total_cost_usd 0.005205, subagents completed 1 killed {'parent': 0, 'user': 0, 'system': 0}
+  model calls shown: main loop 8, subagents 15; tasks: started background, updated completed, notification completed tool_uses=14
+  input      : main loop 16 + subagent lines 30 = 46; modelUsage of the last result 46
+  cache read : main loop 78822 + subagent lines 114853 = 193675; modelUsage of the last result 193675
+  cache write: main loop 4520 + subagent lines 4367 = 8887; modelUsage of the last result 8887
+  output     : main loop by message_delta 1510; subagent lines 194; modelUsage 3627; remainder 2117
+  modelUsage (output tokens, dollars): {'claude-haiku-5-5': (3627, 0.005205)}; subagent models ['claude-haiku-5-5']
 
 subagent-max-budget-then-message: exit 1
   result 0: error_max_budget_usd, num_turns 1, total_cost_usd 0.002711, subagents completed 0 killed {'parent': 0, 'user': 0, 'system': 0}

@@ -1,0 +1,32 @@
+   0.00  _probe  {"note":"message 1 sent (bash-background)"}
+   0.46  system  {"subtype":"init"}
+   1.27  stream_event  {"parent":null,"event":"message_start","id":"6bHgHc","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":6150,"cache_read":0,"out":16}}
+   1.65  assistant  {"parent":null,"blocks":["tool_use:Bash:XbWvjm"],"id":"6bHgHc","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":6150,"cache_read":0,"out":16}}
+   1.65  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":6150,"cache_read":0,"out":81},"stop_reason":"tool_use"}
+   1.66  rate_limit_event  {"rate_limit_info":{"status":"allowed","resetsAt":1795615200,"rateLimitType":"seven_day","overageStatus":"rejected","overageDisabledReason":"org_level_disabled","isUsingOverage":false,"unifiedWindows":{"seven_day":{"utilization":0.37,"resetsAt":1795615200,"status":"allowed"}}}}
+   1.67  system  {"subtype":"background_tasks_changed","keys":["tasks"],"tasks":1}
+   1.67  system  {"subtype":"task_started","keys":["description","is_backgrounded","run_id","task_id","task_type","tool_use_id"],"is_backgrounded":true,"description":"sleep 20; echo finished","tool_use_id":"XbWvjm"}
+   1.68  user  {"parent":null,"blocks":["tool_result:XbWvjm"]}
+   2.46  stream_event  {"parent":null,"event":"message_start","id":"rivWrx","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":310,"cache_read":6150,"out":2}}
+   2.89  assistant  {"parent":null,"blocks":["thinking"],"id":"rivWrx","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":310,"cache_read":6150,"out":2}}
+   2.97  assistant  {"parent":null,"blocks":["tool_use:StructuredOutput:peFQA3"],"id":"rivWrx","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":310,"cache_read":6150,"out":2}}
+   2.98  user  {"parent":null,"blocks":["tool_result:peFQA3"]}
+   2.98  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":310,"cache_read":6150,"out":148},"stop_reason":"tool_use"}
+   2.98  result  {"subtype":"success","terminal_reason":"completed","num_turns":3,"total_cost_usd":0.0014684000000000003}
+   5.99  _probe  {"note":"3 s after result 1: process alive"}
+  21.69  system  {"subtype":"task_updated","keys":["patch","run_id","task_id"],"patch":{"status":"completed","end_time":1795283038606}}
+  21.69  system  {"subtype":"task_notification","keys":["output_file","run_id","status","summary","task_id","tool_use_id"],"status":"completed","tool_use_id":"XbWvjm"}
+  21.69  system  {"subtype":"background_tasks_changed","keys":["tasks"],"tasks":0}
+  21.74  system  {"subtype":"init"}
+  22.53  stream_event  {"parent":null,"event":"message_start","id":"Xwjogb","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":614,"cache_read":6460,"out":10}}
+  22.80  assistant  {"parent":null,"blocks":["thinking"],"id":"Xwjogb","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":614,"cache_read":6460,"out":10}}
+  23.00  assistant  {"parent":null,"blocks":["text"],"id":"Xwjogb","model":"claude-haiku-5-5","usage":{"in":2,"cache_write":614,"cache_read":6460,"out":10}}
+  23.01  stream_event  {"parent":null,"event":"message_delta","usage":{"in":2,"cache_write":614,"cache_read":6460,"out":100},"stop_reason":"end_turn"}
+  23.01  user  {"parent":null,"blocks":["text"],"isSynthetic":true}
+  23.83  stream_event  {"parent":null,"event":"message_start","id":"BUyDNt","model":"claude-haiku-5-5","usage":{"in":4,"cache_write":140,"cache_read":7074,"out":24}}
+  24.08  assistant  {"parent":null,"blocks":["tool_use:StructuredOutput:qGc8Tp"],"id":"BUyDNt","model":"claude-haiku-5-5","usage":{"in":4,"cache_write":140,"cache_read":7074,"out":24}}
+  24.09  user  {"parent":null,"blocks":["tool_result:qGc8Tp"]}
+  24.09  stream_event  {"parent":null,"event":"message_delta","usage":{"in":4,"cache_write":140,"cache_read":7074,"out":55},"stop_reason":"tool_use"}
+  24.09  result  {"subtype":"success","terminal_reason":"completed","num_turns":3,"total_cost_usd":0.0018326400000000002}
+  27.09  _probe  {"note":"3 s after result 2: process alive"}
+  32.27  _probe  {"note":"standard input closed"}

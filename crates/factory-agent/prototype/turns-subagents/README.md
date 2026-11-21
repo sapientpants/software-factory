@@ -32,7 +32,7 @@ nothing of a session that holds it is written to the results.
 
 Every session runs on the `haiku` alias; in one case the subagent runs on
 `sonnet`. A whole pass reported about 0.12 API-equivalent dollars (the sum of
-the last `total_cost_usd` of each session), and the 51 kept sessions 0.27.
+the last `total_cost_usd` of each session), and the 56 kept sessions 0.29.
 
 ## Results
 
@@ -53,8 +53,14 @@ line.
 - `results/pass-2`, `results/pass-3`: the five cases in which a budget cap is
   reached while a subagent runs, again. What the stream shows there differs
   from run to run. `pass-2` also holds a second run of the two
-  `subagent-as-specified` cases, which were added last: the environment and
-  the flag that SPEC AG-11 and AG-1 name after this probe, together.
+  `subagent-as-specified` cases: the environment and the flag that SPEC AG-11
+  and AG-1 name after this probe, together.
+- Added after a review of the record, and counted apart in it:
+  `subagent-main-loop-max-turns`, in all three passes, in which the main loop
+  reaches `--max-turns` while a background subagent runs; and
+  `bash-background` and `bash-background-off`, in `pass-1`, which ask the Bash
+  tool for a background command without and with
+  `CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1`.
 - `results/first-runs`: the 17 sessions run while the cases were being added,
   with the same chains and budgets. They are counted with the passes. Three
   earlier sessions, with a chain of six files and a read loop that slept, were

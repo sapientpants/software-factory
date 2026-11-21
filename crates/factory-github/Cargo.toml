@@ -1,6 +1,6 @@
 [package]
 name = "factory-github"
-description = "The GitHub trait, octocrab adapter, gateway, GraphQL documents and outbound encoder"
+description = "The GitHub trait, octocrab adapter, gateway and GraphQL documents"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true

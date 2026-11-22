@@ -2216,7 +2216,7 @@ The program found 44 code spans in `AGENTS.md`, 35 of them different, and no lin
 
 Answered 2026-11-22 for #71, by calls on `sapientpants/sf-scratch` with the operator's token, through `gh` 2.105.0, and on the operator's Mac: macOS 27.0.1, cargo 1.100.0 and Python 3.14.4, by two throwaway packages and a few Python scripts outside this repository. No research report covers the question. The packages and the scripts are not kept; the sample texts, what each program did and the tables below are the record. P-31 left open whether GitHub hides the same comments that `pulldown-cmark` reports, and this probe answers that.
 
-**Answer.** GitHub's page hides more than what CommonMark reads as a comment. It hides a comment that stands inside another HTML block, and everything after a `<!--` there that nothing closes, up to the next `-->` in raw HTML or to the end of the text. It hides `<?`, `<!` and `</` before a space as well, each up to the next `>`. It shows a `<!--` in a code span, in a code block, after a backslash and inside a paragraph that nothing closes, as CommonMark reads them, and it shows the text that follows a `-->` on its line. A reading that takes where the raw HTML lies from `pulldown-cmark`, with its table extension on, and what a comment is from the HTML standard agreed with the page on 65 of 71 texts. In five of the other six it kept text that is no comment, and in one it removed text that the page showed.
+**Answer.** GitHub's page hides more than what CommonMark reads as a comment. It hides a comment that stands inside another HTML block, and everything after a `<!--` there that nothing closes, up to the next `-->` in raw HTML or to the end of the text. It hides `<?`, `<!` and `</` before a space as well, each up to the next `>`. It shows a `<!--` in a code span, in a code block, after a backslash and inside a paragraph that nothing closes, as CommonMark reads them, and it shows the text that follows a `-->` on its line. A reading that takes where the raw HTML lies from `pulldown-cmark`, with its table extension on, and what a comment is from the HTML standard agreed with the page on 65 of 71 texts. In five of the other six it kept text that is no comment, and in one it removed text that the page showed. A file of a repository is rendered as an issue body is: all 71 texts came back the same.
 
 ### Method
 
@@ -2224,7 +2224,9 @@ Answered 2026-11-22 for #71, by calls on `sapientpants/sf-scratch` with the oper
 
 **The page.** Each text was sent to `POST /markdown` with `mode` set to `gfm` and `context` set to `sapientpants/sf-scratch`. The HTML that came back was read by `html.parser` of Python. A token counts as shown where it stands in a text node, as in an attribute where it stands in an attribute value alone, and as hidden otherwise.
 
-**The issues.** Four issues on the scratch repository, [#122](https://github.com/sapientpants/sf-scratch/issues/122) to [#125](https://github.com/sapientpants/sf-scratch/issues/125), closed after they were read. The body of #122 held texts 1, 2, 3, 4, 5, 6, 8, 10, 13, 14, 16, 22, 23, 24, 25, 29, 30, 31, 36 and 47, with a blank line between two of them, and its title was ``Probe for D-35: K60a <!-- K60b --> K60c `<!-- K60d -->` ``. The bodies of #123, #124 and #125 held texts 7, 15 and 54, each of which hides what follows it. `bodyHTML`, `bodyText` and `titleHTML` were read through GraphQL. Three comments were then written on #122. The first was minimised with the mutation `minimizeComment` and the classifier `OUTDATED`, the second was left as it was, and the third held the 20 texts of the body. Their `bodyHTML` and `isMinimized` were read through GraphQL, and the comments through `GET /repos/{o}/{r}/issues/122/comments` as well.
+**The issues.** Four issues on the scratch repository, [#122](https://github.com/sapientpants/sf-scratch/issues/122) to [#125](https://github.com/sapientpants/sf-scratch/issues/125), closed after they were read. The body of #122 held texts 1, 2, 3, 4, 5, 6, 8, 10, 13, 14, 16, 22, 23, 24, 25, 29, 30, 31, 36 and 47, with a blank line between two of them, and its title was ``Probe for D-35: K60a <!-- K60b --> K60c `<!-- K60d -->` ``. The bodies of #123, #124 and #125 held texts 7, 15 and 54, each of which hides what follows it. `bodyHTML`, `bodyText` and `titleHTML` were read through GraphQL. Three comments were then written on #122. The first was minimised with the mutation `minimizeComment` and the classifier `OUTDATED`, the second was left as it was, and the third held the 20 texts of the body. Five more comments were written afterwards and minimised with the classifiers `SPAM`, `ABUSE`, `OFF_TOPIC`, `RESOLVED` and `DUPLICATE`, one each. The `bodyHTML` and `isMinimized` of all eight were read through GraphQL, and the comments through `GET /repos/{o}/{r}/issues/122/comments` as well.
+
+**The files.** The 71 texts were committed as the files `p32/01.md` to `p32/79.md` on the branch `probe/p-32` of the scratch repository, at commit [`f65fd57`](https://github.com/sapientpants/sf-scratch/tree/f65fd575b3b197e92dc29db7cfae14fe4231d646/p32). Each was read through `GET /repos/{o}/{r}/contents/{path}` with the media type `application/vnd.github.html`, which gives the file as rendered HTML, and its tokens were counted as for the page.
 
 **The reading of AG-2b before D-35.** A package on `pulldown-cmark` 0.13.6 with `default-features = false` ran `Parser::new(text).into_offset_iter()` with no option set. It removed every HTML block whose text begins with `<!--` after white space, from the start of `Tag::HtmlBlock` to its end, and every `Event::InlineHtml` that begins with `<!--`. It kept everything else.
 
@@ -2656,7 +2658,11 @@ Every token of the 23 texts that an issue body held was shown, in an attribute o
 
 `titleHTML` of #122 was ``Probe for D-35: K60a &lt;!-- K60b --&gt; K60c <code>&lt;!-- K60d --&gt;</code>``. A comment in a title is text on the page.
 
-The minimised comment came back with `isMinimized` `true` and `minimizedReason` `outdated`, and the other with `false` and `null`. Its `body` and its `bodyHTML` held its whole text. The REST answer gave it `"minimized": {"reason": "outdated"}` and the other `"minimized": null`.
+Each of the six minimised comments came back with `isMinimized` `true`, and the one that was left as it was with `false` and a `minimizedReason` of `null`. `minimizedReason` was `outdated`, `spam`, `abuse`, `off-topic`, `resolved` and `duplicate`, after the classifier. The `body` and the `bodyHTML` of each held its whole text. The REST answer gave a minimised comment `"minimized": {"reason": "outdated"}`, with its own reason, and the other `"minimized": null`.
+
+### The files
+
+Every token of every one of the 71 texts was shown, in an attribute or hidden in the HTML of the file exactly as in the answer of `POST /markdown` for that text. The HTML of a file stands in a `<div id="file">` and an `<article>`, and is otherwise that of the issue body.
 
 ### The characters
 
@@ -2692,20 +2698,21 @@ No code point of Bidi_Control, Join_Control or Variation_Selector lacks the prop
 
 **The page shows a control character and keeps a character without width.** That is text 57, above.
 
-**A minimised comment is told apart, and its text still comes back.** Both the GraphQL field and the REST field say so.
+**A minimised comment is told apart, and its text still comes back.** Both the GraphQL field and the REST field say so, whichever of the six reasons it was minimised for.
+
+**A file is rendered as an issue body is.** No token of the 71 texts was shown in the one and hidden in the other, so what the page hides of an issue it hides of a Markdown file of a repository.
 
 ### What changed in the spec
 
 1. The P-32 row of 23.2 is new and carries the answer.
 2. SEC-4 says what the sanitisation of a snapshot removes, with decision D-35 in 23.1, and rests on this probe for what a comment is, for the table extension, for the order of the two removals, for the title and for the control characters.
 3. SEC-3 leaves a minimised comment out of a snapshot.
-4. AG-2b takes the comment of SEC-4 in place of the reading by CommonMark alone, and 19.2 and 19.4 name the extension and the texts of this probe.
+4. AG-2b takes the comment of SEC-4 in place of the reading by CommonMark alone, on what the files showed, and 19.2 and 19.4 name the extension and the texts of this probe.
 
 ### Still open
 
 - **An App's token.** Everything was written and read with the operator's token.
-- **The page in a browser.** The page was read as `bodyHTML`, `bodyText` and `titleHTML`, and as the answer of `POST /markdown`. No browser showed it, and what a script of the page does with that HTML was not observed. The math of text 58 is rendered by one.
-- **The page of a file.** No file of a repository was rendered, so that GitHub hides the same of an `AGENTS.md` as of an issue body was not observed.
+- **The page in a browser.** The page was read as `bodyHTML`, `bodyText` and `titleHTML`, as the answer of `POST /markdown`, and for a file as the HTML of the contents API. No browser showed it, and what a script of the page does with that HTML was not observed. The math of text 58 is rendered by one.
 - **The rest of GitHub's dialect.** Alerts, task lists, diagrams in a fenced block and the references that GitHub makes links of were not tried.
-- **Who minimised a comment.** One comment was minimised, by its author, as outdated. A comment minimised by another account, and the other classifiers, were not tried.
+- **Who minimised a comment.** Each of the six comments was minimised by its author. A comment minimised by another account was not tried.
 - **Linux.** Nothing here was run on the server. Both crates read a string and open nothing.

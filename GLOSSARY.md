@@ -90,3 +90,9 @@ The repository that holds `sf` and its specification, `SPEC.md`. It is also a ta
 
 **Scratch repository**:
 `sapientpants/sf-scratch`, where live probes (23.2) and development builds of `sf` (BOOT-2) run.
+
+**Factory's App**:
+The GitHub App that an installed build of `sf` authenticates as (5.7). What the factory writes to a target repository is written under its identity.
+
+**Scratch App**:
+The GitHub App that a development build of `sf` (BOOT-2) and the end-to-end tests (19.4) authenticate as. It is installed on the scratch repository and on no other.

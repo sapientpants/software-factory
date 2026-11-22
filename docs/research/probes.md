@@ -2210,4 +2210,509 @@ The program found 44 code spans in `AGENTS.md`, 35 of them different, and no lin
 - **Linux.** Nothing here was run on the server. The crate reads a string and opens nothing.
 - **GitHub's dialect.** No extension was on. What the crate reports with tables, footnotes or task lists on was not looked at, and AG-2b reads a file without them. A code span in a table cell that holds a `|` may be read differently from how GitHub shows it.
 - **Text that is not UTF-8.** The parser takes a string. AG-2b leaves such a file out before it is parsed.
-- **GitHub's rendering.** That GitHub hides the same comments that the crate reports was not observed.
+- **GitHub's rendering.** That GitHub hides the same comments that the crate reports was not observed. Probe P-32 has since observed it for an issue body and for a comment on an issue: it does not.
+
+## P-32: what GitHub's page hides of an issue, and what a CommonMark reading of a comment leaves
+
+Answered 2026-11-22 for #71, by calls on `sapientpants/sf-scratch` with the operator's token, through `gh` 2.105.0, and on the operator's Mac: macOS 27.0.1, cargo 1.100.0 and Python 3.14.4, by two throwaway packages and a few Python scripts outside this repository. No research report covers the question. The packages and the scripts are not kept; the sample texts, what each program did and the tables below are the record. P-31 left open whether GitHub hides the same comments that `pulldown-cmark` reports, and this probe answers that.
+
+**Answer.** GitHub's page hides more than what CommonMark reads as a comment. It hides a comment that stands inside another HTML block, and everything after a `<!--` there that nothing closes, up to the next `-->` in raw HTML or to the end of the text. It hides `<?`, `<!` and `</` before a space as well, each up to the next `>`. It shows a `<!--` in a code span, in a code block, after a backslash and inside a paragraph that nothing closes, as CommonMark reads them, and it shows the text that follows a `-->` on its line. A reading that takes where the raw HTML lies from `pulldown-cmark`, with its table extension on, and what a comment is from the HTML standard agreed with the page on 65 of 71 texts. In five of the other six it kept text that is no comment, and in one it removed text that the page showed. A file of a repository is rendered as an issue body is: all 71 texts came back the same.
+
+### Method
+
+**The texts.** 71 sample texts, numbered 1 to 79 with gaps. Every word of the form `K`, the number of the text and a letter is a token, so `K15b` is the second token of text 15. A token says whether the text around it reached the page.
+
+**The page.** Each text was sent to `POST /markdown` with `mode` set to `gfm` and `context` set to `sapientpants/sf-scratch`. The HTML that came back was read by `html.parser` of Python. A token counts as shown where it stands in a text node, as in an attribute where it stands in an attribute value alone, and as hidden otherwise.
+
+**The issues.** Four issues on the scratch repository, [#122](https://github.com/sapientpants/sf-scratch/issues/122) to [#125](https://github.com/sapientpants/sf-scratch/issues/125), closed after they were read. The body of #122 held texts 1, 2, 3, 4, 5, 6, 8, 10, 13, 14, 16, 22, 23, 24, 25, 29, 30, 31, 36 and 47, with a blank line between two of them, and its title was ``Probe for D-35: K60a <!-- K60b --> K60c `<!-- K60d -->` ``. The bodies of #123, #124 and #125 held texts 7, 15 and 54, each of which hides what follows it. `bodyHTML`, `bodyText` and `titleHTML` were read through GraphQL. Three comments were then written on #122. The first was minimised with the mutation `minimizeComment` and the classifier `OUTDATED`, the second was left as it was, and the third held the 20 texts of the body. Five more comments were written afterwards and minimised with the classifiers `SPAM`, `ABUSE`, `OFF_TOPIC`, `RESOLVED` and `DUPLICATE`, one each. The `bodyHTML` and `isMinimized` of all eight were read through GraphQL, and the comments through `GET /repos/{o}/{r}/issues/122/comments` as well.
+
+**The files.** The 71 texts were committed as the files `p32/01.md` to `p32/79.md` on the branch `probe/p-32` of the scratch repository, at commit [`f65fd57`](https://github.com/sapientpants/sf-scratch/tree/f65fd575b3b197e92dc29db7cfae14fe4231d646/p32). Each was read through `GET /repos/{o}/{r}/contents/{path}` with the media type `application/vnd.github.html`, which gives the file as rendered HTML, and its tokens were counted as for the page.
+
+**The reading of AG-2b before D-35.** A package on `pulldown-cmark` 0.13.6 with `default-features = false` ran `Parser::new(text).into_offset_iter()` with no option set. It removed every HTML block whose text begins with `<!--` after white space, from the start of `Tag::HtmlBlock` to its end, and every `Event::InlineHtml` that begins with `<!--`. It kept everything else.
+
+**A sketch of the rule of SEC-4.** A second program of the same package ran `Parser::new_ext` with `Options::ENABLE_TABLES`. It took the ranges of the `Event::Html` and `Event::InlineHtml` events as the raw HTML and kept the text between them, unless a comment was open. In an `Event::Html` range it looked for seven forms by the characters:
+
+| Form | What it removed |
+|---|---|
+| `<!-->` and `<!--->` | The form itself |
+| `<!--` | Up to and with the next `-->` or `--!>`; where none followed in that range, the comment stayed open into the text after it |
+| `<!` that no `--` follows, and `<?` | Up to and with the next `>`; where none followed, up to the end of the HTML block |
+| `</>` | The form itself |
+| `</` before anything but an ASCII letter | As `<!` |
+
+It read an `Event::InlineHtml` range in this way only where the range began with `<!` or `<?`, or where a comment was open, and kept every other such range whole. While a comment was open it removed the text between two ranges and looked for `-->` and `--!>` in each range. It also reported two things: whether an HTML block ended with a comment open that had begun in it, which is a comment left open by its block, and whether a comment was still open at the end of the text.
+
+**The characters.** A package on `icu_properties` 2.4.0 listed the code points with the property Default_Ignorable_Code_Point by general category, and those of the category Cf without it, and asked whether the property holds every code point of Bidi_Control, Join_Control and Variation_Selector.
+
+### The texts
+
+A line of four equals signs and a number starts each text. Five are written with escapes, since they hold a carriage return, a control character or a character without width: `\r`, `\xNN` and `\u{NNNN}` stand for one character each, and `\n` is written before each line feed.
+
+````text
+==== 1
+K1a <!-- K1b --> K1c
+==== 2
+K2a
+
+<!-- K2b
+K2c
+--> K2d
+
+K2e
+==== 3
+K3a `<!-- K3b` K3c --> K3d
+==== 4
+```
+<!-- K4a
+```
+
+K4b --> K4c
+==== 5
+K5a
+
+    <!-- K5b -->
+
+K5c
+==== 6
+K6a <!-- K6b
+
+K6c
+==== 7
+K7a
+
+<!-- K7b
+
+K7c
+
+`K7d`
+==== 8
+K8a <!--> K8b --> K8c
+==== 9
+K9a <!---> K9b --> K9c
+==== 10
+K10a <!-- K10b --!> K10c --> K10d
+==== 11
+K11a <!-- K11b -- K11c --> K11d
+==== 12
+K12a <!-- K12b
+K12c --> K12d
+==== 13
+K13a <!-- K13b
+
+K13c --> K13d
+==== 14
+<div>
+<!-- K14a -->
+K14b
+</div>
+
+K14c
+==== 15
+<div>
+<!-- K15a
+</div>
+
+K15b
+
+`K15c`
+
+<!-- x --> K15d
+
+K15e
+==== 16
+<pre>
+<!-- K16a -->
+K16b
+</pre>
+==== 17
+> K17a <!-- K17b --> K17c
+>
+> <!-- K17d -->
+> K17e
+==== 18
+- K18a <!-- K18b -->
+- <!-- K18c -->
+  K18d
+==== 19
+### K19a <!-- K19b --> K19c
+==== 20
+| a | b |
+|---|---|
+| K20a <!-- K20b --> | K20c |
+==== 21
+   <!-- K21a -->
+
+K21b
+==== 22
+<div>
+<? K22a >
+<! K22b >
+</ K22c >
+K22d
+</div>
+==== 23
+<?php K23a ?>
+
+K23b
+==== 24
+<!DOCTYPE K24a>
+
+K24b
+==== 25
+<![CDATA[ K25a ]]>
+
+K25b
+==== 26
+<script>K26a</script>
+
+K26b
+==== 27
+<style>K27a</style>
+
+K27b
+==== 28
+<div hidden>K28a</div>
+
+<template>K28b</template>
+
+<span style="display:none">K28c</span> K28d
+==== 29
+[K29a]: https://example.com/K29b "K29c"
+[//]: # (K29d)
+
+K29e
+==== 30
+![K30a](https://example.com/x.png "K30b") [K30c](https://example.com/y "K30d") [](https://example.com/K30e)
+==== 31
+<a href="https://example.com/" title="K31a">K31b</a> <img src="https://example.com/x.png" alt="K31c"> <span data-x="K31d">K31e</span>
+==== 32
+<details>
+<summary>K32a</summary>
+
+K32b
+
+</details>
+==== 33
+<textarea>K33a</textarea> <title>K33b</title> <xmp>K33c</xmp> <iframe>K33d</iframe> <noscript>K33e</noscript> <noembed>K33f</noembed> K33g
+==== 34
+K34a <plaintext> K34b
+
+K34c
+==== 36
+K36a<!-- K36b -->K36c
+==== 37
+K37a <!-- K37b > K37c --> K37d
+==== 39
+K39a &lt;!-- K39b --&gt; K39c
+==== 40
+K40a \<!-- K40b --> K40c
+==== 41
+[K41a <!-- K41b --> K41c](https://example.com)
+==== 42
+<span>
+<!-- K42a -->
+K42b
+</span>
+
+K42c
+==== 43
+*K43a <!-- K43b --> K43c*
+==== 44
+K44a <!-- K44b <!-- K44c --> K44d --> K44e
+==== 46
+<!-- K46a -->
+K46b
+
+K46c
+==== 47
+K47a
+<!-- K47b -->
+K47c
+==== 50 (written with escapes)
+K50a\r\n
+\r\n
+<!-- K50b\r\n
+K50c -->\r\n
+\r\n
+K50d
+==== 53
+<!-- K53a
+
+```
+K53b --> K53c
+```
+
+K53d
+==== 54
+<div>
+<!-- K54a
+</div>
+
+K54b `-->` K54c
+==== 55
+<div>
+<? K55a
+</div>
+
+K55b > K55c
+
+K55d
+==== 56
+| a | b |
+|---|---|
+| `K56a | <!-- K56b -->` | K56c |
+==== 57 (written with escapes)
+K57a\x1BK57b\x08K57c\x7FK57d\x85K57e\x0CK57f\u{200B}K57g\u{202E}K57h\u{E0041}K57i\u{FE0F}K57j\u{00AD}K57k
+==== 58
+$$
+<!-- K58a -->
+K58b
+$$
+
+$K58c <!-- K58d --> K58e$
+==== 59
+K59a[^1]
+
+[^1]: K59b <!-- K59c --> K59d
+==== 61
+K61a ~~K61b <!-- K61c --> K61d~~ `a` | `<!-- K61e -->`
+==== 62
+<textarea><!-- K62a --></textarea> K62b
+==== 63
+<xmp>
+<!-- K63a -->
+K63b
+</xmp>
+
+K63c
+==== 64
+<script>
+<!-- K64a
+</script>
+
+K64b
+==== 65
+<a title="<!-- K65a -->" href="https://example.com">K65b</a> K65c
+==== 66
+<a title="<!--" href="https://example.com">K66a</a> K66b --> K66c
+==== 67
+<div title="<!--">
+K67a
+</div>
+
+K67b --> K67c
+==== 68
+<div>
+<? K68a
+
+K68b
+
+K68c
+==== 69
+<div>
+<!-- K69a
+</div>
+
+K69b <a title="-->" href="https://example.com">K69c</a> K69d
+==== 70
+<div>
+<!-- K70a
+</div>
+
+K70b <!-- K70c --> K70d
+==== 71
+<div>
+</>K71a
+</ K71b>K71c
+</div>
+==== 72 (written with escapes)
+K72a <!\u{200B}-- K72b --> K72c
+==== 73 (written with escapes)
+<!\u{200B}-- K73a -->\n
+\n
+K73b
+==== 74 (written with escapes)
+K74a <!-- K74b --\u{200B}> K74c --> K74d
+==== 75
+> K75a
+>
+> <!-- K75b
+> K75c -->
+> K75d
+==== 76
+- K76a
+
+  <!-- K76b
+  K76c --> K76d
+
+  K76e
+==== 77
+<div>
+<!-- K77a
+</div>
+
+K77b --> K77c
+
+K77d
+==== 78
+<div>
+<! K78a
+
+K78b
+
+K78c
+==== 79
+<div>
+</ K79a
+
+K79b
+
+K79c
+````
+
+### What the page showed, and what the two readings left
+
+"Kept" names tokens that a reading left in the text and the page hid. "Removed" names tokens that a reading took out and the page showed. "(attribute)" marks a token that the page held in an attribute value alone: a link title, an alternative text, a `title` attribute or an address.
+
+| Text | What it holds | Shown | Hidden | The reading of AG-2b before D-35 | The sketch of SEC-4 |
+|---|---|---|---|---|---|
+| 1 | A comment inside a paragraph | K1a K1c | K1b | as the page | as the page |
+| 2 | A comment block, with text after its `-->` | K2a K2d K2e | K2b K2c | removed K2d | as the page |
+| 3 | `<!--` in a code span | K3a K3b K3c K3d | none | as the page | as the page |
+| 4 | `<!--` in a fenced code block | K4a K4b K4c | none | as the page | as the page |
+| 5 | A comment in an indented code block | K5a K5b K5c | none | as the page | as the page |
+| 6 | `<!--` inside a paragraph, not closed | K6a K6b K6c | none | as the page | as the page |
+| 7 | A comment block that nothing closes | K7a | K7b K7c K7d | as the page | as the page; left open by its block, and open at the end |
+| 8 | `<!-->` | K8a K8b K8c | none | as the page | as the page |
+| 9 | `<!--->` | K9a K9b K9c | none | as the page | as the page |
+| 10 | `--!>` inside a comment | K10a K10c K10d | K10b | removed K10c | as the page |
+| 11 | `--` inside a comment | K11a K11d | K11b K11c | as the page | as the page |
+| 12 | A comment over two lines of a paragraph | K12a K12d | K12b K12c | as the page | as the page |
+| 13 | `<!--` and `-->` in two paragraphs | K13a K13b K13c K13d | none | as the page | as the page |
+| 14 | A comment on a line inside a `<div>` block | K14b K14c | K14a | kept K14a | as the page |
+| 15 | `<!--` inside a `<div>` block, not closed there | K15d K15e | K15a K15b K15c | kept K15a K15b K15c; removed K15d | as the page; left open by its block |
+| 16 | A comment inside a `<pre>` block | K16b | K16a | kept K16a | as the page |
+| 17 | Comments in a block quote | K17a K17c K17e | K17b K17d | as the page | as the page |
+| 18 | Comments in list items | K18a K18d | K18b K18c | as the page | as the page |
+| 19 | A comment in a heading | K19a K19c | K19b | as the page | as the page |
+| 20 | A comment in a table cell | K20a K20c | K20b | as the page | as the page |
+| 21 | A comment block indented by three spaces | K21b | K21a | as the page | as the page |
+| 22 | `<?`, `<!` and `</` with a space, inside a `<div>` block | K22d | K22a K22b K22c | kept K22a K22b K22c | as the page |
+| 23 | A processing instruction | K23b | K23a | kept K23a | as the page |
+| 24 | A declaration | K24b | K24a | kept K24a | as the page |
+| 25 | A CDATA section | K25b | K25a | kept K25a | as the page |
+| 26 | A `<script>` element | K26a K26b | none | as the page | as the page |
+| 27 | A `<style>` element | K27a K27b | none | as the page | as the page |
+| 28 | A `hidden` attribute, a `<template>` and a `style` attribute | K28a K28b K28c K28d | none | as the page | as the page |
+| 29 | Link reference definitions | K29e | K29a K29b K29c K29d | kept K29a K29b K29c K29d | kept K29a K29b K29c K29d |
+| 30 | An image, a link with a title, a link without text | K30c | K30a (attribute) K30b (attribute) K30d (attribute) K30e (attribute) | kept K30a K30b K30d K30e | kept K30a K30b K30d K30e |
+| 31 | Attributes of raw HTML | K31b K31e | K31a (attribute) K31c (attribute) K31d | kept K31a K31c K31d | kept K31a K31c K31d |
+| 32 | A `<details>` element | K32a K32b | none | as the page | as the page |
+| 33 | Elements whose content HTML reads as text | K33a K33b K33c K33d K33e K33f K33g | none | as the page | as the page |
+| 34 | A `<plaintext>` tag | K34a K34b K34c | none | as the page | as the page |
+| 36 | A comment inside a word | K36a K36c | K36b | as the page | as the page |
+| 37 | `>` inside a comment | K37a K37d | K37b K37c | as the page | as the page |
+| 39 | A comment written with character references | K39a K39b K39c | none | as the page | as the page |
+| 40 | A backslash before `<!--` | K40a K40b K40c | none | as the page | as the page |
+| 41 | A comment inside the text of a link | K41a K41c | K41b | as the page | as the page |
+| 42 | A comment on a line inside a `<span>` block | K42b K42c | K42a | kept K42a | as the page |
+| 43 | A comment inside emphasis | K43a K43c | K43b | as the page | as the page |
+| 44 | A second `<!--` inside a comment | K44a K44d K44e | K44b K44c | as the page | as the page |
+| 46 | A comment block, with text on the next line | K46b K46c | K46a | as the page | as the page |
+| 47 | A comment block that interrupts a paragraph | K47a K47c | K47b | as the page | as the page |
+| 50 | A comment block with CR LF line endings | K50a K50d | K50b K50c | as the page | as the page |
+| 53 | A comment block not closed before a fenced block that holds `-->` | K53c K53d | K53a K53b | removed K53c | as the page |
+| 54 | `<!--` inside a `<div>` block, with a `-->` later in a code span | none | K54a K54b K54c | kept K54a K54b K54c | as the page; left open by its block, and open at the end |
+| 55 | `<?` inside a `<div>` block, with a `>` in a later paragraph | K55b K55c K55d | K55a | kept K55a | as the page |
+| 56 | A comment after a vertical bar inside a code span, in a table cell | K56a | K56b K56c | kept K56b K56c | kept K56c |
+| 57 | Control characters and characters without width | K57a K57b K57c K57d K57e K57f K57g K57h K57i K57j K57k | none | as the page | as the page |
+| 58 | Comments inside math | K58b K58c K58e | K58a K58d | as the page | as the page |
+| 59 | A comment in a footnote | K59a K59b K59d | K59c | as the page | as the page |
+| 61 | A comment in struck-through text, and a vertical bar between two code spans | K61a K61b K61d K61e | K61c | as the page | as the page |
+| 62 | A comment inside a `<textarea>` element | K62b | K62a | kept K62a | as the page |
+| 63 | A comment inside an `<xmp>` block | K63b K63c | K63a | kept K63a | as the page |
+| 64 | `<!--` inside a `<script>` block, not closed | none | K64a K64b | kept K64a K64b | as the page; left open by its block, and open at the end |
+| 65 | A comment inside an attribute value, inline | K65b K65c | K65a (attribute) | kept K65a | kept K65a |
+| 66 | `<!--` inside an attribute value, inline | K66a K66b K66c | none | as the page | as the page |
+| 67 | `<!--` inside an attribute value of a `<div>` block | K67a K67b K67c | none | as the page | removed K67a K67b K67c; left open by its block, and open at the end |
+| 68 | `<?` inside a `<div>` block that nothing closes | K68b K68c | K68a | kept K68a | as the page |
+| 69 | `<!--` not closed in its block, with a `-->` later in an attribute value | K69c K69d | K69a K69b | kept K69a K69b | as the page; left open by its block |
+| 70 | `<!--` not closed in its block, with a comment in a later paragraph | K70d | K70a K70b K70c | kept K70a K70b | as the page; left open by its block |
+| 71 | `</>` and `</` with a space, inside a `<div>` block | K71a K71c | K71b | kept K71b | as the page |
+| 72 | A zero-width space inside `<!--`, in a paragraph | K72a K72b K72c | none | as the page | as the page |
+| 73 | A zero-width space inside `<!--`, at the start of a line | K73a K73b | none | as the page | as the page |
+| 74 | A zero-width space inside a `-->` | K74a K74d | K74b K74c | as the page | as the page |
+| 75 | A comment over two lines of a block quote | K75a K75d | K75b K75c | as the page | as the page |
+| 76 | A comment over two lines of a list item, with text after it | K76a K76d K76e | K76b K76c | removed K76d | as the page |
+| 77 | `<!--` not closed in its block, with a `-->` in a later paragraph | none | K77a K77b K77c K77d | kept K77a K77b K77c K77d | as the page; left open by its block, and open at the end |
+| 78 | `<!` inside a `<div>` block that nothing closes | K78b K78c | K78a | kept K78a | as the page |
+| 79 | `</` with a space inside a `<div>` block that nothing closes | K79b K79c | K79a | kept K79a | as the page |
+
+The reading of AG-2b before D-35 kept hidden tokens in 25 texts: 14, 15, 16, 22, 23, 24, 25, 29, 30, 31, 42, 54, 55, 56, 62, 63, 64, 65, 68, 69, 70, 71, 77, 78 and 79. It removed shown tokens in five: 2, 10, 15, 53 and 76. The sketch of SEC-4 kept hidden tokens in five, 29, 30, 31, 56 and 65, and removed shown tokens in one, 67. It reported a comment left open by its block in texts 7, 15, 54, 64, 67, 69, 70 and 77, and still open at the end in 7, 54, 64, 67 and 77.
+
+Text 57 came back as `K57a`, U+FFFD, `K57b`, U+FFFD, `K57c`, U+FFFD, `K57d`, U+FFFD, `K57e`, U+000C, `K57f`, U+200B, `K57g`, U+202E, `K57h`, U+E0041, `K57i`, U+FE0F, `K57j`, U+00AD, `K57k`. ESC, backspace, DEL and U+0085 were each replaced by U+FFFD, and the form feed and the five characters without width came back as they were sent.
+
+### The issues and the comments
+
+Every token of the 23 texts that an issue body held was shown, in an attribute or hidden in `bodyHTML` exactly as in the answer of `POST /markdown` for that text, and `bodyText` held the shown tokens and no other. The `bodyHTML` of the comment that held the 20 texts gave the same tokens, shown and in attributes, as the `bodyHTML` of the issue.
+
+`titleHTML` of #122 was ``Probe for D-35: K60a &lt;!-- K60b --&gt; K60c <code>&lt;!-- K60d --&gt;</code>``. A comment in a title is text on the page.
+
+Each of the six minimised comments came back with `isMinimized` `true`, and the one that was left as it was with `false` and a `minimizedReason` of `null`. `minimizedReason` was `outdated`, `spam`, `abuse`, `off-topic`, `resolved` and `duplicate`, after the classifier. The `body` and the `bodyHTML` of each held its whole text. The REST answer gave a minimised comment `"minimized": {"reason": "outdated"}`, with its own reason, and the other `"minimized": null`.
+
+### The files
+
+Every token of every one of the 71 texts was shown, in an attribute or hidden in the HTML of the file exactly as in the answer of `POST /markdown` for that text. The HTML of a file stands in a `<div id="file">` and an `<article>`, and is otherwise that of the issue body.
+
+### The characters
+
+| Set, in `icu_properties` 2.4.0 | Code points |
+|---|---|
+| Default_Ignorable_Code_Point | 4,174 |
+| Of these, category Cf | 138: U+00AD, U+061C, U+180E, U+200B to U+200F, U+202A to U+202E, U+2060 to U+2064, U+2066 to U+206F, U+FEFF, U+1BCA0 to U+1BCA3, U+1D173 to U+1D17A, U+E0001, U+E0020 to U+E007F |
+| Of these, category Mn | 263: U+034F, U+17B4, U+17B5, U+180B to U+180D, U+180F, U+FE00 to U+FE0F, U+E0100 to U+E01EF |
+| Of these, category Lo | 4: U+115F, U+1160, U+3164, U+FFA0 |
+| Of these, unassigned | 3,769: U+2065, U+FFF0 to U+FFF8, U+E0000, U+E0002 to U+E001F, U+E0080 to U+E00FF, U+E01F0 to U+E0FFF |
+| Category Cf without the property | 32: U+0600 to U+0605, U+06DD, U+070F, U+0890, U+0891, U+08E2, U+FFF9 to U+FFFB, U+110BD, U+110CD, U+13430 to U+1343F |
+| Category Cc | 65: U+0000 to U+001F, U+007F to U+009F |
+
+No code point of Bidi_Control, Join_Control or Variation_Selector lacks the property, and no code point of White_Space has it.
+
+### Findings
+
+**The page agrees with CommonMark on what is no comment.** A `<!--` in a code span, in a fenced or an indented code block, after a backslash, written with character references, and inside a paragraph where no `-->` follows before the paragraph ends was shown in every case (texts 3, 4, 5, 6, 13, 39 and 40).
+
+**Inside raw HTML the page follows the HTML standard, not CommonMark.** A comment ends at `-->` or at `--!>`, and what follows on the line is shown (2, 10, 53, 76). `<!-->` and `<!--->` are each a whole comment (8, 9). A comment on a line inside a `<div>`, a `<pre>` or a `<span>` block is hidden (14, 16, 42), and so are `<?`, `<!` and `</` before a space up to the next `>`, a processing instruction, a declaration and a CDATA section (22, 23, 24, 25, 71). A comment over two lines of a block quote or of a list item is hidden, and the text after its `-->` is shown (75, 76); the sketch left the marker of the block quote before the comment's first line and removed the one before its second, which lies between two pieces of raw HTML while the comment is open, and it did the same with the indentation in the list item.
+
+**A `<!--` in an HTML block that nothing closes stays open after the block.** It hid every paragraph after it up to the next `-->` in raw HTML, whether that stood in a comment block (15), in an inline comment (70) or in an attribute value of a later tag (69), and to the end of the text where none came (7, 54, 64, 77). A `-->` in a code span or in a later paragraph closed nothing (54, 77). In text 53 the fenced block lies inside the comment block, which no blank line ends, so the `-->` in it is raw HTML and closed the comment. A `<?`, a `<!` or a `</` before a space that nothing closed in its block hid nothing beyond the block (68, 78, 79), and a `<?` closed at the `>` of the block's own closing tag (55).
+
+**GitHub reads a table row before a code span.** In text 56 the page hid a `<!-- x -->` that stands after a vertical bar between two backticks, and dropped the third cell of a row in a table of two columns. Without the table extension the crate reported one code span there, and with it an inline HTML event.
+
+**An attribute value is no comment.** A `<!--` inside a quoted attribute value was kept by the page as the value (65, 66, 67). The sketch reads an HTML block by the characters, so in text 67 it took the `<!--` in the attribute of a `<div>` block for a comment and removed the three tokens after it, which the page showed. In inline HTML it keeps a tag whole, and agreed with the page (66).
+
+**Some text is neither shown nor a comment.** A link reference definition was hidden whole, used or not (29). A link title, the alternative text and the title of an image and the address of a link without text were in attributes alone (30), as were the `title` and `alt` attributes of raw HTML, and a `data-` attribute was dropped (31). Both readings keep all of these.
+
+**Text in an element that hides its content elsewhere is shown here.** The content of `<script>`, `<style>`, `<template>`, `<textarea>`, `<title>`, `<xmp>`, `<iframe>`, `<noscript>` and `<noembed>`, of an element with `hidden` and of one with `style="display:none"` was shown as text (26, 27, 28, 33), and a comment inside such an element was hidden like any other (62, 63, 64).
+
+**A character without width changes what a comment is.** With a zero-width space inside `<!--` the page showed the whole text, at the start of a line too (72, 73). With one inside the first `-->` the comment ran on to the second (74).
+
+**The page shows a control character and keeps a character without width.** That is text 57, above.
+
+**A minimised comment is told apart, and its text still comes back.** Both the GraphQL field and the REST field say so, whichever of the six reasons it was minimised for.
+
+**A file is rendered as an issue body is.** No token of the 71 texts was shown in the one and hidden in the other, so what the page hides of an issue it hides of a Markdown file of a repository.
+
+### What changed in the spec
+
+1. The P-32 row of 23.2 is new and carries the answer.
+2. SEC-4 says what the sanitisation of a snapshot removes, with decision D-35 in 23.1, and rests on this probe for what a comment is, for the table extension, for the order of the two removals, for the title and for the control characters.
+3. SEC-3 leaves a minimised comment out of a snapshot.
+4. AG-2b takes the comment of SEC-4 in place of the reading by CommonMark alone, on what the files showed, and 19.2 and 19.4 name the extension and the texts of this probe.
+
+### Still open
+
+- **An App's token.** Everything was written and read with the operator's token.
+- **The page in a browser.** The page was read as `bodyHTML`, `bodyText` and `titleHTML`, as the answer of `POST /markdown`, and for a file as the HTML of the contents API. No browser showed it, and what a script of the page does with that HTML was not observed. The math of text 58 is rendered by one.
+- **The rest of GitHub's dialect.** Alerts, task lists, diagrams in a fenced block and the references that GitHub makes links of were not tried.
+- **Who minimised a comment.** Each of the six comments was minimised by its author. A comment minimised by another account was not tried.
+- **Linux.** Nothing here was run on the server. Both crates read a string and open nothing.

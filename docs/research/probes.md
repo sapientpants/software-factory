@@ -2949,3 +2949,119 @@ At 08:01 the errors endpoint, asked for the branch, still answered `{"errors":[]
 - **Two files in one place.** `.github/CODEOWNERS` beside `.github/codeowners`, or `.github/` beside `.GitHub/`, was not tried.
 - **Owners.** Every owner was `@sapientpants` or a login that does not exist. A team, an email address, a login without write access, and two entries with different owners for one path were not tried.
 - **The size limit.** The documentation gives 3 MB; the largest file here was 11 lines.
+
+## P-34: what cargo reads as a dependency, and what a lockfile holds
+
+Answered 2026-11-22 for #64, on the operator's Mac: macOS 27.0.1, cargo 1.100.0 and git 2.56.1, by one script in a throwaway directory outside this repository, with crates.io reachable. The Cargo reference was read first, on the same day, and for the format of a lockfile the source of cargo; "Against the documentation" below says what each gave. The script and its output are on the branch `prototype/dependency-rule-probe`, at commit [`53979c8`](https://github.com/sapientpants/software-factory/tree/53979c8b2d0e9db6ba1ff79404af3201dec3558f/xtask/prototype/dependency-rule). They are throwaway code.
+
+**Answer.** cargo reads a dependency from more places than the Cargo reference names: the tables `dev_dependencies` and `build_dependencies` in a package of an edition before 2024, and the key `registry-index` of a dependency, which names a registry by its address. A lockfile names every package that a build can fetch, each with the place it comes from, and a package of the tree itself without one. A change to a lockfile alone moves a package to another version or to another commit of the same git repository. It adds no package and moves none to another place: cargo drops what the manifests do not ask for, or refuses the lockfile under `--locked`. Where a manifest asks for more than its lockfile holds, cargo stops under `--locked` and otherwise fetches what is missing.
+
+### Method
+
+Each case is a package or a workspace of empty libraries. The one registry package is `cfg-if`, which has no dependencies. Four git repositories on the same disk, read through `file://` addresses, stand for git dependencies: `gitdep` with a branch `dev` and a tag `v0.3.0` on its one commit; `gitopt` with an optional dependency on `cfg-if` behind the feature `extra`; `gitmove`, which gained a second commit during the run with the same package version; and `gitcfg`, which holds a package with the name and the version of the registry's `cfg-if`. `cargo generate-lockfile` wrote each lockfile. Where a lockfile was edited by hand, `cargo build --locked` and then `cargo build` read it.
+
+### What cargo read in a manifest
+
+| Manifest | cargo 1.100.0 |
+|---|---|
+| Edition 2021, with `[dev_dependencies]`, `[build_dependencies]` and `[target.'cfg(unix)'.dev_dependencies]`, the last with `default_features = false` in its entry | Read all three: the three packages are in the lockfile, and `cargo metadata` gives the third without its default features. `cargo check` warned of each spelling: "`dev_dependencies` is deprecated in favor of `dev-dependencies` and will not work in the 2024 edition" |
+| Edition 2021, with `[target.'cfg(unix)'.build_dependencies]` | Read: the package is in the lockfile |
+| Edition 2024, with `[dev_dependencies]`, with `[build_dependencies]`, or with `default_features` in an entry | An error for each: "`dev_dependencies` is unsupported as of the 2024 edition; instead use `dev-dependencies`", and the same of the other two |
+| A workspace root with `cfg-if` in `[workspace.dependencies]`, which no member inherits | No `cfg-if` in the lockfile. With `cfg-if.workspace = true` in a member, it is there |
+| `cfg-if = { version = "1", optional = true }`, and no feature that turns it on | `cfg-if` is in the lockfile. `cargo tree` does not show it |
+| The same entry without `optional = true` | The lockfile is the same, byte for byte. `cargo tree` shows `cfg-if` |
+| A dependency on `gitopt` | The lockfile holds `gitopt` and no `cfg-if` |
+| The same entry with `features = ["extra"]` added | The lockfile gained the package `cfg-if`, and `cargo tree` shows it below `gitopt` |
+| `alias = { package = "cfg-if", version = "1" }` | The lockfile names `cfg-if`. The word `alias` is nowhere in it |
+| `cfg-if = { version = "1", registry-index = "https://github.com/rust-lang/crates.io-index" }` | Accepted. `cargo check` warned of a key `bogus-key` in the same entry, "unused manifest key", and not of this one |
+| The same key with the `file://` address of an empty directory | "Updating `<directory>` index", then an error: no repository there. cargo took the address for a registry of its own and went to it |
+| `[bogus-dependencies]`, and `[target.'cfg(unix)'.bogus-dependencies]` | Ignored. `cargo check` warned: "unused manifest key" |
+| `[patch.crates-io]` in the root manifest, with `cfg-if = { path = … }` to a package `cfg-if` 1.0.99, and a second entry that nothing uses | The lockfile holds `cfg-if` 1.0.99 without a `source`, and the second entry under `[[patch.unused]]`, with the version 9.9.9 that only the patch's own manifest names. A warning for the unused one |
+| The same `[patch]` in a member that is not the workspace root | "patch for the non root package will be ignored", and the lockfile holds the registry's `cfg-if` |
+| `[replace]` in such a member | "replace for the non root package will be ignored", and the lockfile holds the registry's `cfg-if` alone |
+| `[replace]` with `"cfg-if:1.0.5" = { path = … }` | The lockfile holds two entries `cfg-if` 1.0.5: one without a `source`, and the registry's with `replace = "cfg-if 1.0.5"` |
+
+A manifest that is TOML and has a table of another shape did not load. Each of these was an error, and no lockfile was written: `dependencies`, `dev-dependencies`, `build-dependencies`, `target`, `patch` or `replace` as a string, a number or an array at the top level ("expected a map"), and `workspace` as a string ("expected struct TomlWorkspace"); a string for a table under `target` ("expected struct TomlPlatform"), and for `dependencies` or `build_dependencies` in such a table; `[patch]` with a string for a table, and `[workspace]` with `dependencies` as a string; an entry that is a number or an array, in a dependency table, in `[patch.crates-io]` or in `[replace]` ("expected a version string like "0.9.8" or a detailed dependency"); `git = 5` and `optional = "yes"` in an entry; an entry that is an empty table ("specified without providing a local path, Git repository, version, or workspace dependency to use"); `git` and `path` in one entry ("Only one of `git` or `path` is allowed"); and `registry = "nowhere"` ("registry index was not found in any configuration"). One entry written both inline and as a table of its own is no TOML, and cargo said so: "duplicate key".
+
+### What a lockfile held
+
+The first line of data is `version = 4`. Each package is one `[[package]]` table.
+
+| Package | Its table |
+|---|---|
+| A member of the workspace, and a `path` dependency | `name`, `version` and, where it has any, `dependencies`. No `source` and no `checksum` |
+| From crates.io | `source = "registry+https://github.com/rust-lang/crates.io-index"` and `checksum`, 64 hexadecimal digits |
+| From git, no branch named | `source = "git+file://<dir>/gitdep#<commit>"`, the commit in full. No `checksum` |
+| From git with `branch = "dev"` | `git+file://<dir>/gitdep?branch=dev#<commit>` |
+| From git with `tag = "v0.3.0"` | `git+file://<dir>/gitdep?tag=v0.3.0#<commit>` |
+| From git with `rev = "<commit>"` | `git+file://<dir>/gitdep?rev=<commit>#<commit>` |
+| Patched by a `path` | `name` and `version`, no `source` |
+
+The four git entries were asked for by four members of one workspace. They are one commit of one repository, with one name and one version, and the lockfile holds four tables for them. An entry of `dependencies` names such a package with its version and its source in parentheses, without the commit: `"gitdep 0.3.0 (git+file://<dir>/gitdep?branch=dev)"`. Where a name is the only one of its kind the entry is the name alone.
+
+### What cargo did with an edited lockfile
+
+| Edit, with the manifest unchanged | `cargo build --locked` | `cargo build` |
+|---|---|---|
+| A `[[package]]` added that no manifest leads to | Error: "cannot update the lock file … because --locked was passed to prevent this" | Built, and wrote the lockfile back without the table |
+| The `checksum` of `cfg-if` changed in four digits | Error: "checksum for `cfg-if v1.0.5` changed between lock files" | The same error |
+| The `checksum` of `cfg-if` taken out | The same error as in the first row | Built, and wrote the lockfile back with the checksum |
+| The `source` of `cfg-if` replaced by a git repository that holds a package of that name and version | The same error as in the first row | Built the registry's package, and wrote the lockfile back as it was |
+| `cargo update cfg-if --precise 1.0.0`: the `version` and the `checksum` of one table changed | Built `cfg-if` 1.0.0 | Not run |
+| The commit after `#` of a git package replaced by a later commit of the same repository, with the same package version | Fetched and built the later commit | Not run |
+| None, while the git repository gained that later commit | Built the commit of the lockfile | Not run |
+| None, while the manifest gained `features = ["extra"]` on its dependency `gitopt`, which brings in `cfg-if` | The same error as in the first row | Fetched and built `cfg-if`, and wrote it into the lockfile of the work tree |
+| `version = 99` | Error: "lock file version `99` was found, but this version of Cargo does not understand this lock file" | Not run |
+| A `Cargo.lock` in the directory of a workspace member, with text that is no lockfile | Built, from the root and from the member's directory | Not run |
+| The same text as the lockfile at the workspace root | Error: "failed to parse lock file" | Not run |
+
+### Findings
+
+**The manifest has more dependency tables and more keys than the reference names.** cargo took a dependency from `dev_dependencies` and `build_dependencies`, at the top level and under `target`, in a package of edition 2021, and read `default_features` in an entry. It followed `registry-index` to an address that no configuration names. A rule that lists the keys which say where a package comes from has to know that one, and whatever cargo adds next.
+
+**A feature can bring in a package, and the lockfile shows it.** Turning on a feature of a dependency that was already there added a package that no manifest of the tree names. The manifest's diff is one word in a `features` array. The lockfile's diff is a new `[[package]]` table.
+
+**A package that a manifest of the tree holds as optional is in the lockfile whether or not anything turns it on.** Making it no longer optional changed no line of the lockfile.
+
+**The lockfile names the package and not the key.** A renamed dependency is in the lockfile under the name of `package`.
+
+**A lockfile alone moves a version and a git commit, and nothing else.** With no manifest changed, cargo built another version of a registry package and another commit of a git repository as the lockfile named them. A package that no manifest asks for, and a package from another place than its manifest asks for, were dropped or refused. A wrong checksum never built. So what a candidate can do through a lockfile alone is choose among the versions that the manifests allow, and among the commits of a git repository that a manifest names.
+
+**A lockfile that is behind its manifests holds a build only under `--locked`.** Where a manifest asked for more than the lockfile held, `cargo build --locked` stopped with an error, and `cargo build` fetched the missing package and built it. The lockfile it then wrote is in the work tree of that build and in no diff.
+
+**A package without a `source` is a package of the tree, or one that a `path` put in the place of another.** A `[patch]` by `path` left the patched package in the lockfile with no `source`, as a workspace member has none.
+
+**Two packages can share a name, and a name and a version.** The four git entries differ in their `source` alone, and the two of `[replace]` in having one or not.
+
+**cargo reads one lockfile, at the workspace root.** It did not open the one in a member's directory.
+
+### Against the documentation
+
+The Cargo reference, read on 2026-11-22: "Specifying Dependencies", "The Manifest Format", "Features", "Workspaces", "Overriding Dependencies", "Source Replacement", "Configuration", "Registries", "Dependency Resolution", and of "Unstable Features" the parts on a dependency's keys.
+
+- **Borne out.** The dependency tables are `[dependencies]`, `[dev-dependencies]`, `[build-dependencies]`, the same three under `[target.<cfg or triple>]`, and `[workspace.dependencies]`. `package` names the package that is fetched. "Cargo only looks at the patch settings in the `Cargo.toml` manifest at the root of the workspace." A dependency may have a registry version beside a `git` or a `path`, and "the `git` or `path` dependency will be used locally".
+- **Not stated there.** The underscore spellings, and that edition 2024 ends them. The key `registry-index`. Whether a `[workspace.dependencies]` entry that no member inherits is resolved. That a feature of a dependency can bring in a further package, which follows from what a feature is and is nowhere said in so many words. What a lockfile holds for a patched or a replaced package.
+- **Read and not run.** `[replace]` is deprecated; its keys are package id specifications, and its values are dependencies without features. An inherited dependency may add `optional`, `features` and `default-features` and no other key. The unstable keys of a dependency are `public`, `artifact` with `lib` and `target`, and `base`. A configuration file can hold `[patch]`, which then wins over the manifest's, `[source]` with `replace-with`, `paths` and `[registries]`; cargo looks for it in `.cargo/` of the current directory and of every directory above it, with or without the extension `.toml`. The index of a registry can also come from the environment variable `CARGO_REGISTRIES_<name>_INDEX`, and `--config` on the command line can set a `[patch]`.
+
+The source of cargo: `crates/cargo-util-schemas/src/lockfile.rs` on `master`, and `src/cargo/core/resolver/resolve.rs` and `encode.rs` at the tag `rust-1.90.0`.
+
+- **Borne out.** "Cargo does not serialize path dependencies." A `dependencies` entry carries the version "if multiple packages share the same name" and the source "if multiple packages share the same name and version". A version that cargo does not know is an error.
+- **Read and not run.** A lockfile has had four formats. The first kept the checksums in a `[metadata]` table; the second, from cargo 1.38, has them in each `[[package]]`; the third, from 1.47, has the `version` line; the fourth, from 1.78, escapes the characters of a git reference. "New lockfiles use V3 by default from in 1.53 to 1.82", and "New lockfiles use V4 by default starting in 1.83." A fifth is unstable. A lockfile without the `version` line is of the first or the second format, and an older one can hold the root package in a table `[root]`. The accepted beginnings of a `source` are `registry+`, `sparse+`, `git+` and `path+`.
+- **cargo's own parser.** At that tag cargo depends on the crate `toml` 0.9, and so does `cargo-util-schemas`, which holds the types of a manifest and of a lockfile.
+
+### What changed in the spec
+
+1. The P-34 row of 23.2 is new and carries the answer.
+2. VAL-5g is new, with decision D-32 in 23.1: what the dependency rule flags in a manifest and in a lockfile. It names the underscore tables among the dependency tables, names the keys of an entry that do not draw the flag in place of those that do, and compares a lockfile by its pairs of `name` and `source`.
+3. The row of the dependency rule in the table of 11.3, VAL-3, VAL-5 and VAL-5e cite VAL-5g, and VAL-5e no longer leaves the question to D-32.
+4. 9.5 names VAL-5g among what the `rust` implementation of `Ecosystem` supplies, 19.4 has a row for the rule's tests, step 2 of 20.1 lists a tree with a manifest and no lockfile as an advisory item, BOOT-4 cites VAL-5g, and the M1b row of section 22 names it.
+
+### Still open
+
+- **Linux.** Nothing here was run on the server (D-3).
+- **Other versions of cargo.** Only 1.100.0 was run. Which version first refused the underscore spellings for edition 2024, and whether an older one reads `registry-index`, was not looked at.
+- **Another registry.** No registry but crates.io was used, so no `registry = "<name>"`, no `sparse+` source and no `[registries]` table. What a lockfile holds for a vendored package, behind `[source]` with `replace-with`, was not observed.
+- **Configuration.** `[patch]`, `[source]` and `paths` in `.cargo/config.toml` were read about and not run. A change to that file is a protected path of 11.3 already.
+- **Older lockfiles.** Every lockfile here is of the fourth format. One with `[metadata]` checksums, with `[root]` or without the `version` line was not made.
+- **The unstable keys** and a `[patch]` for a git source were not tried.
+- **`cargo install`.** By its documentation it uses the lockfile of the package it installs. Nothing was installed.

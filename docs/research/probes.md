@@ -2716,3 +2716,236 @@ No code point of Bidi_Control, Join_Control or Variation_Selector lacks the prop
 - **The rest of GitHub's dialect.** Alerts, task lists, diagrams in a fenced block and the references that GitHub makes links of were not tried.
 - **Who minimised a comment.** Each of the six comments was minimised by its author. A comment minimised by another account was not tried.
 - **Linux.** Nothing here was run on the server. Both crates read a string and open nothing.
+
+## P-28: how GitHub reads a `CODEOWNERS` pattern
+
+Answered 2026-11-22 for #56, on the scratch repository `sapientpants/sf-scratch`, which is public: the pushes and the errors endpoint with the operator's token, through git and `gh` 2.105.0, and the owners without a login. GitHub's page "About code owners" was read again the same day through a fetching agent, which quoted single sentences of it and summarised its sample file; it is "the documentation" below. No research report covers the question. The factory's App does not exist yet, and nothing here was done as one.
+
+**Answer.** In each form that the issue asked about, an entry that VAL-3a writes owned the files that its pattern matches by VAL-5c: `**/crates/**` under `crates/` at the root and below it, `**/Cargo.toml` at the root and in a crate, an entry with a leading `/` at the root alone, and `a/**/b` with none or more components between the two. It owned more in one way and fewer files in three. More: where the last component of an entry matches the name of a directory, the entry owns every file below that directory, so `**/Cargo.toml` owns what lies in a directory named `Cargo.toml`. Fewer: a path in another letter case or another normal form has no owner; `?` stands for one byte, so it does not stand for `é`; and a space or a `#` in a pattern ends the pattern unless a backslash stands before it. An unescaped `#` is the worst of these: the rest of the line became a comment, `**/#hash.md` became the entry `**/` without an owner, that entry matched every file, and no error was reported. A pattern copied without `**/` before it lost every match below the root where it holds a `/` between two components, and lost nothing where it holds none or begins with `**/` itself. GitHub took the file from `.github/`, then the root, then `docs/`, as the documentation says, and found it under `.GitHub/` and under the name `codeowners` as well. The errors endpoint named a character class, an unknown owner and a word that is no owner. It was silent on a `#` in a pattern, on an entry without an owner and on a negation.
+
+### Method
+
+**How the owner of a file was read.** The page of a file shows a shield where the file has a code owner. The page takes that from `GET https://github.com/{o}/{r}/deferred-metadata/{ref}/{path}`, which is an endpoint of the web interface and no part of the API, and which answers a request without a login on a public repository. Its answer holds an object `codeownerInfo` with four fields: `ownersForFile`, the owners as text; `ruleForPathLine`, the line of the entry that decided; `codeownerPath`, a link to that line in the file GitHub used; and `ownedByCurrentUser`. Four answers were seen:
+
+| Answer | `ownersForFile` | `ruleForPathLine` | `codeownerPath` |
+|---|---|---|---|
+| Owned | `@sapientpants` | The line | The file and the line |
+| Matched by an entry without an owner | Empty | The line | Null |
+| Matched by no entry | Empty | Null | Null |
+| No file in effect, or the path is a directory | Null | Null | Null |
+
+A path that is no entry of the tree got the third answer, so the endpoint matches the text of a path and does not look the file up.
+
+**The page in a browser.** In Chrome, signed in as the operator, the page of `Cargo.toml` on the branch `probe/p-28-t02` showed the shield, with the label "Code owner:", and the page of `crates/a.rs` on that branch showed none. The endpoint said the same of both from inside the page, with `ownedByCurrentUser` true and `ownersForFile` empty: a signed-in owner is not named to themself. One click on the shield replaced the file's view with GitHub's message "Looks like something went wrong!", so what lies behind the shield was not read. Every other owner below is the endpoint's answer without a login.
+
+**The test files.** 65 files, each holding its own path as its text. The trees were built with `git update-index --cacheinfo`, so that the Mac's file system folded no name. `<U+0301>` stands for the combining acute accent and `<TAB>` for a tab; an `é` written as one letter is U+00E9.
+
+| For | Files |
+|---|---|
+| A directory at two depths | `crates/a.rs`, `crates/sub/b.rs`, `crates/core/Cargo.toml`, `vendor/crates/c.rs`, `vendor/crates/sub/d.rs`, `xcrates/e.rs`, and `misc/crates`, a file |
+| A file name, and a directory of that name | `Cargo.toml`, `misc/xCargo.toml`, `misc/Cargo.toml.bak`, `dirs/Cargo.toml/inner.txt`, `dirs/Cargo.toml/deep/inner2.txt`, `rootname/inner.txt`, `sub/rootname/inner.txt` |
+| The root and below it | `GLOSSARY.md`, `docs/GLOSSARY.md`, `docs/other.md`, `docs/research/a.md`, `docs/research/sub/b.md`, `sub/docs/research/c.md`, `NOTES.md` |
+| Letter case and normal form | `SPEC.md`, `spec.md`, `docs/SPEC.md`, `docs/specs/billing/spec.md`, `case/Spec.MD`, `case/AGENTS.md`, `case/agents.md`, `case/AGENTſ.md`, `norm/nfc/café.md`, `norm/nfd/cafe<U+0301>.md` |
+| `?` | `q/aXb.txt`, `q/ab.txt`, `q/aXYb.txt`, `q/a/b.txt`, `q/nfc/aéb.txt`, `q/nfd/ae<U+0301>b.txt` |
+| `**` between two components | `ma/mb`, `ma/x/mb`, `ma/x/y/mb`, `z/ma/x/mb`, `ma/x/mbx`, `na/nb/below.txt`, `na/x/nb/below.txt` |
+| A space, a tab and a `#` | `sp/my file.txt`, `sp/myXfile.txt`, `sp/my`, `sp/my<TAB>file.txt`, `#hash.md`, `h/#hash.md`, `h/a#b.md`, `h/aXb.md` |
+| `*` and a leading dot | `dot/.hidden`, `dot/plain`, `dot/sub/deep.txt`, `a.snap`, `snap/a.snap`, `snap/deep/b.snap`, `snap/x.snap/inner.txt` |
+| Names of the built-in list | `.factory/policy.toml`, `sub/.factory/x.toml`, `.mcp.json`, `sub/.mcp.json`, `.github/other.txt`, `sub/.github/other.txt` |
+
+`sp/my<TAB>file.txt` was added for the variants f01 to f09, so the others were read on 64 files. Every variant was also read on the two files that `main` already held, `README.md` and `.github/ISSUE_TEMPLATE/factory-task.yml`, and on its own `CODEOWNERS` file. "All 67 files" in a table below is the 64, those two and that file.
+
+**The variants.** 67 variants of the `CODEOWNERS` file, in 68 commits on `main` of the scratch repository, each commit with the test files and one variant, pushed one after another from 07:10 to 07:58 UTC: [`40a74a4`](https://github.com/sapientpants/sf-scratch/commit/40a74a4507c221defdf727b1277b0067751f5420) to [`198d856`](https://github.com/sapientpants/sf-scratch/commit/198d8568f5c4d7cabf12d667381e79b7b6fa55e5). The last commit, [`17d8464`](https://github.com/sapientpants/sf-scratch/commit/17d8464cd28fd71ba3cb0333f13f34d622816867), has the tree that `main` had before the first, at `54c6fb5`. A variant is `.github/CODEOWNERS` with three lines, unless a table says otherwise: an entry for a file of the variant's own, `/sentinel/<variant>.txt @sapientpants`; a comment; and on line 3 the entry under test, with `@sapientpants` as its owner. The tree holds the sentinel file of every variant. Three scripts built the commits, pushed them and read the answers. They are not kept; the commits and the tables are the record.
+
+**The reading.** After a push the script waited until the variant's sentinel had an owner, then five seconds more, and then read every path until two readings in a row agreed. The sentinel named line 1, except in t23, t25 and v13, where the entry on line 3 matches it too and it named line 3. For a variant that leaves the sentinel without an owner it waited until four readings three seconds apart found neither that sentinel nor the previous one owned. The first reading often still held answers of the variant before: it agreed with the second for 7 commits, a third reading was needed for 58 and a fourth for 2. The first variant was read once, before the script read twice. It was pushed and read again as commit `34ce0f3`, after l07 and before f01, with the same answer; that is the 68th commit. GitHub answered 64 requests with a 429 and `Retry-After: 60`, and the script waited each time. No answer in the tables contradicts another, and each surprising one is borne out by a second variant.
+
+**The errors.** `GET /repos/{o}/{r}/codeowners/errors?ref=<commit>` for the commit of each variant, with the operator's token.
+
+**A sketch of VAL-5c.** A matcher of about 40 lines in Python for the grammar of VAL-5c with the fold of VAL-5d, taken from Python's `casefold` and `unicodedata`. It gave the answer of every example of VAL-5b to VAL-5d that was tried, 22 of them. The column "Against the pattern" compares what an entry owned with what that sketch matched among the same files. It is not kept.
+
+### What an entry of VAL-3a owned
+
+The pattern is what a policy would hold, and the entry is how VAL-3a writes it: with `**/` before it unless it begins with `/`.
+
+| Variant | Commit | Pattern | Entry | Owned | Against the pattern |
+|---|---|---|---|---|---|
+| t01 | `40a74a4` | `crates/**` | `**/crates/**` | `crates/a.rs`, `crates/sub/b.rs`, `crates/core/Cargo.toml`, `vendor/crates/c.rs`, `vendor/crates/sub/d.rs` | The same |
+| t02 | `ec27f65` | `Cargo.toml` | `**/Cargo.toml` | `crates/core/Cargo.toml`, `Cargo.toml`, `dirs/Cargo.toml/inner.txt`, `dirs/Cargo.toml/deep/inner2.txt` | More: `dirs/Cargo.toml/inner.txt`, `dirs/Cargo.toml/deep/inner2.txt` |
+| t03 | `408a683` | `/GLOSSARY.md` | `/GLOSSARY.md` | `GLOSSARY.md` | The same |
+| t04 | `36fe748` | `SPEC.md` | `**/SPEC.md` | `SPEC.md`, `docs/SPEC.md` | Fewer: `spec.md`, `docs/specs/billing/spec.md`, `case/Spec.MD` |
+| t05 | `cf82648` | `docs/research/**` | `**/docs/research/**` | `docs/research/a.md`, `docs/research/sub/b.md`, `sub/docs/research/c.md` | The same |
+| t06 | `134d549` | `.factory/**` | `**/.factory/**` | `.factory/policy.toml`, `sub/.factory/x.toml` | The same |
+| t07 | `ec777c1` | `.github/**` | `**/.github/**` | `.github/other.txt`, `sub/.github/other.txt`, `.github/ISSUE_TEMPLATE/factory-task.yml`, `.github/CODEOWNERS` | The same |
+| t08 | `13a8b43` | `CODEOWNERS` | `**/CODEOWNERS` | `.github/CODEOWNERS` | The same |
+| t09 | `db578d2` | `AGENTS.md` | `**/AGENTS.md` | `case/AGENTS.md` | Fewer: `case/agents.md`, `case/AGENTſ.md` |
+| t10 | `c108bc0` | `.mcp.json` | `**/.mcp.json` | `.mcp.json`, `sub/.mcp.json` | The same |
+| t11 | `34198c4` | `/docs/**` | `/docs/**` | `docs/GLOSSARY.md`, `docs/research/a.md`, `docs/research/sub/b.md`, `docs/other.md`, `docs/SPEC.md`, `docs/specs/billing/spec.md` | The same |
+| t12 | `2512a3a` | `**/*.snap` | `**/**/*.snap` | `a.snap`, `snap/a.snap`, `snap/deep/b.snap`, `snap/x.snap/inner.txt` | More: `snap/x.snap/inner.txt` |
+| t13 | `f1584e0` | `*.snap` | `**/*.snap` | `a.snap`, `snap/a.snap`, `snap/deep/b.snap`, `snap/x.snap/inner.txt` | More: `snap/x.snap/inner.txt` |
+| t14 | `bb54183` | `/*.snap` | `/*.snap` | `a.snap` | The same |
+| t15 | `c2bcb65` | `a?b.txt` | `**/a?b.txt` | `q/aXb.txt` | Fewer: `q/nfc/aéb.txt`, `q/nfd/ae<U+0301>b.txt` |
+| t16 | `60dbd30` | `/q/a?b.txt` | `/q/a?b.txt` | `q/aXb.txt` | The same |
+| t17 | `a610bdf` | `ma/**/mb` | `**/ma/**/mb` | `ma/mb`, `ma/x/mb`, `ma/x/y/mb`, `z/ma/x/mb` | The same |
+| t18 | `46d4969` | `/ma/**/mb` | `/ma/**/mb` | `ma/mb`, `ma/x/mb`, `ma/x/y/mb` | The same |
+| t19 | `be3666b` | `na/**/nb` | `**/na/**/nb` | `na/nb/below.txt`, `na/x/nb/below.txt` | More: `na/nb/below.txt`, `na/x/nb/below.txt` |
+| t20 | `00b6596` | `rootname` | `**/rootname` | `rootname/inner.txt`, `sub/rootname/inner.txt` | More: `rootname/inner.txt`, `sub/rootname/inner.txt` |
+| t21 | `f3e8c88` | `/rootname` | `/rootname` | `rootname/inner.txt` | More: `rootname/inner.txt` |
+| t22 | `8915aa8` | `café.md` | `**/café.md` | `norm/nfc/café.md` | Fewer: `norm/nfd/cafe<U+0301>.md` |
+| t23 | `62fa795` | `**` | `**/**` | All 67 files | The same |
+| t24 | `e02c677` | `/dot/*` | `/dot/*` | `dot/.hidden`, `dot/plain` | The same |
+| t25 | `e33cda5` | `*` | `**/*` | All 67 files | The same |
+| t26 | `c0ea180` | `crates` | `**/crates` | `crates/a.rs`, `crates/sub/b.rs`, `crates/core/Cargo.toml`, `vendor/crates/c.rs`, `vendor/crates/sub/d.rs`, `misc/crates` | More: `crates/a.rs`, `crates/sub/b.rs`, `crates/core/Cargo.toml`, `vendor/crates/c.rs`, `vendor/crates/sub/d.rs` |
+
+### A pattern as it stands, and the forms of the sample file
+
+The first eight entries are patterns copied without the prefix. The others are forms that the documentation's sample file shows.
+
+| Variant | Commit | Entry | Owned | Against the pattern |
+|---|---|---|---|---|
+| v01 | `83e32ed` | `crates/**` | `crates/a.rs`, `crates/sub/b.rs`, `crates/core/Cargo.toml` | Fewer: `vendor/crates/c.rs`, `vendor/crates/sub/d.rs` |
+| v02 | `9f61c26` | `Cargo.toml` | `crates/core/Cargo.toml`, `Cargo.toml`, `dirs/Cargo.toml/inner.txt`, `dirs/Cargo.toml/deep/inner2.txt` | More: `dirs/Cargo.toml/inner.txt`, `dirs/Cargo.toml/deep/inner2.txt` |
+| v03 | `1cff8c5` | `docs/research/**` | `docs/research/a.md`, `docs/research/sub/b.md` | Fewer: `sub/docs/research/c.md` |
+| v04 | `14f10ed` | `SPEC.md` | `SPEC.md`, `docs/SPEC.md` | Fewer: `spec.md`, `docs/specs/billing/spec.md`, `case/Spec.MD` |
+| v05 | `ca61a62` | `.factory/**` | `.factory/policy.toml` | Fewer: `sub/.factory/x.toml` |
+| v06 | `62c225b` | `*.snap` | `a.snap`, `snap/a.snap`, `snap/deep/b.snap`, `snap/x.snap/inner.txt` | More: `snap/x.snap/inner.txt` |
+| v07 | `e741979` | `ma/**/mb` | `ma/mb`, `ma/x/mb`, `ma/x/y/mb` | Fewer: `z/ma/x/mb` |
+| v08 | `f2e97fa` | `GLOSSARY.md` | `GLOSSARY.md`, `docs/GLOSSARY.md` | The same |
+| v09 | `41bb1b2` | `crates/` | `crates/a.rs`, `crates/sub/b.rs`, `crates/core/Cargo.toml`, `vendor/crates/c.rs`, `vendor/crates/sub/d.rs` | No pattern of VAL-5c ends in `/` |
+| v10 | `9173d2a` | `**/crates/` | `crates/a.rs`, `crates/sub/b.rs`, `crates/core/Cargo.toml`, `vendor/crates/c.rs`, `vendor/crates/sub/d.rs` | No pattern of VAL-5c ends in `/` |
+| v11 | `d5209e0` | `**/crates/*` | `crates/a.rs`, `vendor/crates/c.rs` | The same |
+| v12 | `2262e49` | `/crates/` | `crates/a.rs`, `crates/sub/b.rs`, `crates/core/Cargo.toml` | No pattern of VAL-5c ends in `/` |
+| v13 | `5b05035` | `*` | All 67 files | The same |
+
+### A space, a tab and a `#`
+
+The last column holds the files that named line 3 as their entry and had no owner.
+
+| Variant | Commit | Entry | Error reported | Owned | Matched by line 3 without an owner |
+|---|---|---|---|---|---|
+| s01 | `1703e2d` | `**/my\ file.txt` | None | `sp/my file.txt` | Nothing |
+| s02 | `be1b144` | `**/my file.txt` | Invalid owner, line 3, column 7 | Nothing | Nothing |
+| s03 | `eca4a48` | `**/my?file.txt` | None | `sp/my file.txt`, `sp/myXfile.txt` | Nothing |
+| s04 | `8f1ace3` | `"**/my file.txt"` | Invalid owner, line 3, column 8 | Nothing | Nothing |
+| s05 | `43279d2` | `**/#hash.md` | None | Nothing | All 67 files |
+| s06 | `1aefebc` | `/#hash.md` | Warning, line 3, column 1 | Nothing | Nothing |
+| s07 | `0ad3ba9` | `**/a#b.md` | None | Nothing | `q/a/b.txt` |
+| s08 | `ed2dac7` | `**/\#hash.md` | None | `#hash.md`, `h/#hash.md` | Nothing |
+| s09 | `00939ff` | `#hash.md` | None | Nothing | Nothing |
+| s10 | `ef2d2b5` | `\#hash.md` | None | `#hash.md`, `h/#hash.md` | Nothing |
+| s11 | `3680b65` | `**/a?b.md` | None | `h/a#b.md`, `h/aXb.md` | Nothing |
+| f05 | `7f69fd7` | `/\#hash.md` | None | `#hash.md` | Nothing |
+| f06 | `b2d56db` | `**/a\#b.md` | None | `h/a#b.md` | Nothing |
+| f07 | `22d2ea5` | `**/my\<TAB>file.txt` | None | `sp/my<TAB>file.txt` | Nothing |
+
+In s02 and s04 the error marks the word after the space. In s05 line 3 also took the sentinel from line 1: the sentinel named line 3 and had no owner. The warning of s06 reads: "the pattern `/` will never match any files - did you mean `*` instead?".
+
+### `?` and `*` on a character outside ASCII
+
+`é` as U+00E9 is two bytes in UTF-8, and `e` with U+0301 is three.
+
+| Variant | Commit | Entry | Error reported | Owned |
+|---|---|---|---|---|
+| f01 | `4d10c74` | `**/a??b.txt` | None | `q/aXYb.txt`, `q/nfc/aéb.txt` |
+| f02 | `757f2dc` | `**/a*b.txt` | None | `q/aXb.txt`, `q/ab.txt`, `q/aXYb.txt`, `q/nfc/aéb.txt`, `q/nfd/ae<U+0301>b.txt` |
+| f03 | `b03270a` | `**/caf?.md` | None | Nothing |
+| f04 | `5b30800` | `**/caf??.md` | None | `norm/nfc/café.md` |
+
+With these go t15, where `**/a?b.txt` owned `q/aXb.txt` and neither spelling of `aéb.txt`, and t22, where an entry that holds `é` itself owned the file with that letter as one code point.
+
+### The errors endpoint
+
+Variant e01, commit `9127b0c`, held nine entries on lines 3 to 11.
+
+| Line | Text | Error reported | What the line did |
+|---|---|---|---|
+| 3 | `**/Cargo.toml @sapientpants` | None | Owned the four files that t02 owned |
+| 4 | `**/[ab].rs @sapientpants` | `Invalid pattern`, column 4, with the suggestion "both `[` and `]` must be escaped with a `\`" | Nothing: `crates/a.rs` named no line |
+| 5 | `!**/GLOSSARY.md @sapientpants` | None | Nothing: neither `GLOSSARY.md` named a line |
+| 6 | `**/SPEC.md @no-such-user-p28-probe` | `Unknown owner`, column 12, with the suggestion "make sure @no-such-user-p28-probe exists and has write access to the repository" | Matched `SPEC.md` and `docs/SPEC.md`: both named line 6 and had no owner |
+| 7 | `**/NOTES.md sapientpants` | `Invalid owner`, column 13 | Nothing: `NOTES.md` named no line |
+| 8 | `/docs/research/**` | None | Matched `docs/research/a.md` and `docs/research/sub/b.md`: both named line 8 and had no owner |
+| 9 | `**/.mcp.json @sapientpants @no-such-user-p28-probe` | `Unknown owner`, column 28 | Owned `.mcp.json` and `sub/.mcp.json`, with `@sapientpants` as the owner |
+| 10 | `**/x\[y @sapientpants` | None | No file of the tree has that name |
+| 11 | `**/sp/** @sapientpants` | None | Owned the three files under `sp/` |
+
+An error is an object with the fields `line`, `column`, `source`, `kind`, `suggestion`, `message` and `path`, the last of which is the file GitHub read. The kinds seen were `Invalid pattern`, `Unknown owner`, `Invalid owner` and, in s06, `Warning`. For a file without a fault the answer was `{"errors":[]}`, and for a commit where GitHub found no file it was a 404.
+
+### Where the file lies
+
+The file under `.github/` held the entry `**/Cargo.toml`, the one at the root `/GLOSSARY.md` and the one under `docs/` `**/SPEC.md`, each after the two lines of every variant. In l05, l06, f08 and f09 the one file held `**/Cargo.toml`.
+
+| Variant | Commit | Files of the tree | File GitHub used | Owned |
+|---|---|---|---|---|
+| l01 | `0049c91` | `.github/CODEOWNERS`, `CODEOWNERS`, `docs/CODEOWNERS` | `.github/CODEOWNERS` | The four files of t02, and neither `GLOSSARY.md` nor `SPEC.md` |
+| l02 | `2e867ea` | `CODEOWNERS`, `docs/CODEOWNERS` | `CODEOWNERS` | `GLOSSARY.md` |
+| l03 | `3e79d53` | `docs/CODEOWNERS` | `docs/CODEOWNERS` | `SPEC.md`, `docs/SPEC.md` |
+| l04 | `2eed959` | `CODEOWNERS` | `CODEOWNERS` | `GLOSSARY.md` |
+| l05 | `bcabd2d` | `.github/codeowners` | `.github/codeowners` | The four files of t02 |
+| f08 | `67688d8` | `.GitHub/CODEOWNERS` | `.GitHub/CODEOWNERS` | The four files of t02 |
+| f09 | `198d856` | `codeowners` | `codeowners` | The four files of t02 |
+| l06 | `9629570` | `sub/CODEOWNERS` | None | Nothing: every answer was null, and the errors endpoint gave a 404 |
+| l07 | `3e4f95c` | None | None | Nothing: as l06 |
+
+The file GitHub used is the one that `codeownerPath` named, and the errors endpoint found a file in each of the first seven.
+
+### Another branch, and a commit
+
+The branch [`probe/p-28-t02`](https://github.com/sapientpants/sf-scratch/tree/probe/p-28-t02) of the scratch repository, at commit `d967ad5`, holds the first 64 test files and a `.github/CODEOWNERS` of one line, `**/Cargo.toml @sapientpants`. It has no commit in common with `main`.
+
+| When | `main` held | Path asked for | Answer |
+|---|---|---|---|
+| 07:06 to 07:09 UTC | No file | `Cargo.toml` on the branch, and with the commit as the ref | Null in all four fields |
+| 07:11, with t01 on `main` | `**/crates/**` on line 3 | `Cargo.toml` on the branch | Owned, by line 1 of the branch's own file |
+| | | `crates/a.rs` on the branch | Matched by no entry |
+| | | `crates/a.rs` on `main` | Owned, by line 3 of the file on `main` |
+| | | `crates/a.rs` with the commit `d967ad5` as the ref | Owned, by line 3 of the file on `main` |
+| 08:00 and 08:01, after the tree was restored | No file | `Cargo.toml` on the branch | Null in all four fields, twice |
+
+At 08:01 the errors endpoint, asked for the branch, still answered `{"errors":[]}`: it found the branch's file.
+
+### Findings
+
+**The rule of VAL-3a holds for what its patterns match.** Of 26 translated entries, 15 owned exactly the files that the sketch of VAL-5c matched, among them `**/crates/**`, `/GLOSSARY.md`, `**/docs/research/**`, `/docs/**`, `**/ma/**/mb` and `/dot/*`. `**/crates/**` did not own a file named `crates`, as a last `**` of VAL-5c does not. `**` between two components stood for none or more of them. `*` stopped at a `/` and stood for a leading dot. Seven entries owned more and four owned fewer files, in the ways that follow.
+
+**An entry owns what lies below a directory that its last component names.** `**/Cargo.toml` owned `dirs/Cargo.toml/inner.txt` and the file a level further down. `**/*.snap` owned `snap/x.snap/inner.txt`. `**/na/**/nb`, `**/rootname` and `/rootname` owned what lies below a directory of that name, and `**/crates` owned the file `misc/crates` and everything under both directories. A last component that is `*` alone is the exception: `/dot/*` and `**/crates/*` owned the files directly in the directory and nothing a level down. VAL-5c matches the file only, so such an entry owns more than its pattern protects, which is a review too many.
+
+**Letter case and normal form are the entry's own.** `**/SPEC.md` did not own `spec.md` or `case/Spec.MD`. `**/AGENTS.md` owned neither `agents.md` nor `AGENTſ.md`, and an entry with `é` as one code point did not own the name written with a combining accent. This is the gap that VAL-3a accepts, and it is as wide as the fold of VAL-5d.
+
+**`?` is one byte.** It stood for `X`, for a space and for `#`, not for a `/`, and not for `é`: `**/a?b.txt` did not own `aéb.txt`, and `**/a??b.txt` owned it where the letter is the two bytes of U+00E9. `*` stood for the letter in both spellings. VAL-5c reads `?` as one code point of the folded form.
+
+**A copied pattern is read from the root where it holds a `/` between two components and does not begin with `**/`.** `crates/**`, `docs/research/**`, `.factory/**` and `ma/**/mb` owned the files below the root directory of that name and none under `vendor/`, `sub/` or `z/`. A pattern without such a `/` was read at any depth as it stands: `Cargo.toml`, `SPEC.md` and `*.snap` owned what their entries with `**/` owned, and `GLOSSARY.md` owned the file at the root and the one under `docs/`. `**/crates/*`, which begins with `**/` already, was read at any depth too. So the prefix changes what an entry owns only for the first kind, and it changed nothing for the worse in any entry tried. `**/**/*.snap`, which the rule writes for a pattern that begins with `**/` already, owned what `**/*.snap` owned. `crates/` with a `/` at its end alone was read at any depth, and `/crates/` at the root.
+
+**A `#` begins a comment wherever it stands, and no error says so.** `**/#hash.md @sapientpants` was read as the entry `**/` without an owner. It matched all 67 files and the sentinel of line 1, and left each without an owner. `**/a#b.md` was read as `**/a` without an owner. `/#hash.md` was read as `/`, which drew a warning and matched nothing. With a backslash before the `#` each entry owned the one name it was written for: `**/\#hash.md`, `/\#hash.md`, `**/a\#b.md`, and `\#hash.md` at the start of a line, which the documentation says does not work.
+
+**A space ends the pattern, and a backslash before it keeps it.** `**/my file.txt` drew `Invalid owner` for `file.txt`, and the line owned nothing. Quotation marks around the pattern did the same. `**/my\ file.txt` owned `sp/my file.txt` alone, and a backslash before a tab owned the name with the tab. A tab without the backslash was not tried.
+
+**A later line decides, and one without an owner takes the owner away.** In t23, t25 and v13 both line 1 and line 3 match the sentinel and name the same owner, and the sentinel named line 3. In s05 line 3 took the sentinel from line 1. In e01 an entry without an owner, and one whose only owner GitHub does not know, left their files matched and without an owner. An entry with a known and an unknown owner kept the known one. A line that draws `Invalid pattern` or `Invalid owner` is skipped and matches nothing.
+
+**The errors endpoint is no check of the entries.** It reported a character class, an unknown owner, a word that is no owner, and the pattern `/`. It reported nothing for a `#` that cut an entry down to `**/`, for an entry without an owner, or for a line that begins with `!`, which owned nothing. A file that owns nothing it was written for can come back with an empty list.
+
+**GitHub looks in `.github/`, then the root, then `docs/`, and not for one letter case.** With a file in all three places it used the one under `.github/`, and with one at the root and one under `docs/` the one at the root. It read `.github/codeowners`, `.GitHub/CODEOWNERS` and `codeowners` at the root. It read no file at `sub/CODEOWNERS`. The built-in pattern `CODEOWNERS` matches each of these by VAL-5b and VAL-5d, so a change to any file that GitHub would read is flagged.
+
+**The page of a file reads the file of the branch it shows, while the default branch has one.** With a file on `main`, a file on another branch was owned by that branch's own `CODEOWNERS`. With none on `main`, the page named no owner on that branch, though the errors endpoint found the branch's file. With a commit as the ref it read the file on `main`. For the probe this meant that every variant had to pass over `main`.
+
+**Against the documentation.** It was borne out on the order of the three places, on the case of a path, on `**/logs`, `apps/` and `docs/*`, on negation and on character ranges. It says that a backslash does not make a pattern of a line that begins with `#`; here it did. It says nothing of a `#` or a space inside a pattern, of `?`, of the letter case of the file's own name, or of what an entry owns below a directory that it names without a `/` at its end.
+
+### What changed in the spec
+
+1. The P-28 row of 23.2 carries the answer.
+2. VAL-3a rests on it. The rule of translation stands, and gains a backslash before a space, a tab and a `#`. The item names what an entry owns beyond its pattern, and the two gaps: letter case with normal form, and `?`.
+3. Decision D-37 in 23.1 is new, and VAL-3a states its four points: the entries go into the file that GitHub reads, or into `.github/CODEOWNERS` where a repository has none; they are the last lines of the file; `?` is written as it is; and the errors endpoint is read as a second check beside the comparison of text.
+4. BOOT-6 names the file of the factory repository and the reading of the errors endpoint before the merge. It and the M1b row of section 22 no longer wait for the probe, and DEV-2 cites the comparison of VAL-3a.
+5. The D-26 row points at D-37 for where the file lies.
+6. The P-18 row asks which file a pull request is held to and whether the required review reads an entry as the page does. The P-33 row is new: whether an installation token may read the errors endpoint.
+
+### Still open
+
+- **A pull request.** The owner was read as the page of a file takes it. Which file a pull request is held to, and whether a required code-owner review follows the same reading of a pattern, was not observed; the documentation says a pull request uses the file of its base branch. Probe P-18 needs a ruleset and now asks both.
+- **A private repository.** The endpoint answered without a login because the scratch repository is public. On a private one the same reading needs a session of the web interface.
+- **An installation token.** The errors endpoint was read with the operator's token. Whether the App's token may read it is the new probe P-33; `sf repo check` reads the endpoint from M5 (VAL-3a).
+- **The endpoint of the page.** It is no part of the API and GitHub can change it without notice. `sf doctor --probe` cannot rest on it.
+- **Behind the shield.** The one click on it failed, so the text the page shows for an owner was not read.
+- **Other characters.** A tab without a backslash, a line feed, a carriage return and every other control character were not tried, nor a `@` or a `!` at the start of a component.
+- **Other folds.** Of the spellings that VAL-5d folds, ASCII letter case, the long s and a combining accent were tried, each in a file name. A fold to more than one character, such as `ß`, and another letter case in a directory name were not.
+- **Two files in one place.** `.github/CODEOWNERS` beside `.github/codeowners`, or `.github/` beside `.GitHub/`, was not tried.
+- **Owners.** Every owner was `@sapientpants` or a login that does not exist. A team, an email address, a login without write access, and two entries with different owners for one path were not tried.
+- **The size limit.** The documentation gives 3 MB; the largest file here was 11 lines.

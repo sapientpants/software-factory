@@ -80,7 +80,7 @@ A name in a file of the instruction set that the host follows to another file of
 The text of the instruction set as the host gives it to an agent session (AG-2a, 10.4).
 
 **Snapshot**:
-The issue title, body and trusted comments captured at claim or resume and given to agents.
+The issue title, body and trusted comments captured at claim or resume, as sanitised (SEC-4) and given to agents. SEC-3 says which comments it holds.
 
 **Target repository**:
 A repository the factory is onboarded to (20) and works on.

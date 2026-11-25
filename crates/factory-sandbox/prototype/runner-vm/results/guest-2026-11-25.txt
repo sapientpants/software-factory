@@ -1,0 +1,62 @@
+RESULT facts date=2026-11-25T22:00:19Z
+RESULT facts uid=502 groups-of-interest=
+RESULT facts os=Debian GNU/Linux 13 (trixie)
+RESULT facts kernel=6.12.115+deb13.1-cloud-arm64 aarch64
+RESULT facts virt=apple
+RESULT facts vendor=Apple Inc.
+RESULT facts cpus=4 mem-kib=8131564
+RESULT facts bwrap=bubblewrap 0.12.0 at /usr/bin/bwrap mode -rwxr-xr-x
+RESULT facts package=bubblewrap 0.12.0-1~deb13u1
+RESULT facts /proc/sys/kernel/unprivileged_userns_clone=1
+RESULT facts /proc/sys/user/max_user_namespaces=31436
+RESULT facts /proc/sys/kernel/apparmor_restrict_unprivileged_userns=absent
+RESULT facts /sys/kernel/security/lsm=lockdown,capability,landlock,yama,apparmor,tomoyo,bpf,ipe,ima,evm
+RESULT facts apparmor-files=/etc/apparmor.d/lxc-usernsexec /etc/apparmor.d/unprivileged_userns
+RESULT facts sudo-n=yes
+RESULT kvm device=crw-rw---- 1 root kvm 10, 232 Nov 25 22:58 /dev/kvm
+RESULT kvm group=kvm:x:992:<members> in-group=0
+RESULT kvm open=fail(2) :: sh: 1: cannot create /dev/kvm: Permission denied
+RESULT kvm ioctls=not tried: [Errno 13] Permission denied: '/dev/kvm'
+RESULT host links=lo eth0
+RESULT host basic=ok
+RESULT host caps=ok
+RESULT host nested=ok
+RESULT host copy=ok
+RESULT host unshare=ok
+RESULT host links-in-basic= lo
+RESULT host seccomp=Seccomp: 2 Seccomp_filters: 1
+RESULT host nouserns-unshare-all=fail(1) :: bwrap: --disable-userns requires --unshare-user
+RESULT host nouserns-starts=ok
+RESULT host nouserns-limit=2147483647
+RESULT host nouserns-links= lo
+RESULT host nouserns-nested=refused(1) :: bwrap: Creating new namespace failed: nesting depth or /proc/sys/user/max_*_namespaces exceeded (ENOSPC)
+RESULT host nouserns-unshare=refused(1) :: unshare: unshare failed: No space left on device
+RESULT host nouserns-caps=refused(1) :: unshare: unshare failed: No space left on device
+RESULT host nouserns-seccomp=Seccomp: 2 Seccomp_filters: 1
+RESULT host control-nested=ok
+RESULT netns links=lo
+RESULT netns basic=ok
+RESULT netns caps=ok
+RESULT netns nested=ok
+RESULT netns copy=ok
+RESULT netns unshare=ok
+RESULT netns links-in-basic= lo
+RESULT netns seccomp=Seccomp: 2 Seccomp_filters: 1
+RESULT netns nouserns-unshare-all=fail(1) :: bwrap: --disable-userns requires --unshare-user
+RESULT netns nouserns-starts=ok
+RESULT netns nouserns-limit=2147483647
+RESULT netns nouserns-links= lo
+RESULT netns nouserns-nested=refused(1) :: bwrap: Creating new namespace failed: nesting depth or /proc/sys/user/max_*_namespaces exceeded (ENOSPC)
+RESULT netns nouserns-unshare=refused(1) :: unshare: unshare failed: No space left on device
+RESULT netns nouserns-caps=refused(1) :: unshare: unshare failed: No space left on device
+RESULT netns nouserns-seccomp=Seccomp: 2 Seccomp_filters: 1
+RESULT netns control-nested=ok
+# The /dev/kvm checks again, as the same user with kvm as a supplementary group:
+# sudo setpriv --reuid=$(id -u) --regid=$(id -g) --groups=kvm bash userns-probe.sh kvm
+RESULT kvm device=crw-rw---- 1 root kvm 10, 232 Nov 25 22:58 /dev/kvm
+RESULT kvm group=kvm:x:992:<members> in-group=1
+RESULT kvm open=ok
+RESULT kvm KVM_GET_API_VERSION=ok(12)
+RESULT kvm KVM_CREATE_VM(0)=ok(4)
+RESULT kvm KVM_CHECK_EXTENSION(KVM_CAP_ARM_VM_IPA_SIZE)=ok(40)
+RESULT kvm KVM_CREATE_VCPU(0)=ok(5)

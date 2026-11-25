@@ -1,0 +1,45 @@
+# PROTOTYPE for probe P-36 of sapientpants/software-factory (issue #85), part 1:
+# does `bwrap --disable-userns` (SEC-6b) do on the hosted runners that DEV-5 pins,
+# with the bubblewrap that apt installs there, what it did on the server (P-6)?
+# The job runs userns-probe.sh from this branch three times: as the image is
+# provisioned, after the setup of DEV-6, and in a network namespace that holds
+# only `lo`. It uses no action and no token. Every result is a line that starts
+# with RESULT, and the job never fails on a test.
+name: probe-p36
+
+on:
+  push:
+    branches: [probe/p-36]
+
+permissions: {}
+
+jobs:
+  probe:
+    strategy:
+      fail-fast: false
+      matrix:
+        label: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.label }}
+    timeout-minutes: 10
+    steps:
+      - name: Probe
+        shell: bash
+        run: |
+          set -u
+          echo "RESULT job label=${{ matrix.label }} sha=$GITHUB_SHA attempt=$GITHUB_RUN_ATTEMPT"
+
+          # The repository is public, so the script is fetched without a token.
+          git init -q probe
+          git -C probe fetch -q --depth 1 "https://github.com/$GITHUB_REPOSITORY.git" "$GITHUB_SHA"
+          git -C probe checkout -q FETCH_HEAD
+
+          echo "RESULT job bwrap-preinstalled=$(command -v bwrap || echo no)"
+          sudo apt-get update -qq >/dev/null 2>&1
+          sudo apt-get install -y -qq bubblewrap >/dev/null 2>&1
+
+          # As provisioned: Ubuntu's AppArmor restriction is in force (P-16).
+          bash probe/userns-probe.sh tests provisioned
+
+          # The setup of DEV-6, then the tests on the runner and in the namespace.
+          sudo sysctl -q -w kernel.apparmor_restrict_unprivileged_userns=0
+          bash probe/userns-probe.sh

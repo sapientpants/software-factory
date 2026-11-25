@@ -1,0 +1,36 @@
+# PROTOTYPE for probe P-36 (issue #85), parts 2 and 3: a Lima guest as DEV-3 describes
+# the development VM, to see what it gives. It is not the committed configuration of
+# DEV-3, which arrives with `cargo xtask` in M0.
+#
+#     limactl start --name=sf-p36 --tty=false lima.yaml
+#     limactl delete --force sf-p36
+#
+# Debian stable on the Mac's architecture, `vmType: vz`, nested virtualisation. Nothing
+# of the Mac is mounted: files go in and out with `limactl copy`.
+minimumLimaVersion: 2.0.0
+
+base:
+- template:_images/debian-13
+
+vmType: vz
+nestedVirtualization: true
+
+cpus: 4
+memory: 8GiB
+disk: 20GiB
+
+mounts: []
+
+containerd:
+  system: false
+  user: false
+
+provision:
+- mode: system
+  script: |
+    #!/bin/bash
+    set -eux -o pipefail
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get update -qq
+    # bubblewrap and socat are what the server holds (SPEC 4.4). strace is for part 3.
+    apt-get install -y -qq bubblewrap socat strace python3 curl ca-certificates iproute2 util-linux

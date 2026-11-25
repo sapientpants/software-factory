@@ -1,0 +1,80 @@
+# sapientpants/sf-scratch, workflow probe-p36, run 45709406404, attempt 3, job probe (ubuntu-24.04)
+# The lines of the job log that start with RESULT, and the image lines of its setup.
+Hosted Compute Agent
+Version: 20261111.635
+Region: westus3
+Cloud: Azure
+Image: ubuntu-24.04
+Version: 20261116.376.1
+Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261116.376/images/ubuntu/Ubuntu2404-Readme.md
+Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261116.376
+RESULT job label=ubuntu-24.04 sha=86c268f6f94e22e1ad9a89a9e77685c087f8fc03 attempt=3
+RESULT job bwrap-preinstalled=no
+RESULT provisioned links=lo eth0 enP64065s1 docker0
+RESULT provisioned basic=fail(1) :: bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted
+RESULT provisioned caps=fail(1) :: bwrap: loopback: Failed RTM_NEWADDR: No child processes
+RESULT provisioned nested=fail(1) :: bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted
+RESULT provisioned copy=fail(1) :: bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted
+RESULT provisioned unshare=fail(1) :: unshare: write failed /proc/self/uid_map: Operation not permitted
+RESULT provisioned links-in-basic=bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted
+RESULT provisioned seccomp=bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted
+RESULT provisioned nouserns-unshare-all=fail(1) :: bwrap: --disable-userns requires --unshare-user
+RESULT provisioned nouserns-starts=fail(1) :: bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted
+RESULT provisioned nouserns-others=not run: the outer sandbox does not start
+RESULT facts date=2026-11-25T22:08:24Z
+RESULT facts uid=1001 groups-of-interest=docker
+RESULT facts os=Ubuntu 24.04.5 LTS
+RESULT facts kernel=7.0.0-1017-azure x86_64
+RESULT facts virt=microsoft
+RESULT facts vendor=Microsoft Corporation
+RESULT facts cpus=4 mem-kib=16367528
+RESULT facts bwrap=bubblewrap 0.9.0 at /usr/bin/bwrap mode -rwxr-xr-x
+RESULT facts package=bubblewrap 0.9.0-1ubuntu0.3
+RESULT facts /proc/sys/kernel/unprivileged_userns_clone=1
+RESULT facts /proc/sys/user/max_user_namespaces=58121
+RESULT facts /proc/sys/kernel/apparmor_restrict_unprivileged_userns=0
+RESULT facts /sys/kernel/security/lsm=lockdown,capability,landlock,yama,apparmor,ima,evm
+RESULT facts apparmor-files=/etc/apparmor.d/unprivileged_userns /etc/apparmor.d/lxc-usernsexec
+RESULT facts sudo-n=yes
+RESULT kvm device=crw-rw---- 1 root kvm 10, 232 Nov 25 22:03 /dev/kvm
+RESULT kvm group=kvm:x:993:<members> in-group=0
+RESULT kvm open=fail(2) :: sh: 1: cannot create /dev/kvm: Permission denied
+RESULT kvm ioctls=not tried: [Errno 13] Permission denied: '/dev/kvm'
+RESULT host links=lo eth0 enP64065s1 docker0
+RESULT host basic=ok
+RESULT host caps=ok
+RESULT host nested=ok
+RESULT host copy=ok
+RESULT host unshare=ok
+RESULT host links-in-basic= lo
+RESULT host seccomp=Seccomp: 2 Seccomp_filters: 1
+RESULT host nouserns-unshare-all=fail(1) :: bwrap: --disable-userns requires --unshare-user
+RESULT host nouserns-starts=ok
+RESULT host nouserns-limit=2147483647
+RESULT host nouserns-links= lo
+RESULT host nouserns-nested=refused(1) :: bwrap: Creating new namespace failed: nesting depth or /proc/sys/user/max_*_namespaces exceeded (ENOSPC)
+RESULT host nouserns-unshare=refused(1) :: unshare: unshare failed: No space left on device
+RESULT host nouserns-caps=refused(1) :: unshare: unshare failed: No space left on device
+RESULT host nouserns-seccomp=Seccomp: 2 Seccomp_filters: 1
+RESULT host control-nested=ok
+RESULT netns links=lo
+RESULT netns basic=ok
+RESULT netns caps=ok
+RESULT netns nested=ok
+RESULT netns copy=ok
+RESULT netns unshare=ok
+RESULT netns links-in-basic= lo
+RESULT netns seccomp=Seccomp: 2 Seccomp_filters: 1
+RESULT netns nouserns-unshare-all=fail(1) :: bwrap: --disable-userns requires --unshare-user
+RESULT netns nouserns-starts=ok
+RESULT netns nouserns-limit=2147483647
+RESULT netns nouserns-links= lo
+RESULT netns nouserns-nested=refused(1) :: bwrap: Creating new namespace failed: nesting depth or /proc/sys/user/max_*_namespaces exceeded (ENOSPC)
+RESULT netns nouserns-unshare=refused(1) :: unshare: unshare failed: No space left on device
+RESULT netns nouserns-caps=refused(1) :: unshare: unshare failed: No space left on device
+RESULT netns nouserns-seccomp=Seccomp: 2 Seccomp_filters: 1
+RESULT netns control-nested=ok
+RESULT dmesg [  277.453852] audit: type=1400 audit(1795644504.833:131): apparmor="DENIED" operation="capable" class="cap" profile="unprivileged_userns" pid=2478 comm="bwrap" capability=12  capname="net_admin"
+RESULT dmesg [  277.459263] audit: type=1400 audit(1795644504.838:133): apparmor="DENIED" operation="capable" class="cap" profile="unprivileged_userns" pid=2488 comm="bwrap" capability=8  capname="setpcap"
+RESULT dmesg [  277.459320] audit: type=1400 audit(1795644504.838:134): apparmor="DENIED" operation="capable" class="cap" profile="unprivileged_userns" pid=2488 comm="bwrap" capability=12  capname="net_admin"
+RESULT dmesg [  277.466081] audit: type=1400 audit(1795644504.845:136): apparmor="DENIED" operation="capable" class="cap" profile="unprivileged_userns" pid=2500 comm="bwrap" capability=8  capname="setpcap"

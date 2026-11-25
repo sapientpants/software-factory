@@ -1,0 +1,558 @@
+# Probe P-36, part 3 (issue #85): where the agent CLI reads and writes on Linux
+
+Collected 2026-11-25T22:06:32Z as uid 502.
+Linux 6.12.115+deb13.1-cloud-arm64 aarch64; bubblewrap 0.12.0; strace -- version 6.13
+claude: 2.1.326 (Claude Code) (~/.local/share/claude/versions/2.1.326)
+Token: none (--no-login). Model haiku. At most 300s a session.
+/etc/claude-code before the cases: absent
+
+## Case trace
+
+Outer sandbox: none. TMPDIR=<scratch>/trace/tmpdir, mode 0700
+Command: strace -f -s 400 -e trace=%file,bind,connect,clone,clone3,fork,vfork -o <scratch>/trace/out/trace.txt <scratch>/trace/bin/claude -p --tools Bash,Agent --allowedTools Bash(sh ./inside.sh) Agent --setting-sources user --strict-mcp-config --output-format stream-json --verbose --model haiku --session-id cef40f6c-9335-4d93-b8e3-dc9b5643a297 --permission-mode dontAsk --permission-prompts none --settings <scratch>/trace/host/settings.json --max-turns 8 --max-budget-usd 0.50 --forward-subagent-text --debug-file <scratch>/trace/out/debug.log <prompt>
+Exit code 1, after 0s.
+init: version 2.1.326, tools ['Task', 'Bash']
+Paths that the stream names, outside the working directory: 2
+    system/init memory_paths.auto = <scratch>/trace/home/.claude/projects/-home-<user>-guest-sf-p36-dt1nxjjh-trace-work/memory/
+    system/init messaging_socket_path = <scratch>/trace/tmpdir/cc-socks/3353.sock
+result: subtype success, is_error True, turns 1, cost 0, denials []
+    Not logged in · Please run /login
+Model calls of a subagent on the stream: 0
+observed.txt, which inside.sh appended to in the working directory (0 runs):
+    (absent)
+New in the machine's /tmp after the session: nothing
+The directory that TMPDIR names, after the session:
+    dir           - cc-socks
+    dir           - claude-502
+    dir           - claude-502/fswatch-probe-Jh0PMb
+    file          1 claude-502/fswatch-probe-Jh0PMb/probe
+The home directory of the session, which holds the config directory, after the session:
+    dir           - .claude
+    file        811 .claude/.claude.json
+    dir           - .claude/backups
+    file         84 .claude/backups/.claude.json.backup.1795644392382
+    dir           - .claude/plugins
+    dir           - .claude/plugins/store
+    file         92 .claude/plugins/store/cc-plugin-agents-md_builtin-b049b47b3618.json
+    dir           - .claude/projects
+    dir           - .claude/projects/-home-<user>-guest-sf-p36-dt1nxjjh-trace-work
+    file      43650 .claude/projects/-home-<user>-guest-sf-p36-dt1nxjjh-trace-work/cef40f6c-9335-4d93-b8e3-dc9b5643a297.jsonl
+    dir           - .claude/projects/-home-<user>-guest-sf-p36-dt1nxjjh-trace-work/memory
+    dir           - .claude/sessions
+Debug-log lines that mention a managed location, a temporary directory, a socket or a refused write: 10
+    [DEBUG] Broken symlink or missing file encountered for settings.json at path: /etc/claude-code/managed-settings.json
+    [DEBUG] Loading skills from: managed=/etc/claude-code/.claude/skills, user=<scratch>/trace/home/.claude/skills, project=[]
+    [DEBUG] Loaded 0 unique skills (0 unconditional, 0 conditional, managed: 0, user: 0, project: 0, additional: 0, legacy commands: 0)
+    [INFO] [uds-messaging] Listening: <scratch>/trace/tmpdir/cc-socks/3353.sock
+    [DEBUG] [uds-messaging] Inject messages (auth line optional here): { echo '{"type":"auth","token":"[REDACTED]"$CLAUDE_CODE_MESSAGING_TOKEN"'"}'; echo '{"type":"user","message":{"role":"user","content":"hello"}}'; } | socat - UNIX-CONNECT:<scratch>/trace/tmpdir/cc-socks/3353.sock
+    [DEBUG] [uds-messaging] Connect when the data is ready (e.g. out=$(cmd); printf '%s\n' "$out" | nc -N -U "$CLAUDE_CODE_MESSAGING_SOCKET" — or the socat form above): a connection that sends no complete line within 30000 ms is closed
+    [DEBUG] cc-plugin-sec-default@builtin not seated: no managed settings and not a Team or Enterprise organization (none)
+    [DEBUG] Artifacts MCP server not added: managed_or_strict_mcp_config (strict_mcp_config)
+    [DEBUG] [auto-mode] verifyAutoModeGateAccess: enabledState=enabled disabledBySettings=false model=claude-haiku-5-5 modelSupported=true disableFastModeBreakerFires=false carouselAvailable=true canEnterAuto=true
+    [DEBUG] plugin cc-plugin-agents-md: no pluginConfigs["agents-md@builtin" or "cc-plugin-agents-md@builtin"].options in user, --settings or managed settings (project settings are not read); every option is its default
+Trace: 1345 calls that name a path.
+Calls by place: config 340, (relative) 304, /etc 262, /home 140, /proc 71, work 63, out 59, /usr 23, /sys 22, TMPDIR 18, host 9, /.git 9, /lib 5, /.claude 5, bin 4, /bin 4, / 2, /.dockerenv 1, /var 1, /System 1, /HEAD 1, /opt 1
+
+Written, created or removed outside the working directory, the config directory and TMPDIR: 0
+
+Looked up under /etc, and not written: 25
+    /etc  [EINVAL,ok]  readlinkat,statx  by claude
+    /etc/claude-code  [ENOENT]  openat,statx  by claude
+    /etc/claude-code/.claude  [ENOENT]  statx  by claude
+    /etc/claude-code/.claude/agents  [ENOENT]  statx  by claude
+    /etc/claude-code/.claude/commands  [ENOENT]  statx  by claude
+    /etc/claude-code/.claude/output-styles  [ENOENT]  statx  by claude
+    /etc/claude-code/.claude/rules  [ENOENT]  openat,statx  by claude
+    /etc/claude-code/.claude/skills  [ENOENT]  openat  by claude
+    /etc/claude-code/CLAUDE.md  [ENOENT]  openat,statx  by claude
+    /etc/claude-code/managed-mcp.json  [ENOENT]  statx  by claude
+    /etc/claude-code/managed-settings.d  [ENOENT]  openat,statx  by claude
+    /etc/claude-code/managed-settings.json  [ENOENT]  openat,statx  by claude
+    /etc/ld.so.cache  [ok]  openat  by claude
+    /etc/ld.so.preload  [ENOENT]  faccessat  by claude
+    /etc/localtime  [ok]  newfstatat,openat,readlinkat  by claude
+    /etc/machine-id  [ok]  openat  by claude
+    /etc/openssl/certs  [ENOENT]  openat  by claude
+    /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem  [ENOENT]  openat  by claude
+    /etc/pki/tls/cert.pem  [ENOENT]  openat  by claude
+    /etc/pki/tls/certs  [ENOENT]  openat  by claude
+    /etc/pki/tls/certs/ca-bundle.crt  [ENOENT]  openat  by claude
+    /etc/ssl/ca-bundle.pem  [ENOENT]  openat  by claude
+    /etc/ssl/cert.pem  [ENOENT]  openat  by claude
+    /etc/ssl/certs  [ok]  openat  by claude
+    /etc/ssl/certs/*  [ok]  openat  by claude
+
+Looked up elsewhere outside what the session is given, and not written: 47
+    /  [ok]  statx  by claude
+    /.claude/agents  [ENOENT]  statx  by claude
+    /.claude/commands  [ENOENT]  statx  by claude
+    /.claude/output-styles  [ENOENT]  statx  by claude
+    /.claude/skills  [ENOENT]  statx  by claude
+    /.claude/workflows  [ENOENT]  statx  by claude
+    /.dockerenv  [ENOENT]  faccessat  by claude
+    /.git  [ENOENT]  statx  by claude
+    /HEAD  [ENOENT]  statx  by claude
+    /System/Library/OpenSSL/certs  [ENOENT]  openat  by claude
+    /home  [ok]  statfs,statx  by claude
+    /home/.claude/agents  [ENOENT]  statx  by claude
+    /home/.claude/commands  [ENOENT]  statx  by claude
+    /home/.claude/output-styles  [ENOENT]  statx  by claude
+    /home/.claude/skills  [ENOENT]  statx  by claude
+    /home/.claude/workflows  [ENOENT]  statx  by claude
+    /home/.git  [ENOENT]  statx  by claude
+    /home/HEAD  [ENOENT]  statx  by claude
+    /home/claude/.claude/remote/.api_key  [ENOENT]  openat  by claude
+    /home/claude/.claude/remote/.oauth_token  [ENOENT]  openat  by claude
+    /home/claude/.claude/remote/.session_ingress_token  [ENOENT]  openat  by claude
+    ~  [ok]  statx  by claude
+    ~/.claude/agents  [ENOENT]  statx  by claude
+    ~/.claude/commands  [ENOENT]  statx  by claude
+    ~/.claude/output-styles  [ENOENT]  statx  by claude
+    ~/.claude/skills  [ENOENT]  statx  by claude
+    ~/.claude/workflows  [ENOENT]  statx  by claude
+    ~/.git  [ENOENT]  statx  by claude
+    ~/HEAD  [ENOENT]  statx  by claude
+    <scratch>  [ok]  statx  by claude
+    <scratch>/.claude/agents  [ENOENT]  statx  by claude
+    <scratch>/.claude/commands  [ENOENT]  statx  by claude
+    <scratch>/.claude/output-styles  [ENOENT]  statx  by claude
+    <scratch>/.claude/skills  [ENOENT]  statx  by claude
+    <scratch>/.claude/workflows  [ENOENT]  statx  by claude
+    <scratch>/.git  [ENOENT]  statx  by claude
+    <scratch>/HEAD  [ENOENT]  statx  by claude
+    <scratch>/trace  [ok]  statx  by claude
+    <scratch>/trace/.claude/agents  [ENOENT]  statx  by claude
+    <scratch>/trace/.claude/commands  [ENOENT]  statx  by claude
+    <scratch>/trace/.claude/output-styles  [ENOENT]  statx  by claude
+    <scratch>/trace/.claude/skills  [ENOENT]  statx  by claude
+    <scratch>/trace/.claude/workflows  [ENOENT]  statx  by claude
+    <scratch>/trace/.git  [ENOENT]  statx  by claude
+    <scratch>/trace/HEAD  [ENOENT]  statx  by claude
+    /opt/homebrew/bin/zsh  [ENOENT]  newfstatat  by claude
+    /var/ssl/certs  [ENOENT]  openat  by claude
+
+Every path that holds `managed`, `claude-code` or `ClaudeCode`, wherever it lies: 11
+    /etc/claude-code  [ENOENT]
+    /etc/claude-code/.claude  [ENOENT]
+    /etc/claude-code/.claude/agents  [ENOENT]
+    /etc/claude-code/.claude/commands  [ENOENT]
+    /etc/claude-code/.claude/output-styles  [ENOENT]
+    /etc/claude-code/.claude/rules  [ENOENT]
+    /etc/claude-code/.claude/skills  [ENOENT]
+    /etc/claude-code/CLAUDE.md  [ENOENT]
+    /etc/claude-code/managed-mcp.json  [ENOENT]
+    /etc/claude-code/managed-settings.d  [ENOENT]
+    /etc/claude-code/managed-settings.json  [ENOENT]
+
+## Case trace-tmpdir-0775
+
+Outer sandbox: none. TMPDIR=<scratch>/trace-tmpdir-0775/tmpdir, mode 0775
+Command: strace -f -s 400 -e trace=%file,bind,connect,clone,clone3,fork,vfork -o <scratch>/trace-tmpdir-0775/out/trace.txt <scratch>/trace-tmpdir-0775/bin/claude -p --tools Bash --allowedTools Bash(sh ./inside.sh) --setting-sources user --strict-mcp-config --output-format stream-json --verbose --model haiku --session-id 57c78e61-a538-4c77-a722-73da412f7164 --permission-mode dontAsk --permission-prompts none --settings <scratch>/trace-tmpdir-0775/host/settings.json --max-turns 8 --max-budget-usd 0.50 --forward-subagent-text --debug-file <scratch>/trace-tmpdir-0775/out/debug.log <prompt>
+Exit code 1, after 0s.
+init: version 2.1.326, tools ['Bash']
+Paths that the stream names, outside the working directory: 2
+    system/init memory_paths.auto = <scratch>/trace-tmpdir-0775/home/.claude/projects/-home-<user>-guest-sf-p36-dt1nxjjh-trace-tmpdir-0775-work/memory/
+    system/init messaging_socket_path = /tmp/cc-socks-502/3366.sock
+result: subtype success, is_error True, turns 1, cost 0, denials []
+    Not logged in · Please run /login
+Model calls of a subagent on the stream: 0
+observed.txt, which inside.sh appended to in the working directory (0 runs):
+    (absent)
+New in the machine's /tmp after the session: nothing
+The directory that TMPDIR names, after the session:
+    dir           - claude-502
+    dir           - claude-502/fswatch-probe-CztTAr
+    file          1 claude-502/fswatch-probe-CztTAr/probe
+The home directory of the session, which holds the config directory, after the session:
+    dir           - .claude
+    file        811 .claude/.claude.json
+    dir           - .claude/backups
+    file         84 .claude/backups/.claude.json.backup.1795644392865
+    dir           - .claude/plugins
+    dir           - .claude/plugins/store
+    file         92 .claude/plugins/store/cc-plugin-agents-md_builtin-b049b47b3618.json
+    dir           - .claude/projects
+    dir           - .claude/projects/-home-<user>-guest-sf-p36-dt1nxjjh-trace-tmpdir-0775-work
+    file      33260 .claude/projects/-home-<user>-guest-sf-p36-dt1nxjjh-trace-tmpdir-0775-work/57c78e61-a538-4c77-a722-73da412f7164.jsonl
+    dir           - .claude/projects/-home-<user>-guest-sf-p36-dt1nxjjh-trace-tmpdir-0775-work/memory
+    dir           - .claude/sessions
+Debug-log lines that mention a managed location, a temporary directory, a socket or a refused write: 38
+    [DEBUG] Broken symlink or missing file encountered for settings.json at path: <scratch>/trace-tmpdir-0775/home/.claude/settings.json
+    [DEBUG] Broken symlink or missing file encountered for settings.json at path: /etc/claude-code/managed-settings.json
+    [ERROR] Failed to save config with lock: Error: ENOENT: no such file or directory, lstat '<scratch>/trace-tmpdir-0775/home/.claude/.claude.json'
+    [DEBUG] Writing to temp file: <scratch>/trace-tmpdir-0775/home/.claude/.claude.json.tmp.3366.741363934d01
+    [DEBUG] Created <scratch>/trace-tmpdir-0775/home/.claude/.claude.json
+    [DEBUG] Writing to temp file: <scratch>/trace-tmpdir-0775/home/.claude/.claude.json.tmp.3366.ed9c4f8157d0
+    [DEBUG] Renaming <scratch>/trace-tmpdir-0775/home/.claude/.claude.json.tmp.3366.ed9c4f8157d0 to <scratch>/trace-tmpdir-0775/home/.claude/.claude.json
+    [DEBUG] File <scratch>/trace-tmpdir-0775/home/.claude/.claude.json written atomically
+    [DEBUG] Writing to temp file: <scratch>/trace-tmpdir-0775/home/.claude/.claude.json.tmp.3366.d6109510fb99
+    [DEBUG] Renaming <scratch>/trace-tmpdir-0775/home/.claude/.claude.json.tmp.3366.d6109510fb99 to <scratch>/trace-tmpdir-0775/home/.claude/.claude.json
+    [DEBUG] Writing to temp file: <scratch>/trace-tmpdir-0775/home/.claude/.claude.json.tmp.3366.19d7637df6f0
+    [DEBUG] Renaming <scratch>/trace-tmpdir-0775/home/.claude/.claude.json.tmp.3366.19d7637df6f0 to <scratch>/trace-tmpdir-0775/home/.claude/.claude.json
+    [DEBUG] Writing to temp file: <scratch>/trace-tmpdir-0775/home/.claude/.claude.json.tmp.3366.ab7f88f44871
+    [DEBUG] Renaming <scratch>/trace-tmpdir-0775/home/.claude/.claude.json.tmp.3366.ab7f88f44871 to <scratch>/trace-tmpdir-0775/home/.claude/.claude.json
+    [DEBUG] Writing to temp file: <scratch>/trace-tmpdir-0775/home/.claude/.claude.json.tmp.3366.931fd05f8059
+    [DEBUG] Renaming <scratch>/trace-tmpdir-0775/home/.claude/.claude.json.tmp.3366.931fd05f8059 to <scratch>/trace-tmpdir-0775/home/.claude/.claude.json
+    [DEBUG] Loading skills from: managed=/etc/claude-code/.claude/skills, user=<scratch>/trace-tmpdir-0775/home/.claude/skills, project=[]
+    [DEBUG] Failed to stat directory <scratch>/trace-tmpdir-0775/home/.claude/agents: ENOENT: no such file or directory, stat '<scratch>/trace-tmpdir-0775/home/.claude/agents'
+    [DEBUG] Failed to stat directory <scratch>/trace-tmpdir-0775/home/.claude/commands: ENOENT: no such file or directory, stat '<scratch>/trace-tmpdir-0775/home/.claude/commands'
+    [DEBUG] Loaded 0 unique skills (0 unconditional, 0 conditional, managed: 0, user: 0, project: 0, additional: 0, legacy commands: 0)
+    [WARN] [uds-messaging] sockets directory <scratch>/trace-tmpdir-0775/tmpdir/cc-socks refused (a sockets-directory component is not a private-or-sticky directory owned by us or root — refusing to use it; refused component: '<scratch>/trace-tmpdir-0775/tmpdir' is group-writable without the sticky bit (owner 502:1000, mode 0775) — chmod g-w <scratch>/trace-tmpdir-0775/tmpdir, or pass --messaging-socket-path); trying the per-uid fallback /tmp/cc-socks-502
+    [INFO] [uds-messaging] Listening: /tmp/cc-socks-502/3366.sock
+    [DEBUG] [uds-messaging] Inject messages (auth line optional here): { echo '{"type":"auth","token":"[REDACTED]"$CLAUDE_CODE_MESSAGING_TOKEN"'"}'; echo '{"type":"user","message":{"role":"user","content":"hello"}}'; } | socat - UNIX-CONNECT:/tmp/cc-socks-502/3366.sock
+    [DEBUG] [uds-messaging] Connect when the data is ready (e.g. out=$(cmd); printf '%s\n' "$out" | nc -N -U "$CLAUDE_CODE_MESSAGING_SOCKET" — or the socat form above): a connection that sends no complete line within 30000 ms is closed
+    [DEBUG] Broken symlink or missing file encountered for settings.json at path: <scratch>/trace-tmpdir-0775/work/.claude/settings.json
+    [DEBUG] cc-plugin-sec-default@builtin not seated: no managed settings and not a Team or Enterprise organization (none)
+    [DEBUG] Broken symlink or missing file encountered for settings.json at path: <scratch>/trace-tmpdir-0775/work/.claude/settings.local.json
+    [DEBUG] Artifacts MCP server not added: managed_or_strict_mcp_config (strict_mcp_config)
+    [DEBUG] [auto-mode] verifyAutoModeGateAccess: enabledState=enabled disabledBySettings=false model=claude-haiku-5-5 modelSupported=true disableFastModeBreakerFires=false carouselAvailable=true canEnterAuto=true
+    [DEBUG] plugin cc-plugin-agents-md: no pluginConfigs["agents-md@builtin" or "cc-plugin-agents-md@builtin"].options in user, --settings or managed settings (project settings are not read); every option is its default
+    [DEBUG] memory index backfill: ENOENT: no such file or directory, scandir '<scratch>/trace-tmpdir-0775/home/.claude/projects/-home-<user>-guest-sf-p36-dt1nxjjh-trace-tmpdir-0775-work/memory/'
+    [DEBUG] Failed to stat directory <scratch>/trace-tmpdir-0775/home/.claude/output-styles: ENOENT: no such file or directory, stat '<scratch>/trace-tmpdir-0775/home/.claude/output-styles'
+    [DEBUG] Watching <scratch>/trace-tmpdir-0775/work for <scratch>/trace-tmpdir-0775/work/.claude to appear
+    [DEBUG] Watching for changes in setting files <scratch>/trace-tmpdir-0775/home/.claude/settings.json...
+    [DEBUG] Writing to temp file: <scratch>/trace-tmpdir-0775/home/.claude/.claude.json.tmp.3366.b5e94448cd11
+    [DEBUG] Renaming <scratch>/trace-tmpdir-0775/home/.claude/.claude.json.tmp.3366.b5e94448cd11 to <scratch>/trace-tmpdir-0775/home/.claude/.claude.json
+    [DEBUG] Writing to temp file: <scratch>/trace-tmpdir-0775/home/.claude/.claude.json.tmp.3366.f1082d8d58cf
+    [DEBUG] Renaming <scratch>/trace-tmpdir-0775/home/.claude/.claude.json.tmp.3366.f1082d8d58cf to <scratch>/trace-tmpdir-0775/home/.claude/.claude.json
+Trace: 1340 calls that name a path.
+Calls by place: config 336, (relative) 304, /etc 262, /home 136, /proc 72, work 63, out 62, /usr 23, /sys 22, TMPDIR 10, host 9, /.git 9, /tmp 7, /lib 5, /.claude 5, bin 4, /bin 4, / 2, /.dockerenv 1, /var 1, /System 1, /HEAD 1, /opt 1
+
+Written, created or removed outside the working directory, the config directory and TMPDIR: 1
+    /tmp/cc-socks-502/3366.sock  [ENOENT,ok]  bind,fchmodat,unlinkat  by claude
+
+Looked up under /etc, and not written: 25
+    /etc  [EINVAL,ok]  readlinkat,statx  by claude
+    /etc/claude-code  [ENOENT]  openat,statx  by claude
+    /etc/claude-code/.claude  [ENOENT]  statx  by claude
+    /etc/claude-code/.claude/agents  [ENOENT]  statx  by claude
+    /etc/claude-code/.claude/commands  [ENOENT]  statx  by claude
+    /etc/claude-code/.claude/output-styles  [ENOENT]  statx  by claude
+    /etc/claude-code/.claude/rules  [ENOENT]  openat,statx  by claude
+    /etc/claude-code/.claude/skills  [ENOENT]  openat  by claude
+    /etc/claude-code/CLAUDE.md  [ENOENT]  openat,statx  by claude
+    /etc/claude-code/managed-mcp.json  [ENOENT]  statx  by claude
+    /etc/claude-code/managed-settings.d  [ENOENT]  openat,statx  by claude
+    /etc/claude-code/managed-settings.json  [ENOENT]  openat,statx  by claude
+    /etc/ld.so.cache  [ok]  openat  by claude
+    /etc/ld.so.preload  [ENOENT]  faccessat  by claude
+    /etc/localtime  [ok]  newfstatat,openat,readlinkat  by claude
+    /etc/machine-id  [ok]  openat  by claude
+    /etc/openssl/certs  [ENOENT]  openat  by claude
+    /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem  [ENOENT]  openat  by claude
+    /etc/pki/tls/cert.pem  [ENOENT]  openat  by claude
+    /etc/pki/tls/certs  [ENOENT]  openat  by claude
+    /etc/pki/tls/certs/ca-bundle.crt  [ENOENT]  openat  by claude
+    /etc/ssl/ca-bundle.pem  [ENOENT]  openat  by claude
+    /etc/ssl/cert.pem  [ENOENT]  openat  by claude
+    /etc/ssl/certs  [ok]  openat  by claude
+    /etc/ssl/certs/*  [ok]  openat  by claude
+
+Looked up elsewhere outside what the session is given, and not written: 49
+    /  [ok]  statx  by claude
+    /.claude/agents  [ENOENT]  statx  by claude
+    /.claude/commands  [ENOENT]  statx  by claude
+    /.claude/output-styles  [ENOENT]  statx  by claude
+    /.claude/skills  [ENOENT]  statx  by claude
+    /.claude/workflows  [ENOENT]  statx  by claude
+    /.dockerenv  [ENOENT]  faccessat  by claude
+    /.git  [ENOENT]  statx  by claude
+    /HEAD  [ENOENT]  statx  by claude
+    /System/Library/OpenSSL/certs  [ENOENT]  openat  by claude
+    /home  [ok]  statfs,statx  by claude
+    /home/.claude/agents  [ENOENT]  statx  by claude
+    /home/.claude/commands  [ENOENT]  statx  by claude
+    /home/.claude/output-styles  [ENOENT]  statx  by claude
+    /home/.claude/skills  [ENOENT]  statx  by claude
+    /home/.claude/workflows  [ENOENT]  statx  by claude
+    /home/.git  [ENOENT]  statx  by claude
+    /home/HEAD  [ENOENT]  statx  by claude
+    /home/claude/.claude/remote/.api_key  [ENOENT]  openat  by claude
+    /home/claude/.claude/remote/.oauth_token  [ENOENT]  openat  by claude
+    /home/claude/.claude/remote/.session_ingress_token  [ENOENT]  openat  by claude
+    ~  [ok]  statx  by claude
+    ~/.claude/agents  [ENOENT]  statx  by claude
+    ~/.claude/commands  [ENOENT]  statx  by claude
+    ~/.claude/output-styles  [ENOENT]  statx  by claude
+    ~/.claude/skills  [ENOENT]  statx  by claude
+    ~/.claude/workflows  [ENOENT]  statx  by claude
+    ~/.git  [ENOENT]  statx  by claude
+    ~/HEAD  [ENOENT]  statx  by claude
+    <scratch>  [ok]  statx  by claude
+    <scratch>/.claude/agents  [ENOENT]  statx  by claude
+    <scratch>/.claude/commands  [ENOENT]  statx  by claude
+    <scratch>/.claude/output-styles  [ENOENT]  statx  by claude
+    <scratch>/.claude/skills  [ENOENT]  statx  by claude
+    <scratch>/.claude/workflows  [ENOENT]  statx  by claude
+    <scratch>/.git  [ENOENT]  statx  by claude
+    <scratch>/HEAD  [ENOENT]  statx  by claude
+    <scratch>/trace-tmpdir-0775  [ok]  statx  by claude
+    <scratch>/trace-tmpdir-0775/.claude/agents  [ENOENT]  statx  by claude
+    <scratch>/trace-tmpdir-0775/.claude/commands  [ENOENT]  statx  by claude
+    <scratch>/trace-tmpdir-0775/.claude/output-styles  [ENOENT]  statx  by claude
+    <scratch>/trace-tmpdir-0775/.claude/skills  [ENOENT]  statx  by claude
+    <scratch>/trace-tmpdir-0775/.claude/workflows  [ENOENT]  statx  by claude
+    <scratch>/trace-tmpdir-0775/.git  [ENOENT]  statx  by claude
+    <scratch>/trace-tmpdir-0775/HEAD  [ENOENT]  statx  by claude
+    /opt/homebrew/bin/zsh  [ENOENT]  newfstatat  by claude
+    /tmp  [ok]  statx  by claude
+    /tmp/cc-socks-502  [ok]  openat,statx  by claude
+    /var/ssl/certs  [ENOENT]  openat  by claude
+
+Every path that holds `managed`, `claude-code` or `ClaudeCode`, wherever it lies: 11
+    /etc/claude-code  [ENOENT]
+    /etc/claude-code/.claude  [ENOENT]
+    /etc/claude-code/.claude/agents  [ENOENT]
+    /etc/claude-code/.claude/commands  [ENOENT]
+    /etc/claude-code/.claude/output-styles  [ENOENT]
+    /etc/claude-code/.claude/rules  [ENOENT]
+    /etc/claude-code/.claude/skills  [ENOENT]
+    /etc/claude-code/CLAUDE.md  [ENOENT]
+    /etc/claude-code/managed-mcp.json  [ENOENT]
+    /etc/claude-code/managed-settings.d  [ENOENT]
+    /etc/claude-code/managed-settings.json  [ENOENT]
+
+## Case standin
+
+Outer sandbox: nouserns, /tmp bound read-write. TMPDIR=/sf/tmpdir, mode 0700
+Command: bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --disable-userns --die-with-parent --new-session --hostname sandbox --ro-bind /usr /usr --ro-bind /etc /etc --symlink usr/bin /bin --symlink usr/sbin /sbin --symlink usr/lib /lib --ro-bind /run/systemd/resolve/stub-resolv.conf /run/systemd/resolve/stub-resolv.conf --proc /proc --dev /dev --bind <scratch>/standin/tmp /tmp --ro-bind ~/.local/share/claude/versions/2.1.326 /sf/bin/claude --ro-bind <scratch>/standin/host /sf/host --bind <scratch>/standin/work /sf/work --bind <scratch>/standin/home /sf/home --bind <scratch>/standin/tmpdir /sf/tmpdir --bind <scratch>/standin/out /sf/out --chdir /sf/work -- /sf/bin/claude -p --tools Bash,Agent --allowedTools Bash(sh ./inside.sh) Agent --setting-sources user --strict-mcp-config --output-format stream-json --verbose --model haiku --session-id cc444d1c-a5a7-4867-8f4b-616b7818c71b --permission-mode dontAsk --permission-prompts none --settings /sf/host/settings.json --max-turns 8 --max-budget-usd 0.50 --forward-subagent-text --debug-file /sf/out/debug.log <prompt>
+Exit code 1, after 0s.
+init: version 2.1.326, tools ['Task', 'Bash']
+Paths that the stream names, outside the working directory: 2
+    system/init memory_paths.auto = /sf/home/.claude/projects/-sf-work/memory/
+    system/init messaging_socket_path = /sf/tmpdir/cc-socks/2.sock
+result: subtype success, is_error True, turns 1, cost 0, denials []
+    Not logged in · Please run /login
+Model calls of a subagent on the stream: 0
+observed.txt, which inside.sh appended to in the working directory (0 runs):
+    (absent)
+The directory bound at /tmp, after the session:
+    (empty)
+The directory that TMPDIR names, after the session:
+    dir           - cc-socks
+    dir           - claude-502
+    dir           - claude-502/fswatch-probe-i3wE5C
+    file          1 claude-502/fswatch-probe-i3wE5C/probe
+The home directory of the session, which holds the config directory, after the session:
+    dir           - .claude
+    file        811 .claude/.claude.json
+    dir           - .claude/backups
+    file         84 .claude/backups/.claude.json.backup.1795644393160
+    dir           - .claude/plugins
+    dir           - .claude/plugins/store
+    file         92 .claude/plugins/store/cc-plugin-agents-md_builtin-b049b47b3618.json
+    dir           - .claude/projects
+    dir           - .claude/projects/-sf-work
+    file      43020 .claude/projects/-sf-work/cc444d1c-a5a7-4867-8f4b-616b7818c71b.jsonl
+    dir           - .claude/projects/-sf-work/memory
+    dir           - .claude/sessions
+Debug-log lines that mention a managed location, a temporary directory, a socket or a refused write: 10
+    [DEBUG] Broken symlink or missing file encountered for settings.json at path: /etc/claude-code/managed-settings.json
+    [DEBUG] Loading skills from: managed=/etc/claude-code/.claude/skills, user=/sf/home/.claude/skills, project=[]
+    [DEBUG] Loaded 0 unique skills (0 unconditional, 0 conditional, managed: 0, user: 0, project: 0, additional: 0, legacy commands: 0)
+    [INFO] [uds-messaging] Listening: /sf/tmpdir/cc-socks/2.sock
+    [DEBUG] [uds-messaging] Inject messages (auth line optional here): { echo '{"type":"auth","token":"[REDACTED]"$CLAUDE_CODE_MESSAGING_TOKEN"'"}'; echo '{"type":"user","message":{"role":"user","content":"hello"}}'; } | socat - UNIX-CONNECT:/sf/tmpdir/cc-socks/2.sock
+    [DEBUG] [uds-messaging] Connect when the data is ready (e.g. out=$(cmd); printf '%s\n' "$out" | nc -N -U "$CLAUDE_CODE_MESSAGING_SOCKET" — or the socat form above): a connection that sends no complete line within 30000 ms is closed
+    [DEBUG] cc-plugin-sec-default@builtin not seated: no managed settings and not a Team or Enterprise organization (none)
+    [DEBUG] Artifacts MCP server not added: managed_or_strict_mcp_config (strict_mcp_config)
+    [DEBUG] [auto-mode] verifyAutoModeGateAccess: enabledState=enabled disabledBySettings=false model=claude-haiku-5-5 modelSupported=true disableFastModeBreakerFires=false carouselAvailable=true canEnterAuto=true
+    [DEBUG] plugin cc-plugin-agents-md: no pluginConfigs["agents-md@builtin" or "cc-plugin-agents-md@builtin"].options in user, --settings or managed settings (project settings are not read); every option is its default
+
+## Case standin-tmp-ro
+
+Outer sandbox: nouserns, /tmp bound read-only. TMPDIR=/sf/tmpdir, mode 0700
+Command: bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --disable-userns --die-with-parent --new-session --hostname sandbox --ro-bind /usr /usr --ro-bind /etc /etc --symlink usr/bin /bin --symlink usr/sbin /sbin --symlink usr/lib /lib --ro-bind /run/systemd/resolve/stub-resolv.conf /run/systemd/resolve/stub-resolv.conf --proc /proc --dev /dev --ro-bind <scratch>/standin-tmp-ro/tmp /tmp --ro-bind ~/.local/share/claude/versions/2.1.326 /sf/bin/claude --ro-bind <scratch>/standin-tmp-ro/host /sf/host --bind <scratch>/standin-tmp-ro/work /sf/work --bind <scratch>/standin-tmp-ro/home /sf/home --bind <scratch>/standin-tmp-ro/tmpdir /sf/tmpdir --bind <scratch>/standin-tmp-ro/out /sf/out --chdir /sf/work -- /sf/bin/claude -p --tools Bash,Agent --allowedTools Bash(sh ./inside.sh) Agent --setting-sources user --strict-mcp-config --output-format stream-json --verbose --model haiku --session-id 18a1b0ef-8f5f-4e3e-8bef-26cfb99ef266 --permission-mode dontAsk --permission-prompts none --settings /sf/host/settings.json --max-turns 8 --max-budget-usd 0.50 --forward-subagent-text --debug-file /sf/out/debug.log <prompt>
+Exit code 1, after 0s.
+init: version 2.1.326, tools ['Task', 'Bash']
+Paths that the stream names, outside the working directory: 2
+    system/init memory_paths.auto = /sf/home/.claude/projects/-sf-work/memory/
+    system/init messaging_socket_path = /sf/tmpdir/cc-socks/2.sock
+result: subtype success, is_error True, turns 1, cost 0, denials []
+    Not logged in · Please run /login
+Model calls of a subagent on the stream: 0
+observed.txt, which inside.sh appended to in the working directory (0 runs):
+    (absent)
+The directory bound at /tmp, after the session:
+    (empty)
+The directory that TMPDIR names, after the session:
+    dir           - cc-socks
+    dir           - claude-502
+    dir           - claude-502/fswatch-probe-CpWR8r
+    file          1 claude-502/fswatch-probe-CpWR8r/probe
+The home directory of the session, which holds the config directory, after the session:
+    dir           - .claude
+    file        811 .claude/.claude.json
+    dir           - .claude/backups
+    file         84 .claude/backups/.claude.json.backup.1795644393339
+    dir           - .claude/plugins
+    dir           - .claude/plugins/store
+    file         92 .claude/plugins/store/cc-plugin-agents-md_builtin-b049b47b3618.json
+    dir           - .claude/projects
+    dir           - .claude/projects/-sf-work
+    file      43020 .claude/projects/-sf-work/18a1b0ef-8f5f-4e3e-8bef-26cfb99ef266.jsonl
+    dir           - .claude/projects/-sf-work/memory
+    dir           - .claude/sessions
+Debug-log lines that mention a managed location, a temporary directory, a socket or a refused write: 10
+    [DEBUG] Broken symlink or missing file encountered for settings.json at path: /etc/claude-code/managed-settings.json
+    [DEBUG] Loading skills from: managed=/etc/claude-code/.claude/skills, user=/sf/home/.claude/skills, project=[]
+    [DEBUG] Loaded 0 unique skills (0 unconditional, 0 conditional, managed: 0, user: 0, project: 0, additional: 0, legacy commands: 0)
+    [INFO] [uds-messaging] Listening: /sf/tmpdir/cc-socks/2.sock
+    [DEBUG] [uds-messaging] Inject messages (auth line optional here): { echo '{"type":"auth","token":"[REDACTED]"$CLAUDE_CODE_MESSAGING_TOKEN"'"}'; echo '{"type":"user","message":{"role":"user","content":"hello"}}'; } | socat - UNIX-CONNECT:/sf/tmpdir/cc-socks/2.sock
+    [DEBUG] [uds-messaging] Connect when the data is ready (e.g. out=$(cmd); printf '%s\n' "$out" | nc -N -U "$CLAUDE_CODE_MESSAGING_SOCKET" — or the socat form above): a connection that sends no complete line within 30000 ms is closed
+    [DEBUG] cc-plugin-sec-default@builtin not seated: no managed settings and not a Team or Enterprise organization (none)
+    [DEBUG] Artifacts MCP server not added: managed_or_strict_mcp_config (strict_mcp_config)
+    [DEBUG] [auto-mode] verifyAutoModeGateAccess: enabledState=enabled disabledBySettings=false model=claude-haiku-5-5 modelSupported=true disableFastModeBreakerFires=false carouselAvailable=true canEnterAuto=true
+    [DEBUG] plugin cc-plugin-agents-md: no pluginConfigs["agents-md@builtin" or "cc-plugin-agents-md@builtin"].options in user, --settings or managed settings (project settings are not read); every option is its default
+
+## Case standin-tmp-ro-0775
+
+Outer sandbox: nouserns, /tmp bound read-only. TMPDIR=/sf/tmpdir, mode 0775
+Command: bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --disable-userns --die-with-parent --new-session --hostname sandbox --ro-bind /usr /usr --ro-bind /etc /etc --symlink usr/bin /bin --symlink usr/sbin /sbin --symlink usr/lib /lib --ro-bind /run/systemd/resolve/stub-resolv.conf /run/systemd/resolve/stub-resolv.conf --proc /proc --dev /dev --ro-bind <scratch>/standin-tmp-ro-0775/tmp /tmp --ro-bind ~/.local/share/claude/versions/2.1.326 /sf/bin/claude --ro-bind <scratch>/standin-tmp-ro-0775/host /sf/host --bind <scratch>/standin-tmp-ro-0775/work /sf/work --bind <scratch>/standin-tmp-ro-0775/home /sf/home --bind <scratch>/standin-tmp-ro-0775/tmpdir /sf/tmpdir --bind <scratch>/standin-tmp-ro-0775/out /sf/out --chdir /sf/work -- /sf/bin/claude -p --tools Bash,Agent --allowedTools Bash(sh ./inside.sh) Agent --setting-sources user --strict-mcp-config --output-format stream-json --verbose --model haiku --session-id 7026749c-7076-4ccd-8c7b-ddcdd885ff3e --permission-mode dontAsk --permission-prompts none --settings /sf/host/settings.json --max-turns 8 --max-budget-usd 0.50 --forward-subagent-text --debug-file /sf/out/debug.log <prompt>
+Exit code 1, after 0s.
+init: version 2.1.326, tools ['Task', 'Bash']
+Paths that the stream names, outside the working directory: 1
+    system/init memory_paths.auto = /sf/home/.claude/projects/-sf-work/memory/
+result: subtype success, is_error True, turns 1, cost 0, denials []
+    Not logged in · Please run /login
+Model calls of a subagent on the stream: 0
+observed.txt, which inside.sh appended to in the working directory (0 runs):
+    (absent)
+The directory bound at /tmp, after the session:
+    (empty)
+The directory that TMPDIR names, after the session:
+    dir           - claude-502
+    dir           - claude-502/fswatch-probe-JMlmaX
+    file          1 claude-502/fswatch-probe-JMlmaX/probe
+The home directory of the session, which holds the config directory, after the session:
+    dir           - .claude
+    file        811 .claude/.claude.json
+    dir           - .claude/backups
+    file         84 .claude/backups/.claude.json.backup.1795644393520
+    dir           - .claude/plugins
+    dir           - .claude/plugins/store
+    file         92 .claude/plugins/store/cc-plugin-agents-md_builtin-b049b47b3618.json
+    dir           - .claude/projects
+    dir           - .claude/projects/-sf-work
+    file      43020 .claude/projects/-sf-work/7026749c-7076-4ccd-8c7b-ddcdd885ff3e.jsonl
+    dir           - .claude/projects/-sf-work/memory
+    dir           - .claude/sessions
+Debug-log lines that mention a managed location, a temporary directory, a socket or a refused write: 9
+    [DEBUG] Broken symlink or missing file encountered for settings.json at path: /etc/claude-code/managed-settings.json
+    [DEBUG] Loading skills from: managed=/etc/claude-code/.claude/skills, user=/sf/home/.claude/skills, project=[]
+    [DEBUG] Loaded 0 unique skills (0 unconditional, 0 conditional, managed: 0, user: 0, project: 0, additional: 0, legacy commands: 0)
+    [WARN] [uds-messaging] sockets directory /sf/tmpdir/cc-socks refused (a sockets-directory component is not a private-or-sticky directory owned by us or root — refusing to use it; refused component: '/sf/tmpdir' is group-writable without the sticky bit (owner 502:1000, mode 0775) — chmod g-w /sf/tmpdir, or pass --messaging-socket-path); trying the per-uid fallback /tmp/cc-socks-0
+    [ERROR] [uds-messaging] Failed to set up sockets directory /tmp/cc-socks-0 (refusing to bind — cross-session messaging is OFF for this session): EROFS: read-only file system, mkdir '/tmp/cc-socks-0'.
+    [DEBUG] cc-plugin-sec-default@builtin not seated: no managed settings and not a Team or Enterprise organization (none)
+    [DEBUG] Artifacts MCP server not added: managed_or_strict_mcp_config (strict_mcp_config)
+    [DEBUG] [auto-mode] verifyAutoModeGateAccess: enabledState=enabled disabledBySettings=false model=claude-haiku-5-5 modelSupported=true disableFastModeBreakerFires=false carouselAvailable=true canEnterAuto=true
+    [DEBUG] plugin cc-plugin-agents-md: no pluginConfigs["agents-md@builtin" or "cc-plugin-agents-md@builtin"].options in user, --settings or managed settings (project settings are not read); every option is its default
+Planted /etc/claude-code/managed-settings.json: {"env": {"SF_P36_MANAGED": "set-by-managed-settings"}}
+
+## Case managed-visible
+
+Outer sandbox: nouserns, /tmp bound read-write, /etc/claude-code visible. TMPDIR=/sf/tmpdir, mode 0700
+Command: bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --disable-userns --die-with-parent --new-session --hostname sandbox --ro-bind /usr /usr --ro-bind /etc /etc --symlink usr/bin /bin --symlink usr/sbin /sbin --symlink usr/lib /lib --ro-bind /run/systemd/resolve/stub-resolv.conf /run/systemd/resolve/stub-resolv.conf --proc /proc --dev /dev --bind <scratch>/managed-visible/tmp /tmp --ro-bind ~/.local/share/claude/versions/2.1.326 /sf/bin/claude --ro-bind <scratch>/managed-visible/host /sf/host --bind <scratch>/managed-visible/work /sf/work --bind <scratch>/managed-visible/home /sf/home --bind <scratch>/managed-visible/tmpdir /sf/tmpdir --bind <scratch>/managed-visible/out /sf/out --chdir /sf/work -- /sf/bin/claude -p --tools Bash --allowedTools Bash(sh ./inside.sh) --setting-sources user --strict-mcp-config --output-format stream-json --verbose --model haiku --session-id 47142172-2653-4d33-b37a-453596ab4197 --permission-mode dontAsk --permission-prompts none --settings /sf/host/settings.json --max-turns 8 --max-budget-usd 0.50 --forward-subagent-text --debug-file /sf/out/debug.log <prompt>
+Exit code 1, after 0s.
+init: version 2.1.326, tools ['Bash']
+Paths that the stream names, outside the working directory: 2
+    system/init memory_paths.auto = /sf/home/.claude/projects/-sf-work/memory/
+    system/init messaging_socket_path = /sf/tmpdir/cc-socks/2.sock
+result: subtype success, is_error True, turns 1, cost 0, denials []
+    Not logged in · Please run /login
+Model calls of a subagent on the stream: 0
+observed.txt, which inside.sh appended to in the working directory (0 runs):
+    (absent)
+The directory bound at /tmp, after the session:
+    (empty)
+The directory that TMPDIR names, after the session:
+    dir           - cc-socks
+    dir           - claude-502
+    dir           - claude-502/fswatch-probe-9tCMO4
+    file          1 claude-502/fswatch-probe-9tCMO4/probe
+The home directory of the session, which holds the config directory, after the session:
+    dir           - .claude
+    file        946 .claude/.claude.json
+    dir           - .claude/backups
+    file         84 .claude/backups/.claude.json.backup.1795644393702
+    dir           - .claude/plugins
+    dir           - .claude/plugins/store
+    file         92 .claude/plugins/store/cc-plugin-agents-md_builtin-b049b47b3618.json
+    dir           - .claude/projects
+    dir           - .claude/projects/-sf-work
+    file      32461 .claude/projects/-sf-work/47142172-2653-4d33-b37a-453596ab4197.jsonl
+    dir           - .claude/projects/-sf-work/memory
+    dir           - .claude/sessions
+Debug-log lines that mention a managed location, a temporary directory, a socket or a refused write: 10
+    [DEBUG] Loading skills from: managed=/etc/claude-code/.claude/skills, user=/sf/home/.claude/skills, project=[]
+    [DEBUG] Loaded 0 unique skills (0 unconditional, 0 conditional, managed: 0, user: 0, project: 0, additional: 0, legacy commands: 0)
+    [INFO] [uds-messaging] Listening: /sf/tmpdir/cc-socks/2.sock
+    [DEBUG] [uds-messaging] Inject messages (auth line optional here): { echo '{"type":"auth","token":"[REDACTED]"$CLAUDE_CODE_MESSAGING_TOKEN"'"}'; echo '{"type":"user","message":{"role":"user","content":"hello"}}'; } | socat - UNIX-CONNECT:/sf/tmpdir/cc-socks/2.sock
+    [DEBUG] [uds-messaging] Connect when the data is ready (e.g. out=$(cmd); printf '%s\n' "$out" | nc -N -U "$CLAUDE_CODE_MESSAGING_SOCKET" — or the socat form above): a connection that sends no complete line within 30000 ms is closed
+    [DEBUG] cc-plugin-sec-default@builtin seated outermost: this machine has managed settings
+    [DEBUG] Artifacts MCP server not added: managed_or_strict_mcp_config (strict_mcp_config)
+    [DEBUG] [auto-mode] verifyAutoModeGateAccess: enabledState=enabled disabledBySettings=false model=claude-haiku-5-5 modelSupported=true disableFastModeBreakerFires=false carouselAvailable=true canEnterAuto=true
+    [DEBUG] plugin cc-plugin-agents-md: no pluginConfigs["agents-md@builtin" or "cc-plugin-agents-md@builtin"].options in user, --settings or managed settings (project settings are not read); every option is its default
+    [DEBUG] Watching for changes in setting files /sf/home/.claude/settings.json, /etc/claude-code/managed-settings.json...
+
+## Case managed-hidden
+
+Outer sandbox: nouserns, /tmp bound read-write, /etc/claude-code hidden. TMPDIR=/sf/tmpdir, mode 0700
+Command: bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --disable-userns --die-with-parent --new-session --hostname sandbox --ro-bind /usr /usr --ro-bind /etc /etc --symlink usr/bin /bin --symlink usr/sbin /sbin --symlink usr/lib /lib --ro-bind /run/systemd/resolve/stub-resolv.conf /run/systemd/resolve/stub-resolv.conf --proc /proc --dev /dev --bind <scratch>/managed-hidden/tmp /tmp --ro-bind <scratch>/managed-hidden/empty /etc/claude-code --ro-bind ~/.local/share/claude/versions/2.1.326 /sf/bin/claude --ro-bind <scratch>/managed-hidden/host /sf/host --bind <scratch>/managed-hidden/work /sf/work --bind <scratch>/managed-hidden/home /sf/home --bind <scratch>/managed-hidden/tmpdir /sf/tmpdir --bind <scratch>/managed-hidden/out /sf/out --chdir /sf/work -- /sf/bin/claude -p --tools Bash --allowedTools Bash(sh ./inside.sh) --setting-sources user --strict-mcp-config --output-format stream-json --verbose --model haiku --session-id 7d7b3dc5-2afd-49bb-875d-1cbf2d2d4ba0 --permission-mode dontAsk --permission-prompts none --settings /sf/host/settings.json --max-turns 8 --max-budget-usd 0.50 --forward-subagent-text --debug-file /sf/out/debug.log <prompt>
+Exit code 1, after 0s.
+init: version 2.1.326, tools ['Bash']
+Paths that the stream names, outside the working directory: 2
+    system/init memory_paths.auto = /sf/home/.claude/projects/-sf-work/memory/
+    system/init messaging_socket_path = /sf/tmpdir/cc-socks/2.sock
+result: subtype success, is_error True, turns 1, cost 0, denials []
+    Not logged in · Please run /login
+Model calls of a subagent on the stream: 0
+observed.txt, which inside.sh appended to in the working directory (0 runs):
+    (absent)
+The directory bound at /tmp, after the session:
+    (empty)
+The directory that TMPDIR names, after the session:
+    dir           - cc-socks
+    dir           - claude-502
+    dir           - claude-502/fswatch-probe-WIDdRw
+    file          1 claude-502/fswatch-probe-WIDdRw/probe
+The home directory of the session, which holds the config directory, after the session:
+    dir           - .claude
+    file        811 .claude/.claude.json
+    dir           - .claude/backups
+    file         84 .claude/backups/.claude.json.backup.1795644393887
+    dir           - .claude/plugins
+    dir           - .claude/plugins/store
+    file         92 .claude/plugins/store/cc-plugin-agents-md_builtin-b049b47b3618.json
+    dir           - .claude/projects
+    dir           - .claude/projects/-sf-work
+    file      32461 .claude/projects/-sf-work/7d7b3dc5-2afd-49bb-875d-1cbf2d2d4ba0.jsonl
+    dir           - .claude/projects/-sf-work/memory
+    dir           - .claude/sessions
+Debug-log lines that mention a managed location, a temporary directory, a socket or a refused write: 11
+    [DEBUG] Broken symlink or missing file encountered for settings.json at path: /etc/claude-code/managed-settings.json
+    [DEBUG] Loading skills from: managed=/etc/claude-code/.claude/skills, user=/sf/home/.claude/skills, project=[]
+    [DEBUG] Loaded 0 unique skills (0 unconditional, 0 conditional, managed: 0, user: 0, project: 0, additional: 0, legacy commands: 0)
+    [INFO] [uds-messaging] Listening: /sf/tmpdir/cc-socks/2.sock
+    [DEBUG] [uds-messaging] Inject messages (auth line optional here): { echo '{"type":"auth","token":"[REDACTED]"$CLAUDE_CODE_MESSAGING_TOKEN"'"}'; echo '{"type":"user","message":{"role":"user","content":"hello"}}'; } | socat - UNIX-CONNECT:/sf/tmpdir/cc-socks/2.sock
+    [DEBUG] [uds-messaging] Connect when the data is ready (e.g. out=$(cmd); printf '%s\n' "$out" | nc -N -U "$CLAUDE_CODE_MESSAGING_SOCKET" — or the socat form above): a connection that sends no complete line within 30000 ms is closed
+    [DEBUG] cc-plugin-sec-default@builtin not seated: no managed settings and not a Team or Enterprise organization (none)
+    [DEBUG] Artifacts MCP server not added: managed_or_strict_mcp_config (strict_mcp_config)
+    [DEBUG] [auto-mode] verifyAutoModeGateAccess: enabledState=enabled disabledBySettings=false model=claude-haiku-5-5 modelSupported=true disableFastModeBreakerFires=false carouselAvailable=true canEnterAuto=true
+    [DEBUG] plugin cc-plugin-agents-md: no pluginConfigs["agents-md@builtin" or "cc-plugin-agents-md@builtin"].options in user, --settings or managed settings (project settings are not read); every option is its default
+    [DEBUG] Watching for changes in setting files /sf/home/.claude/settings.json, /etc/claude-code/managed-settings.json...
+
+Removed /etc/claude-code: yes
+
+## Summary
+
+| Case | Exit | Result | Subagent calls on the stream | Runs of inside.sh | SF_P36_MANAGED in them |
+|---|---|---|---|---|---|
+| trace | 1 | success | 0 | 0 | - |
+| trace-tmpdir-0775 | 1 | success | 0 | 0 | - |
+| standin | 1 | success | 0 | 0 | - |
+| standin-tmp-ro | 1 | success | 0 | 0 | - |
+| standin-tmp-ro-0775 | 1 | success | 0 | 0 | - |
+| managed-visible | 1 | success | 0 | 0 | - |
+| managed-hidden | 1 | success | 0 | 0 | - |
+
+Sum of total_cost_usd: 0.0000

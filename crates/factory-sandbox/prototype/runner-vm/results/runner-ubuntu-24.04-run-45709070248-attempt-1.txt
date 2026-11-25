@@ -1,0 +1,89 @@
+# sapientpants/sf-scratch, workflow probe-p36, run 45709070248, attempt 1, job probe (ubuntu-24.04)
+# The lines of the job log that start with RESULT, and the image lines of its setup.
+Hosted Compute Agent
+Version: 20261111.635
+Region: us-west-2
+Cloud: AWS
+Image: ubuntu-24.04
+Version: 20261116.133.1
+Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261116.133/images/ubuntu/Ubuntu2404-Readme.md
+Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261116.133
+RESULT job label=ubuntu-24.04 sha=38240648ccca1bed753fa6fd3e8b10fee4e4f33c attempt=1
+RESULT job bwrap-preinstalled=no
+RESULT provisioned links=lo enp39s0 docker0
+RESULT provisioned basic=fail(1) :: bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted
+RESULT provisioned caps=fail(1) :: bwrap: loopback: Failed RTM_NEWADDR: No child processes
+RESULT provisioned nested=fail(1) :: bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted
+RESULT provisioned copy=fail(1) :: bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted
+RESULT provisioned unshare=fail(1) :: unshare: write failed /proc/self/uid_map: Operation not permitted
+RESULT provisioned links-in-basic=bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted
+RESULT provisioned seccomp=bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted
+RESULT provisioned nouserns-starts=fail(1) :: bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted
+RESULT provisioned nouserns-limit=bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted
+RESULT provisioned nouserns-links=bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted
+RESULT provisioned nouserns-nested=refused(1) :: bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted
+RESULT provisioned nouserns-unshare=refused(1) :: bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted
+RESULT provisioned nouserns-caps=refused(1) :: bwrap: loopback: Failed RTM_NEWADDR: No child processes
+RESULT provisioned nouserns-seccomp=bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted
+RESULT provisioned nouserns-unshare-all=fail(1) :: bwrap: --disable-userns requires --unshare-user
+RESULT provisioned nouserns-unshare-all-nested=refused(1) :: bwrap: --disable-userns requires --unshare-user
+RESULT provisioned control-nested=fail(1) :: bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted
+RESULT facts date=2026-11-25T21:58:25Z
+RESULT facts uid=1001 groups-of-interest=docker
+RESULT facts os=Ubuntu 24.04.5 LTS
+RESULT facts kernel=7.0.0-1014-aws x86_64
+RESULT facts virt=amazon
+RESULT facts vendor=Amazon EC2
+RESULT facts cpus=4 mem-kib=16078420
+RESULT facts bwrap=bubblewrap 0.9.0 at /usr/bin/bwrap mode -rwxr-xr-x
+RESULT facts package=bubblewrap 0.9.0-1ubuntu0.3
+RESULT facts /proc/sys/kernel/unprivileged_userns_clone=1
+RESULT facts /proc/sys/user/max_user_namespaces=55514
+RESULT facts /proc/sys/kernel/apparmor_restrict_unprivileged_userns=0
+RESULT facts /sys/kernel/security/lsm=lockdown,capability,landlock,yama,apparmor,ima,evm
+RESULT facts apparmor-files=/etc/apparmor.d/lxc-usernsexec /etc/apparmor.d/unprivileged_userns
+RESULT facts sudo-without-***
+RESULT kvm device=crw-rw---- 1 root kvm 10, 232 Nov 25 21:56 /dev/kvm
+RESULT kvm group=kvm:x:993:<members> member=0
+RESULT kvm open=fail(2) :: sh: 1: cannot create /dev/kvm: Permission denied
+RESULT kvm ioctls=not tried: [Errno 13] Permission denied: '/dev/kvm'
+RESULT host links=lo enp39s0 docker0
+RESULT host basic=ok
+RESULT host caps=ok
+RESULT host nested=ok
+RESULT host copy=ok
+RESULT host unshare=ok
+RESULT host links-in-basic= lo
+RESULT host seccomp=Seccomp: 2 Seccomp_filters: 1
+RESULT host nouserns-starts=ok
+RESULT host nouserns-limit=2147483647
+RESULT host nouserns-links= lo
+RESULT host nouserns-nested=refused(1) :: bwrap: Creating new namespace failed: nesting depth or /proc/sys/user/max_*_namespaces exceeded (ENOSPC)
+RESULT host nouserns-unshare=refused(1) :: unshare: unshare failed: No space left on device
+RESULT host nouserns-caps=refused(1) :: unshare: unshare failed: No space left on device
+RESULT host nouserns-seccomp=Seccomp: 2 Seccomp_filters: 1
+RESULT host nouserns-unshare-all=fail(1) :: bwrap: --disable-userns requires --unshare-user
+RESULT host nouserns-unshare-all-nested=refused(1) :: bwrap: --disable-userns requires --unshare-user
+RESULT host control-nested=ok
+RESULT netns links=lo
+RESULT netns basic=ok
+RESULT netns caps=ok
+RESULT netns nested=ok
+RESULT netns copy=ok
+RESULT netns unshare=ok
+RESULT netns links-in-basic= lo
+RESULT netns seccomp=Seccomp: 2 Seccomp_filters: 1
+RESULT netns nouserns-starts=ok
+RESULT netns nouserns-limit=2147483647
+RESULT netns nouserns-links= lo
+RESULT netns nouserns-nested=refused(1) :: bwrap: Creating new namespace failed: nesting depth or /proc/sys/user/max_*_namespaces exceeded (ENOSPC)
+RESULT netns nouserns-unshare=refused(1) :: unshare: unshare failed: No space left on device
+RESULT netns nouserns-caps=refused(1) :: unshare: unshare failed: No space left on device
+RESULT netns nouserns-seccomp=Seccomp: 2 Seccomp_filters: 1
+RESULT netns nouserns-unshare-all=fail(1) :: bwrap: --disable-userns requires --unshare-user
+RESULT netns nouserns-unshare-all-nested=refused(1) :: bwrap: --disable-userns requires --unshare-user
+RESULT netns control-nested=ok
+RESULT dmesg [  126.353150] audit: type=1400 audit(1795643905.313:132): apparmor="DENIED" operation="capable" class="cap" profile="unprivileged_userns" pid=2513 comm="bwrap" capability=12  capname="net_admin"
+RESULT dmesg [  126.357324] audit: type=1400 audit(1795643905.317:134): apparmor="DENIED" operation="capable" class="cap" profile="unprivileged_userns" pid=2523 comm="bwrap" capability=8  capname="setpcap"
+RESULT dmesg [  126.357386] audit: type=1400 audit(1795643905.317:135): apparmor="DENIED" operation="capable" class="cap" profile="unprivileged_userns" pid=2523 comm="bwrap" capability=12  capname="net_admin"
+RESULT dmesg [  126.362795] audit: type=1400 audit(1795643905.323:137): apparmor="DENIED" operation="capable" class="cap" profile="unprivileged_userns" pid=2535 comm="bwrap" capability=8  capname="setpcap"

@@ -32,10 +32,14 @@ limactl delete --force sf-p36
 
 | File | Run |
 |---|---|
-| `results/runner-<label>-run-<id>-attempt-<n>.txt` | The `RESULT` lines of one job of the workflow, with the image lines of its setup. Run 45709070248 is the script at the branch's first commit, `3824064`; run 45709406404 is the script as it is here, at `86c268f` |
+| `results/runner-<label>-run-<id>-attempt-<n>.txt` | The `RESULT` lines of one job of the workflow, with the image lines of its setup. Run 45709070248 is the script at the branch's first commit, `3824064`: one attempt. Run 45709406404 is the script as it is here, at `86c268f`: three attempts. Eight jobs in all |
 | `results/guest-2026-11-25.txt` | `userns-probe.sh` in the guest, and its `/dev/kvm` checks again with `kvm` as a supplementary group |
+| `results/guest-p6-2026-11-25.txt` | The script of P-6 in the guest, unchanged, at the commit its record names (`d23e6b7`): fifteen sessions. Started by the operator with `run-guest-sessions.sh` |
+| `results/guest-cli-2026-11-25.txt` | `cli_paths_probe.py` in the guest, with the operator's token: seven sessions. Started the same way |
 | `results/guest-cli-no-login-2026-11-25.txt` | `cli_paths_probe.py --no-login`: every session ends with "Not logged in", after the CLI has read its settings and opened its socket |
 
 The guest's account is named after the Mac's. The script prints `<user>` for it and `~` for its home directory.
 
 Lima 2.3.0 from Homebrew on macOS 27.0.1, on an Apple M4 Max. Claude Code 2.1.326 in the guest, the version on the Mac that day.
+
+The 22 sessions with the token reported 0.0129 and 0.0086 API-equivalent dollars.

@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| Status | Draft 4. Drafts 1 and 2 were reviewed (`docs/research/09-spec-review.md`, `10-spec-recheck.md`) and draft 3 addressed the findings. Draft 4 applies the operator's requirement decisions (23.1) and has not been reviewed. |
-| Date | 2026-11-22 |
+| Status | Draft 4. Drafts 1 and 2 were reviewed (`docs/research/09-spec-review.md`, `10-spec-recheck.md`) and draft 3 addressed the findings. Draft 4 applies the operator's requirement decisions (23.1). It was reviewed as it stood on 2026-11-22 (`16-spec-draft-4-review.md`), and the findings are not yet addressed. |
+| Date | 2026-11-25 |
 | Implementation language | Rust (toolchain 1.100, edition 2024) |
 | System of record | git on GitHub for code, GitHub Issues for work items |
 | Research basis | `docs/research/01`–`08` (sourced reports and a fact-check table) |
@@ -1866,3 +1866,4 @@ The reports in `docs/research/` hold the evidence and source URLs behind this sp
 - `10-spec-recheck`: the 47 problems a recheck found in draft 2 (unresolved findings and contradictions the rewrite introduced), addressed in draft 3.
 - `14-server-facts`: what the operator's server is, observed on 2026-11-20 and set against the host requirements of 4.4. Reports 11 to 13 are on `research/*` branches and are cited from `probes.md`.
 - `15-session-sizes`: how large the operator's interactive sessions on the factory repository were, in model calls, minutes and API-equivalent dollars, measured on 2026-11-21 for the session limits of section 14 (D-22).
+- `16-spec-draft-4-review`: the 51 findings of a review of draft 4 as it stood on 2026-11-22, in four lenses (consistency, evidence, security, and whether M0 and M1 can be built from the text), each with the reviewer's proposed fix. No second reader judged them. They are not yet addressed.

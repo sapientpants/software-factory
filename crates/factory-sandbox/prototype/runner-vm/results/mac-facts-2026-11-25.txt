@@ -1,0 +1,16 @@
+# Facts of the Mac that ran the guest, collected 2026-11-25T22:22:32Z
+limactl: limactl version 2.3.0
+macOS: 27.0.1 (26A434)
+CPU: Apple M4 Max, arm64
+kern.hv_support: 1
+Lima's default template, /opt/homebrew/opt/lima/share/lima/templates/default.yaml, on nested virtualisation:
+    681-
+    682:# When the "nestedVirtualization" feature is enabled:
+    683-# - Allows running a VM inside the guest VM.
+    684-# - The guest VM must configure QEMU with the `-cpu host` parameters to run a nested VM:
+    685-#   qemu-system-aarch64 -accel kvm -cpu host -M virt
+    686-# - Without specifying `-cpu host`, nested virtualization may fail with the error:
+    687-#   qemu-system-aarch64: kvm_init_vcpu: kvm_arch_init_vcpu failed (0): Invalid argument
+    688-# - Supported with `vmType: vz` or `vmType: krunkit` on Apple M3 or later (macOS 15 or later).
+The guest's instance, from limactl list:
+    sf-p36 Running vmType=vz arch=aarch64 cpus=4 memory=8589934592 disk=21474836480

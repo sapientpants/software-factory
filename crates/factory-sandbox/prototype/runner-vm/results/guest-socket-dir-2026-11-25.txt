@@ -1,0 +1,61 @@
+## Guest facts
+date: 2026-11-25T22:22:17Z
+/etc/debian_version: 13.7
+umask: 0002
+modes: ~ 700, ~/.cache 775, /tmp 1777, /home 755
+claude: 2.1.326 (Claude Code)
+kernel log, lines of kvm:
+    [    0.056648] kvm [1]: nv: 554 coarse grained trap handlers
+    [    0.056694] kvm [1]: nv: 669 fine grained trap handlers
+    [    0.056718] kvm [1]: IPA Size Limit: 40 bits
+    [    0.056982] kvm [1]: GICv3: no GICV resource entry
+    [    0.056985] kvm [1]: disabling GICv2 emulation
+    [    0.057012] kvm [1]: GIC system register CPU interface enabled
+    [    0.057025] kvm [1]: vgic interrupt IRQ9
+    [    0.057072] kvm [1]: Hyp nVHE mode initialized successfully
+
+## Cases
+/tmp/cc-socks-502 before the cases: absent
+
+RESULT private: the directory above TMPDIR 700 self, TMPDIR 700 self
+    [uds-messaging] Listening: <base>/private/parent/tmpdir/cc-socks/4825.sock
+    messaging_socket_path of system/init: <base>/private/parent/tmpdir/cc-socks/4825.sock
+
+RESULT group-writable: the directory above TMPDIR 700 self, TMPDIR 770 self
+    [uds-messaging] sockets directory <base>/group-writable/parent/tmpdir/cc-socks refused (a sockets-directory component is not a private-or-sticky directory owned by us or root — refusing to use it; refused component: '<base>/group-writable/parent/tmpdir' is group-writable without the sticky bit (owner 502:1000, mode 0770) — chmod g-w <base>/group-writable/parent/tmpdir, or pass --messaging-socket-path); trying the per-uid fallback /tmp/cc-socks-502
+    [uds-messaging] Listening: /tmp/cc-socks-502/4856.sock
+    messaging_socket_path of system/init: /tmp/cc-socks-502/4856.sock
+
+RESULT other-writable: the directory above TMPDIR 700 self, TMPDIR 707 self
+    [uds-messaging] sockets directory <base>/other-writable/parent/tmpdir/cc-socks refused (a sockets-directory component is not a private-or-sticky directory owned by us or root — refusing to use it; refused component: '<base>/other-writable/parent/tmpdir' is world-writable without the sticky bit (owner 502:1000, mode 0707) — chmod o-w <base>/other-writable/parent/tmpdir (or chmod +t), or pass --messaging-socket-path); trying the per-uid fallback /tmp/cc-socks-502
+    [uds-messaging] Listening: /tmp/cc-socks-502/4887.sock
+    messaging_socket_path of system/init: /tmp/cc-socks-502/4887.sock
+
+RESULT sticky: the directory above TMPDIR 700 self, TMPDIR 1777 self
+    [uds-messaging] Listening: <base>/sticky/parent/tmpdir/cc-socks/4918.sock
+    messaging_socket_path of system/init: <base>/sticky/parent/tmpdir/cc-socks/4918.sock
+
+RESULT above-group-writable: the directory above TMPDIR 775 self, TMPDIR 700 self
+    [uds-messaging] sockets directory <base>/above-group-writable/parent/tmpdir/cc-socks refused (a sockets-directory component is not a private-or-sticky directory owned by us or root — refusing to use it; refused component: '<base>/above-group-writable/parent' is group-writable without the sticky bit (owner 502:1000, mode 0775) — chmod g-w <base>/above-group-writable/parent, or pass --messaging-socket-path); trying the per-uid fallback /tmp/cc-socks-502
+    [uds-messaging] Listening: /tmp/cc-socks-502/4949.sock
+    messaging_socket_path of system/init: /tmp/cc-socks-502/4949.sock
+
+RESULT above-sticky: the directory above TMPDIR 1777 self, TMPDIR 700 self
+    [uds-messaging] Listening: <base>/above-sticky/parent/tmpdir/cc-socks/4979.sock
+    messaging_socket_path of system/init: <base>/above-sticky/parent/tmpdir/cc-socks/4979.sock
+
+RESULT root-sticky: the directory above TMPDIR 755 self, TMPDIR 1777 root
+    [uds-messaging] Listening: <base>/root-sticky/parent/tmpdir/cc-socks/5013.sock
+    messaging_socket_path of system/init: <base>/root-sticky/parent/tmpdir/cc-socks/5013.sock
+
+RESULT another-sticky: the directory above TMPDIR 755 self, TMPDIR 1777 another
+    [uds-messaging] sockets directory <base>/another-sticky/parent/tmpdir/cc-socks refused (a sockets-directory component is not a private-or-sticky directory owned by us or root — refusing to use it; refused component: '<base>/another-sticky/parent/tmpdir' is not owned by you or root (owner 65534:1000, mode 1777) — use a private directory (XDG_RUNTIME_DIR / CLAUDE_CODE_TMPDIR), or pass --messaging-socket-path); trying the per-uid fallback /tmp/cc-socks-502
+    [uds-messaging] Listening: /tmp/cc-socks-502/5047.sock
+    messaging_socket_path of system/init: /tmp/cc-socks-502/5047.sock
+
+RESULT above-another: the directory above TMPDIR 755 another, TMPDIR 700 self
+    [uds-messaging] sockets directory <base>/above-another/parent/tmpdir/cc-socks refused (a sockets-directory component is not a private-or-sticky directory owned by us or root — refusing to use it; refused component: '<base>/above-another/parent' is not owned by you or root (owner 65534:1000, mode 0755) — use a private directory (XDG_RUNTIME_DIR / CLAUDE_CODE_TMPDIR), or pass --messaging-socket-path); trying the per-uid fallback /tmp/cc-socks-502
+    [uds-messaging] Listening: /tmp/cc-socks-502/5081.sock
+    messaging_socket_path of system/init: /tmp/cc-socks-502/5081.sock
+
+/tmp/cc-socks-502 after the cases: 700 self, holding 0 entries

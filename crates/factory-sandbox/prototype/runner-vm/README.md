@@ -14,6 +14,7 @@ Three questions, each about Linux:
 | `probe-p36.yml` | The workflow that runs it on `ubuntu-24.04` and `ubuntu-24.04-arm`. It lies on the branch `probe/p-36` of `sapientpants/sf-scratch`, at `.github/workflows/`, beside a copy of the script |
 | `lima.yaml` | The guest: Debian 13, `vmType: vz`, nested virtualisation, nothing of the Mac mounted |
 | `cli_paths_probe.py` | Seven sessions of the agent CLI in the guest, one under `strace` and the others under the `nouserns` stand-in of P-6, with `/tmp` writable or read-only and with a managed-settings file planted or hidden |
+| `socket-dir-probe.sh` | Nine starts of the CLI in the guest, without a token, each with another mode or owner of the directory that `TMPDIR` names or of the one above it: which does the CLI take for its socket? It prints a few facts of the guest first |
 | `run-guest-sessions.sh` | The operator's step: gives the token to the script of P-6 and to `cli_paths_probe.py` in the guest |
 
 ```sh
@@ -36,6 +37,8 @@ limactl delete --force sf-p36
 | `results/guest-2026-11-25.txt` | `userns-probe.sh` in the guest, and its `/dev/kvm` checks again with `kvm` as a supplementary group |
 | `results/guest-p6-2026-11-25.txt` | The script of P-6 in the guest, unchanged, at the commit its record names (`d23e6b7`): fifteen sessions. Started by the operator with `run-guest-sessions.sh` |
 | `results/guest-cli-2026-11-25.txt` | `cli_paths_probe.py` in the guest, with the operator's token: seven sessions. Started the same way |
+| `results/guest-socket-dir-2026-11-25.txt` | `socket-dir-probe.sh` in the guest, run after a review of the record asked for kept evidence of the socket's condition |
+| `results/mac-facts-2026-11-25.txt` | The Mac: Lima, macOS, the CPU, and what Lima's template says of nested virtualisation |
 | `results/guest-cli-no-login-2026-11-25.txt` | `cli_paths_probe.py --no-login`: every session ends with "Not logged in", after the CLI has read its settings and opened its socket |
 
 The guest's account is named after the Mac's. The script prints `<user>` for it and `~` for its home directory.

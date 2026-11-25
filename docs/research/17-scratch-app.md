@@ -24,7 +24,7 @@ The repository is public. The identifiers below are not secrets: an App's id and
 | 4 | The seven permissions of SPEC 5.7 and no other | `GET /app`: `actions: read`, `checks: write`, `contents: write`, `issues: write`, `metadata: read`, `pull_requests: write`, `statuses: read`, and no other key. `GET /app/installations/185898834` returned the same seven. Neither holds `workflows` or `administration` (GH-11) |
 | 5 | Installable on this account only | Not observed. No field of the six responses says it; it is step 5 of the checklist, done by the operator |
 | 6 | The key outside every repository, mode 0600 | The directory `~/Projects/sf-scratch-app` is not inside a git work tree. The file was mode 0644 as downloaded, and the session set it to 0600 on 2026-11-25. The directory is mode 0755 |
-| 7 | Installed on `sapientpants`, on `sf-scratch` only | `GET /app`: `installations_count` is 1. `GET /app/installations`: one installation, 185898834, `repository_selection: selected`, not suspended, created 2026-11-25T20:23:26Z. `GET /repos/sapientpants/sf-scratch/installation` returned that installation. `GET /repos/sapientpants/software-factory/installation` returned 404 |
+| 7 | Installed on `sapientpants`, on `sf-scratch` only | `GET /app`: `installations_count` is 1. `GET /app/installations`: one installation, 185898834, `repository_selection: selected`, not suspended, created 2026-11-25T20:23:26Z. `GET /repos/sapientpants/sf-scratch/installation` returned that installation. `GET /repos/sapientpants/software-factory/installation` returned 404. The operator states that the installation has access to `sf-scratch` and to no other repository |
 
 That the key file belongs to this App follows from the first request: GitHub accepted a token whose issuer is 5926866 and whose signature the file made.
 
@@ -45,7 +45,7 @@ With the operator's OAuth token, as `gh` holds it, `GET /apps/sf-scratch-app` re
 
 ## 4. What was not observed
 
-- **Which repositories the installation covers, as a list.** That needs an installation token (`GET /installation/repositories`). What was seen is that the selection is `selected`, that `sf-scratch` is in it and that the factory repository is not. A third repository of the account would not have shown. #82 can list them with its first token.
+- **Which repositories the installation covers, as a list.** That needs an installation token (`GET /installation/repositories`). What was seen is that the selection is `selected`, that `sf-scratch` is in it and that the factory repository is not. A third repository of the account would not have shown. That there is none is the operator's statement of 2026-11-25, read from the settings page, and not an observation of the session. #82 can list them with its first token.
 - **That the App is installable on the operator's account only** (step 5).
 - **The settings page.** Every observation is a response of the REST API.
 - **Anything the App can do.** No call was made under an installation token, so nothing here says what the seven permissions allow or refuse. Those are the probes of #82.

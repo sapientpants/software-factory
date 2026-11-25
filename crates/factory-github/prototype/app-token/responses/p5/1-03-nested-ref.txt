@@ -1,0 +1,17 @@
+HTTP/2 200 
+date: Wed, 25 Nov 2026 20:55:38 GMT
+x-accepted-github-permissions: contents=read
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: EA7E:27D4AA:DF9FE52:1493EA70:6B074B4A
+
+{
+  "ref": "refs/heads/probe/p-5-app-nested",
+  "node_id": "REF_kwDOVzkiD79yZWZzL2hlYWRzL3Byb2JlL3AtNS1hcHAtbmVzdGVk",
+  "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-5-app-nested",
+  "object": {
+    "sha": "2da3b5d4ccca1bc9c7ba160ca796291540fd6aa1",
+    "type": "commit",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/2da3b5d4ccca1bc9c7ba160ca796291540fd6aa1"
+  }
+}
+

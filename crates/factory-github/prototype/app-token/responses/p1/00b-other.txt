@@ -1,0 +1,17 @@
+HTTP/2 200 
+date: Wed, 25 Nov 2026 20:48:51 GMT
+x-accepted-github-permissions: contents=read
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: E712:13EDEF:DCD3C28:144E151F:6B0749B2
+
+{
+  "ref": "refs/heads/probe/p-16",
+  "node_id": "REF_kwDOVzkiD7VyZWZzL2hlYWRzL3Byb2JlL3AtMTY",
+  "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-16",
+  "object": {
+    "sha": "1f934b934c5d073f7953b596f3beeec04c25ffaf",
+    "type": "commit",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/1f934b934c5d073f7953b596f3beeec04c25ffaf"
+  }
+}
+

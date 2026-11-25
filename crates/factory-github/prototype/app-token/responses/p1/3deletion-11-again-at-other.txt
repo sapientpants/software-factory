@@ -1,0 +1,12 @@
+HTTP/2 422 
+date: Wed, 25 Nov 2026 20:52:38 GMT
+x-accepted-github-permissions: contents=write; contents=write,workflows=write
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: F5AB:1EA2A5:D81CD6D:13E4BA33:6B074A95
+
+{
+  "message": "Reference already exists",
+  "documentation_url": "https://docs.github.com/rest/git/refs#create-a-reference",
+  "status": "422"
+}
+

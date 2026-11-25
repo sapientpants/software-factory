@@ -1,0 +1,17 @@
+HTTP/2 200 
+date: Wed, 25 Nov 2026 20:56:14 GMT
+x-accepted-github-permissions: contents=read
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: F508:343C1D:DB14E86:1426164C:6B074B6E
+
+{
+  "ref": "refs/heads/probe/p-5-app-workflows-file",
+  "node_id": "REF_kwDOVzkiD9oAJ3JlZnMvaGVhZHMvcHJvYmUvcC01LWFwcC13b3JrZmxvd3MtZmlsZQ",
+  "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-5-app-workflows-file",
+  "object": {
+    "sha": "778ad3e0776a1ce4285e2eaaafb79c75e87cbbe9",
+    "type": "commit",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/778ad3e0776a1ce4285e2eaaafb79c75e87cbbe9"
+  }
+}
+

@@ -1,0 +1,17 @@
+HTTP/2 200 
+date: Wed, 25 Nov 2026 20:56:48 GMT
+x-accepted-github-permissions: contents=read
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: F535:1552F8:DBD9012:14436A12:6B074B90
+
+{
+  "ref": "refs/heads/probe/p-5-app-upd-control",
+  "node_id": "REF_kwDOVzkiD9oAJHJlZnMvaGVhZHMvcHJvYmUvcC01LWFwcC11cGQtY29udHJvbA",
+  "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-5-app-upd-control",
+  "object": {
+    "sha": "ad87ec0380431157002cb2598981b8c3a274f40a",
+    "type": "commit",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/ad87ec0380431157002cb2598981b8c3a274f40a"
+  }
+}
+

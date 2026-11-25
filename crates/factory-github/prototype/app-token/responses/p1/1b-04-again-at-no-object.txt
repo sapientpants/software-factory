@@ -1,0 +1,12 @@
+HTTP/2 422 
+date: Wed, 25 Nov 2026 20:49:43 GMT
+x-accepted-github-permissions: contents=write; contents=write,workflows=write
+x-github-api-version-selected: 2022-11-28
+x-github-request-id: EA92:1552F8:DAC8F4C:142A8814:6B0749E6
+
+{
+  "message": "Object does not exist",
+  "documentation_url": "https://docs.github.com/rest/git/refs#create-a-reference",
+  "status": "422"
+}
+

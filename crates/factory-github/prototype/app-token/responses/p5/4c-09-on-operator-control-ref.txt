@@ -1,0 +1,17 @@
+HTTP/2 200 
+date: Wed, 25 Nov 2026 20:57:59 GMT
+x-accepted-github-permissions: contents=read
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: FE02:BEF0F:E6A92CF:1535115E:6B074BD6
+
+{
+  "ref": "refs/heads/probe/p-5-app-on-op-control",
+  "node_id": "REF_kwDOVzkiD9oAJnJlZnMvaGVhZHMvcHJvYmUvcC01LWFwcC1vbi1vcC1jb250cm9s",
+  "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-5-app-on-op-control",
+  "object": {
+    "sha": "78348b56f0d28d7c28799999e6487595963032b7",
+    "type": "commit",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/78348b56f0d28d7c28799999e6487595963032b7"
+  }
+}
+

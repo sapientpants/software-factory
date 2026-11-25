@@ -1,0 +1,17 @@
+HTTP/2 200 
+date: Wed, 25 Nov 2026 20:56:30 GMT
+x-accepted-github-permissions: contents=read
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: EEF5:13EDEF:DDFA070:1468FB29:6B074B7E
+
+{
+  "ref": "refs/heads/probe/p-5-app-base-delete",
+  "node_id": "REF_kwDOVzkiD9oAJHJlZnMvaGVhZHMvcHJvYmUvcC01LWFwcC1iYXNlLWRlbGV0ZQ",
+  "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-5-app-base-delete",
+  "object": {
+    "sha": "011b0a1df285fa77d21a840b7b16c34281bdfdea",
+    "type": "commit",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/011b0a1df285fa77d21a840b7b16c34281bdfdea"
+  }
+}
+

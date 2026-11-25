@@ -1,0 +1,17 @@
+HTTP/2 200 
+date: Wed, 25 Nov 2026 20:59:17 GMT
+x-accepted-github-permissions: contents=read
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: F4BF:358466:DA4A5CC:14124232:6B074C24
+
+{
+  "ref": "refs/heads/probe/p-5-app-new-add-remove",
+  "node_id": "REF_kwDOVzkiD9oAJ3JlZnMvaGVhZHMvcHJvYmUvcC01LWFwcC1uZXctYWRkLXJlbW92ZQ",
+  "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-5-app-new-add-remove",
+  "object": {
+    "sha": "c2e9294d0bf3af0fb4801bea14e2556520bb59e7",
+    "type": "commit",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/c2e9294d0bf3af0fb4801bea14e2556520bb59e7"
+  }
+}
+

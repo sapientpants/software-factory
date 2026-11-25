@@ -1,0 +1,28 @@
+HTTP/2 200 
+date: Wed, 25 Nov 2026 20:51:17 GMT
+x-accepted-github-permissions: metadata=read
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: E6AB:A3B42:DD02530:14563E4D:6B074A45
+
+[
+  {
+    "id": 28108117,
+    "name": "probe-p1-creation",
+    "target": "branch",
+    "source_type": "Repository",
+    "source": "sapientpants/sf-scratch",
+    "enforcement": "active",
+    "node_id": "RRS_lACqUmVwb3NpdG9yec5XOSIPzgGs5VU",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/sapientpants/sf-scratch/rulesets/28108117"
+      },
+      "html": {
+        "href": "https://github.com/sapientpants/sf-scratch/rules/28108117"
+      }
+    },
+    "created_at": "2026-11-25T20:51:12.845Z",
+    "updated_at": "2026-11-25T20:51:12.865Z"
+  }
+]
+

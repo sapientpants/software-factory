@@ -1,0 +1,18 @@
+HTTP/2 200 
+date: Wed, 25 Nov 2026 20:46:58 GMT
+x-accepted-github-permissions: issues=read; pull_requests=read
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: FA5B:343C1D:D9B164B:14057B9D:6B074942
+
+{
+  "id": 13227540501,
+  "node_id": "LA_kwDOVzkiD88AAAADFGxAFQ",
+  "url": "https://api.github.com/repos/sapientpants/sf-scratch/labels/p25app:patch-b",
+  "name": "p25app:patch-b",
+  "color": "ededed",
+  "default": false,
+  "description": null,
+  "archived_at": null,
+  "archived_by": null
+}
+

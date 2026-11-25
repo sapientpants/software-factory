@@ -1,0 +1,60 @@
+HTTP/2 201 
+date: Wed, 25 Nov 2026 20:57:28 GMT
+x-accepted-github-permissions: contents=write; contents=write,workflows=write
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: F96E:1DC27D:DE96172:14821BEF:6B074BB7
+
+{
+  "content": {
+    "name": "p5app-contents-nested.yml",
+    "path": "sub/.github/workflows/p5app-contents-nested.yml",
+    "sha": "58987f60f2bab28dd62df1434147deac6ff6cb20",
+    "size": 165,
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/contents/sub/.github/workflows/p5app-contents-nested.yml?ref=probe/p-5-app-contents",
+    "html_url": "https://github.com/sapientpants/sf-scratch/blob/probe/p-5-app-contents/sub/.github/workflows/p5app-contents-nested.yml",
+    "git_url": "https://api.github.com/repos/sapientpants/sf-scratch/git/blobs/58987f60f2bab28dd62df1434147deac6ff6cb20",
+    "download_url": "https://raw.githubusercontent.com/sapientpants/sf-scratch/probe/p-5-app-contents/sub/.github/workflows/p5app-contents-nested.yml",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/sapientpants/sf-scratch/contents/sub/.github/workflows/p5app-contents-nested.yml?ref=probe/p-5-app-contents",
+      "git": "https://api.github.com/repos/sapientpants/sf-scratch/git/blobs/58987f60f2bab28dd62df1434147deac6ff6cb20",
+      "html": "https://github.com/sapientpants/sf-scratch/blob/probe/p-5-app-contents/sub/.github/workflows/p5app-contents-nested.yml"
+    }
+  },
+  "commit": {
+    "sha": "efec49fcb4c2b57de7d4f0be7a3e6737c425ce34",
+    "node_id": "C_kwDOVzkiD9oAKGVmZWM0OWZjYjRjMmI1N2RlN2Q0ZjBiZTdhM2U2NzM3YzQyNWNlMzQ",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/efec49fcb4c2b57de7d4f0be7a3e6737c425ce34",
+    "html_url": "https://github.com/sapientpants/sf-scratch/commit/efec49fcb4c2b57de7d4f0be7a3e6737c425ce34",
+    "author": {
+      "name": "sf-scratch-app[bot]",
+      "email": "361295021+sf-scratch-app[bot]@users.noreply.github.com",
+      "date": "2026-11-25T20:57:27Z"
+    },
+    "committer": {
+      "name": "GitHub",
+      "email": "noreply@github.com",
+      "date": "2026-11-25T20:57:27Z"
+    },
+    "tree": {
+      "sha": "1ab60ce78fb2c1b7bba736247c7a23155498ef83",
+      "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/trees/1ab60ce78fb2c1b7bba736247c7a23155498ef83"
+    },
+    "message": "Probe P-5, App part: contents, a nested workflow",
+    "parents": [
+      {
+        "sha": "0526aa66a937a44006f4006203ff2f37b1077800",
+        "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/0526aa66a937a44006f4006203ff2f37b1077800",
+        "html_url": "https://github.com/sapientpants/sf-scratch/commit/0526aa66a937a44006f4006203ff2f37b1077800"
+      }
+    ],
+    "verification": {
+      "verified": true,
+      "reason": "valid",
+      "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJrB0u4CRC1aQ7uu5UhlAAAnJ4QACTE1xrK8YgsGI80kYSZZTeW\nEW5u+DkBFYOsQts9LHGzMkWlknCQamvtku1GSWxnR6Ylbv9d39FYvNOx5o253oXO\n9blFLfqDSycD+nOBzOJ3wbo+1x9ojUCqWD1KJh9dBbc1h9y+EzKCRuGXR8gVLrXJ\n9iMABFZt7mkdNg8DOJa2Gu/BDsE+BVxJMxgzq/PmE+no/57ZjbMOHc0nHQWa/Cmq\nWxpqPSjfMRMNc0UW1W0wnVL1tVKRph1pbgnmh/5B0NrIH4/63p/E+65eIL6RXXR+\n6oH0R2Hhcd3gU56Iycq2fS/yEkLLNP80OXwcWW+KdSlsCcbB62hM9aBLLQC77O8d\ndJPZ4CG9JqkEIdmkWOSIKEiPNp6uUi81AeAghSnxr8eaDuTMwed6ap509BLuf7Fh\nl/Ds6Xi4F1TjlZfzbK130MqwTopfDdAa0Mv+THl3+xhaB3aQ616oELPa0VSKwCqk\noJVlieVUFrZxAqZGSQTq25BPuHev+UdZK6q1aBBt3Hl7+IraBEWkus+wma0/DLzx\nUNE1sPIqEGh+3G+30Ulpb2ciRfuhzpoKkKt9F0jf/3RNt/0MLUCH+LaBWJbNuino\nzfI4C1qEtRo8ttd3j+XijA3ZhWfLa5S/EmGOw7azI5WrFii4WbwH4HJGGwZlXz12\nB3uGlqDklIjf1opBIgaK\n=+xpf\n-----END PGP SIGNATURE-----\n",
+      "payload": "tree 1ab60ce78fb2c1b7bba736247c7a23155498ef83\nparent 0526aa66a937a44006f4006203ff2f37b1077800\nauthor sf-scratch-app[bot] <361295021+sf-scratch-app[bot]@users.noreply.github.com> 1795640247 +0000\ncommitter GitHub <noreply@github.com> 1795640247 +0000\n\nProbe P-5, App part: contents, a nested workflow",
+      "verified_at": "2026-11-25T20:57:28Z"
+    }
+  }
+}
+

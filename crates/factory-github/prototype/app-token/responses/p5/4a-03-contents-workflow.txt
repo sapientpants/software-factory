@@ -1,0 +1,12 @@
+HTTP/2 403 
+date: Wed, 25 Nov 2026 20:57:25 GMT
+x-accepted-github-permissions: contents=write; contents=write,workflows=write
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: EF3D:2CE761:E171ABF:14BB4DDD:6B074BB5
+
+{
+  "message": "Resource not accessible by integration",
+  "documentation_url": "https://docs.github.com/rest/repos/contents#create-or-update-file-contents",
+  "status": "403"
+}
+

@@ -1,0 +1,104 @@
+HTTP/2 201 
+date: Wed, 25 Nov 2026 20:46:59 GMT
+x-accepted-github-permissions: issues=write
+x-github-api-version-selected: 2022-11-28
+x-github-request-id: EE72:B2E79:D88E83C:13E4D1A4:6B074942
+
+{
+  "url": "https://api.github.com/repos/sapientpants/sf-scratch/issues/129",
+  "repository_url": "https://api.github.com/repos/sapientpants/sf-scratch",
+  "labels_url": "https://api.github.com/repos/sapientpants/sf-scratch/issues/129/labels{/name}",
+  "comments_url": "https://api.github.com/repos/sapientpants/sf-scratch/issues/129/comments",
+  "events_url": "https://api.github.com/repos/sapientpants/sf-scratch/issues/129/events",
+  "html_url": "https://github.com/sapientpants/sf-scratch/issues/129",
+  "id": 6613433609,
+  "node_id": "I_kwDOVzkiD88AAAABijD9CQ",
+  "number": 129,
+  "title": "P-25 probe: created by the scratch App with a label that does not exist (2022-11-28)",
+  "user": {
+    "login": "sf-scratch-app[bot]",
+    "id": 361295021,
+    "node_id": "BOT_kgDOFYjsrQ",
+    "avatar_url": "https://avatars.githubusercontent.com/u/305936?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/sf-scratch-app%5Bbot%5D",
+    "html_url": "https://github.com/apps/sf-scratch-app",
+    "followers_url": "https://api.github.com/users/sf-scratch-app%5Bbot%5D/followers",
+    "following_url": "https://api.github.com/users/sf-scratch-app%5Bbot%5D/following{/other_user}",
+    "gists_url": "https://api.github.com/users/sf-scratch-app%5Bbot%5D/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/sf-scratch-app%5Bbot%5D/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/sf-scratch-app%5Bbot%5D/subscriptions",
+    "organizations_url": "https://api.github.com/users/sf-scratch-app%5Bbot%5D/orgs",
+    "repos_url": "https://api.github.com/users/sf-scratch-app%5Bbot%5D/repos",
+    "events_url": "https://api.github.com/users/sf-scratch-app%5Bbot%5D/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/sf-scratch-app%5Bbot%5D/received_events",
+    "type": "Bot",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "labels": [
+    {
+      "id": 13227540984,
+      "node_id": "LA_kwDOVzkiD88AAAADFGxB-A",
+      "url": "https://api.github.com/repos/sapientpants/sf-scratch/labels/p25app:create-b",
+      "name": "p25app:create-b",
+      "color": "ededed",
+      "default": false,
+      "description": null,
+      "archived_at": null,
+      "archived_by": null
+    }
+  ],
+  "state": "open",
+  "locked": false,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2026-11-25T20:46:59Z",
+  "updated_at": "2026-11-25T20:46:59Z",
+  "closed_at": null,
+  "assignee": null,
+  "author_association": "NONE",
+  "issue_field_values": [
+
+  ],
+  "type": null,
+  "status": {
+    "id": 2,
+    "name": "Backlog",
+    "category": "backlog"
+  },
+  "active_lock_reason": null,
+  "sub_issues_summary": {
+    "total": 0,
+    "completed": 0,
+    "percent_completed": 0
+  },
+  "issue_dependencies_summary": {
+    "blocked_by": 0,
+    "total_blocked_by": 0,
+    "blocking": 0,
+    "total_blocking": 0
+  },
+  "body": null,
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/issues/129/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/sapientpants/sf-scratch/issues/129/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null,
+  "pinned_comment": null
+}
+

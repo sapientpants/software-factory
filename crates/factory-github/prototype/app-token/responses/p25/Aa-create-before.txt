@@ -1,0 +1,12 @@
+HTTP/2 404 
+date: Wed, 25 Nov 2026 20:46:45 GMT
+x-accepted-github-permissions: issues=read; pull_requests=read
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: EFB0:BEB88:DC2FFE5:1443AAD9:6B074935
+
+{
+  "message": "Not Found",
+  "documentation_url": "https://docs.github.com/rest/issues/labels#get-a-label",
+  "status": "404"
+}
+

@@ -1,0 +1,10 @@
+HTTP/2 401 
+date: Wed, 25 Nov 2026 20:44:30 GMT
+x-github-request-id: F26A:2CE761:DF6F1B0:148C06BC:6B0748AD
+
+{
+  "message": "A JSON web token could not be decoded",
+  "documentation_url": "https://docs.github.com/rest",
+  "status": "401"
+}
+

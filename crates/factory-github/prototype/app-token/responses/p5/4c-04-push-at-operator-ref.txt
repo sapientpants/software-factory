@@ -1,0 +1,17 @@
+HTTP/2 200 
+date: Wed, 25 Nov 2026 20:57:46 GMT
+x-accepted-github-permissions: contents=read
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: F55F:BEB88:DDDED6F:146B3CED:6B074BCA
+
+{
+  "ref": "refs/heads/probe/p-5-app-push-at-op",
+  "node_id": "REF_kwDOVzkiD9oAI3JlZnMvaGVhZHMvcHJvYmUvcC01LWFwcC1wdXNoLWF0LW9w",
+  "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-5-app-push-at-op",
+  "object": {
+    "sha": "2581b8f2112810e2a1d70b0be08e1d4bf2da631d",
+    "type": "commit",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/2581b8f2112810e2a1d70b0be08e1d4bf2da631d"
+  }
+}
+

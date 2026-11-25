@@ -1,0 +1,20 @@
+HTTP/2 200 
+date: Wed, 25 Nov 2026 20:47:04 GMT
+x-accepted-github-permissions: issues=write; pull_requests=write
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: F2BF:358466:D879A6E:13E77940:6B074947
+
+[
+  {
+    "id": 13227537872,
+    "node_id": "LA_kwDOVzkiD88AAAADFGw10A",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/labels/p25app:put-a",
+    "name": "p25app:put-a",
+    "color": "ededed",
+    "default": false,
+    "description": null,
+    "archived_at": null,
+    "archived_by": null
+  }
+]
+

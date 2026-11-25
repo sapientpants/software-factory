@@ -1,0 +1,12 @@
+push by app: 2da3b5d4ccca1bc9c7ba160ca796291540fd6aa1 -> refs/heads/probe/p-5-app-nested
+the commit against its parent (git diff-tree -r --raw --no-renames):
+:000000 100644 0000000000000000000000000000000000000000 15c59f1a5370da740de4bcf66dd976c2299276b6 A	sub/.github/workflows/p5app-nested.yml
+
+remote: 
+remote: Create a pull request for 'probe/p-5-app-nested' on GitHub by visiting:        
+remote:      https://github.com/sapientpants/sf-scratch/pull/new/probe/p-5-app-nested        
+remote: 
+To https://github.com/sapientpants/sf-scratch.git
+*	2da3b5d4ccca1bc9c7ba160ca796291540fd6aa1:refs/heads/probe/p-5-app-nested	[new branch]
+Done
+exit=0

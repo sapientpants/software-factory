@@ -1,0 +1,8 @@
+push by app: 5ef80db64fb9095188664d9764f8ca5ccc1a8e17 -> refs/heads/probe/p-5-app-upd-add-remove
+the commit against its parent (git diff-tree -r --raw --no-renames):
+:100644 000000 6dd643ece837948e7a49410544097b18b833231d 0000000000000000000000000000000000000000 D	.github/workflows/p5app-gone.yml
+
+To https://github.com/sapientpants/sf-scratch.git
+ 	5ef80db64fb9095188664d9764f8ca5ccc1a8e17:refs/heads/probe/p-5-app-upd-add-remove	17d8464..5ef80db
+Done
+exit=0

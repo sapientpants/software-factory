@@ -1,0 +1,12 @@
+HTTP/2 422 
+date: Wed, 25 Nov 2026 20:49:01 GMT
+x-accepted-github-permissions: contents=write; contents=write,workflows=write
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: F11F:EDE73:2A7570:3F1C02:6B0749BD
+
+{
+  "message": "Invalid request.\n\nAt least 40 characters are required; only 6 were supplied.\nabc123 does not match /^([0-9a-f]{40}(?:[0-9a-f]{24})?)$/.",
+  "documentation_url": "https://docs.github.com/rest/git/refs#create-a-reference",
+  "status": "422"
+}
+

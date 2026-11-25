@@ -1,0 +1,29 @@
+HTTP/2 200 
+date: Wed, 25 Nov 2026 20:48:51 GMT
+x-accepted-github-permissions: contents=read
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: EF72:37967B:D5963ED:13AECF72:6B0749B3
+
+{
+  "sha": "a05138dabce7fa69ff924842563b19165f64f62f",
+  "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/trees/a05138dabce7fa69ff924842563b19165f64f62f",
+  "tree": [
+    {
+      "path": ".github",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "1911667e322b5dba9c01ee893bc440ed7a689e2f",
+      "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/trees/1911667e322b5dba9c01ee893bc440ed7a689e2f"
+    },
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1f17817c69d5eb273bb9f8de2de1d6c2cfb1cf5b",
+      "size": 75,
+      "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/blobs/1f17817c69d5eb273bb9f8de2de1d6c2cfb1cf5b"
+    }
+  ],
+  "truncated": false
+}
+

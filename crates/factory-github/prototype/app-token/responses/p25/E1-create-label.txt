@@ -1,0 +1,18 @@
+HTTP/2 201 
+date: Wed, 25 Nov 2026 20:47:10 GMT
+x-accepted-github-permissions: issues=write; pull_requests=write
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: FCAA:1EA2A5:D74F087:13D1D2C5:6B07494E
+
+{
+  "id": 13227542832,
+  "node_id": "LA_kwDOVzkiD88AAAADFGxJMA",
+  "url": "https://api.github.com/repos/sapientpants/sf-scratch/labels/p25app:explicit",
+  "name": "p25app:explicit",
+  "color": "0e8a16",
+  "default": false,
+  "description": "Created by the scratch App through POST /labels",
+  "archived_at": null,
+  "archived_by": null
+}
+

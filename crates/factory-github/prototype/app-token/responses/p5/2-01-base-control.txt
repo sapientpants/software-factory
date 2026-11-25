@@ -1,0 +1,12 @@
+push by app: d6cda6334954fdf81999d60e5268276f457ff052 -> refs/heads/probe/p-5-app-base-control
+the commit against its parent (git diff-tree -r --raw --no-renames):
+:000000 100644 0000000000000000000000000000000000000000 5d8c161daa853c0f2f944bf5323ef37863868297 A	p5app/control.txt
+
+remote: 
+remote: Create a pull request for 'probe/p-5-app-base-control' on GitHub by visiting:        
+remote:      https://github.com/sapientpants/sf-scratch/pull/new/probe/p-5-app-base-control        
+remote: 
+To https://github.com/sapientpants/sf-scratch.git
+*	d6cda6334954fdf81999d60e5268276f457ff052:refs/heads/probe/p-5-app-base-control	[new branch]
+Done
+exit=0

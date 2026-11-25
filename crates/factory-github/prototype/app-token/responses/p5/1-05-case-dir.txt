@@ -1,0 +1,12 @@
+push by app: 07aa17177c7fcb1d5136a8405457bafffc0a8afd -> refs/heads/probe/p-5-app-case-dir
+the commit against its parent (git diff-tree -r --raw --no-renames):
+:000000 100644 0000000000000000000000000000000000000000 5a35bc5b8c75bb007e0c81dc7e9b68045562013d A	.github/Workflows/p5app-case-dir.yml
+
+remote: 
+remote: Create a pull request for 'probe/p-5-app-case-dir' on GitHub by visiting:        
+remote:      https://github.com/sapientpants/sf-scratch/pull/new/probe/p-5-app-case-dir        
+remote: 
+To https://github.com/sapientpants/sf-scratch.git
+*	07aa17177c7fcb1d5136a8405457bafffc0a8afd:refs/heads/probe/p-5-app-case-dir	[new branch]
+Done
+exit=0

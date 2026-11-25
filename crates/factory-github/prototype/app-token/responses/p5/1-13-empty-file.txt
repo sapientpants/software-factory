@@ -1,0 +1,9 @@
+push by app: 3aa1b2df489b9a196d06d73d62e223dd1bd61e13 -> refs/heads/probe/p-5-app-empty-file
+the commit against its parent (git diff-tree -r --raw --no-renames):
+:000000 100644 0000000000000000000000000000000000000000 e69de29bb2d1d6434b8b29ae775ad8c2e48c5391 A	.github/workflows/p5app-empty.yml
+
+error: failed to push some refs to 'https://github.com/sapientpants/sf-scratch.git'
+To https://github.com/sapientpants/sf-scratch.git
+!	3aa1b2df489b9a196d06d73d62e223dd1bd61e13:refs/heads/probe/p-5-app-empty-file	[remote rejected] (refusing to allow a GitHub App to create or update workflow `.github/workflows/p5app-empty.yml` without `workflows` permission)
+Done
+exit=1

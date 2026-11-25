@@ -1,0 +1,89 @@
+HTTP/2 200 
+date: Wed, 25 Nov 2026 20:45:19 GMT
+x-accepted-github-permissions: issues=read
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: F3B0:27D4AA:DE0AE95:146EB5DB:6B0748DF
+
+{
+  "url": "https://api.github.com/repos/sapientpants/sf-scratch/issues/8",
+  "repository_url": "https://api.github.com/repos/sapientpants/sf-scratch",
+  "labels_url": "https://api.github.com/repos/sapientpants/sf-scratch/issues/8/labels{/name}",
+  "comments_url": "https://api.github.com/repos/sapientpants/sf-scratch/issues/8/comments",
+  "events_url": "https://api.github.com/repos/sapientpants/sf-scratch/issues/8/events",
+  "html_url": "https://github.com/sapientpants/sf-scratch/issues/8",
+  "id": 6518942135,
+  "node_id": "I_kwDOVzkiD88AAAABhI8ptw",
+  "number": 8,
+  "title": "P-8 probe, bot target: title 1, by the workflow",
+  "user": {
+    "login": "sapientpants",
+    "id": 305936,
+    "node_id": "MDQ6VXNlcjMwNTkzNg==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/305936?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/sapientpants",
+    "html_url": "https://github.com/sapientpants",
+    "followers_url": "https://api.github.com/users/sapientpants/followers",
+    "following_url": "https://api.github.com/users/sapientpants/following{/other_user}",
+    "gists_url": "https://api.github.com/users/sapientpants/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/sapientpants/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/sapientpants/subscriptions",
+    "organizations_url": "https://api.github.com/users/sapientpants/orgs",
+    "repos_url": "https://api.github.com/users/sapientpants/repos",
+    "events_url": "https://api.github.com/users/sapientpants/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/sapientpants/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2026-11-20T20:17:16Z",
+  "updated_at": "2026-11-20T20:18:13Z",
+  "closed_at": null,
+  "author_association": "OWNER",
+  "issue_field_values": [
+
+  ],
+  "type": null,
+  "status": null,
+  "active_lock_reason": null,
+  "sub_issues_summary": {
+    "total": 0,
+    "completed": 0,
+    "percent_completed": 0
+  },
+  "issue_dependencies_summary": {
+    "blocked_by": 0,
+    "total_blocked_by": 0,
+    "blocking": 0,
+    "total_blocking": 0
+  },
+  "body": "Body 3, by the operator again.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/issues/8/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/sapientpants/sf-scratch/issues/8/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null,
+  "pinned_comment": null
+}
+

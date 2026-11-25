@@ -1,0 +1,18 @@
+push by app: 0e77cee141fab763d9f8b54ef1a4e9450785f9d8 -> refs/heads/probe/p-5-app-temporary
+the commits of the push, newest first, each against its parent (git log --raw --no-renames):
+commit 0e77cee141fab763d9f8b54ef1a4e9450785f9d8
+
+:100644 000000 a5b070b 0000000 D	.github/workflows/p5app-unreachable.yml
+commit accd2c8b33fe6dfdb89b206d09bb5dde9c6d5507
+
+:000000 100644 0000000 a5b070b A	.github/workflows/p5app-unreachable.yml
+:000000 100644 0000000 5fdfdd1 A	p5app/control.txt
+
+remote: 
+remote: Create a pull request for 'probe/p-5-app-temporary' on GitHub by visiting:        
+remote:      https://github.com/sapientpants/sf-scratch/pull/new/probe/p-5-app-temporary        
+remote: 
+To https://github.com/sapientpants/sf-scratch.git
+*	0e77cee141fab763d9f8b54ef1a4e9450785f9d8:refs/heads/probe/p-5-app-temporary	[new branch]
+Done
+exit=0

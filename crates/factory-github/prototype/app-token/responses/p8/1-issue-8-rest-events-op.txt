@@ -1,0 +1,43 @@
+HTTP/2 200 
+date: Wed, 25 Nov 2026 20:45:22 GMT
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: ECA2:BEF0F:E4A0267:15057D6F:6B0748E2
+
+[
+  {
+    "id": 36808893692,
+    "node_id": "RTE_lADOVzkiD88AAAABhI8pt88AAAAIkfsk_A",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/issues/events/36808893692",
+    "actor": {
+      "login": "github-actions[bot]",
+      "id": 41898282,
+      "node_id": "MDM6Qm90NDE4OTgyODI=",
+      "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/github-actions%5Bbot%5D",
+      "html_url": "https://github.com/apps/github-actions",
+      "followers_url": "https://api.github.com/users/github-actions%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/github-actions%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/github-actions%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/github-actions%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/github-actions%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/github-actions%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/github-actions%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/github-actions%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/github-actions%5Bbot%5D/received_events",
+      "type": "Bot",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "event": "renamed",
+    "commit_id": null,
+    "commit_url": null,
+    "created_at": "2026-11-20T20:17:42Z",
+    "rename": {
+      "from": "P-8 probe, bot target: title 0",
+      "to": "P-8 probe, bot target: title 1, by the workflow"
+    },
+    "performed_via_github_app": null
+  }
+]
+

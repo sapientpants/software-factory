@@ -1,0 +1,18 @@
+HTTP/2 200 
+date: Wed, 25 Nov 2026 20:47:01 GMT
+x-accepted-github-permissions: issues=read; pull_requests=read
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: E9AC:14A31E:DD384FF:145D15C9:6B074944
+
+{
+  "id": 13227540984,
+  "node_id": "LA_kwDOVzkiD88AAAADFGxB-A",
+  "url": "https://api.github.com/repos/sapientpants/sf-scratch/labels/p25app:create-b",
+  "name": "p25app:create-b",
+  "color": "ededed",
+  "default": false,
+  "description": null,
+  "archived_at": null,
+  "archived_by": null
+}
+

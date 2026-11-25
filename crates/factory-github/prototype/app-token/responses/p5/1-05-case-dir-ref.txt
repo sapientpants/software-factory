@@ -1,0 +1,17 @@
+HTTP/2 200 
+date: Wed, 25 Nov 2026 20:55:47 GMT
+x-accepted-github-permissions: contents=read
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: F5A6:A3B42:DDABF73:1465BADB:6B074B52
+
+{
+  "ref": "refs/heads/probe/p-5-app-case-dir",
+  "node_id": "REF_kwDOVzkiD9oAIXJlZnMvaGVhZHMvcHJvYmUvcC01LWFwcC1jYXNlLWRpcg",
+  "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-5-app-case-dir",
+  "object": {
+    "sha": "07aa17177c7fcb1d5136a8405457bafffc0a8afd",
+    "type": "commit",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/07aa17177c7fcb1d5136a8405457bafffc0a8afd"
+  }
+}
+

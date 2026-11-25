@@ -1,0 +1,30 @@
+pair 1 x 201 1.099538
+pair 1 y 422 1.116485
+pair 1: x=created y=Reference already exists ref at 17d8464 (base 17d8464, other 1f934b9)
+pair 2 x 201 1.042884
+pair 2 y 422 1.249469
+pair 2: x=created y=Reference already exists ref at 17d8464 (base 17d8464, other 1f934b9)
+pair 3 x 422 1.436003
+pair 3 y 201 1.436207
+pair 3: x=Reference already exists y=created ref at 17d8464 (base 17d8464, other 1f934b9)
+pair 4 y 422 1.167153
+pair 4 x 201 1.195040
+pair 4: x=created y=Reference already exists ref at 17d8464 (base 17d8464, other 1f934b9)
+pair 5 y 201 1.141960
+pair 5 x 422 1.243303
+pair 5: x=Reference already exists y=created ref at 17d8464 (base 17d8464, other 1f934b9)
+pair 6 y 201 1.196930
+pair 6 x 422 1.295347
+pair 6: x=Reference already exists y=created ref at 1f934b9 (base 17d8464, other 1f934b9)
+pair 7 y 422 1.410555
+pair 7 x 201 1.504711
+pair 7: x=created y=Reference already exists ref at 17d8464 (base 17d8464, other 1f934b9)
+pair 8 y 422 1.385038
+pair 8 x 201 1.527347
+pair 8: x=created y=Reference already exists ref at 17d8464 (base 17d8464, other 1f934b9)
+pair 9 y 422 1.240503
+pair 9 x 201 1.277033
+pair 9: x=created y=Reference already exists ref at 17d8464 (base 17d8464, other 1f934b9)
+pair 10 x 201 1.198436
+pair 10 y 422 1.306974
+pair 10: x=created y=Reference already exists ref at 17d8464 (base 17d8464, other 1f934b9)

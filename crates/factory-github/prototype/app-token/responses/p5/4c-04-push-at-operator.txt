@@ -1,0 +1,12 @@
+push by app: 2581b8f2112810e2a1d70b0be08e1d4bf2da631d -> refs/heads/probe/p-5-app-push-at-op
+the commit against its parent (git diff-tree -r --raw --no-renames):
+:000000 100644 0000000000000000000000000000000000000000 9fbedd71c936796cb1e8131112cdbcaf8f981a23 A	.github/workflows/p5app-op.yml
+
+remote: 
+remote: Create a pull request for 'probe/p-5-app-push-at-op' on GitHub by visiting:        
+remote:      https://github.com/sapientpants/sf-scratch/pull/new/probe/p-5-app-push-at-op        
+remote: 
+To https://github.com/sapientpants/sf-scratch.git
+*	2581b8f2112810e2a1d70b0be08e1d4bf2da631d:refs/heads/probe/p-5-app-push-at-op	[new branch]
+Done
+exit=0

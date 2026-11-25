@@ -1,0 +1,20 @@
+HTTP/2 200 
+date: Wed, 25 Nov 2026 20:47:19 GMT
+x-accepted-github-permissions: issues=write; pull_requests=write
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: F6FB:28E0E1:DB2307F:142CFB4B:6B074956
+
+[
+  {
+    "id": 13227538540,
+    "node_id": "LA_kwDOVzkiD88AAAADFGw4bA",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/labels/p25app:patch-a",
+    "name": "p25app:patch-a",
+    "color": "ededed",
+    "default": false,
+    "description": null,
+    "archived_at": null,
+    "archived_by": null
+  }
+]
+

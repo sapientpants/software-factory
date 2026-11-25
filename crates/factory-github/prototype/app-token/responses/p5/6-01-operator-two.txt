@@ -1,0 +1,17 @@
+push by op: 0c73cc39061be5462deabe25d7251ea22dd41747 -> refs/heads/probe/p-5-app-op-two
+commit 0c73cc39061be5462deabe25d7251ea22dd41747
+
+:100644 000000 dd91986 0000000 D	.github/workflows/p5app-op-two.yml
+:000000 100644 0000000 d36af14 A	p5app/control.txt
+commit 63d4c64c3ea5a93fcdf78ce3a576fb33a7ad38db
+
+:000000 100644 0000000 dd91986 A	.github/workflows/p5app-op-two.yml
+
+remote: 
+remote: Create a pull request for 'probe/p-5-app-op-two' on GitHub by visiting:        
+remote:      https://github.com/sapientpants/sf-scratch/pull/new/probe/p-5-app-op-two        
+remote: 
+To https://github.com/sapientpants/sf-scratch.git
+*	0c73cc39061be5462deabe25d7251ea22dd41747:refs/heads/probe/p-5-app-op-two	[new branch]
+Done
+exit=0

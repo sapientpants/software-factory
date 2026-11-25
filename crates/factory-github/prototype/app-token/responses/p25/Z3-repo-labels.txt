@@ -1,0 +1,229 @@
+HTTP/2 200 
+date: Wed, 25 Nov 2026 20:47:24 GMT
+x-accepted-github-permissions: issues=read; pull_requests=read
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: F295:13EDEF:DC99177:1448AF2C:6B07495C
+
+[
+  {
+    "id": 13136432495,
+    "node_id": "LA_kwDOVzkiD88AAAADDv4Nbw",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/labels/accessibility",
+    "name": "accessibility",
+    "color": "f143ab",
+    "default": true,
+    "description": "Barrier affecting people with disabilities",
+    "archived_at": null,
+    "archived_by": null
+  },
+  {
+    "id": 13136432475,
+    "node_id": "LA_kwDOVzkiD88AAAADDv4NWw",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/labels/bug",
+    "name": "bug",
+    "color": "d73a4a",
+    "default": true,
+    "description": "Something isn't working",
+    "archived_at": null,
+    "archived_by": null
+  },
+  {
+    "id": 13136432514,
+    "node_id": "LA_kwDOVzkiD88AAAADDv4Ngg",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/labels/documentation",
+    "name": "documentation",
+    "color": "0075ca",
+    "default": true,
+    "description": "Improvements or additions to documentation",
+    "archived_at": null,
+    "archived_by": null
+  },
+  {
+    "id": 13136432533,
+    "node_id": "LA_kwDOVzkiD88AAAADDv4NlQ",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/labels/duplicate",
+    "name": "duplicate",
+    "color": "cfd3d7",
+    "default": true,
+    "description": "This issue or pull request already exists",
+    "archived_at": null,
+    "archived_by": null
+  },
+  {
+    "id": 13136432550,
+    "node_id": "LA_kwDOVzkiD88AAAADDv4Npg",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/labels/enhancement",
+    "name": "enhancement",
+    "color": "a2eeef",
+    "default": true,
+    "description": "New feature or request",
+    "archived_at": null,
+    "archived_by": null
+  },
+  {
+    "id": 13136432579,
+    "node_id": "LA_kwDOVzkiD88AAAADDv4Nww",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/labels/good%20first%20issue",
+    "name": "good first issue",
+    "color": "7057ff",
+    "default": true,
+    "description": "Good for newcomers",
+    "archived_at": null,
+    "archived_by": null
+  },
+  {
+    "id": 13136432566,
+    "node_id": "LA_kwDOVzkiD88AAAADDv4Ntg",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/labels/help%20wanted",
+    "name": "help wanted",
+    "color": "008672",
+    "default": true,
+    "description": "Extra attention is needed",
+    "archived_at": null,
+    "archived_by": null
+  },
+  {
+    "id": 13136432595,
+    "node_id": "LA_kwDOVzkiD88AAAADDv4N0w",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/labels/invalid",
+    "name": "invalid",
+    "color": "e4e669",
+    "default": true,
+    "description": "This doesn't seem right",
+    "archived_at": null,
+    "archived_by": null
+  },
+  {
+    "id": 13227539078,
+    "node_id": "LA_kwDOVzkiD88AAAADFGw6hg",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/labels/p25app:create-a",
+    "name": "p25app:create-a",
+    "color": "ededed",
+    "default": false,
+    "description": null,
+    "archived_at": null,
+    "archived_by": null
+  },
+  {
+    "id": 13227540984,
+    "node_id": "LA_kwDOVzkiD88AAAADFGxB-A",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/labels/p25app:create-b",
+    "name": "p25app:create-b",
+    "color": "ededed",
+    "default": false,
+    "description": null,
+    "archived_at": null,
+    "archived_by": null
+  },
+  {
+    "id": 13227542832,
+    "node_id": "LA_kwDOVzkiD88AAAADFGxJMA",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/labels/p25app:explicit",
+    "name": "p25app:explicit",
+    "color": "0e8a16",
+    "default": false,
+    "description": "Changed by the scratch App",
+    "archived_at": null,
+    "archived_by": null
+  },
+  {
+    "id": 13227538540,
+    "node_id": "LA_kwDOVzkiD88AAAADFGw4bA",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/labels/p25app:patch-a",
+    "name": "p25app:patch-a",
+    "color": "ededed",
+    "default": false,
+    "description": null,
+    "archived_at": null,
+    "archived_by": null
+  },
+  {
+    "id": 13227540501,
+    "node_id": "LA_kwDOVzkiD88AAAADFGxAFQ",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/labels/p25app:patch-b",
+    "name": "p25app:patch-b",
+    "color": "ededed",
+    "default": false,
+    "description": null,
+    "archived_at": null,
+    "archived_by": null
+  },
+  {
+    "id": 13227537370,
+    "node_id": "LA_kwDOVzkiD88AAAADFGwz2g",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/labels/p25app:post-a",
+    "name": "p25app:post-a",
+    "color": "ededed",
+    "default": false,
+    "description": null,
+    "archived_at": null,
+    "archived_by": null
+  },
+  {
+    "id": 13227539578,
+    "node_id": "LA_kwDOVzkiD88AAAADFGw8eg",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/labels/p25app:post-b",
+    "name": "p25app:post-b",
+    "color": "ededed",
+    "default": false,
+    "description": null,
+    "archived_at": null,
+    "archived_by": null
+  },
+  {
+    "id": 13227537872,
+    "node_id": "LA_kwDOVzkiD88AAAADFGw10A",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/labels/p25app:put-a",
+    "name": "p25app:put-a",
+    "color": "ededed",
+    "default": false,
+    "description": null,
+    "archived_at": null,
+    "archived_by": null
+  },
+  {
+    "id": 13227540024,
+    "node_id": "LA_kwDOVzkiD88AAAADFGw-OA",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/labels/p25app:put-b",
+    "name": "p25app:put-b",
+    "color": "ededed",
+    "default": false,
+    "description": null,
+    "archived_at": null,
+    "archived_by": null
+  },
+  {
+    "id": 13161851395,
+    "node_id": "LA_kwDOVzkiD88AAAADEIHqAw",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/labels/probe:p-8",
+    "name": "probe:p-8",
+    "color": "ededed",
+    "default": false,
+    "description": "Probe P-8: a label with no meaning to the factory",
+    "archived_at": null,
+    "archived_by": null
+  },
+  {
+    "id": 13136432614,
+    "node_id": "LA_kwDOVzkiD88AAAADDv4N5g",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/labels/question",
+    "name": "question",
+    "color": "d876e3",
+    "default": true,
+    "description": "Further information is requested",
+    "archived_at": null,
+    "archived_by": null
+  },
+  {
+    "id": 13136432629,
+    "node_id": "LA_kwDOVzkiD88AAAADDv4N9Q",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/labels/wontfix",
+    "name": "wontfix",
+    "color": "ffffff",
+    "default": true,
+    "description": "This will not be worked on",
+    "archived_at": null,
+    "archived_by": null
+  }
+]
+

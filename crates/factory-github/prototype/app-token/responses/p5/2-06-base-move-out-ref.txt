@@ -1,0 +1,17 @@
+HTTP/2 200 
+date: Wed, 25 Nov 2026 20:56:42 GMT
+x-accepted-github-permissions: contents=read
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: FB99:1775:24E60C2:36330EB:6B074B89
+
+{
+  "ref": "refs/heads/probe/p-5-app-base-move-out",
+  "node_id": "REF_kwDOVzkiD9oAJnJlZnMvaGVhZHMvcHJvYmUvcC01LWFwcC1iYXNlLW1vdmUtb3V0",
+  "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-5-app-base-move-out",
+  "object": {
+    "sha": "a02dc552d0c2ab99417437bfcebfa81030675b14",
+    "type": "commit",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/a02dc552d0c2ab99417437bfcebfa81030675b14"
+  }
+}
+

@@ -1,0 +1,9 @@
+push by app: 3fea668e38e014f4b852cf190979e622f48146b2 -> refs/heads/probe/p-5-app-not-yaml
+the commit against its parent (git diff-tree -r --raw --no-renames):
+:000000 100644 0000000000000000000000000000000000000000 d15602c2012522ec0a7ef42fca01a130a6c4ce07 A	.github/workflows/README.md
+
+error: failed to push some refs to 'https://github.com/sapientpants/sf-scratch.git'
+To https://github.com/sapientpants/sf-scratch.git
+!	3fea668e38e014f4b852cf190979e622f48146b2:refs/heads/probe/p-5-app-not-yaml	[remote rejected] (refusing to allow a GitHub App to create or update workflow `.github/workflows/README.md` without `workflows` permission)
+Done
+exit=1

@@ -1,0 +1,9 @@
+push by app: 96abd3d314fbba7ec5e358e40b97f67cd2e3edf2 -> refs/heads/probe/p-5-app-upd-link-workflows
+the commit against its parent (git diff-tree -r --raw --no-renames):
+:000000 120000 0000000000000000000000000000000000000000 99eb73d1fddca3feb44462a798cc25bd8807b332 A	.github/workflows
+:000000 100644 0000000000000000000000000000000000000000 49470faad6749249e9df9bad242f9e40efce88d3 A	ci/p5app-upd-link-workflows.yml
+
+To https://github.com/sapientpants/sf-scratch.git
+ 	96abd3d314fbba7ec5e358e40b97f67cd2e3edf2:refs/heads/probe/p-5-app-upd-link-workflows	17d8464..96abd3d
+Done
+exit=0

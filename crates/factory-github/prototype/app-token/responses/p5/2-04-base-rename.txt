@@ -1,0 +1,10 @@
+push by app: 4c63fdc88d4f892b37d5bb00454d8bfb7f8ec1fd -> refs/heads/probe/p-5-app-base-rename
+the commit against its parent (git diff-tree -r --raw --no-renames):
+:100644 000000 4e2b8ac8e3cfcf832bf700f058f3224b4c627c63 0000000000000000000000000000000000000000 D	.github/workflows/p5app-base.yml
+:000000 100644 0000000000000000000000000000000000000000 4e2b8ac8e3cfcf832bf700f058f3224b4c627c63 A	.github/workflows/p5app-renamed.yml
+
+error: failed to push some refs to 'https://github.com/sapientpants/sf-scratch.git'
+To https://github.com/sapientpants/sf-scratch.git
+!	4c63fdc88d4f892b37d5bb00454d8bfb7f8ec1fd:refs/heads/probe/p-5-app-base-rename	[remote rejected] (refusing to allow a GitHub App to create or update workflow `.github/workflows/p5app-renamed.yml` without `workflows` permission)
+Done
+exit=1

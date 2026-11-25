@@ -1,0 +1,94 @@
+HTTP/2 201 
+date: Wed, 25 Nov 2026 20:57:53 GMT
+x-accepted-github-permissions: contents=write
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: E927:28E0E1:DCBE4D2:1452B763:6B074BCF
+
+{
+  "sha": "154270f29e7cfb58074403aaec2f6c3987025bbe",
+  "node_id": "C_kwDOVzkiD9oAKDE1NDI3MGYyOWU3Y2ZiNTgwNzQ0MDNhYWVjMmY2YzM5ODcwMjViYmU",
+  "commit": {
+    "author": {
+      "name": "sf-scratch-app[bot]",
+      "email": "361295021+sf-scratch-app[bot]@users.noreply.github.com",
+      "date": "2026-11-25T20:57:52Z"
+    },
+    "committer": {
+      "name": "GitHub",
+      "email": "noreply@github.com",
+      "date": "2026-11-25T20:57:52Z"
+    },
+    "message": "Probe P-5, App part: merge of a branch that adds a workflow",
+    "tree": {
+      "sha": "45e3b2f7d1cad2ed8e00e2c628f0bee9d200e6ee",
+      "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/trees/45e3b2f7d1cad2ed8e00e2c628f0bee9d200e6ee"
+    },
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/154270f29e7cfb58074403aaec2f6c3987025bbe",
+    "comment_count": 0,
+    "verification": {
+      "verified": true,
+      "reason": "valid",
+      "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJrB0vQCRC1aQ7uu5UhlAAAh1IQABtYwoznhvjLbVPo8DKy7GFb\nRgktg0L07tjspFffWPa8Yly8moxC7MqplqPhz098qLdtlPE7Ns5sFDkHNkQDF9i3\nAZI0wRiZ+dYUvhn990Iz/wjSe9axcm7LP2zw9O2PW4zXM3qZzXlfjnSRpoYoqWrG\nl3jaYqtThHwESQr+NRfVWkZG3HLuQynAFkIQbuyt2X7qRlU5xpAwWhuJRFCTf+H9\njoSCrSZU2EKgeJRz5p7RTbXhdMv50P8sj58VR5s3OfHNtxUHb4pI28F0J17SX3z/\noC1opgztUH4n+jHqI25Llog0keczidbuHj5/GkvkQfq4Sh+1aIyjps2Fo/DcWOyp\nh8imLztNID5x3Fhah0rIWdL47MNo/gxXwECv4e3ttf37IJQrn7647LDuno1hl3eT\nc8uaOQcDq0kh9jfNlgDJzUlyzTHkgy13PjBtn7iQ94hhbOhwjwVgX/yLLyGHRlhf\n+++77LIikD3IU3O2YjPbuTJeLdRLGlq0gxAR1HmsAvdPYvZ/z3rvmYTsEZsp1Jv1\nyII2vcrRqlW6sxFHS3p7RiI49pdQg+k4FBjAxJ4Zim2HWV7tkUygRRiUmjeQHUuH\nQ8n71MKSddOVl/WeRHnsh9lIUupA3dq6VrNdhuadlg93SG/9t3J4IQ6zAKB50XNz\nWqgzM7Kb++stbMX2GPX7\n=voUQ\n-----END PGP SIGNATURE-----\n",
+      "payload": "tree 45e3b2f7d1cad2ed8e00e2c628f0bee9d200e6ee\nparent a43e9e00f46b9bf138c7ec8d1d5b7b9eb9542536\nparent 2581b8f2112810e2a1d70b0be08e1d4bf2da631d\nauthor sf-scratch-app[bot] <361295021+sf-scratch-app[bot]@users.noreply.github.com> 1795640272 +0000\ncommitter GitHub <noreply@github.com> 1795640272 +0000\n\nProbe P-5, App part: merge of a branch that adds a workflow\n",
+      "verified_at": "2026-11-25T20:57:52Z"
+    }
+  },
+  "url": "https://api.github.com/repos/sapientpants/sf-scratch/commits/154270f29e7cfb58074403aaec2f6c3987025bbe",
+  "html_url": "https://github.com/sapientpants/sf-scratch/commit/154270f29e7cfb58074403aaec2f6c3987025bbe",
+  "comments_url": "https://api.github.com/repos/sapientpants/sf-scratch/commits/154270f29e7cfb58074403aaec2f6c3987025bbe/comments",
+  "author": {
+    "login": "sf-scratch-app[bot]",
+    "id": 361295021,
+    "node_id": "BOT_kgDOFYjsrQ",
+    "avatar_url": "https://avatars.githubusercontent.com/u/305936?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/sf-scratch-app%5Bbot%5D",
+    "html_url": "https://github.com/apps/sf-scratch-app",
+    "followers_url": "https://api.github.com/users/sf-scratch-app%5Bbot%5D/followers",
+    "following_url": "https://api.github.com/users/sf-scratch-app%5Bbot%5D/following{/other_user}",
+    "gists_url": "https://api.github.com/users/sf-scratch-app%5Bbot%5D/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/sf-scratch-app%5Bbot%5D/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/sf-scratch-app%5Bbot%5D/subscriptions",
+    "organizations_url": "https://api.github.com/users/sf-scratch-app%5Bbot%5D/orgs",
+    "repos_url": "https://api.github.com/users/sf-scratch-app%5Bbot%5D/repos",
+    "events_url": "https://api.github.com/users/sf-scratch-app%5Bbot%5D/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/sf-scratch-app%5Bbot%5D/received_events",
+    "type": "Bot",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "committer": {
+    "login": "web-flow",
+    "id": 19864447,
+    "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/web-flow",
+    "html_url": "https://github.com/web-flow",
+    "followers_url": "https://api.github.com/users/web-flow/followers",
+    "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+    "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+    "organizations_url": "https://api.github.com/users/web-flow/orgs",
+    "repos_url": "https://api.github.com/users/web-flow/repos",
+    "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/web-flow/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "parents": [
+    {
+      "sha": "a43e9e00f46b9bf138c7ec8d1d5b7b9eb9542536",
+      "url": "https://api.github.com/repos/sapientpants/sf-scratch/commits/a43e9e00f46b9bf138c7ec8d1d5b7b9eb9542536",
+      "html_url": "https://github.com/sapientpants/sf-scratch/commit/a43e9e00f46b9bf138c7ec8d1d5b7b9eb9542536"
+    },
+    {
+      "sha": "2581b8f2112810e2a1d70b0be08e1d4bf2da631d",
+      "url": "https://api.github.com/repos/sapientpants/sf-scratch/commits/2581b8f2112810e2a1d70b0be08e1d4bf2da631d",
+      "html_url": "https://github.com/sapientpants/sf-scratch/commit/2581b8f2112810e2a1d70b0be08e1d4bf2da631d"
+    }
+  ]
+}
+

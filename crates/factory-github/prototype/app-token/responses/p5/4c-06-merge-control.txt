@@ -1,0 +1,60 @@
+HTTP/2 201 
+date: Wed, 25 Nov 2026 20:57:50 GMT
+x-accepted-github-permissions: contents=write; contents=write,workflows=write
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: FA68:1EA2A5:D8E2B45:13F6F1BE:6B074BCD
+
+{
+  "content": {
+    "name": "merge.txt",
+    "path": "p5app/merge.txt",
+    "sha": "d36af1482ddd4a2446acd5f790304d183bdc5914",
+    "size": 7,
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/contents/p5app/merge.txt?ref=probe/p-5-app-merge",
+    "html_url": "https://github.com/sapientpants/sf-scratch/blob/probe/p-5-app-merge/p5app/merge.txt",
+    "git_url": "https://api.github.com/repos/sapientpants/sf-scratch/git/blobs/d36af1482ddd4a2446acd5f790304d183bdc5914",
+    "download_url": "https://raw.githubusercontent.com/sapientpants/sf-scratch/probe/p-5-app-merge/p5app/merge.txt",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/sapientpants/sf-scratch/contents/p5app/merge.txt?ref=probe/p-5-app-merge",
+      "git": "https://api.github.com/repos/sapientpants/sf-scratch/git/blobs/d36af1482ddd4a2446acd5f790304d183bdc5914",
+      "html": "https://github.com/sapientpants/sf-scratch/blob/probe/p-5-app-merge/p5app/merge.txt"
+    }
+  },
+  "commit": {
+    "sha": "a43e9e00f46b9bf138c7ec8d1d5b7b9eb9542536",
+    "node_id": "C_kwDOVzkiD9oAKGE0M2U5ZTAwZjQ2YjliZjEzOGM3ZWM4ZDFkNWI3YjllYjk1NDI1MzY",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/a43e9e00f46b9bf138c7ec8d1d5b7b9eb9542536",
+    "html_url": "https://github.com/sapientpants/sf-scratch/commit/a43e9e00f46b9bf138c7ec8d1d5b7b9eb9542536",
+    "author": {
+      "name": "sf-scratch-app[bot]",
+      "email": "361295021+sf-scratch-app[bot]@users.noreply.github.com",
+      "date": "2026-11-25T20:57:49Z"
+    },
+    "committer": {
+      "name": "GitHub",
+      "email": "noreply@github.com",
+      "date": "2026-11-25T20:57:49Z"
+    },
+    "tree": {
+      "sha": "7f9b9d5321dd086b3260364e2553d45e14c16bc1",
+      "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/trees/7f9b9d5321dd086b3260364e2553d45e14c16bc1"
+    },
+    "message": "Probe P-5, App part: merge, a commit of its own",
+    "parents": [
+      {
+        "sha": "17d8464cd28fd71ba3cb0333f13f34d622816867",
+        "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/17d8464cd28fd71ba3cb0333f13f34d622816867",
+        "html_url": "https://github.com/sapientpants/sf-scratch/commit/17d8464cd28fd71ba3cb0333f13f34d622816867"
+      }
+    ],
+    "verification": {
+      "verified": true,
+      "reason": "valid",
+      "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJrB0vNCRC1aQ7uu5UhlAAAAMIQABL1mUA708tdPaHF4SgtUMcW\nvTsyQtl9m0OXn3qSu5iQYQpEQqOkoype7h86JVhXNFAAw5v3wq7iGlsCw94nMpdy\nGv/QguD83g0sBuk4QVLJwKymWY1Df4b2kKcATPD5ypu8pM+Dxc5XRuBwRPnKinJR\n70ftoAhyQSFXciEasYPA9JqFwXl9prVOdTCiV2f16CeJBj2KJYV0LISX9wZWyzrs\nUp0yjCYtYpzQueEtT5uPuLk/IEtEU5qBfHR6JqLgUeuNcS1n1q1VLKyBc+SiNyyT\nzKbHEB+CFHe6sG63BAUlTzuMscozADWJh7bxSHurNzysFkw+MmRnwd5aUbrdRUJy\nyHRQDFjMDvHrXGDDFFlC+Yk3WiT2B0leMQiHjtt3C+y8nD30G/Tb0LoSCKBscEbu\nK4S5k70xzg13mvOGYuLGNuwaVEN5AceY71gWevDjqKGJuxCQxXCkkAnvomZ/hww0\n2PZasx9VZtkv8o1t+vaCoOe8V0HhBvF0TRers5UvEaIprnIRNfGfANKCdknF0FyF\nEFBS8jZ+KOue8wrIgu8+Wzyey883bQgen/dgJkGPTN6VagsmFqMpbj9xrfPNMsja\nfyE8IDw8f1jZDEgS1XyuvqGbxwVt6T2vtVRPOJwbFUow5eOfLa/Eou5xp53dzZ8q\nHz2DH7D7M2gtw258nVa5\n=rDLW\n-----END PGP SIGNATURE-----\n",
+      "payload": "tree 7f9b9d5321dd086b3260364e2553d45e14c16bc1\nparent 17d8464cd28fd71ba3cb0333f13f34d622816867\nauthor sf-scratch-app[bot] <361295021+sf-scratch-app[bot]@users.noreply.github.com> 1795640269 +0000\ncommitter GitHub <noreply@github.com> 1795640269 +0000\n\nProbe P-5, App part: merge, a commit of its own",
+      "verified_at": "2026-11-25T20:57:50Z"
+    }
+  }
+}
+

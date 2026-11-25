@@ -1,0 +1,16 @@
+HTTP/2 201 
+date: Wed, 25 Nov 2026 21:00:04 GMT
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: F12B:13958E:1E5CB:35F38:6B074C53
+
+{
+  "ref": "refs/heads/probe/p-5-app-ref-at-op-first-op",
+  "node_id": "REF_kwDOVzkiD9oAK3JlZnMvaGVhZHMvcHJvYmUvcC01LWFwcC1yZWYtYXQtb3AtZmlyc3Qtb3A",
+  "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-5-app-ref-at-op-first-op",
+  "object": {
+    "sha": "63d4c64c3ea5a93fcdf78ce3a576fb33a7ad38db",
+    "type": "commit",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/63d4c64c3ea5a93fcdf78ce3a576fb33a7ad38db"
+  }
+}
+

@@ -1,0 +1,17 @@
+HTTP/2 200 
+date: Wed, 25 Nov 2026 20:56:38 GMT
+x-accepted-github-permissions: contents=read
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: EFC2:BEF0F:E66E6B7:152FAE87:6B074B86
+
+{
+  "ref": "refs/heads/probe/p-5-app-base-mode",
+  "node_id": "REF_kwDOVzkiD9oAInJlZnMvaGVhZHMvcHJvYmUvcC01LWFwcC1iYXNlLW1vZGU",
+  "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-5-app-base-mode",
+  "object": {
+    "sha": "7d7228e231881987f027e9c724e81c554441c15e",
+    "type": "commit",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/7d7228e231881987f027e9c724e81c554441c15e"
+  }
+}
+

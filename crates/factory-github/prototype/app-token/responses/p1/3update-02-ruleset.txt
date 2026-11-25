@@ -1,0 +1,44 @@
+HTTP/2 201 
+date: Wed, 25 Nov 2026 20:51:47 GMT
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: E8B4:1EA2A5:D7FE366:13E1EF8A:6B074A62
+
+{
+  "id": 28108143,
+  "name": "probe-p1-update",
+  "target": "branch",
+  "source_type": "Repository",
+  "source": "sapientpants/sf-scratch",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "exclude": [
+
+      ],
+      "include": [
+        "refs/heads/factory/**"
+      ]
+    }
+  },
+  "rules": [
+    {
+      "type": "update"
+    }
+  ],
+  "node_id": "RRS_lACqUmVwb3NpdG9yec5XOSIPzgGs5W8",
+  "created_at": "2026-11-25T21:51:46.930+01:00",
+  "updated_at": "2026-11-25T21:51:46.946+01:00",
+  "bypass_actors": [
+
+  ],
+  "current_user_can_bypass": "never",
+  "_links": {
+    "self": {
+      "href": "https://api.github.com/repos/sapientpants/sf-scratch/rulesets/28108143"
+    },
+    "html": {
+      "href": "https://github.com/sapientpants/sf-scratch/rules/28108143"
+    }
+  }
+}
+

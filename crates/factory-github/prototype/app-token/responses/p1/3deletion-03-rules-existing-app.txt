@@ -1,0 +1,21 @@
+HTTP/2 200 
+date: Wed, 25 Nov 2026 20:52:32 GMT
+x-accepted-github-permissions: metadata=read
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: FC66:14A31E:DE102D6:1470EC21:6B074A90
+
+[
+  {
+    "type": "deletion",
+    "ruleset_source_type": "Repository",
+    "ruleset_source": "sapientpants/sf-scratch",
+    "ruleset_id": 28108161
+  },
+  {
+    "type": "non_fast_forward",
+    "ruleset_source_type": "Repository",
+    "ruleset_source": "sapientpants/sf-scratch",
+    "ruleset_id": 28108161
+  }
+]
+

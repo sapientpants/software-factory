@@ -1,0 +1,12 @@
+push by app: 07a75cd1e5d91bc21d84a124e5ea060d3ac23887 -> refs/heads/probe/p-5-app-push-at-own
+the commits of the push, newest first, each against its parent (git log --raw --no-renames):
+commit 07a75cd1e5d91bc21d84a124e5ea060d3ac23887
+
+:000000 100644 0000000 6dd643e A	.github/workflows/p5app-gone.yml
+:000000 100644 0000000 d36af14 A	p5app/control.txt
+
+error: failed to push some refs to 'https://github.com/sapientpants/sf-scratch.git'
+To https://github.com/sapientpants/sf-scratch.git
+!	07a75cd1e5d91bc21d84a124e5ea060d3ac23887:refs/heads/probe/p-5-app-push-at-own	[remote rejected] (refusing to allow a GitHub App to create or update workflow `.github/workflows/p5app-gone.yml` without `workflows` permission)
+Done
+exit=1

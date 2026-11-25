@@ -1,0 +1,17 @@
+HTTP/2 201 
+date: Wed, 25 Nov 2026 20:57:47 GMT
+x-accepted-github-permissions: contents=write; contents=write,workflows=write
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: ECEC:367830:E1303AA:14B4FBEE:6B074BCA
+
+{
+  "ref": "refs/heads/probe/p-5-app-merge",
+  "node_id": "REF_kwDOVzkiD75yZWZzL2hlYWRzL3Byb2JlL3AtNS1hcHAtbWVyZ2U",
+  "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-5-app-merge",
+  "object": {
+    "sha": "17d8464cd28fd71ba3cb0333f13f34d622816867",
+    "type": "commit",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/17d8464cd28fd71ba3cb0333f13f34d622816867"
+  }
+}
+

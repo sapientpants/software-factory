@@ -1,0 +1,15 @@
+push by app: eea5593a1b385c8c8e19d06ecb6616a31466f369 -> refs/heads/probe/p-5-app-link-github
+the commit against its parent (git diff-tree -r --raw --no-renames):
+:000000 120000 0000000000000000000000000000000000000000 c036c168e478a94fde05f915c9670df03fa4ce84 A	.github
+:100644 000000 15213ee8ed496d6ccfacaa42b457a265b199adf2 0000000000000000000000000000000000000000 D	.github/ISSUE_TEMPLATE/factory-task.yml
+:000000 100644 0000000000000000000000000000000000000000 15213ee8ed496d6ccfacaa42b457a265b199adf2 A	gh/ISSUE_TEMPLATE/factory-task.yml
+:000000 100644 0000000000000000000000000000000000000000 481a81d8d93a55386cf3cee47b66f8fbf76e8c13 A	gh/workflows/p5app-link-github.yml
+
+remote: 
+remote: Create a pull request for 'probe/p-5-app-link-github' on GitHub by visiting:        
+remote:      https://github.com/sapientpants/sf-scratch/pull/new/probe/p-5-app-link-github        
+remote: 
+To https://github.com/sapientpants/sf-scratch.git
+*	eea5593a1b385c8c8e19d06ecb6616a31466f369:refs/heads/probe/p-5-app-link-github	[new branch]
+Done
+exit=0

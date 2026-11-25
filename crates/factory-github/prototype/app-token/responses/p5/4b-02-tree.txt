@@ -1,0 +1,12 @@
+HTTP/2 403 
+date: Wed, 25 Nov 2026 20:57:32 GMT
+x-accepted-github-permissions: contents=write
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: F24E:27D4AA:DFECE11:149B0642:6B074BBC
+
+{
+  "message": "Resource not accessible by integration",
+  "documentation_url": "https://docs.github.com/rest/git/trees#create-a-tree",
+  "status": "403"
+}
+

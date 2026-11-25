@@ -1,0 +1,199 @@
+HTTP/2 200 
+date: Wed, 25 Nov 2026 20:53:11 GMT
+x-accepted-github-permissions: contents=read
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: F581:1552F8:DB4E79A:1436A17A:6B074AB7
+
+[
+  {
+    "ref": "refs/heads/probe/p-15",
+    "node_id": "REF_kwDOVzkiD7VyZWZzL2hlYWRzL3Byb2JlL3AtMTU",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-15",
+    "object": {
+      "sha": "82240230c182182590fe8556e02ff1a7c33f9a41",
+      "type": "commit",
+      "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/82240230c182182590fe8556e02ff1a7c33f9a41"
+    }
+  },
+  {
+    "ref": "refs/heads/probe/p-15-commits",
+    "node_id": "REF_kwDOVzkiD71yZWZzL2hlYWRzL3Byb2JlL3AtMTUtY29tbWl0cw",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-15-commits",
+    "object": {
+      "sha": "569d9ee402c685bae891c1063756277bbc84d21a",
+      "type": "commit",
+      "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/569d9ee402c685bae891c1063756277bbc84d21a"
+    }
+  },
+  {
+    "ref": "refs/heads/probe/p-15-operator",
+    "node_id": "REF_kwDOVzkiD75yZWZzL2hlYWRzL3Byb2JlL3AtMTUtb3BlcmF0b3I",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-15-operator",
+    "object": {
+      "sha": "e36738d710a59f2be06ddb904e3ec6dfcec3becf",
+      "type": "commit",
+      "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/e36738d710a59f2be06ddb904e3ec6dfcec3becf"
+    }
+  },
+  {
+    "ref": "refs/heads/probe/p-15-prc-backslash",
+    "node_id": "REF_kwDOVzkiD9oAI3JlZnMvaGVhZHMvcHJvYmUvcC0xNS1wcmMtYmFja3NsYXNo",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-15-prc-backslash",
+    "object": {
+      "sha": "df8dce20a9724e0447621f441eddcf5bc8d034c7",
+      "type": "commit",
+      "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/df8dce20a9724e0447621f441eddcf5bc8d034c7"
+    }
+  },
+  {
+    "ref": "refs/heads/probe/p-15-prc-code",
+    "node_id": "REF_kwDOVzkiD75yZWZzL2hlYWRzL3Byb2JlL3AtMTUtcHJjLWNvZGU",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-15-prc-code",
+    "object": {
+      "sha": "b4bc8cc7b912bebd8a1b7f016865cfa77f88e38f",
+      "type": "commit",
+      "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/b4bc8cc7b912bebd8a1b7f016865cfa77f88e38f"
+    }
+  },
+  {
+    "ref": "refs/heads/probe/p-15-prc-entity",
+    "node_id": "REF_kwDOVzkiD9oAIHJlZnMvaGVhZHMvcHJvYmUvcC0xNS1wcmMtZW50aXR5",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-15-prc-entity",
+    "object": {
+      "sha": "80c1a1e96550c62059490be5ae7e4e1a8b5daa06",
+      "type": "commit",
+      "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/80c1a1e96550c62059490be5ae7e4e1a8b5daa06"
+    }
+  },
+  {
+    "ref": "refs/heads/probe/p-15-prc-fence",
+    "node_id": "REF_kwDOVzkiD79yZWZzL2hlYWRzL3Byb2JlL3AtMTUtcHJjLWZlbmNl",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-15-prc-fence",
+    "object": {
+      "sha": "e284ac89e8d5896c29c2c185cf0c52087bea671e",
+      "type": "commit",
+      "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/e284ac89e8d5896c29c2c185cf0c52087bea671e"
+    }
+  },
+  {
+    "ref": "refs/heads/probe/p-15-prc-plain",
+    "node_id": "REF_kwDOVzkiD79yZWZzL2hlYWRzL3Byb2JlL3AtMTUtcHJjLXBsYWlu",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-15-prc-plain",
+    "object": {
+      "sha": "902090d8a9d6bd27b82c377172ab95626f59773c",
+      "type": "commit",
+      "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/902090d8a9d6bd27b82c377172ab95626f59773c"
+    }
+  },
+  {
+    "ref": "refs/heads/probe/p-15-prc-zwj",
+    "node_id": "REF_kwDOVzkiD71yZWZzL2hlYWRzL3Byb2JlL3AtMTUtcHJjLXp3ag",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-15-prc-zwj",
+    "object": {
+      "sha": "7043172ed52f497ad0a031168aee00e838ce5b93",
+      "type": "commit",
+      "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/7043172ed52f497ad0a031168aee00e838ce5b93"
+    }
+  },
+  {
+    "ref": "refs/heads/probe/p-15-prc-zwsp",
+    "node_id": "REF_kwDOVzkiD75yZWZzL2hlYWRzL3Byb2JlL3AtMTUtcHJjLXp3c3A",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-15-prc-zwsp",
+    "object": {
+      "sha": "f1ace36d919a29657c8932aab6686f76dc83bcf8",
+      "type": "commit",
+      "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/f1ace36d919a29657c8932aab6686f76dc83bcf8"
+    }
+  },
+  {
+    "ref": "refs/heads/probe/p-15-pre-backslash",
+    "node_id": "REF_kwDOVzkiD9oAI3JlZnMvaGVhZHMvcHJvYmUvcC0xNS1wcmUtYmFja3NsYXNo",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-15-pre-backslash",
+    "object": {
+      "sha": "8598f5555b1e78343a2062cd236ba6250ae4880e",
+      "type": "commit",
+      "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/8598f5555b1e78343a2062cd236ba6250ae4880e"
+    }
+  },
+  {
+    "ref": "refs/heads/probe/p-15-pre-code",
+    "node_id": "REF_kwDOVzkiD75yZWZzL2hlYWRzL3Byb2JlL3AtMTUtcHJlLWNvZGU",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-15-pre-code",
+    "object": {
+      "sha": "0ab5adb116b60a1844e256e6268308d0fe8ebb6c",
+      "type": "commit",
+      "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/0ab5adb116b60a1844e256e6268308d0fe8ebb6c"
+    }
+  },
+  {
+    "ref": "refs/heads/probe/p-15-pre-entity",
+    "node_id": "REF_kwDOVzkiD9oAIHJlZnMvaGVhZHMvcHJvYmUvcC0xNS1wcmUtZW50aXR5",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-15-pre-entity",
+    "object": {
+      "sha": "d07cd3eada290177b822c24830abaa6e0e908a46",
+      "type": "commit",
+      "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/d07cd3eada290177b822c24830abaa6e0e908a46"
+    }
+  },
+  {
+    "ref": "refs/heads/probe/p-15-pre-fence",
+    "node_id": "REF_kwDOVzkiD79yZWZzL2hlYWRzL3Byb2JlL3AtMTUtcHJlLWZlbmNl",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-15-pre-fence",
+    "object": {
+      "sha": "f4a16374fbbed3c9998f0075457fc49def850bbf",
+      "type": "commit",
+      "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/f4a16374fbbed3c9998f0075457fc49def850bbf"
+    }
+  },
+  {
+    "ref": "refs/heads/probe/p-15-pre-plain",
+    "node_id": "REF_kwDOVzkiD79yZWZzL2hlYWRzL3Byb2JlL3AtMTUtcHJlLXBsYWlu",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-15-pre-plain",
+    "object": {
+      "sha": "247475f64c40874967a3ad6b6473c58f1b63f250",
+      "type": "commit",
+      "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/247475f64c40874967a3ad6b6473c58f1b63f250"
+    }
+  },
+  {
+    "ref": "refs/heads/probe/p-15-pre-zwj",
+    "node_id": "REF_kwDOVzkiD71yZWZzL2hlYWRzL3Byb2JlL3AtMTUtcHJlLXp3ag",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-15-pre-zwj",
+    "object": {
+      "sha": "abc6c10bfe46636f15e82c77a031fd392057964c",
+      "type": "commit",
+      "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/abc6c10bfe46636f15e82c77a031fd392057964c"
+    }
+  },
+  {
+    "ref": "refs/heads/probe/p-15-pre-zwsp",
+    "node_id": "REF_kwDOVzkiD75yZWZzL2hlYWRzL3Byb2JlL3AtMTUtcHJlLXp3c3A",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-15-pre-zwsp",
+    "object": {
+      "sha": "0fd2c1ab316521c7a79246962928779316cce220",
+      "type": "commit",
+      "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/0fd2c1ab316521c7a79246962928779316cce220"
+    }
+  },
+  {
+    "ref": "refs/heads/probe/p-15-variants",
+    "node_id": "REF_kwDOVzkiD75yZWZzL2hlYWRzL3Byb2JlL3AtMTUtdmFyaWFudHM",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-15-variants",
+    "object": {
+      "sha": "6213b7b7c81d8bd138d509f946319936a19576c5",
+      "type": "commit",
+      "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/6213b7b7c81d8bd138d509f946319936a19576c5"
+    }
+  },
+  {
+    "ref": "refs/heads/probe/p-16",
+    "node_id": "REF_kwDOVzkiD7VyZWZzL2hlYWRzL3Byb2JlL3AtMTY",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-16",
+    "object": {
+      "sha": "1f934b934c5d073f7953b596f3beeec04c25ffaf",
+      "type": "commit",
+      "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/1f934b934c5d073f7953b596f3beeec04c25ffaf"
+    }
+  }
+]
+

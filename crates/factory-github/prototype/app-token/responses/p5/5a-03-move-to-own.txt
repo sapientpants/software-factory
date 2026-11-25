@@ -1,0 +1,12 @@
+HTTP/2 403 
+date: Wed, 25 Nov 2026 20:59:08 GMT
+x-accepted-github-permissions: contents=write; contents=write,workflows=write
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: F50E:235C9:DB109C3:142536CA:6B074C1B
+
+{
+  "message": "Resource not accessible by integration",
+  "documentation_url": "https://docs.github.com/rest/git/refs#update-a-reference",
+  "status": "403"
+}
+

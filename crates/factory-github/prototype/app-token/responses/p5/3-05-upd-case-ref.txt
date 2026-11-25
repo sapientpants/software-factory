@@ -1,0 +1,17 @@
+HTTP/2 200 
+date: Wed, 25 Nov 2026 20:57:13 GMT
+x-accepted-github-permissions: contents=read
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: F768:BEF0F:E68883B:15321747:6B074BA9
+
+{
+  "ref": "refs/heads/probe/p-5-app-upd-case",
+  "node_id": "REF_kwDOVzkiD9oAIXJlZnMvaGVhZHMvcHJvYmUvcC01LWFwcC11cGQtY2FzZQ",
+  "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-5-app-upd-case",
+  "object": {
+    "sha": "066da48fb6546ee0d01b84ffa50b4efaee8bed61",
+    "type": "commit",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/066da48fb6546ee0d01b84ffa50b4efaee8bed61"
+  }
+}
+

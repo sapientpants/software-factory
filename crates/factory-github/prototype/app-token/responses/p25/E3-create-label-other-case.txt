@@ -1,0 +1,19 @@
+HTTP/2 422 
+date: Wed, 25 Nov 2026 20:47:13 GMT
+x-accepted-github-permissions: issues=write; pull_requests=write
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: E80D:1775:23660D4:3403B40:6B074951
+
+{
+  "message": "Validation Failed",
+  "errors": [
+    {
+      "resource": "Label",
+      "code": "already_exists",
+      "field": "name"
+    }
+  ],
+  "documentation_url": "https://docs.github.com/rest/issues/labels#create-a-label",
+  "status": "422"
+}
+

@@ -1,0 +1,31 @@
+HTTP/2 200 
+date: Wed, 25 Nov 2026 20:47:02 GMT
+x-accepted-github-permissions: issues=write; pull_requests=write
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: F594:1775:235D3C5:33F6ADD:6B074945
+
+[
+  {
+    "id": 13227537370,
+    "node_id": "LA_kwDOVzkiD88AAAADFGwz2g",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/labels/p25app:post-a",
+    "name": "p25app:post-a",
+    "color": "ededed",
+    "default": false,
+    "description": null,
+    "archived_at": null,
+    "archived_by": null
+  },
+  {
+    "id": 13227540501,
+    "node_id": "LA_kwDOVzkiD88AAAADFGxAFQ",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/labels/p25app:patch-b",
+    "name": "p25app:patch-b",
+    "color": "ededed",
+    "default": false,
+    "description": null,
+    "archived_at": null,
+    "archived_by": null
+  }
+]
+

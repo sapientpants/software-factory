@@ -1,0 +1,11 @@
+HTTP/2 201 
+date: Wed, 25 Nov 2026 20:57:30 GMT
+x-accepted-github-permissions: contents=write
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: FA15:13EDEF:DE21ED1:146CB7B3:6B074BBA
+
+{
+  "sha": "53909c32aae5436a8d824ff55e88b252588f2127",
+  "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/blobs/53909c32aae5436a8d824ff55e88b252588f2127"
+}
+

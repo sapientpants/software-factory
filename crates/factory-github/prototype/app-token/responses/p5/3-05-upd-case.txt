@@ -1,0 +1,8 @@
+push by app: 066da48fb6546ee0d01b84ffa50b4efaee8bed61 -> refs/heads/probe/p-5-app-upd-case
+the commit against its parent (git diff-tree -r --raw --no-renames):
+:000000 100644 0000000000000000000000000000000000000000 4fb9eb5a9fb33111caa02fd82bb76bb45b2f270d A	.GitHub/workflows/p5app-upd-case.yml
+
+To https://github.com/sapientpants/sf-scratch.git
+ 	066da48fb6546ee0d01b84ffa50b4efaee8bed61:refs/heads/probe/p-5-app-upd-case	17d8464..066da48
+Done
+exit=0

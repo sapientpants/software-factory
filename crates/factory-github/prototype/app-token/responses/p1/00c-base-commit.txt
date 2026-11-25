@@ -1,0 +1,42 @@
+HTTP/2 200 
+date: Wed, 25 Nov 2026 20:48:51 GMT
+x-accepted-github-permissions: contents=read
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: F57C:A3B42:DCA3953:144D8B2E:6B0749B3
+
+{
+  "sha": "17d8464cd28fd71ba3cb0333f13f34d622816867",
+  "node_id": "C_kwDOVzkiD9oAKDE3ZDg0NjRjZDI4ZmQ3MWJhM2NiMDMzM2YxM2YzNGQ2MjI4MTY4Njc",
+  "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/17d8464cd28fd71ba3cb0333f13f34d622816867",
+  "html_url": "https://github.com/sapientpants/sf-scratch/commit/17d8464cd28fd71ba3cb0333f13f34d622816867",
+  "author": {
+    "name": "Marc Tremblay",
+    "email": "sapientpants@users.noreply.github.com",
+    "date": "2026-11-22T07:53:34Z"
+  },
+  "committer": {
+    "name": "Marc Tremblay",
+    "email": "sapientpants@users.noreply.github.com",
+    "date": "2026-11-22T07:53:34Z"
+  },
+  "tree": {
+    "sha": "a05138dabce7fa69ff924842563b19165f64f62f",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/trees/a05138dabce7fa69ff924842563b19165f64f62f"
+  },
+  "message": "Probe P-28: restore the tree",
+  "parents": [
+    {
+      "sha": "198d8568f5c4d7cabf12d667381e79b7b6fa55e5",
+      "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/198d8568f5c4d7cabf12d667381e79b7b6fa55e5",
+      "html_url": "https://github.com/sapientpants/sf-scratch/commit/198d8568f5c4d7cabf12d667381e79b7b6fa55e5"
+    }
+  ],
+  "verification": {
+    "verified": false,
+    "reason": "unsigned",
+    "signature": null,
+    "payload": null,
+    "verified_at": null
+  }
+}
+

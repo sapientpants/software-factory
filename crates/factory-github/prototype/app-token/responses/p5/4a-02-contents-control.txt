@@ -1,0 +1,60 @@
+HTTP/2 201 
+date: Wed, 25 Nov 2026 20:57:23 GMT
+x-accepted-github-permissions: contents=write; contents=write,workflows=write
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: FA73:358466:D9FF4AC:140B55BB:6B074BB2
+
+{
+  "content": {
+    "name": "contents.txt",
+    "path": "p5app/contents.txt",
+    "sha": "d36af1482ddd4a2446acd5f790304d183bdc5914",
+    "size": 7,
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/contents/p5app/contents.txt?ref=probe/p-5-app-contents",
+    "html_url": "https://github.com/sapientpants/sf-scratch/blob/probe/p-5-app-contents/p5app/contents.txt",
+    "git_url": "https://api.github.com/repos/sapientpants/sf-scratch/git/blobs/d36af1482ddd4a2446acd5f790304d183bdc5914",
+    "download_url": "https://raw.githubusercontent.com/sapientpants/sf-scratch/probe/p-5-app-contents/p5app/contents.txt",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/sapientpants/sf-scratch/contents/p5app/contents.txt?ref=probe/p-5-app-contents",
+      "git": "https://api.github.com/repos/sapientpants/sf-scratch/git/blobs/d36af1482ddd4a2446acd5f790304d183bdc5914",
+      "html": "https://github.com/sapientpants/sf-scratch/blob/probe/p-5-app-contents/p5app/contents.txt"
+    }
+  },
+  "commit": {
+    "sha": "0526aa66a937a44006f4006203ff2f37b1077800",
+    "node_id": "C_kwDOVzkiD9oAKDA1MjZhYTY2YTkzN2E0NDAwNmY0MDA2MjAzZmYyZjM3YjEwNzc4MDA",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/0526aa66a937a44006f4006203ff2f37b1077800",
+    "html_url": "https://github.com/sapientpants/sf-scratch/commit/0526aa66a937a44006f4006203ff2f37b1077800",
+    "author": {
+      "name": "sf-scratch-app[bot]",
+      "email": "361295021+sf-scratch-app[bot]@users.noreply.github.com",
+      "date": "2026-11-25T20:57:23Z"
+    },
+    "committer": {
+      "name": "GitHub",
+      "email": "noreply@github.com",
+      "date": "2026-11-25T20:57:23Z"
+    },
+    "tree": {
+      "sha": "74f8560180e26f9f4b82c240d466f79261422824",
+      "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/trees/74f8560180e26f9f4b82c240d466f79261422824"
+    },
+    "message": "Probe P-5, App part: contents, control",
+    "parents": [
+      {
+        "sha": "17d8464cd28fd71ba3cb0333f13f34d622816867",
+        "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/17d8464cd28fd71ba3cb0333f13f34d622816867",
+        "html_url": "https://github.com/sapientpants/sf-scratch/commit/17d8464cd28fd71ba3cb0333f13f34d622816867"
+      }
+    ],
+    "verification": {
+      "verified": true,
+      "reason": "valid",
+      "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJrB0uzCRC1aQ7uu5UhlAAAkIUQAC5SDR7YxLsCGsN0aHKF06BN\nnOsOjqnNEfDKqt3inJOPS6BUyo2MKKCkwcwLeEcL+6lt4D3LxbbrMSqg0Sz5khLM\nrvpZdtl7mxt8PwWoqR5lTTzqRwTVJifleTCaaqmvjBrxiYJumVx095TUxMj43JH2\noI60Qm0so2+uvVV4HGT+zMqyDFRL0OuFNd40kbCL14gUSdYW0KnOwmx3nRk/uNq8\nb53WbRyRF37mZDpEwctMWMOaq8In7NXCk/bQfI04u2D8oSPgurl1hED89CSZdmp1\nkCqEpZgqrN7O8WhlEq5UMEytV5+gY+37+WVwwDeKWH/cSQIZ0mBgwZdWdnMrewbn\nQ5bE2vcKY8zWSvN2NmiCGGAyuFV6cRgL9ACOa6JeLHvcsNP9flyRTEjlZ9p/Suon\nU0cmUtLt/jd+c6vKwjqxcZIxmEHaTEvxX/1/1xha05v5Hj8FgCgMnlMvPMgDOSaR\nfZ94HtvHb+HGucOXD8gARU3Sz6HihTsoWvkWdCwxGwAsPUTESTsPmgizCbJo1RMv\nFnCQzgwTgofTxoqhtcaqiGipi0DcFnxlbtqbXiVzBTgDTUI9JY6uZFVQf4NrRIlM\nq2u+wGR4m4YgbqTxn0hnQy3Pl0/zkHMhDy+bSZ8WF19AxcB91ILA6zXYzbrBncwL\nqIkaGjr4t0ZXOdNUtY/h\n=EuEK\n-----END PGP SIGNATURE-----\n",
+      "payload": "tree 74f8560180e26f9f4b82c240d466f79261422824\nparent 17d8464cd28fd71ba3cb0333f13f34d622816867\nauthor sf-scratch-app[bot] <361295021+sf-scratch-app[bot]@users.noreply.github.com> 1795640243 +0000\ncommitter GitHub <noreply@github.com> 1795640243 +0000\n\nProbe P-5, App part: contents, control",
+      "verified_at": "2026-11-25T20:57:23Z"
+    }
+  }
+}
+

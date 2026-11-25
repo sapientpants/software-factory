@@ -1,0 +1,10 @@
+push by app: 96c888a0a22292cdbb04766c9bfc5a4039a2c45e -> refs/heads/probe/p-5-app-link-file
+the commit against its parent (git diff-tree -r --raw --no-renames):
+:000000 120000 0000000000000000000000000000000000000000 c2454648437c0a7b4c2acd952abfcd64837b6017 A	.github/workflows/p5app-link-file.yml
+:000000 100644 0000000000000000000000000000000000000000 0f0a3624768f68e342454c9f67d04ea312bc4c95 A	ci/p5app-link-file.yml
+
+error: failed to push some refs to 'https://github.com/sapientpants/sf-scratch.git'
+To https://github.com/sapientpants/sf-scratch.git
+!	96c888a0a22292cdbb04766c9bfc5a4039a2c45e:refs/heads/probe/p-5-app-link-file	[remote rejected] (refusing to allow a GitHub App to create or update workflow `.github/workflows/p5app-link-file.yml` without `workflows` permission)
+Done
+exit=1

@@ -1,0 +1,12 @@
+push by app: 011b0a1df285fa77d21a840b7b16c34281bdfdea -> refs/heads/probe/p-5-app-base-delete
+the commit against its parent (git diff-tree -r --raw --no-renames):
+:100644 000000 4e2b8ac8e3cfcf832bf700f058f3224b4c627c63 0000000000000000000000000000000000000000 D	.github/workflows/p5app-base.yml
+
+remote: 
+remote: Create a pull request for 'probe/p-5-app-base-delete' on GitHub by visiting:        
+remote:      https://github.com/sapientpants/sf-scratch/pull/new/probe/p-5-app-base-delete        
+remote: 
+To https://github.com/sapientpants/sf-scratch.git
+*	011b0a1df285fa77d21a840b7b16c34281bdfdea:refs/heads/probe/p-5-app-base-delete	[new branch]
+Done
+exit=0

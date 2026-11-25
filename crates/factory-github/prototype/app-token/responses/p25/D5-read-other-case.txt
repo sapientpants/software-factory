@@ -1,0 +1,18 @@
+HTTP/2 200 
+date: Wed, 25 Nov 2026 20:47:10 GMT
+x-accepted-github-permissions: issues=read; pull_requests=read
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: F42B:343C1D:D9B9651:14063B5A:6B07494D
+
+{
+  "id": 13227537370,
+  "node_id": "LA_kwDOVzkiD88AAAADFGwz2g",
+  "url": "https://api.github.com/repos/sapientpants/sf-scratch/labels/p25app:post-a",
+  "name": "p25app:post-a",
+  "color": "ededed",
+  "default": false,
+  "description": null,
+  "archived_at": null,
+  "archived_by": null
+}
+

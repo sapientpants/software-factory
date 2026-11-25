@@ -1,0 +1,18 @@
+push by app: c2e9294d0bf3af0fb4801bea14e2556520bb59e7 -> refs/heads/probe/p-5-app-new-add-remove
+the commits of the push, newest first, each against its parent (git log --raw --no-renames):
+commit c2e9294d0bf3af0fb4801bea14e2556520bb59e7
+
+:100644 000000 e7781fb 0000000 D	.github/workflows/p5app-new-gone.yml
+commit b5f718b41b62cdd7ac443f0f9c8dc3e4894b84d6
+
+:000000 100644 0000000 e7781fb A	.github/workflows/p5app-new-gone.yml
+:000000 100644 0000000 038898f A	p5app/control.txt
+
+remote: 
+remote: Create a pull request for 'probe/p-5-app-new-add-remove' on GitHub by visiting:        
+remote:      https://github.com/sapientpants/sf-scratch/pull/new/probe/p-5-app-new-add-remove        
+remote: 
+To https://github.com/sapientpants/sf-scratch.git
+*	c2e9294d0bf3af0fb4801bea14e2556520bb59e7:refs/heads/probe/p-5-app-new-add-remove	[new branch]
+Done
+exit=0

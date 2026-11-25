@@ -1,0 +1,12 @@
+# Notes on the scripts and the responses
+
+Probes P-5 (the App part), P-1, P-8 (the reads) and P-25 under the scratch App's installation token, for #82. Throwaway code, run against `sapientpants/sf-scratch` only. The record is in `docs/research/probes.md` on `main`.
+
+- The scripts ran on 2026-11-25 between 20:44 and 21:01 UTC, in this order: `token.sh`, `p8.sh`, `p25.sh`, `p1.sh`, `p5.sh`, `p5b.sh`, `p5c.sh`. Each was run once.
+- `lib.sh` is sourced by the others. Each script signs a JSON Web Token with the App's private key, through `openssl`, asks for one installation token restricted to the scratch repository, keeps it in a shell variable and revokes it when it ends. The key is not in this repository. `00-token*.json` is the response that held the token, with the token taken out.
+- A response file holds the status line, up to four headers, a blank line and the body. `x-accepted-github-permissions` is GitHub's own statement of the permissions that the endpoint accepts.
+- The operator's token, as `gh` holds it, made these requests and no other: in `p8.sh` those whose file name ends in `-op`, with `3e` and `3f`; in `p25.sh` the last read, `Z4`; in `p1.sh` the reads `00e` and `99a` and, for each ruleset, `02` (create), `08` (read) and `80` (delete); the pushes `00a` and `00b` of `p5.sh` and `6-01` of `p5c.sh`, and the request `6-03` of `p5c.sh`. Every other request is the App's, also where a file name holds the word `operator`: `2a-permission-operator` is the App reading the operator's permission, and `4c-01-ref-at-operator` the App's ref at the operator's commit.
+- What a script printed to the terminal was not kept. Each line of it can be read again from the response of the same name.
+- `p1.sh`: `2-pairs.txt` holds the status and the time of each request of the ten pairs, and `2-pair-<i>-x.json` and `-y.json` their bodies.
+- `p5.sh`, `p5b.sh` and `p5c.sh` built their commits in a work repository that was not kept. A push file holds what the commit changes, git's output and its exit code. The commits of a refused push are on no branch of the scratch repository. `p5b.sh` and `p5c.sh` moved the token file of the script before them to `00-token-first.json` and `00-token-second.json`.
+- The branches `probe/p-5-app-*` stay on the scratch repository, with issues 126 to 130, which are closed. The labels `p25app:*`, the refs under `factory/` and `probe/p-1-app-*`, and the three rulesets were deleted by the scripts.

@@ -1,0 +1,40 @@
+HTTP/2 200 
+date: Wed, 25 Nov 2026 20:45:34 GMT
+x-accepted-github-permissions: metadata=read
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: ECF1:B2E79:D85747E:13DFB047:6B0748ED
+
+{
+  "permission": "admin",
+  "user": {
+    "login": "sapientpants",
+    "id": 305936,
+    "node_id": "MDQ6VXNlcjMwNTkzNg==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/305936?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/sapientpants",
+    "html_url": "https://github.com/sapientpants",
+    "followers_url": "https://api.github.com/users/sapientpants/followers",
+    "following_url": "https://api.github.com/users/sapientpants/following{/other_user}",
+    "gists_url": "https://api.github.com/users/sapientpants/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/sapientpants/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/sapientpants/subscriptions",
+    "organizations_url": "https://api.github.com/users/sapientpants/orgs",
+    "repos_url": "https://api.github.com/users/sapientpants/repos",
+    "events_url": "https://api.github.com/users/sapientpants/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/sapientpants/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false,
+    "permissions": {
+      "admin": true,
+      "maintain": true,
+      "push": true,
+      "triage": true,
+      "pull": true
+    },
+    "role_name": "admin"
+  },
+  "role_name": "admin"
+}
+

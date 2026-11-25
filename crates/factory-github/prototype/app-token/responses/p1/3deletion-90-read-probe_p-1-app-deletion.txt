@@ -1,0 +1,17 @@
+HTTP/2 200 
+date: Wed, 25 Nov 2026 20:53:07 GMT
+x-accepted-github-permissions: contents=read
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: F856:1552F8:DB4B8B1:14365DA4:6B074AB2
+
+{
+  "ref": "refs/heads/probe/p-1-app-deletion",
+  "node_id": "REF_kwDOVzkiD9oAIXJlZnMvaGVhZHMvcHJvYmUvcC0xLWFwcC1kZWxldGlvbg",
+  "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-1-app-deletion",
+  "object": {
+    "sha": "17d8464cd28fd71ba3cb0333f13f34d622816867",
+    "type": "commit",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/17d8464cd28fd71ba3cb0333f13f34d622816867"
+  }
+}
+

@@ -2,7 +2,7 @@
 
 Probes P-5 (the App part), P-1, P-8 (the reads) and P-25 under the scratch App's installation token, for #82. Throwaway code, run against `sapientpants/sf-scratch` only. The record is in `docs/research/probes.md` on `main`.
 
-- The scripts ran on 2026-11-25 between 20:44 and 21:01 UTC, in this order: `token.sh`, `p8.sh`, `p25.sh`, `p1.sh`, `p5.sh`, `p5b.sh`, `p5c.sh`. Each was run once.
+- The scripts ran on 2026-11-25 between 20:44 and 21:01 UTC, in this order: `token.sh`, `p8.sh`, `p25.sh`, `p1.sh`, `p5.sh`, `p5b.sh`, `p5c.sh`. `p5d.sh` followed at 21:16. Each was run once.
 - `lib.sh` is sourced by the others. Each script signs a JSON Web Token with the App's private key, through `openssl`, asks for one installation token restricted to the scratch repository, keeps it in a shell variable and revokes it when it ends. The key is not in this repository. `00-token*.json` is the response that held the token, with the token taken out.
 - A response file holds the status line, up to four headers, a blank line and the body. `x-accepted-github-permissions` is GitHub's own statement of the permissions that the endpoint accepts.
 - The operator's token, as `gh` holds it, made these requests and no other: in `p8.sh` those whose file name ends in `-op`, with `3e` and `3f`; in `p25.sh` the last read, `Z4`; in `p1.sh` the reads `00e` and `99a` and, for each ruleset, `02` (create), `08` (read) and `80` (delete); the pushes `00a` and `00b` of `p5.sh` and `6-01` of `p5c.sh`, and the request `6-03` of `p5c.sh`. Every other request is the App's, also where a file name holds the word `operator`: `2a-permission-operator` is the App reading the operator's permission, and `4c-01-ref-at-operator` the App's ref at the operator's commit.
@@ -12,3 +12,7 @@ Probes P-5 (the App part), P-1, P-8 (the reads) and P-25 under the scratch App's
 - The branches `probe/p-5-app-*` stay on the scratch repository, with issues 126 to 130, which are closed. The labels `p25app:*`, the refs under `factory/` and `probe/p-1-app-*`, and the three rulesets were deleted by the scripts.
 - `p5.sh`: `4b-03-commit` is no observation. The tree request before it was refused, so the script sent the commit request with an empty tree SHA, and the 422 answers that.
 - `token.sh`: `06-token-unrestricted.json` and `07` are a second token, asked for without a repository restriction, to list every repository of the installation. It was revoked in the same script.
+- `p5d.sh` ran at 21:16 UTC on the same day, after a review of the record asked for the case it holds. Every request of it is the App's. `8-12-token-revoked.txt` is the line it printed when it revoked its token.
+- `token.sh`: `02-factory-repository` is a read of the factory repository with the App's token. The rule is that live probes go to the scratch repository only, and this request should not have been sent. It wrote nothing.
+- The session read the scratch repository's runs once more by hand at 21:06 UTC, with the operator's token (`GET /repos/sapientpants/sf-scratch/actions/runs`, the query of `7-01-runs`), and got the same 11. That response was not kept.
+- The scripts printed `token revoked: 204` at their end. Only `p5d.sh` kept the line.

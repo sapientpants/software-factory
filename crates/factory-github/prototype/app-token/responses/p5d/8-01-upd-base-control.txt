@@ -1,0 +1,8 @@
+push by app: d6c625619d5bc1f4e85f9ab1458dc5e80f38626d -> refs/heads/probe/p-5-app-upd-base-control
+the commit against its parent (git diff-tree -r --raw --no-renames):
+:000000 100644 0000000000000000000000000000000000000000 cac21a402a2f8e77741bf1b520b28859626d6510 A	p5app/control.txt
+
+To https://github.com/sapientpants/sf-scratch.git
+ 	d6c625619d5bc1f4e85f9ab1458dc5e80f38626d:refs/heads/probe/p-5-app-upd-base-control	4891e4f..d6c6256
+Done
+exit=0

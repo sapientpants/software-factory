@@ -1,0 +1,17 @@
+HTTP/2 201 
+date: Wed, 25 Nov 2026 21:16:14 GMT
+x-accepted-github-permissions: contents=write; contents=write,workflows=write
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: F66B:1EA2A5:DBAEB41:14388436:6B07501D
+
+{
+  "ref": "refs/heads/probe/p-5-app-upd-base-modify",
+  "node_id": "REF_kwDOVzkiD9oAKHJlZnMvaGVhZHMvcHJvYmUvcC01LWFwcC11cGQtYmFzZS1tb2RpZnk",
+  "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-5-app-upd-base-modify",
+  "object": {
+    "sha": "4891e4ff5783b4ea45bc0dde9b9d23f562397f42",
+    "type": "commit",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/4891e4ff5783b4ea45bc0dde9b9d23f562397f42"
+  }
+}
+

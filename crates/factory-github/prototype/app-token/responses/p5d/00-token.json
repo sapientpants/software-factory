@@ -1,0 +1,21 @@
+{
+  "token": "<removed>",
+  "expires_at": "2026-11-25T22:16:05Z",
+  "permissions": {
+    "checks": "write",
+    "issues": "write",
+    "actions": "read",
+    "contents": "write",
+    "metadata": "read",
+    "statuses": "read",
+    "pull_requests": "write"
+  },
+  "repository_selection": "selected",
+  "repositories": [
+    {
+      "id": 1463362063,
+      "full_name": "sapientpants/sf-scratch",
+      "private": false
+    }
+  ]
+}

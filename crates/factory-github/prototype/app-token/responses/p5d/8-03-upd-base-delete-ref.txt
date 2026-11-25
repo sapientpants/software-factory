@@ -1,0 +1,17 @@
+HTTP/2 200 
+date: Wed, 25 Nov 2026 21:16:25 GMT
+x-accepted-github-permissions: contents=read
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: EA0F:235C9:DDB624B:14634469:6B075029
+
+{
+  "ref": "refs/heads/probe/p-5-app-upd-base-delete",
+  "node_id": "REF_kwDOVzkiD9oAKHJlZnMvaGVhZHMvcHJvYmUvcC01LWFwcC11cGQtYmFzZS1kZWxldGU",
+  "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/probe/p-5-app-upd-base-delete",
+  "object": {
+    "sha": "0ffb6baf3a15832b45158fe0c253727d7985de00",
+    "type": "commit",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/0ffb6baf3a15832b45158fe0c253727d7985de00"
+  }
+}
+

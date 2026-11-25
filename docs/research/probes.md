@@ -3068,24 +3068,24 @@ The source of cargo: `crates/cargo-util-schemas/src/lockfile.rs` on `master`, an
 
 ## P-5, P-1, P-8 and P-25 under the scratch App's installation token
 
-Answered 2026-11-25 for #82, on `sapientpants/sf-scratch`, between 20:44 and 21:01 UTC. The four probes were answered before with the operator's token, in the sections above, and D-38 has an answer observed again where it is about what an identity may do or may read. Every request below is the scratch App's unless it says otherwise: an installation token of App 5926866 (`17-scratch-app`), which holds the seven permissions of 5.7 and no other, sent with `curl` 8.7.1 and, for a push, with git 2.56.1 over HTTPS, on macOS 27.0.1. The operator's OAuth token, as `gh` 2.105.0 holds it, created and deleted the rulesets, pushed three branches for the App's cases to build on, and made the reads that the App's are set against. GitHub's documentation was not read again.
+Answered 2026-11-25 for #82, on `sapientpants/sf-scratch`, between 20:44 and 21:01 UTC, with one more script at 21:16, after a review of this record. The four probes were answered before with the operator's token, in the sections above, and D-38 has an answer observed again where it is about what an identity may do or may read. Every request below is the scratch App's unless it says otherwise: an installation token of App 5926866 (`17-scratch-app`), which holds the seven permissions of 5.7 and no other, sent with `curl` 8.7.1 and, for a push, with git 2.56.1 over HTTPS, on macOS 27.0.1. The operator's OAuth token, as `gh` 2.105.0 holds it, created and deleted the rulesets, pushed three branches for the App's cases to build on, and made the reads that the App's are set against. GitHub's documentation was not read again.
 
 **Answer.**
 
-- **P-5, the App part.** GitHub refused the App every push that adds or changes a file under `.github/workflows/` at the repository root, in that letter case: a workflow, a file that is none, an empty file, a file one directory further down and a symbolic link that is a file of that directory. It refused the same change through the contents endpoint and through the tree endpoint of the REST API. It accepted a push that only removes a workflow, one that changes a workflow's mode alone, one that adds a workflow under `sub/.github/workflows`, under `.GitHub/workflows` or under `.github/Workflows`, and one that makes `.github/workflows` or `.github` a symbolic link, and none of these started a run. So GitHub refused nothing that the integrity check lets through: every refused change is at a path that the workflow rule fails (VAL-5e).
+- **P-5, the App part.** GitHub refused the App every push that adds or changes a file under `.github/workflows/` at the repository root, in that letter case: a workflow, a file that is none, an empty file, a file one directory further down and a symbolic link that is a file of that directory. It refused the addition of a workflow through the contents endpoint and through the tree endpoint of the REST API. It accepted a push that only removes a workflow and one that changes a workflow's mode alone. It accepted a push that adds a workflow under `sub/.github/workflows`, under `.GitHub/workflows` or under `.github/Workflows`, and one that makes `.github/workflows` or `.github` a symbolic link, and none of those five started a run. So in the cases tried GitHub refused nothing that the integrity check lets through: every refused change is at a path that the workflow rule fails (VAL-5e).
 - **P-1.** As for the operator's token: `422 Reference already exists`, whatever SHA the call asks for, and the same status and message as before in every other case of the first run. With a ruleset on `factory/**` that restricts creation, the call got `422 Reference update failed` instead, for a ref that exists and for one that does not, so the message no longer says that the ref exists and the read of 8.2 step 3 still decides. With a ruleset that restricts updates, or deletions and force pushes, the answers were those without a ruleset. No call returned a 409.
 - **P-8, the reads.** The App's token read what the operator's read: `editor`, `lastEditedAt`, the whole edit history with the editor of each entry, and the rename and label events with their actors, on the six issues of the first run and on one that the App filed. The two tokens' responses were the same in each of 21 pairs. The App's token also read the permission endpoint that SEC-1 checks a labeller through.
 - **P-25.** As for the operator's token: each of the four calls that take label names created a label that did not exist, grey and without a description, applied it and answered with its ordinary success. A name in another letter case than an existing label applied the existing label, on each of the four calls.
 
 ### Method
 
-Each script signed a JSON Web Token with the App's private key, through `openssl` 4.1.0, and asked for one installation token restricted to the scratch repository, as GH-12 has it (`POST /app/installations/185898834/access_tokens` with `repositories: ["sf-scratch"]`). The token stayed in a shell variable and was revoked when the script ended (`DELETE /installation/token`, 204 each time). The key was read by `openssl` alone. No token was written to a file, and the response that held one is kept without it.
+Each script signed a JSON Web Token with the App's private key, through `openssl` 4.1.0, and asked for one installation token restricted to the scratch repository, as GH-12 has it (`POST /app/installations/185898834/access_tokens` with `repositories: ["sf-scratch"]`). The token stayed in a shell variable and was revoked when the script ended (`DELETE /installation/token`). Each script printed a 204 for it; that line was kept for the last script alone. The key was read by `openssl` alone. No token was written to a file, and the response that held one is kept without it.
 
-REST requests went out under `X-GitHub-Api-Version: 2026-03-10`, the version GH-17 pins, and where a table says so also under `2022-11-28`; the server named the version in `X-GitHub-Api-Version-Selected` on each REST response but the two 401s. Mutating requests were sent one at a time with a second between them, except the paired creates of P-1.
+REST requests went out under `X-GitHub-Api-Version: 2026-03-10`, the version GH-17 pins, and where a table says so also under `2022-11-28`; the server named the version in `X-GitHub-Api-Version-Selected` on each REST response but the three 401s. Mutating requests were sent one at a time with a second between them, except the paired creates of P-1.
 
-The scripts and every response are on the branch `prototype/app-token-probes`, at commit [`654d2be`](https://github.com/sapientpants/software-factory/tree/654d2bece60f5ec3250542de389c0eefa359d57d/crates/factory-github/prototype/app-token), with the response headers cut down to status, date, API version, request id and `X-Accepted-GitHub-Permissions`, GitHub's own statement of the permissions an endpoint accepts. They are throwaway code. A note there says which requests the operator's token made.
+The scripts and every response are on the branch `prototype/app-token-probes`, at commit [`487ffc7`](https://github.com/sapientpants/software-factory/tree/487ffc772d14676900f026d83559e8c014cc1e27/crates/factory-github/prototype/app-token), with the response headers cut down to status, date, API version, request id and `X-Accepted-GitHub-Permissions`, GitHub's own statement of the permissions an endpoint accepts. They are throwaway code. A note there says which requests the operator's token made.
 
-On the scratch repository the branches `probe/p-5-app-*` stay, 31 of them, and issues 126 to 130, closed. The scripts deleted what else they made: the labels `p25app:*`, every ref under `factory/`, three refs `probe/p-1-app-*` and the three rulesets. The repository has no ruleset again, and the labels it had before.
+On the scratch repository the branches `probe/p-5-app-*` stay, 34 of them, and issues 126 to 130, closed. The scripts deleted what else they made: the labels `p25app:*`, every ref under `factory/`, three refs `probe/p-1-app-*` and the three rulesets. The repository has no ruleset again, and the labels it had before.
 
 ### The token
 
@@ -3095,13 +3095,13 @@ On the scratch repository the branches `probe/p-5-app-*` stay, 31 of them, and i
 | `GET /installation/repositories` | 200 | One repository, `sapientpants/sf-scratch` |
 | The same with a second token, asked for without the restriction | 200 | The same one repository |
 | `GET /repos/sapientpants/sf-scratch` | 200 | `permissions` is false in all five fields, `pull` included: the field says nothing of what an installation may do |
-| `GET /repos/sapientpants/software-factory` | 200 | A public repository is read by any token |
+| `GET /repos/sapientpants/software-factory` | 200 | A public repository is read by any token. This one request went to the factory repository, which the rule for live probes excludes: it is a read, it wrote nothing, and it should not have been sent |
 | `GET /app` | 401 | `A JSON web token could not be decoded`: the endpoint is the App's, not an installation's |
 | `GET /apps/sf-scratch-app` | 200 | The App, with id 5926866. The operator's OAuth token got a 404 here (`17-scratch-app`) |
 | `GET /rate_limit` | 200 | 5000 an hour for REST and 5000 for GraphQL |
 | GraphQL `viewer` | 200 | `__typename: User`, login `sf-scratch-app[bot]`, `databaseId` 361295021 |
 
-The second row answers what `17-scratch-app` left as the operator's statement: the installation covers the scratch repository and no other.
+The third row answers what `17-scratch-app` left as the operator's statement: the installation covers the scratch repository and no other. The second row could not, since its token was restricted to that repository.
 
 ### P-5: what GitHub refused the App
 
@@ -3153,6 +3153,14 @@ A refused push ended with git's exit code 1 and this line, naming the path:
 | `upd-case` | Adds `.GitHub/workflows/p5app-upd-case.yml` | Accepted, `066da48` | `fail` |
 | `upd-add-remove` | Two commits in one push: the first adds `.github/workflows/p5app-gone.yml` and a control file, the second removes the workflow | Accepted, `5ef80db` | Nothing for the range; `fail` for the first commit alone |
 
+**A branch that exists, on a base that holds a workflow.** The case nearest to publish on a repository that has CI, run at 21:16. The App created each branch through `POST /git/refs` at `4891e4f`, the head of the operator's `probe/p-5-app-base`, whose tree holds the workflow, and then pushed one commit to it, a fast-forward. Each of the three creates answered 201.
+
+| Case | The commit | The App's push | 11.3 |
+|---|---|---|---|
+| `upd-base-control` | Adds `p5app/control.txt` and leaves the workflow | Accepted, `d6c6256` | Nothing |
+| `upd-base-modify` | Changes the workflow's text | Refused; the branch stayed at `4891e4f` | `fail` |
+| `upd-base-delete` | Removes the workflow | Accepted, `0ffb6ba` | `fail` |
+
 **The REST API in place of a push.**
 
 | Request | Status | |
@@ -3188,7 +3196,7 @@ Then the operator's commits. The operator's token pushed `probe/p-5-app-op-wf`, 
 | The same request with the operator's token, for another branch name | 201 |
 | The App's request again, now that a branch has `63d4c64` as its head | 201 |
 
-**Runs.** `GET /actions/runs`, read with the App's token at 21:00:54 UTC, three minutes after the last push of the first script and 47 seconds after the last ref of the table above, lists 11 runs since the first push, all for a `push` event and all successful. The operator's token read the same 11 at 21:06. Three have the operator as actor, for the operator's two branches and the ref of the last table. Eight have `sf-scratch-app[bot]` as actor: `base-control` and `base-mode`, which carry the base's workflow, and the six refs that the App put on the operator's commits or on a child or a merge of one. No other accepted push started a run: not `nested`, `case`, `case-dir`, `link-workflows`, `link-github`, `github-other`, `workflows-file` or any `upd-` case. `GET /actions/workflows` gained `p5app-base.yml`, `p5app-op.yml` and `p5app-op-two.yml` and nothing else.
+**Runs.** `GET /actions/runs`, read with the App's token at 21:00:54 UTC, three minutes after the last push of the first script and 47 seconds after the last ref of the table above, lists 11 runs since the first push, all for a `push` event and all successful. The session read the same 11 by hand at 21:06, with the operator's token, and did not keep that response. The script of 21:16 added four runs, read 75 seconds after its last push, all with the App as actor: one for each of the three branches that the App created at the base, whose workflow ran, and one for the push of `upd-base-control`. Three have the operator as actor, for the operator's two branches and the ref of the last table. Eight have `sf-scratch-app[bot]` as actor: `base-control` and `base-mode`, which carry the base's workflow, and the six refs that the App put on the operator's commits or on a child or a merge of one. No other accepted push started a run: not `nested`, `case`, `case-dir`, `link-workflows`, `link-github`, `github-other`, `workflows-file` or any `upd-` case. `GET /actions/workflows` gained `p5app-base.yml`, `p5app-op.yml` and `p5app-op-two.yml` and nothing else.
 
 ### P-1: creating a ref that already exists, as the App
 
@@ -3287,7 +3295,7 @@ Both API versions gave the same in each row. Each of the eight labels reads `"co
 
 ### Findings
 
-**Publish meets no refusal for a candidate that passed the integrity check.** In the cases tried, what GitHub refused the App is an added or changed file at a path under `.github/workflows/` at the root, and each such path matches the pattern `/.github/workflows/**`, which fails (VAL-5e). The concern of the first run, a push that the integrity check lets through with a flag and GitHub then refuses, did not occur: the links at `.github` and `.github/workflows`, the nested directory and a regular file named `.github/workflows` were all accepted.
+**In the cases tried, publish meets no refusal for a candidate that passed the integrity check.** What GitHub refused the App is an added or changed file at a path under `.github/workflows/` at the root, and each such path matches the pattern `/.github/workflows/**`, which fails (VAL-5e). A push that leaves the workflows of its branch as they are was accepted, on a branch that the App had created at a commit with a workflow in its tree, which is what publish sends on a repository that has CI. The concern of the first run, a push that the integrity check lets through with a flag and GitHub then refuses, did not occur: the links at `.github` and `.github/workflows`, the nested directory and a regular file named `.github/workflows` were all accepted.
 
 **GitHub's guard is narrower than the workflow rule.** It let the App remove a workflow, move one out of the directory and change a workflow's mode, and it does not fold letter case. The integrity check fails all four. A removed workflow is the one that matters: with it goes whatever that workflow checked, and GitHub's refusal is no second line of defence there. GH-11 said that GitHub rejects pushes that change the directory, which is more than it does.
 
@@ -3305,9 +3313,9 @@ Both API versions gave the same in each row. Each of the eight labels reads `"co
 
 **The App reads who may bypass only as far as itself.** The ruleset as the App read it has no bypass list, which is what DEP-4 assumes, and it has `current_user_can_bypass`, with the value `never` where no actor may bypass. That is the field probe P-14 asks about. It was seen on a ruleset for `factory/**` with an empty bypass list, and not on one that contributes to the default branch's rules or that names a bypass actor.
 
-**The App reads an issue as the operator does.** Everything that rule 6 of 5.3, SEC-1 and SEC-2 read came back to the App's token as to the operator's, the edit history with its editors and a deleted revision included, with the Issues and Metadata permissions of 5.7 and nothing more.
+**The App reads an issue as the operator does.** Everything that rule 6 of 5.3, SEC-1 and SEC-2 read came back to the App's token as to the operator's, the edit history with its editors and a deleted revision included. The token held the seven permissions of 5.7. Which of them a read needs was seen for the REST reads alone, whose responses name `issues=read`, `pull_requests=read` or `metadata=read` as accepted; a GraphQL response carries no such header.
 
-**The App is named as P-8 found for the Actions App.** `Bot` and a login without `[bot]` in GraphQL, `Bot` and the login with it in REST, one numeric id in both, and that id is the bot account's and not the App's. SEC-2 recognises the factory's App by that id, and the scratch App, which holds the same permissions (GH-11a), is named as the rule expects. As `viewer` the same account is a `User` with the suffix in its login, so the type and the login depend on where the account is read, and the id does not.
+**The App is named as P-8 found for the Actions App.** `Bot` and a login without `[bot]` in GraphQL, `Bot` and the login with it in REST, one numeric id in both, and that id is the bot account's and not the App's. SEC-2 recognises the factory's App by that id, and the scratch App, which holds the same permissions (5.7), is named as the rule expects. As `viewer` the same account is a `User` with the suffix in its login, so the type and the login depend on where the account is read, and the id does not.
 
 **A missing label is created for the App too.** An App with the Issues permission and no admin permission creates a label by naming it, on each of the four calls. So GH-3a stands as written: the factory lists the labels before its first label write and adds none that the list did not hold.
 
@@ -3318,9 +3326,9 @@ Both API versions gave the same in each row. Each of the eight labels reads `"co
 ### What changed in the spec
 
 1. The rows of P-5, P-1, P-8 and P-25 in 23.2 carry these answers. The rows of P-14 and P-20 say what was seen in passing, and both probes stay open.
-2. GH-11 says what GitHub refuses the App and what it accepts, in place of "rejects pushes that change `.github/workflows/`".
+2. GH-11 says what GitHub refuses the App and what it accepts, in place of "rejects pushes that change `.github/workflows/`", and the sentence of VAL-5e that restated it follows.
 3. VAL-5e says of a nested workflow directory and of one in another letter case that GitHub accepted the App's push of it, where it said that this was not observed.
-4. VAL-5f says that GitHub accepted the App's push of a link at `.github` and at `.github/workflows`, and no longer that a run may meet a rejection at publish.
+4. VAL-5f says that GitHub accepted the App's push of a link at `.github` and at `.github/workflows`, and no longer that a run may meet a rejection at publish. The row of D-31, which gave that possible rejection as the gain of a `fail` it did not take, says that the push was accepted.
 5. 8.2 step 3 names a ruleset that restricts the creation of the ref as a second cause of `Reference update failed`, and says that under one the message is the same for a ref that exists.
 6. GH-3a says that the App's token read the label list and created a missing label, where it cited GitHub's documentation and the operator's token, and that each call folded letter case.
 7. VAL-10 cites the runs that the App's pushes started.
@@ -3334,6 +3342,7 @@ No rule's outcome changed. SEC-1 and SEC-2 stand as they were.
 - **An organisation's ruleset, a ruleset in evaluate mode and a classic branch protection.** Each ruleset here was the repository's own and active.
 - **The documented 409.** No request produced it. An empty repository was not tried, since the scratch repository is not one.
 - **Which commits GitHub compares when it refuses a workflow.** The reading under "Findings" fits the cases and was not tested against another: a workflow that is at the head of a tag only, one that is on the default branch only, or one whose content is at the head of a branch under another path.
+- **A workflow changed or removed through the REST API.** The two requests that were refused each add a workflow. The contents endpoint was not asked to change or to delete one.
 - **The push of a merge commit, and a reset** (P-20). The merge here was made by GitHub, through `POST /merges`.
 - **Events other than a push.** `schedule`, `workflow_dispatch`, `pull_request_target` and a pull request opened by the App on one of the accepted branches were not tried.
 - **The factory's App.** It does not exist until M1b. Every answer here is the scratch App's, which holds the same permissions.

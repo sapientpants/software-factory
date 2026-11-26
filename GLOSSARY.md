@@ -58,6 +58,9 @@ The directory tree in which the implementer works. It lives for one attempt, or 
 **Candidate**:
 A commit the host builds from the workspace (9.4). Gates run on candidates; only candidates are pushed.
 
+**Export**:
+A clean checkout of a candidate, which the host makes from `host.git` for one stage execution of `verify` or of `review` and for no other (9.4, WS-14).
+
 **Policy**:
 The repository-owned configuration in `.factory/` on the default branch.
 

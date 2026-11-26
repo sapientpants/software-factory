@@ -36,7 +36,7 @@ Where to read in `SPEC.md`:
 Read in `SPEC.md`:
 
 - **Crate layout (19.1):** before adding a crate or a dependency between crates. `xtask/tests/structure.rs` holds that table as data; change the spec's table and the test together.
-- **Stack (19.2):** before adding an external dependency. It names the crate chosen for each concern, the exact pins and the crates that are not used.
+- **Stack (19.2):** before adding an external dependency. It names the crate chosen for each concern, the exact pins and the crates that are not used, and says what a change does where the table lacks a concern or a pin.
 - **Conventions (19.3):** when a workspace lint fails, and before spawning a task or a process.
 - **Testing (19.4):** before writing a test, for the layer it belongs to.
 
@@ -56,7 +56,7 @@ Open design work is tracked on a wayfinder map: the GitHub issue labelled `wayfi
 
 ## Labels that mean approval
 
-`state:ready`, `factory:plan-approved`, `factory:hold`, `factory:restart`, `factory:stop`, `tier:*` and `risk:*` are the operator's inputs to the factory (SPEC 5.2, SEC-1). Only the operator applies or removes them. An agent that applies one with the operator's `gh` login has approved work in the operator's name.
+`state:ready`, `factory:plan-approved`, `factory:hold`, `factory:restart`, `factory:stop`, `tier:*`, `risk:*`, `priority:*`, `type:ci` and `type:spec-delta` are the operator's inputs to the factory (SPEC 5.2, SEC-1). Only the operator applies or removes them. An agent that applies one with the operator's `gh` login has approved work in the operator's name.
 
 No label of SPEC 5.2 exists on this repository before its onboarding (D-21). A session creates none of them on its own: creating them is step 5 of SPEC 20.1, and it waits for the operator's instruction.
 

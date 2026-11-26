@@ -22,6 +22,9 @@ The machine the control plane runs on: in operation, the operator's Linux server
 **Worker**:
 The untrusted side: an agent process or build command and everything it spawns, inside a sandbox.
 
+**First process**:
+The process that bubblewrap starts as PID 1 of a sandbox at level `process`: a hidden subcommand of `sf`, and no part of the worker. SEC-10a says what it does and how far it is trusted.
+
 **Work item**:
 An open GitHub issue carrying exactly one `state:*` label.
 

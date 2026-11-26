@@ -1,0 +1,132 @@
+## rustup
+rustup 1.29.3 (edbc831ce 2026-11-02)
+## install 1.100.0: profile minimal, components clippy and rustfmt, target x86_64-unknown-linux-gnu
+  1.100.0-aarch64-apple-darwin installed - rustc 1.100.0 (0ef1bc386 2026-11-09)
+## install 1.100: profile minimal
+  1.100-aarch64-apple-darwin installed - rustc 1.100.0 (0ef1bc386 2026-11-09)
+## install stable: profile minimal
+  stable-aarch64-apple-darwin installed - rustc 1.100.0 (0ef1bc386 2026-11-09)
+## the rustup home
+downloads
+settings.toml
+tmp
+toolchains
+update-hashes
+## its toolchains directory
+1.100-aarch64-apple-darwin
+1.100.0-aarch64-apple-darwin
+stable-aarch64-apple-darwin
+## 1.100.0: lib/rustlib/components
+clippy-preview-aarch64-apple-darwin
+cargo-aarch64-apple-darwin
+rust-std-aarch64-apple-darwin
+rust-std-x86_64-unknown-linux-gnu
+rustfmt-preview-aarch64-apple-darwin
+rustc-aarch64-apple-darwin
+## 1.100.0: bin
+cargo
+cargo-clippy
+cargo-fmt
+clippy-driver
+rust-gdb
+rust-gdbgui
+rust-lldb
+rustc
+rustdoc
+rustfmt
+## 1.100.0: lib/rustlib
+aarch64-apple-darwin
+components
+etc
+manifest-cargo-aarch64-apple-darwin
+manifest-clippy-preview-aarch64-apple-darwin
+manifest-rust-std-aarch64-apple-darwin
+manifest-rust-std-x86_64-unknown-linux-gnu
+manifest-rustc-aarch64-apple-darwin
+manifest-rustfmt-preview-aarch64-apple-darwin
+multirust-channel-manifest.toml
+multirust-config.toml
+rust-installer-version
+x86_64-unknown-linux-gnu
+## 1.100 (minimal): lib/rustlib/components
+cargo-aarch64-apple-darwin
+rust-std-aarch64-apple-darwin
+rustc-aarch64-apple-darwin
+## 1.100 (minimal): bin
+cargo
+rust-gdb
+rust-gdbgui
+rust-lldb
+rustc
+rustdoc
+## 1.100.0: rustup component remove clippy
+info: removing component clippy
+cargo-aarch64-apple-darwin
+rust-std-aarch64-apple-darwin
+rust-std-x86_64-unknown-linux-gnu
+rustfmt-preview-aarch64-apple-darwin
+rustc-aarch64-apple-darwin
+## 1.100.0: bin after it
+cargo
+cargo-fmt
+rust-gdb
+rust-gdbgui
+rust-lldb
+rustc
+rustdoc
+rustfmt
+## 1.100.0: rustup target remove x86_64-unknown-linux-gnu
+info: removing component rust-std for target x86_64-unknown-linux-gnu
+cargo-aarch64-apple-darwin
+rust-std-aarch64-apple-darwin
+rustfmt-preview-aarch64-apple-darwin
+rustc-aarch64-apple-darwin
+## 1.100.0: entries of lib/rustlib that name that target
+0
+## 1.100.0: both added again
+info: downloading component clippy
+info: downloading component rust-std
+cargo-aarch64-apple-darwin
+rust-std-aarch64-apple-darwin
+rustfmt-preview-aarch64-apple-darwin
+rustc-aarch64-apple-darwin
+clippy-preview-aarch64-apple-darwin
+rust-std-x86_64-unknown-linux-gnu
+## 1.100: rustup component add rust-src
+info: downloading component rust-src
+cargo-aarch64-apple-darwin
+rust-std-aarch64-apple-darwin
+rustc-aarch64-apple-darwin
+rust-src
+## the names that the channel manifest of 1.100.0 renames
+clippy -> clippy-preview
+enzyme -> enzyme-preview
+gcc-x86_64-unknown-linux-gnu -> gcc-x86_64-unknown-linux-gnu-preview
+llvm-bitcode-linker -> llvm-bitcode-linker-preview
+llvm-tools -> llvm-tools-preview
+miri -> miri-preview
+offload -> offload-preview
+rust-analyzer -> rust-analyzer-preview
+rust-docs-json -> rust-docs-json-preview
+rustc-codegen-cranelift -> rustc-codegen-cranelift-preview
+rustc-codegen-gcc -> rustc-codegen-gcc-preview
+rustfmt -> rustfmt-preview
+## a second rustup home, empty; rustup --version in a directory whose rust-toolchain.toml names 1.100.0 with clippy
+rustup 1.29.3 (edbc831ce 2026-11-02)
+info: This is the version for the rustup toolchain manager, not the rustc compiler.
+info: syncing channel updates for 1.100.0-aarch64-apple-darwin
+info: latest update on 2026-11-12 for version 1.100.0 (0ef1bc386 2026-11-09)
+info: downloading 6 components
+warn: the missing active toolchain `1.100.0-aarch64-apple-darwin` has been auto-installed
+warn: this might cause rustup commands to take longer time to finish than expected
+info: you may opt out with `RUSTUP_AUTO_INSTALL=0` or `rustup set auto-install disable`
+info: the currently active `rustc` version is `rustc 1.100.0 (0ef1bc386 2026-11-09)`
+## the toolchains directory of that home afterwards
+1.100.0-aarch64-apple-darwin
+## and its record of components
+clippy-preview-aarch64-apple-darwin
+cargo-aarch64-apple-darwin
+rust-std-aarch64-apple-darwin
+rust-docs-aarch64-apple-darwin
+rustc-aarch64-apple-darwin
+rustfmt-preview-aarch64-apple-darwin

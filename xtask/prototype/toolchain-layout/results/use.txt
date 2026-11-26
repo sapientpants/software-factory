@@ -1,0 +1,33 @@
+## A. bare PATH, no rustup, no RUSTUP_HOME; the directory holds a rust-toolchain.toml that names 1.97.1
+cargo 1.100.0 (3acc79c0c 2026-11-05)
+rustc 1.100.0 (0ef1bc386 2026-11-09)
+<scratch>/rustup/toolchains/1.100.0-aarch64-apple-darwin
+exit=0 :: cargo build --offline
+exit=0 :: cargo test --offline
+exit=0 :: cargo clippy --offline -- -D warnings
+exit=0 :: cargo fmt --check
+exit=101 :: cargo +1.97.1 --version
+error: no such command: `+1.97.1`
+## B. a copy of the toolchain under another path and name
+<scratch>/moved/tc
+exit=0 :: cargo build --offline
+exit=0 :: cargo clippy --offline -- -D warnings
+exit=0 :: cargo fmt --check
+## C. the copy with no write permission on any entry (chmod -R a-w)
+exit=0 :: cargo build --offline
+exit=0 :: cargo test --offline
+exit=0 :: cargo clippy --offline -- -D warnings
+exit=0 :: cargo fmt --check
+## D. through a symbolic link to the toolchain directory
+<scratch>/rustup/toolchains/1.100.0-aarch64-apple-darwin
+exit=0 :: cargo build --offline
+## E. the toolchain installed with the minimal profile: no clippy, no rustfmt
+exit=0 :: cargo build --offline
+exit=101 :: cargo clippy --offline
+error: no such command: `clippy`
+exit=101 :: cargo fmt --check
+error: no such command: `fmt`
+## F. a second target, where its rust-std is installed and where it is not
+exit=0 :: cargo check --offline --target x86_64-unknown-linux-gnu
+exit=101 :: cargo check --offline --target x86_64-unknown-linux-gnu
+error[E0463]: can't find crate for `std`

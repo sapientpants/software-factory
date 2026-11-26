@@ -94,6 +94,9 @@ The text of the instruction set as the host gives it to an agent session (AG-2a,
 **Snapshot**:
 The issue title, body and trusted comments captured at claim or resume, as sanitised (SEC-4) and given to agents. SEC-3 says which comments it holds.
 
+**Acceptance criterion**:
+A statement in an issue of what holds when its work is done, with an id and a verification method. WI-3 says how one is written, and 10.5 and 11.6 what the factory checks against it.
+
 **Target repository**:
 A repository the factory is onboarded to (20) and works on.
 

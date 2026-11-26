@@ -1,0 +1,161 @@
+## git
+git version 2.47.3
+file system of the scratch directory: overlayfs
+it does not take caseprobe for CaseProbe
+
+## A. Layouts, each a directory of the work tree of outer/. '.' or a path under the directory means that git took it for a repository; <w>/outer/.git means that it did not.
+A1 HEAD (ref: refs/heads/main), config, objects/keep, refs/keep
+  git rev-parse --git-dir      exit=0   canary: none             <w>/outer/a1
+  git st                       exit=0   canary: alias            
+  git status --porcelain       exit=0   canary: fsmonitor        warning: Empty last update token.
+A2 the same without config
+  git rev-parse --git-dir      exit=0   canary: none             .
+A3 objects and refs are symbolic links to '.'
+  git rev-parse --git-dir      exit=0   canary: none             <w>/outer/a3
+  git st                       exit=0   canary: alias            
+  git status --porcelain       exit=0   canary: fsmonitor        warning: Empty last update token.
+A4 objects and refs are regular files, mode 0755
+  git rev-parse --git-dir      exit=0   canary: none             <w>/outer/a4
+  git st                       exit=0   canary: alias            
+  git status --porcelain       exit=0   canary: fsmonitor        warning: Empty last update token.
+A5 objects and refs are regular files, mode 0644
+  git rev-parse --git-dir      exit=0   canary: none             <w>/outer/.git
+  git st                       exit=1   canary: none             git: 'st' is not a git command. See 'git --help'.
+  git status --porcelain       exit=0   canary: none             ?? README.md
+A6 HEAD and commondir (../a6common), which holds config, objects/keep and refs/keep and no HEAD
+  git rev-parse --git-dir      exit=0   canary: none             .
+  git st                       exit=0   canary: alias            
+  git status --porcelain       exit=128 canary: none             fatal: this operation must be run in a work tree
+   started in a6common itself:
+  git rev-parse --git-dir      exit=0   canary: none             <w>/outer/.git
+A7 the names in another letter case: head, Objects/keep, REFS/keep, Config
+  git rev-parse --git-dir      exit=0   canary: none             <w>/outer/.git
+  git st                       exit=1   canary: none             git: 'st' is not a git command. See 'git --help'.
+  git status --porcelain       exit=0   canary: none             ?? README.md
+A8 HEAD holds 40 hex digits
+  git rev-parse --git-dir      exit=0   canary: none             <w>/outer/a8
+  git st                       exit=0   canary: alias            
+  git status --porcelain       exit=128 canary: fsmonitor        warning: Empty last update token.
+A9 HEAD is a symbolic link to refs/heads/main
+  git rev-parse --git-dir      exit=0   canary: none             <w>/outer/a9
+  git st                       exit=0   canary: alias            
+  git status --porcelain       exit=0   canary: fsmonitor        warning: Empty last update token.
+A10 HEAD holds the word hello
+  git rev-parse --git-dir      exit=0   canary: none             <w>/outer/.git
+  git st                       exit=1   canary: none             git: 'st' is not a git command. See 'git --help'.
+  git status --porcelain       exit=0   canary: none             ?? README.md
+A11 HEAD, config and objects/keep, no refs
+  git rev-parse --git-dir      exit=0   canary: none             <w>/outer/.git
+  git st                       exit=1   canary: none             git: 'st' is not a git command. See 'git --help'.
+  git status --porcelain       exit=0   canary: none             ?? README.md
+A12 the layout of A1, git started two directories below it
+  git rev-parse --git-dir      exit=0   canary: none             <w>/outer/a12
+  git st                       exit=0   canary: alias            
+  git status --porcelain       exit=0   canary: fsmonitor        warning: Empty last update token.
+A13 the layout at the root of a checkout, beside its .git: a second repository, root/, with HEAD, config, objects/keep and refs/keep
+  git rev-parse --git-dir      exit=0   canary: none             .git
+  git st                       exit=1   canary: none             git: 'st' is not a git command. See 'git --help'.
+  git status --porcelain       exit=0   canary: none             ?? HEAD
+   started in root/sub:
+  git rev-parse --git-dir      exit=0   canary: none             <w>/root/.git
+   the same tree without its .git, as an export holds it:
+  git rev-parse --git-dir      exit=0   canary: none             <w>/root-export
+
+## B. The layouts committed and cloned
+git add -A: exit=0
+git commit: exit=0
+a1/HEAD a1/config a1/objects/keep a1/refs/keep a3/HEAD a3/config a3/objects a3/refs a4/HEAD a4/config a4/objects a4/refs a6/HEAD a6/commondir a6common/config a6common/objects/keep a6common/refs/keep a7/Config a7/Objects/keep a7/REFS/keep a7/head 
+  100644 blob b870d82622c1a9ca6bcaf5df639680424a1904b0	a3/HEAD
+  100644 blob f10a8b4fdfe19299a92f29cbf62a28e43c120117	a3/config
+  120000 blob 945c9b46d684f08ec84cb316e1dc0061e361f794	a3/objects
+  120000 blob 945c9b46d684f08ec84cb316e1dc0061e361f794	a3/refs
+  100644 blob b870d82622c1a9ca6bcaf5df639680424a1904b0	a4/HEAD
+  100644 blob f10a8b4fdfe19299a92f29cbf62a28e43c120117	a4/config
+  100755 blob e69de29bb2d1d6434b8b29ae775ad8c2e48c5391	a4/objects
+  100755 blob e69de29bb2d1d6434b8b29ae775ad8c2e48c5391	a4/refs
+in the clone:
+a1
+  git rev-parse --git-dir      exit=0   canary: none             <w>/clone/a1
+  git st                       exit=0   canary: alias            
+  git status --porcelain       exit=0   canary: fsmonitor        warning: Empty last update token.
+a3
+  git rev-parse --git-dir      exit=0   canary: none             <w>/clone/a3
+  git st                       exit=0   canary: alias            
+  git status --porcelain       exit=0   canary: fsmonitor        warning: Empty last update token.
+a4
+  git rev-parse --git-dir      exit=0   canary: none             <w>/clone/a4
+  git st                       exit=0   canary: alias            
+  git status --porcelain       exit=0   canary: fsmonitor        warning: Empty last update token.
+a6
+  git rev-parse --git-dir      exit=0   canary: none             .
+  git st                       exit=0   canary: alias            
+  git status --porcelain       exit=128 canary: none             fatal: this operation must be run in a work tree
+a7
+  git rev-parse --git-dir      exit=0   canary: none             <w>/clone/.git
+  git st                       exit=1   canary: none             git: 'st' is not a git command. See 'git --help'.
+  git status --porcelain       exit=0   canary: none             
+
+## C. safe.bareRepository = explicit in the global configuration
+a1
+  git rev-parse --git-dir      exit=128 canary: none             fatal: cannot use bare repository '<w>/outer/a1' (safe.bareRepository is 'explicit')
+  git st                       exit=1   canary: none             git: 'st' is not a git command. See 'git --help'.
+  git status --porcelain       exit=128 canary: none             fatal: cannot use bare repository '<w>/outer/a1' (safe.bareRepository is 'explicit')
+a3
+  git rev-parse --git-dir      exit=128 canary: none             fatal: cannot use bare repository '<w>/outer/a3' (safe.bareRepository is 'explicit')
+  git st                       exit=1   canary: none             git: 'st' is not a git command. See 'git --help'.
+  git status --porcelain       exit=128 canary: none             fatal: cannot use bare repository '<w>/outer/a3' (safe.bareRepository is 'explicit')
+a4
+  git rev-parse --git-dir      exit=128 canary: none             fatal: cannot use bare repository '<w>/outer/a4' (safe.bareRepository is 'explicit')
+  git st                       exit=1   canary: none             git: 'st' is not a git command. See 'git --help'.
+  git status --porcelain       exit=128 canary: none             fatal: cannot use bare repository '<w>/outer/a4' (safe.bareRepository is 'explicit')
+a6
+  git rev-parse --git-dir      exit=128 canary: none             fatal: cannot use bare repository '<w>/outer/a6' (safe.bareRepository is 'explicit')
+  git st                       exit=1   canary: none             git: 'st' is not a git command. See 'git --help'.
+  git status --porcelain       exit=128 canary: none             fatal: cannot use bare repository '<w>/outer/a6' (safe.bareRepository is 'explicit')
+a7
+  git rev-parse --git-dir      exit=0   canary: none             <w>/outer/.git
+  git st                       exit=1   canary: none             git: 'st' is not a git command. See 'git --help'.
+  git status --porcelain       exit=0   canary: none             
+a9
+  git rev-parse --git-dir      exit=128 canary: none             fatal: cannot use bare repository '<w>/outer/a9' (safe.bareRepository is 'explicit')
+  git st                       exit=1   canary: none             git: 'st' is not a git command. See 'git --help'.
+  git status --porcelain       exit=128 canary: none             fatal: cannot use bare repository '<w>/outer/a9' (safe.bareRepository is 'explicit')
+a12/sub/deep
+  git rev-parse --git-dir      exit=128 canary: none             fatal: cannot use bare repository '<w>/outer/a12' (safe.bareRepository is 'explicit')
+  git st                       exit=1   canary: none             git: 'st' is not a git command. See 'git --help'.
+  git status --porcelain       exit=128 canary: none             fatal: cannot use bare repository '<w>/outer/a12' (safe.bareRepository is 'explicit')
+a1, whose own config also says [safe] bareRepository = all
+  git rev-parse --git-dir      exit=128 canary: none             fatal: cannot use bare repository '<w>/outer/a1' (safe.bareRepository is 'explicit')
+  git st                       exit=1   canary: none             git: 'st' is not a git command. See 'git --help'.
+  git status --porcelain       exit=128 canary: none             fatal: cannot use bare repository '<w>/outer/a1' (safe.bareRepository is 'explicit')
+
+## D. The setting in other places
+D1 on the command line, -c safe.bareRepository=explicit
+  git -c safe.bareRepository=explicit rev-parse --git-dir exit=128 canary: none             fatal: cannot use bare repository '<w>/outer/a1' (safe.bareRepository is 'explicit')
+D2 in the configuration of outer/ alone (outer/.git/config)
+  git st                       exit=0   canary: alias            
+  git st                       exit=0   canary: alias            
+D3 in the system configuration, the global one empty
+  git rev-parse --git-dir      exit=128 canary: none             fatal: cannot use bare repository '<w>/outer/a3' (safe.bareRepository is 'explicit')
+  git st                       exit=1   canary: none             git: 'st' is not a git command. See 'git --help'.
+
+## E. What else changes under explicit (global)
+E1 an ordinary repository, at its root and in a subdirectory
+  git status --porcelain       exit=0   canary: none              M a1/config
+  git rev-parse --show-toplevel exit=0   canary: none             <w>/outer
+E2 inside the .git directory of an ordinary repository
+  git rev-parse --git-dir      exit=0   canary: none             .
+  git rev-parse --git-dir      exit=0   canary: none             <w>/outer/.git
+E3 a linked worktree
+  git status --porcelain       exit=0   canary: none             
+E4 a bare repository of the operator's own, started inside it
+  git rev-parse --git-dir      exit=128 canary: none             fatal: cannot use bare repository '<w>/real.git' (safe.bareRepository is 'explicit')
+  git --git-dir=. rev-parse --git-dir exit=0   canary: none             .
+   with GIT_DIR=. in the environment:
+  git rev-parse --git-dir      exit=0   canary: none             .
+E5 a bare repository as a remote, by path
+  push to a path: exit=0
+  clone from a path: exit=0
+  fetch from a path: exit=0
+ac3f9a147d2ad4bace40e9168b1365a23c697277	HEAD
+  ls-remote of a path: exit=0

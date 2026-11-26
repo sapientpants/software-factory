@@ -1,0 +1,126 @@
+git version 2.47.3
+
+## A. diff-tree, the plumbing command
+$ git --git-dir=<repo> diff-tree -r --raw --abbrev=7 <base> <candidate>
+  :100644 000000 cf6e8a1 0000000 D	.github/workflows/ci.yml
+  :100644 000000 9b8c2bb 0000000 D	build.rs
+  :120000 000000 71e9f31 0000000 D	cfg
+  :000000 120000 0000000 71e9f31 A	cfg2
+  :100644 000000 2642ab8 0000000 D	clippy.toml
+  :000000 100644 0000000 cf6e8a1 A	docs/ci-example.yml
+  :000000 100644 0000000 2642ab8 A	notes/lints.txt
+  :000000 100644 0000000 86e9888 A	src/gen.rs
+  :000000 100644 0000000 184c20d A	vendor/Cargo.toml
+
+$ git --git-dir=<repo> diff-tree -r --raw --abbrev=7 -M <base> <candidate>
+  :120000 120000 71e9f31 71e9f31 R100	cfg	cfg2
+  :100644 100644 cf6e8a1 cf6e8a1 R100	.github/workflows/ci.yml	docs/ci-example.yml
+  :100644 100644 2642ab8 2642ab8 R100	clippy.toml	notes/lints.txt
+  :100644 100644 9b8c2bb 86e9888 R096	build.rs	src/gen.rs
+  :000000 100644 0000000 184c20d A	vendor/Cargo.toml
+
+$ git --git-dir=<repo> diff-tree -r --raw --abbrev=7 -C --find-copies-harder <base> <candidate>
+  :120000 120000 71e9f31 71e9f31 R100	cfg	cfg2
+  :100644 100644 cf6e8a1 cf6e8a1 R100	.github/workflows/ci.yml	docs/ci-example.yml
+  :100644 100644 2642ab8 2642ab8 R100	clippy.toml	notes/lints.txt
+  :100644 100644 9b8c2bb 86e9888 R096	build.rs	src/gen.rs
+  :100644 100644 184c20d 184c20d C100	Cargo.toml	vendor/Cargo.toml
+
+$ git --git-dir=<repo> diff-tree -r --raw --abbrev=7 --no-renames <base> <candidate>
+  :100644 000000 cf6e8a1 0000000 D	.github/workflows/ci.yml
+  :100644 000000 9b8c2bb 0000000 D	build.rs
+  :120000 000000 71e9f31 0000000 D	cfg
+  :000000 120000 0000000 71e9f31 A	cfg2
+  :100644 000000 2642ab8 0000000 D	clippy.toml
+  :000000 100644 0000000 cf6e8a1 A	docs/ci-example.yml
+  :000000 100644 0000000 2642ab8 A	notes/lints.txt
+  :000000 100644 0000000 86e9888 A	src/gen.rs
+  :000000 100644 0000000 184c20d A	vendor/Cargo.toml
+
+## B. diff, the porcelain command, on the same two trees
+$ git --git-dir=<repo> diff --raw --abbrev=7 <base> <candidate>
+  :120000 120000 71e9f31 71e9f31 R100	cfg	cfg2
+  :100644 100644 cf6e8a1 cf6e8a1 R100	.github/workflows/ci.yml	docs/ci-example.yml
+  :100644 100644 2642ab8 2642ab8 R100	clippy.toml	notes/lints.txt
+  :100644 100644 9b8c2bb 86e9888 R096	build.rs	src/gen.rs
+  :000000 100644 0000000 184c20d A	vendor/Cargo.toml
+
+$ git --git-dir=<repo> diff --raw --abbrev=7 --no-renames <base> <candidate>
+  :100644 000000 cf6e8a1 0000000 D	.github/workflows/ci.yml
+  :100644 000000 9b8c2bb 0000000 D	build.rs
+  :120000 000000 71e9f31 0000000 D	cfg
+  :000000 120000 0000000 71e9f31 A	cfg2
+  :100644 000000 2642ab8 0000000 D	clippy.toml
+  :000000 100644 0000000 cf6e8a1 A	docs/ci-example.yml
+  :000000 100644 0000000 2642ab8 A	notes/lints.txt
+  :000000 100644 0000000 86e9888 A	src/gen.rs
+  :000000 100644 0000000 184c20d A	vendor/Cargo.toml
+
+## C. With diff.renames = copies in the configuration of the repository
+$ git --git-dir=<repo> diff-tree -r --raw --abbrev=7 <base> <candidate>
+  :100644 000000 cf6e8a1 0000000 D	.github/workflows/ci.yml
+  :100644 000000 9b8c2bb 0000000 D	build.rs
+  :120000 000000 71e9f31 0000000 D	cfg
+  :000000 120000 0000000 71e9f31 A	cfg2
+  :100644 000000 2642ab8 0000000 D	clippy.toml
+  :000000 100644 0000000 cf6e8a1 A	docs/ci-example.yml
+  :000000 100644 0000000 2642ab8 A	notes/lints.txt
+  :000000 100644 0000000 86e9888 A	src/gen.rs
+  :000000 100644 0000000 184c20d A	vendor/Cargo.toml
+
+$ git --git-dir=<repo> diff --raw --abbrev=7 <base> <candidate>
+  :120000 120000 71e9f31 71e9f31 R100	cfg	cfg2
+  :100644 100644 cf6e8a1 cf6e8a1 R100	.github/workflows/ci.yml	docs/ci-example.yml
+  :100644 100644 2642ab8 2642ab8 R100	clippy.toml	notes/lints.txt
+  :100644 100644 9b8c2bb 86e9888 R096	build.rs	src/gen.rs
+  :000000 100644 0000000 184c20d A	vendor/Cargo.toml
+
+$ git --git-dir=<repo> diff --raw --abbrev=7 --no-renames <base> <candidate>
+  :100644 000000 cf6e8a1 0000000 D	.github/workflows/ci.yml
+  :100644 000000 9b8c2bb 0000000 D	build.rs
+  :120000 000000 71e9f31 0000000 D	cfg
+  :000000 120000 0000000 71e9f31 A	cfg2
+  :100644 000000 2642ab8 0000000 D	clippy.toml
+  :000000 100644 0000000 cf6e8a1 A	docs/ci-example.yml
+  :000000 100644 0000000 2642ab8 A	notes/lints.txt
+  :000000 100644 0000000 86e9888 A	src/gen.rs
+  :000000 100644 0000000 184c20d A	vendor/Cargo.toml
+
+## D. The lines that each form counts (added, deleted, path)
+$ git --git-dir=<repo> diff-tree -r --numstat --no-renames <base> <candidate>
+  0	30	.github/workflows/ci.yml
+  0	30	build.rs
+  0	1	cfg
+  1	0	cfg2
+  0	40	clippy.toml
+  30	0	docs/ci-example.yml
+  40	0	notes/lints.txt
+  31	0	src/gen.rs
+  30	0	vendor/Cargo.toml
+
+$ git --git-dir=<repo> diff-tree -r --numstat -M <base> <candidate>
+  0	0	cfg => cfg2
+  0	0	.github/workflows/ci.yml => docs/ci-example.yml
+  0	0	clippy.toml => notes/lints.txt
+  1	0	build.rs => src/gen.rs
+  30	0	vendor/Cargo.toml
+
+## E. The names alone, as a rule that reads paths would take them
+$ git --git-dir=<repo> diff-tree -r --name-status --no-renames <base> <candidate>
+  D	.github/workflows/ci.yml
+  D	build.rs
+  D	cfg
+  A	cfg2
+  D	clippy.toml
+  A	docs/ci-example.yml
+  A	notes/lints.txt
+  A	src/gen.rs
+  A	vendor/Cargo.toml
+
+$ git --git-dir=<repo> diff-tree -r --name-status -M <base> <candidate>
+  R100	cfg	cfg2
+  R100	.github/workflows/ci.yml	docs/ci-example.yml
+  R100	clippy.toml	notes/lints.txt
+  R096	build.rs	src/gen.rs
+  A	vendor/Cargo.toml
+

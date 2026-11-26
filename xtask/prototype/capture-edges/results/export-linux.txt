@@ -1,0 +1,39 @@
+git version 2.47.3
+
+## A. A first export, into a new and empty directory
+    checkout-index -a : exit=0
+    src/lib.rs   -rw-r--r--  pub fn answer() -> u32 { 41 }
+    tests/t.rs   -rw-r--r--  assert_eq!(answer(), 42);
+    run.sh       -rwxr-xr-x  #!/bin/sh
+    planted.rs   absent
+
+## B. A verify writes to it; then the same two commands on the same directory
+  after the verify:
+    src/lib.rs   -rw-r--r--  pub fn answer() -> u32 { 41 } // rewritten
+    tests/t.rs   -rw-r--r--  assert_eq!(answer(), 41);
+    run.sh       -rw-r--r--  #!/bin/sh
+    planted.rs   -rw-r--r--  mod planted;
+  the second export:
+    run.sh already exists, no checkout
+    src/lib.rs already exists, no checkout
+    tests/t.rs already exists, no checkout
+    checkout-index -a : exit=1
+    src/lib.rs   -rw-r--r--  pub fn answer() -> u32 { 41 } // rewritten
+    tests/t.rs   -rw-r--r--  assert_eq!(answer(), 41);
+    run.sh       -rw-r--r--  #!/bin/sh
+    planted.rs   -rw-r--r--  mod planted;
+
+## C. The same with checkout-index -f
+  the second export:
+    checkout-index -a -f: exit=0
+    src/lib.rs   -rw-r--r--  pub fn answer() -> u32 { 41 }
+    tests/t.rs   -rw-r--r--  assert_eq!(answer(), 42);
+    run.sh       -rwxr-xr-x  #!/bin/sh
+    planted.rs   -rw-r--r--  mod planted;
+
+## D. A directory of its own for the second use
+    checkout-index -a : exit=0
+    src/lib.rs   -rw-r--r--  pub fn answer() -> u32 { 41 }
+    tests/t.rs   -rw-r--r--  assert_eq!(answer(), 42);
+    run.sh       -rwxr-xr-x  #!/bin/sh
+    planted.rs   absent

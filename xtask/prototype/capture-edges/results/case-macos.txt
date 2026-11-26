@@ -1,0 +1,84 @@
+git version 2.56.1
+the scratch directory takes caseprobe for CaseProbe
+
+## A. Trees with two names that have one fold
+
+### A1 README.md and readme.md
+  100644 blob aae155685cde470f3d4a86e9068397fe46842490	README.md
+  100644 blob 698cf2ef1f7eeaaeebcbbf06feb043b56a8a2218	readme.md
+  fsck --strict: exit=0
+  index-pack: pack	395a6561eb2b223ad47a12925942b42f0b703db3
+  index-pack --strict: exit=0
+  checkout-index: readme.md already exists, no checkout
+  checkout-index -a: exit=1
+  the export holds:
+    ./README.md: the file named in upper case
+
+### A2 directories src and SRC
+  040000 tree e80cd11cbdecceef6da8d5c3156f4001cbec3e09	SRC
+  100644 blob aae155685cde470f3d4a86e9068397fe46842490	SRC/b.rs
+  040000 tree 28a4463550075704158dfa0641f5255ab95b8608	src
+  100644 blob 698cf2ef1f7eeaaeebcbbf06feb043b56a8a2218	src/a.rs
+  fsck --strict: exit=0
+  index-pack: pack	69bdab94ac3a48276116195be602297877842043
+  index-pack --strict: exit=0
+  checkout-index -a: exit=0
+  the export holds:
+    ./SRC/a.rs: the file named in lower case
+    ./SRC/b.rs: the file named in upper case
+
+### A3 a symbolic link Docs and a directory docs
+  120000 blob f98eb10ae82b19af44956c0891e3cc36187fa092	Docs
+  040000 tree 28a4463550075704158dfa0641f5255ab95b8608	docs
+  100644 blob 698cf2ef1f7eeaaeebcbbf06feb043b56a8a2218	docs/a.rs
+  fsck --strict: exit=0
+  index-pack: pack	a99516b6c3df3bc8fb45f84da699afaa1f89d194
+  index-pack --strict: exit=0
+  checkout-index: fatal: cannot create directory at 'docs': File exists
+  checkout-index -a: exit=128
+  the export holds:
+    ./Docs -> elsewhere
+
+### A4 strasse.txt in two spellings, full case folding
+  100644 blob aae155685cde470f3d4a86e9068397fe46842490	STRASSE.txt
+  100644 blob 698cf2ef1f7eeaaeebcbbf06feb043b56a8a2218	"stra\303\237e.txt"
+  fsck --strict: exit=0
+  index-pack: pack	8d5473898ea5211726a6f7ca84fd5530508bd4ef
+  index-pack --strict: exit=0
+  checkout-index: straße.txt already exists, no checkout
+  checkout-index -a: exit=1
+  the export holds:
+    ./STRASSE.txt: the file named in upper case
+
+### A5 e-acute as one code point and as two
+  100644 blob 698cf2ef1f7eeaaeebcbbf06feb043b56a8a2218	"e\314\201.md"
+  100644 blob aae155685cde470f3d4a86e9068397fe46842490	"\303\251.md"
+  fsck --strict: exit=0
+  index-pack: pack	bc60f138e9991fce25782731a706da7f17235f26
+  index-pack --strict: exit=0
+  checkout-index: é.md already exists, no checkout
+  checkout-index -a: exit=1
+  the export holds:
+    ./é.md: the file named in lower case
+
+### A6 AGENTS.md and the same with a long s
+  100644 blob aae155685cde470f3d4a86e9068397fe46842490	AGENTS.md
+  100644 blob 698cf2ef1f7eeaaeebcbbf06feb043b56a8a2218	"AGENT\305\277.md"
+  fsck --strict: exit=0
+  index-pack: pack	13c86f31aaba5ff5835c7592a801fb69d48e7f06
+  index-pack --strict: exit=0
+  checkout-index: AGENTſ.md already exists, no checkout
+  checkout-index -a: exit=1
+  the export holds:
+    ./AGENTS.md: the file named in upper case
+
+## B. A clone of a branch that holds A1, and its status
+  warning: the following paths have collided (e.g. case-sensitive paths
+  on a case-insensitive filesystem) and only one from the same
+  colliding group is in the working tree:
+  
+    'README.md'
+    'readme.md'
+  clone: exit=0
+  status:  M README.md
+  holds: readme.md

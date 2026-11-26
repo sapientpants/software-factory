@@ -82,6 +82,9 @@ The whole path of one file from the repository root, which the host took from a 
 **Locked path**:
 The exact path of a file that `author_tests` wrote for a run (11.7). A change to it by the implementer fails the integrity check (VAL-5e).
 
+**Literal-token scan**:
+The host's search for the exact bytes of a credential that a worker holds, in every candidate and in every text that it writes to GitHub (SEC-13). A hit stops the run. It is the only secret rule: no pattern of a secret is matched, and "secret scan" is not used for it.
+
 **Toolchain**:
 The compiler and the build programs of one version that a target repository names for its ecosystem: for Rust, what `rust-toolchain.toml` names. WS-7 says where the host finds one and how it reaches a worker.
 

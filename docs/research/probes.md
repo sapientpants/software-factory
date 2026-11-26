@@ -3815,3 +3815,258 @@ The operator answered eight questions on the same day, with these observations b
 - **Other versions.** rustup 1.29.3 and the toolchain 1.100.0 were run. An older toolchain's `components` file was not read.
 - **A toolchain that rustup did not install,** from the standalone installer or built from source.
 - **A component with a target of its own in its name,** `gcc-x86_64-unknown-linux-gnu` of the renames for one, and a component of the `complete` profile. Only `clippy`, `rustfmt` and `rust-src` were added.
+
+## P-40: a repository layout inside a checkout, a moved file in a diff, an export used twice, and two names with one fold
+
+Answered 2026-11-26 for #89. The review of draft 4 (`16-spec-draft-4-review`) found four points where the text on capture, the diff and the export left the outcome open: findings E3, S2, S5 and S6. Two of them are points that P-7 had left under "Still open", and its record says of the second what git "would" do. One is a point that P-30 had left open. What git does in each of the four was observed before the operator was asked, on the operator's Mac and in a Debian container on it.
+
+**Answer.**
+
+- **git takes a directory under any name for a repository when it holds `HEAD` with `objects` and `refs`, or `HEAD` with `commondir`.** `HEAD` was a file with a ref, a file with 40 hex digits or a symbolic link. `objects` and `refs` were directories, symbolic links to `.`, or empty regular files of mode 0755. A `config` was not needed. The directory was not taken where `refs` was missing, where `HEAD` held the word `hello`, or where `objects` and `refs` were files of mode 0644.
+- **Started in such a directory, or two directories below it, git ran what the directory's `config` named.** An alias ran in every layout that was taken and had a `config`. The fsmonitor ran on `git status` in every one of those but the layout with `commondir`, where `status` stopped with `this operation must be run in a work tree`. The same happened in a clone of the repository that held the directories.
+- **The `config` need not lie in the directory.** The alias and the fsmonitor ran where `config` was a symbolic link to a file outside it, and where `config` named such a file in `include.path`. With `commondir`, the `config` that git read is that of the directory which the file names.
+- **On the Mac the names need not be in that letter case.** `head`, `Objects`, `REFS` and `Config` were taken there, and not in the container, whose file system is case-sensitive.
+- **At the root of a checkout git takes the `.git`.** The same tree copied without its `.git`, as an export holds it, was taken for a repository at its root, and git ran the alias there and in a subdirectory.
+- **`safe.bareRepository = explicit` made git refuse every layout that it had taken,** in the global configuration, in the system configuration and on the command line, with `fatal: cannot use bare repository '<path>' (safe.bareRepository is 'explicit')`. A `[safe] bareRepository = all` in the directory's own `config` changed nothing. The setting in the configuration of the surrounding repository alone was not read: the alias ran.
+- **Under that setting the rest worked as before:** an ordinary repository at its root and in a subdirectory, the inside of its `.git`, a linked worktree, and push, clone, fetch and `ls-remote` with a bare repository named by its path. git started inside a bare repository was refused, and worked with `--git-dir=.` or with `GIT_DIR=.`.
+- **`git diff-tree` detects no rename unless it is asked to, and `git diff` detects them.** Both gave the same lines with `--no-renames`. `diff.renames = copies` in the repository's configuration changed the output of neither. With detection, a file that moved is one entry.
+- **The export commands do not make a directory clean.** Run a second time on a directory that had been written to, `checkout-index -a` left every changed file, printed `already exists, no checkout` for each and exited with 1. With `-f` it wrote the candidate's files again and exited with 0, and a file that the candidate does not hold stayed.
+- **git accepts a tree with two paths that have one fold, and a file system that is not case-sensitive holds one of them.** `fsck --strict` and `index-pack --strict` accepted seven such trees. In the container the export held both paths of each. On the Mac it held one file of each pair of files, with exit status 1; two directories became one, with exit status 0; and a symbolic link beside a directory stopped the export with exit status 128.
+- **On the Mac a layout can be put together from two directories.** A tree with `fix/HEAD`, and with `FIX/config`, `FIX/objects` and `FIX/refs`, was exported there as one directory, and git started in it ran the alias of the `config`. In the container the export held two directories and neither was a repository.
+
+### Method
+
+Throwaway scripts on the branch `prototype/capture-edges`, at commit [`cf87255`](https://github.com/sapientpants/software-factory/tree/cf87255be2878b11a26d687d2a5406627f934705/xtask/prototype/capture-edges), with the output of each under `results/`, one file for each system. Each script takes a scratch directory and works below a directory of its own in it. Every git process has a cleared environment, a home in the scratch directory, `GIT_CONFIG_NOSYSTEM=1` and a global configuration that the script names, so the operator's own configuration plays no part.
+
+| Run | git | File system of the scratch directory |
+|---|---|---|
+| macOS 27.0.1 on arm64 | 2.56.1 | APFS, which took `caseprobe` for `CaseProbe` |
+| Debian 13.8 in Docker on the same machine, arm64, as an unprivileged user | 2.47.3 | overlayfs, which did not |
+
+2.47.3 is the version of the server (4.4). Each version of git ran on one of the two file systems and not on the other. The times below are in UTC and are those the session noted; the kept output holds none.
+
+- **`bare.sh`** makes a repository `outer/` and fourteen directories in its work tree, A1 to A12, A14 and A15, each with some of the files of a git directory. A13 is a second repository with those files at its root, and a copy of it without its `.git`. The `config` of each names a canary script as the alias `st` and as `core.fsmonitor`, and sets `core.bare = false` and `core.worktree = ..`, so that `git status` has a work tree to read. In each directory the script starts `git rev-parse --git-dir`, `git st` and `git status --porcelain`, and prints for each the exit status, the first line of output and what the canary logged. It then commits the directories, lists the entries of the commit, clones the repository and runs the three commands in the clone, in each of the ten directories that git had taken on at least one system. Parts C and D repeat commands in those ten with `safe.bareRepository = explicit` in the global configuration, on the command line and in a system configuration, and in two of them with the setting in the configuration of `outer/` alone. Part E runs under the setting what an operator does with repositories of their own. The kept runs ended at 09:22 and 09:23.
+- **`renames.sh`** makes a base commit with a `clippy.toml`, a workflow, a `build.rs`, a `Cargo.toml` and a symbolic link, and a candidate that moves the first three and the link and copies the fourth; the moved `build.rs` gains a line. It prints the diff of the two trees from `git diff-tree -r --raw` and from `git diff --raw`, each with no option, with detection and with `--no-renames`, then with `diff.renames = copies` in the repository's configuration, and last as `--numstat` and `--name-status`. The kept runs ended at 08:46 and 08:47.
+- **`export.sh`** makes a bare `host.git` with one commit and runs the two export commands of 9.4 into a new directory, with the attribute source of WS-11. A stand-in for verify then rewrites two files of the directory, takes the executable bit from a third and adds a fourth. The script runs the export commands on that directory again, then on a second such directory with `-f`, then into a third directory that is new. 08:46 and 08:47.
+- **`case.sh`** builds seven trees with `git mktree` from two blobs, so that no file system has to hold two paths of one fold. For each it runs `fsck --strict`, makes a pack of the commit and feeds it to `index-pack --stdin --strict` in an empty repository, and runs the export commands into a new directory, whose files it lists with their first line. It then clones a branch that holds the first tree. Its last part exports a tree that holds `fix/HEAD` and, in a second directory, `FIX/config`, `FIX/objects` and `FIX/refs`, the last two as empty files of mode `100755`, and starts `git st` and `git rev-parse --git-dir` in what the export made of the two; the `config` names an alias that prints a line. 09:22 and 09:23.
+
+Earlier runs the same day are not kept. `export.sh` asked `stat` for a file's mode in the form of macOS alone. `case.sh` printed a notice of `fsck` about a repository without a branch, whose wording differs between the two versions of git, and now leaves it out. The first commit of the branch holds the runs that the operator's answers followed. A review of this record then found that it said of every layout what `bare.sh` had run on some: the clone on five directories, the system configuration and the command line on one each, and A8 under no setting. It also found that the exit status printed for `git add -A` was that of a `sed` behind it, and it named cases that no script had: a `config` that reads from outside its directory, a file added to one of two directories with one fold, and the root of a copy without its `.git` beyond `rev-parse`. The scripts were changed for each point and run again, which gave the cases A14 and A15 and the second half of A13 in `bare.sh`, and the seventh tree and the last part of `case.sh`. In the cases that both runs hold, no outcome differed.
+
+### A directory that git takes for a repository
+
+"The directory" means that `git rev-parse --git-dir` named the directory itself, and "outer" that it named `outer/.git`. "Ran" means that the canary ran. The two runs agree except in A7.
+
+| | The directory holds | `rev-parse --git-dir` | `git st`, the alias | `git status` |
+|---|---|---|---|---|
+| A1 | `HEAD` with `ref: refs/heads/main`, `config`, `objects/keep`, `refs/keep` | The directory | The canary ran | The canary ran, as the fsmonitor |
+| A2 | The same without `config` | The directory | Not run | Not run |
+| A3 | `objects` and `refs` are symbolic links to `.` | The directory | Ran | Ran |
+| A4 | `objects` and `refs` are empty regular files of mode 0755 | The directory | Ran | Ran |
+| A5 | `objects` and `refs` are empty regular files of mode 0644 | Outer | `'st' is not a git command` | Nothing ran |
+| A6 | `HEAD` and `commondir`, which holds `../a6common`; that directory holds `config`, `objects/keep` and `refs/keep` | The directory | Ran | Exit status 128, `this operation must be run in a work tree`; nothing ran |
+| A7 | `head`, `Config`, `Objects/keep`, `REFS/keep` | macOS: the directory. Linux: outer | macOS: ran. Linux: not a git command | macOS: ran. Linux: nothing ran |
+| A8 | `HEAD` holds 40 hex digits | The directory | Ran | Ran, and then exit status 128 |
+| A9 | `HEAD` is a symbolic link to `refs/heads/main` | The directory | Ran | Ran |
+| A10 | `HEAD` holds the word `hello` | Outer | Not a git command | Nothing ran |
+| A11 | `HEAD`, `config` and `objects/keep`, no `refs` | Outer | Not a git command | Nothing ran |
+| A12 | The files of A1; git started in `sub/deep` below it | The directory, two levels up | Ran | Ran |
+| A13 | The files of A1 at the root of a second repository, beside its `.git` | `.git` | Not a git command | Nothing ran |
+| A13, copied without its `.git` | The same files at the root of a directory that is in no repository | The directory | Ran | Ran |
+| A14 | The files of A1, with `config` a symbolic link to `../a14cfg/config` | The directory | Ran | Ran |
+| A15 | The files of A1, with a `config` that holds `[include] path = ../a15cfg/extra`; that file names the alias and the fsmonitor | The directory | Ran | Ran |
+
+Started in `a6common`, which has no `HEAD`, git named `outer/.git`. Started in a subdirectory of A13 it named that repository's `.git`. Started in a subdirectory of the copy without the `.git`, `git st` ran the canary.
+
+`git add -A` and `git commit` took the fourteen directories of `outer/` with exit status 0 and without a message, and the commit holds every file of each. It holds `a3/objects`, `a3/refs`, `a9/HEAD` and `a14/config` as entries of mode `120000`, and `a4/objects` and `a4/refs` as entries of mode `100755`. In a clone the three commands gave what they gave in the work tree, in each of `a1`, `a3`, `a4`, `a6`, `a8`, `a9`, `a12/sub/deep`, `a14` and `a15`, and in `a7` what the file system of the run allows.
+
+### `safe.bareRepository = explicit`
+
+| Where the setting stands | Started in | Outcome |
+|---|---|---|
+| The global configuration | `a1`, `a3`, `a4`, `a6`, `a8`, `a9`, `a12/sub/deep`, `a14`, `a15`, and on macOS `a7` | `rev-parse` and `status`: exit status 128, `fatal: cannot use bare repository '<path>' (safe.bareRepository is 'explicit')`. `git st`: `'st' is not a git command`. The canary did not run |
+| The global configuration, and `[safe] bareRepository = all` in the `config` of `a1` | `a1` | The same |
+| The command line, `-c safe.bareRepository=explicit` | The same ten | `rev-parse`: exit status 128 and the same message |
+| The configuration of `outer/` alone | `a1`, `a3` | `git st` ran the canary |
+| The system configuration, the global one empty | The same ten | `rev-parse` and `git st` as in the first row |
+
+In the container `a7` is no repository, and the commands there gave under each setting what they gave without it.
+
+With the setting in the global configuration:
+
+| What was run | Outcome |
+|---|---|
+| `git status` at the root of `outer/`, `git rev-parse --show-toplevel` in a subdirectory | Exit status 0 |
+| `git rev-parse --git-dir` in `outer/.git` and in `outer/.git/refs` | Exit status 0 |
+| `git status` in a linked worktree of `outer/` | Exit status 0 |
+| `git rev-parse --git-dir` inside a bare repository made with `git init --bare` | Exit status 128, the message above |
+| The same with `--git-dir=.`, and with `GIT_DIR=.` in the environment | Exit status 0 |
+| `git push`, `git clone`, `git fetch` and `git ls-remote` with that bare repository named by its path | Exit status 0 |
+
+### A file that moved, in a diff of two trees
+
+The candidate moves `clippy.toml` to `notes/lints.txt` and `.github/workflows/ci.yml` to `docs/ci-example.yml` with their bytes unchanged, moves `build.rs` to `src/gen.rs` and adds a line, moves the symbolic link `cfg` to `cfg2`, and copies `Cargo.toml` to `vendor/Cargo.toml`. The two runs gave the same lines.
+
+`git diff-tree -r --raw` with no option, and with `--no-renames`:
+
+```text
+:100644 000000 cf6e8a1 0000000 D	.github/workflows/ci.yml
+:100644 000000 9b8c2bb 0000000 D	build.rs
+:120000 000000 71e9f31 0000000 D	cfg
+:000000 120000 0000000 71e9f31 A	cfg2
+:100644 000000 2642ab8 0000000 D	clippy.toml
+:000000 100644 0000000 cf6e8a1 A	docs/ci-example.yml
+:000000 100644 0000000 2642ab8 A	notes/lints.txt
+:000000 100644 0000000 86e9888 A	src/gen.rs
+:000000 100644 0000000 184c20d A	vendor/Cargo.toml
+```
+
+`git diff-tree -r --raw -M`, and `git diff --raw` with no option:
+
+```text
+:120000 120000 71e9f31 71e9f31 R100	cfg	cfg2
+:100644 100644 cf6e8a1 cf6e8a1 R100	.github/workflows/ci.yml	docs/ci-example.yml
+:100644 100644 2642ab8 2642ab8 R100	clippy.toml	notes/lints.txt
+:100644 100644 9b8c2bb 86e9888 R096	build.rs	src/gen.rs
+:000000 100644 0000000 184c20d A	vendor/Cargo.toml
+```
+
+With `-C --find-copies-harder` the last line became `C100	Cargo.toml	vendor/Cargo.toml`. `git diff --raw --no-renames` gave the first block. With `diff.renames = copies` in the configuration of the repository, `diff-tree` with no option still gave the first block and `git diff` the second.
+
+The lines that `--numstat` counts for the three files that moved, as added and deleted:
+
+| | `--no-renames` | `-M` |
+|---|---|---|
+| `clippy.toml`, 40 lines | 40 deleted at the old path, 40 added at the new one | 0 and 0 |
+| The workflow, 30 lines | 30 deleted, 30 added | 0 and 0 |
+| `build.rs`, 30 lines and one more | 30 deleted, 31 added | 1 added |
+
+### An export that is used a second time
+
+The candidate holds `src/lib.rs`, `tests/t.rs` and an executable `run.sh`. The stand-in for verify rewrites the first two, takes the executable bit from the third and adds `planted.rs`. The two runs gave the same lines.
+
+```text
+## B. A verify writes to it; then the same two commands on the same directory
+  after the verify:
+    src/lib.rs   -rw-r--r--  pub fn answer() -> u32 { 41 } // rewritten
+    tests/t.rs   -rw-r--r--  assert_eq!(answer(), 41);
+    run.sh       -rw-r--r--  #!/bin/sh
+    planted.rs   -rw-r--r--  mod planted;
+  the second export:
+    run.sh already exists, no checkout
+    src/lib.rs already exists, no checkout
+    tests/t.rs already exists, no checkout
+    checkout-index -a : exit=1
+    src/lib.rs   -rw-r--r--  pub fn answer() -> u32 { 41 } // rewritten
+    tests/t.rs   -rw-r--r--  assert_eq!(answer(), 41);
+    run.sh       -rw-r--r--  #!/bin/sh
+    planted.rs   -rw-r--r--  mod planted;
+
+## C. The same with checkout-index -f
+  the second export:
+    checkout-index -a -f: exit=0
+    src/lib.rs   -rw-r--r--  pub fn answer() -> u32 { 41 }
+    tests/t.rs   -rw-r--r--  assert_eq!(answer(), 42);
+    run.sh       -rwxr-xr-x  #!/bin/sh
+    planted.rs   -rw-r--r--  mod planted;
+```
+
+An export into a third, new directory held the three files of the candidate with their bytes and modes, and no `planted.rs`.
+
+### Two names with one fold
+
+`fsck --strict` exited with 0 on each of the seven trees, and on the tree of the last part, and printed nothing but the notice that the script leaves out, and `index-pack --strict` exited with 0 on a pack of each, on both versions of git. What the export commands then left:
+
+| The tree holds | Linux, case-sensitive | macOS, APFS |
+|---|---|---|
+| `README.md` and `readme.md` | Both files, exit status 0 | `README.md` alone; `readme.md already exists, no checkout`, exit status 1 |
+| The directories `SRC`, with `b.rs`, and `src`, with `a.rs` | Both directories, exit status 0 | One directory `SRC` with `a.rs` and `b.rs`, exit status 0 and no message |
+| A symbolic link `Docs` and a directory `docs` with a file | Both, exit status 0 | The link alone; `fatal: cannot create directory at 'docs': File exists`, exit status 128 |
+| `STRASSE.txt` and `straße.txt` | Both files, exit status 0 | `STRASSE.txt` alone, exit status 1 |
+| `é.md` as U+00E9 and as `e` with U+0301 | Both files, exit status 0 | One file, with the content of the second, exit status 1 |
+| `AGENTS.md` and `AGENTſ.md`, with U+017F | Both files, exit status 0 | `AGENTS.md` alone, exit status 1 |
+| `SRC/a.rs` and `src/a.rs` | Both files, exit status 0 | `SRC/a.rs` alone; `src/a.rs already exists, no checkout`, exit status 1 |
+
+In each pair of files the Mac kept the content of the name that comes first in the order of the tree, which is the order of the bytes.
+
+A clone of a branch that holds the first tree, on the Mac:
+
+```text
+warning: the following paths have collided (e.g. case-sensitive paths
+on a case-insensitive filesystem) and only one from the same
+colliding group is in the working tree:
+
+  'README.md'
+  'readme.md'
+clone: exit=0
+status:  M README.md
+holds: readme.md
+```
+
+In the container the clone held both files and `git status` printed nothing.
+
+The tree of the last part, exported on the Mac:
+
+```text
+  checkout-index -a: exit=0
+  the export holds:
+    ./FIX/HEAD: ref: refs/heads/main
+    ./FIX/config: [core]
+    ./FIX/objects: 
+    ./FIX/refs: 
+  git st in fix/: the alias of the config ran
+  git rev-parse --git-dir in fix/: .
+  git st in FIX/: the alias of the config ran
+  git rev-parse --git-dir in FIX/: .
+```
+
+In the container the export held `fix/HEAD` and the three files of `FIX/`, `git st` was no git command in either directory, and `git rev-parse --git-dir` ended with `fatal: not a git repository`.
+
+### Findings
+
+**The review's test for a layout was too narrow.** Finding S2 proposes to reject "a directory that holds `HEAD`, `objects/` and `refs/` together". git also took a directory where the last two were symbolic links or executable files, and one that held `HEAD` and a file `commondir` and neither of the two. A rule that asked for two directories would have let those through. A rule on the names of the entries covers every layout that was taken here.
+
+**The paths have to be folded.** A tree that is captured on Linux with `head`, `Objects` and `REFS` is a repository on the operator's Mac, and so is one whose entries lie in two directories that the Mac takes for one.
+
+**A rule on the names inside one directory is too narrow for a pair as well.** Where a tree holds `src` and `SRC`, a file `a.rs` in each is one file on the Mac. The paths have to be compared whole.
+
+**A layout can read its configuration from outside its directory,** through a symbolic link, through `include.path` and through `commondir`. A rule that guards the paths below a layout does not guard those files.
+
+**The root of a checkout is safe, and the root of a copy without `.git` is not.** git looks for `.git` first. An export has none. A layout at the root of a tree ran its alias in a copy that was made with `cp`. An archive of a repository and the context of a container build would be such copies too, and neither was made.
+
+**The setting is a second layer and no substitute.** It has to stand in a configuration that the checkout cannot write, it is the operator's to set on each machine, and nothing in a repository can tell whether it is set. It stopped everything that was tried.
+
+**`diff-tree` is safe as P-7 and P-30 ran it, and the option is still worth giving.** Neither command of the host has to rely on what git does with no option: `git diff` on the same trees gave the renames.
+
+**A moved protected file leaves both paths in a diff without detection.** `clippy.toml` is a deletion that the pattern `clippy.toml` matches, and the workflow a deletion under `.github/workflows/`. With detection each was one entry that names both paths, and a rule that took the second of them would have matched neither.
+
+**A link under a new name is two entries of mode `120000`,** a deletion and an addition, which answers the point that P-30 left open under "Rename detection".
+
+**The cost of no detection is in the size budget.** The three moves count 201 lines without detection and 1 with it.
+
+**An export has to be a new directory each time.** Without `-f` the second export fails and leaves the first verify's files, and a host that did not read the exit status would run verify on them. With `-f` a planted file stays, and a file of that kind is what a build picks up.
+
+**What the fold takes for one name, the Mac's file system took for one name,** in the seven pairs here as in the 21 of P-29, and git has no check for it at any layer that 9.4 uses.
+
+### What changed in the spec
+
+The operator answered six questions on the same day, each as recommended, with the observations of the first commit before them. D-43 records the answers, the two points in which the text differs from them after the review, and what was not asked.
+
+1. 9.4 step 3 names two more rejections, and WS-12 and WS-13 are new and say what each reads, why, what a base tree may hold and what was not taken. 12.3 and 12.4 have the host make the two tests on the tree of a test-merge and of a base update, and 8.2 and 20.1 refuse a base tree with a layout at its root. WS-15 is new and holds the git setting on the operator's machines, which 4.4 and DEV-3 cite.
+2. WS-14 is new: an export belongs to one stage execution. 9.1 has `exec/<seq>/export/` in place of `export/<sha>/`, the export paragraph of 9.4 and INV-11 follow, and 8.4 says that an export is no journalled sub-step.
+3. VAL-5a says that no diff of the host detects a rename or a copy, and what that costs in the size budget. VAL-5f gains the row of a link under a new name.
+4. WS-8 says that every git command of the host names its repository.
+5. WS-9 names the two cases for the suite, and 19.4 the tests: the trees and layouts of this probe as tables, a tree that a base update merged, an export that a verify wrote to, and the diff of a candidate that moves a protected file.
+6. VAL-5d says that capture reads the fold, the roadmap has M0 build it, and M1a builds the matcher over it.
+7. 20.1 lists the pairs and the layouts of a default branch as advisory items. 13.1 gains a row and 23.3 an item. P-40 and D-43 are rows of section 23, `GLOSSARY.md` gains the term "Export", and the status row and the entry of `16-spec-draft-4-review` count E3, S2, S5 and S6 as addressed.
+
+### Still open
+
+- **The factory's sandbox, and the server.** Nothing ran in either. The container has the server's version of git and not its kernel or its file system.
+- **A program that reads a repository without the `git` CLI.** cargo with its own git library, an editor's integration, or a shell prompt that parses `.git` by itself. Whether any of them takes such a layout for a repository, and whether it honours `safe.bareRepository`, was not tried.
+- **A file system on each version of git.** git 2.56.1 ran on APFS alone and git 2.47.3 on overlayfs alone, so no case tells a difference of version from one of file system.
+- **Other settings of a `config` that run a command.** An alias and the fsmonitor were tried, and not a pager, an editor, a credential helper, `core.sshCommand`, a diff or merge driver, or a hook through `core.hooksPath`.
+- **The versions between.** git 2.42 to 2.46 and 2.48 to 2.55 were not run; the floor of 4.4 is 2.42. The git documentation was not read for the version that first knows `safe.bareRepository`.
+- **The rules themselves.** No walk of a tree was written, and no base update was made. The cases of this record are the fixtures for the one that M0 builds, with the fold that M0 builds; what the fold makes of each name was taken from VAL-5d and P-29 and not computed here.
+- **The spellings that VAL-5d does not fold.** A name with a code point that HFS+ ignores, or a short name of NTFS, in the place of `HEAD`, `objects` or `refs`, or beside its counterpart in a pair.
+- **A file system that is case-sensitive and normalises,** or the reverse.
+- **A layout as a fixture.** What an issue does whose tests need a repository on disk. A round cannot commit one; a test can build it when it runs.

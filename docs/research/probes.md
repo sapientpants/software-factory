@@ -3349,3 +3349,211 @@ No rule's outcome changed. SEC-1 and SEC-2 stand as they were.
 - **A token restricted to one repository of several.** The installation covers one repository, so what the restriction of GH-12 keeps a token from was not seen.
 - **What the first runs left open and this one did not touch:** for P-8 an editor that GitHub cannot name, a second human, more edits than one page and an edit of a comment; for P-25 a human caller below admin and GraphQL; for P-1 the replay rule, the force-update of a ref and GraphQL `createRef`.
 - **The development VM.** The scripts ran on the operator's Mac. A development build makes these calls from the VM (DEV-4), which does not exist yet.
+
+## P-36: `--disable-userns` on the hosted runners, the development VM, and where the agent CLI reads and writes on Linux
+
+Answered 2026-11-25 for #85. Three facts about Linux that M0 builds on had been observed somewhere else or not at all: findings E5, E8 and E7 of the review of draft 4 (`16-spec-draft-4-review`). The first was answered by workflow runs on `sapientpants/sf-scratch`, the other two in a Lima guest on the operator's Mac. The sandbox was a stand-in built from `bwrap` arguments throughout; the factory's sandbox does not exist yet.
+
+**Answer.**
+
+- **The hosted runners.** `bwrap --unshare-user --disable-userns` does on `ubuntu-24.04` and on `ubuntu-24.04-arm` what it did on the server (P-6), with the bubblewrap 0.9.0 that apt installs there, on the runner and inside a network namespace that holds only `lo`. The sandbox starts, a second `bwrap` inside it is refused with the message the server gave, and so is `unshare --user`. The same in each of 8 jobs. The option needs `--unshare-user` by name: with `--unshare-all` alone bubblewrap refuses it, on 0.9.0 and on 0.12.0.
+- **The development VM.** A Lima guest with `vmType: vz` and nested virtualisation, running Debian 13, passes the five tests of P-16 and every case above as it is provisioned, with the bubblewrap 0.12.0 of the server. The fifteen sessions of P-6's script gave there what they gave on the server, so a session of the agent CLI completes under both stand-ins. `/dev/kvm` is present and answers `KVM_CREATE_VM` and `KVM_CREATE_VCPU`, for a member of group `kvm`; the account that Lima creates is not one. No microVM was booted in it.
+- **The agent CLI's paths.** On Linux the CLI follows `TMPDIR`, which on macOS it did not (P-26): a subagent's task output and the CLI's other temporary files are under `$TMPDIR/claude-<uid>/`, and its socket is `$TMPDIR/cc-socks/<pid>.sock`. It takes that directory for the socket only if every directory on the way to it belongs to the user or to root and cannot be written by the group or by others without the sticky bit; otherwise it uses a directory of its own under `/tmp`, and where it can write neither it runs without the socket. A session with a subagent completed with `/tmp` read-only. The CLI looks for managed settings under `/etc/claude-code/`. A `managed-settings.json` planted there set a variable in a session started with `--setting-sources user`, and did not when the stand-in mounted an empty directory over it.
+
+### Method
+
+Throwaway code on the branch `prototype/runner-vm-sandbox`, at commit [`98b04a3`](https://github.com/sapientpants/software-factory/tree/98b04a3aff6d49315e4b40bb7642c3a26bab8bb8/crates/factory-sandbox/prototype/runner-vm), with the output of every run under `results/`.
+
+- **`userns-probe.sh`** is one script for the runners and the guest, so both are asked with the same arguments. It repeats the five tests of P-16 and the seccomp and `/dev/kvm` checks of P-24, with the arguments of `server-facts.sh`, and adds the cases below. It runs them on the machine and again in a network namespace that holds only `lo`, entered as P-16 entered it, with `ip netns` and `setpriv`.
+- **`probe-p36.yml`** is the workflow, on the branch `probe/p-36` of the scratch repository. It uses no action and `permissions: {}`, and fetches the script from that branch by the commit's SHA, without a token. Each job installs `bubblewrap`, runs the tests as the image is provisioned, sets `kernel.apparmor_restrict_unprivileged_userns=0` (DEV-6) and runs the script whole.
+- **`lima.yaml`** is the guest: Lima's image for Debian 13, `vmType: vz`, `nestedVirtualization: true`, 4 CPUs, 8 GiB, nothing of the Mac mounted. It is not the committed configuration of DEV-3, which arrives with `cargo xtask` in M0.
+- **`cli_paths_probe.py`** runs seven sessions of the agent CLI in the guest. Each is one `claude -p` with the flags of AG-1 in `subscription` mode that a session with its prompt on the command line takes, `--forward-subagent-text` among them, and the environment of AG-11: its own `HOME`, config directory and `TMPDIR`, `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1` and `CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1`. The host's `--settings` file sets `sandbox.enabled` to `false` (AG-8). The sessions may run one command, `sh ./inside.sh`, which prints the variables it was given and tries a write in the working directory, in `/tmp` and in `TMPDIR`. Four sessions are also asked to start one subagent that runs it.
+- **`socket-dir-probe.sh`** starts the CLI nine times in the guest without a token, each time with another mode or owner of the directory that `TMPDIR` names or of the one above it, and reads from the debug log and from `system/init` where the socket went. The CLI sets its socket up before it finds that it is not logged in.
+
+The cases of the last script:
+
+| Case | Outer sandbox | `/tmp` | Mode of `TMPDIR` | |
+|---|---|---|---|---|
+| `trace` | None | The guest's | 0700 | Under `strace -f`, which records every call that names a path, with `bind` and `connect`. One subagent |
+| `trace-tmpdir-0775` | None | The guest's | 0775 | Under `strace -f` |
+| `standin` | The `nouserns` stand-in of P-6 | A directory of the run, writable, in place of P-6's `tmpfs`, so that it can be listed afterwards | 0700 | One subagent |
+| `standin-tmp-ro` | The same | The same, read-only | 0700 | One subagent |
+| `standin-tmp-ro-0775` | The same | The same, read-only | 0775 | One subagent |
+| `managed-visible` | The same, which binds `/etc` as it is | Writable | 0700 | `/etc/claude-code/managed-settings.json` planted, holding `{"env": {"SF_P36_MANAGED": "set-by-managed-settings"}}` |
+| `managed-hidden` | The same, with an empty directory mounted over `/etc/claude-code` | Writable | 0700 | The same file planted |
+
+The runs:
+
+| | |
+|---|---|
+| The workflow | Run [45709070248](https://github.com/sapientpants/sf-scratch/actions/runs/45709070248), one attempt, with the script at the branch's first commit, `3824064`. Run [45709406404](https://github.com/sapientpants/sf-scratch/actions/runs/45709406404), three attempts, with the script as it is kept, at `86c268f`: it no longer reports a case as refused where the outer sandbox did not start. 8 jobs between 21:57 and 22:09 UTC, by the jobs' start and end times. Of the 4 x86-64 jobs 3 ran on AWS and 1 on Azure; the 4 arm64 jobs ran on Azure |
+| The runner images | Ubuntu 24.04.5 LTS, image versions `20261116.133.1`, `20261116.376.1` and `20261122.23.1` (x86-64), `20261116.188.1` and `20261122.193.1` (arm64); kernels `7.0.0-1014-aws`, `7.0.0-1018-aws`, `7.0.0-1017-azure` and `7.0.0-1020-azure`. `bubblewrap` was not installed in any, and apt gave `0.9.0-1ubuntu0.3`, not setuid, in all 8 |
+| The Mac | An Apple M4 Max with macOS 27.0.1. Lima 2.3.0, which the session installed that day with Homebrew. Lima's default template says of nested virtualisation: "Supported with `vmType: vz` or `vmType: krunkit` on Apple M3 or later (macOS 15 or later)" |
+| The guest | Debian 13.7 from the `genericcloud` arm64 image of Lima's `debian-13` template, kernel `6.12.115+deb13.1-cloud-arm64`; `systemd-detect-virt` says `apple`. `bubblewrap` `0.12.0-1~deb13u1`, the package version of the server (P-24), not setuid; `socat` 1.8.0.3; `strace` 6.13. The account is the one Lima creates, uid 502, with `sudo` without a password and in none of the groups `kvm`, `sudo`, `wheel` and `docker`. Its umask is 002, and its `~/.cache` has mode 0775 |
+| The CLI | Claude Code 2.1.326, the version on the Mac that day, installed in the guest by Anthropic's installer. P-6 ran 2.1.311 and P-26 2.1.323 |
+| The sessions | `cli_paths_probe.py --no-login` at 22:06 UTC, started by the session: no token, so each of the seven ends with "Not logged in", after the CLI has read its settings and opened its socket. Then the operator's step, since the issue leaves the login to the operator: `run-guest-sessions.sh` at 22:09 UTC: the script of P-6, unchanged, at the commit its record names, and `cli_paths_probe.py` with the token of `~/.config/sf-probe/oauth-token` on standard input. 22 sessions on the `haiku` alias, which reported 0.013 and 0.009 API-equivalent dollars. Last, `socket-dir-probe.sh` at 22:22 UTC, started by the session after a review of this record found the socket's condition stated without kept output behind it |
+
+The documentation was read the same day through a fetch tool, which gave some passages word for word and summarised others; only the first kind is quoted below.
+
+### `--disable-userns` on the hosted runners
+
+The cases, each as the runner's unprivileged user. The outer sandbox takes the namespaces of level `process` (13.3) one by one: `bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-net --unshare-uts --unshare-cgroup-try --disable-userns --die-with-parent --ro-bind / / --proc /proc --dev /dev --tmpfs /tmp`. "basic" is the sandbox of P-16's first test.
+
+| Case | On the runner, after the setup of DEV-6 | In the network namespace |
+|---|---|---|
+| The five tests of P-16 | ok | ok. P-16 had run `basic` and `nested` there, and not the other three |
+| The seccomp check of P-24 | `Seccomp: 2`, `Seccomp_filters: 1` | The same |
+| The outer sandbox starts | ok | ok |
+| A second `bwrap` inside it, with the arguments of basic | Refused: `bwrap: Creating new namespace failed: nesting depth or /proc/sys/user/max_*_namespaces exceeded (ENOSPC)` | The same |
+| `unshare --user --map-root-user true` inside it | Refused: `unshare: unshare failed: No space left on device` | The same |
+| The same, in an outer sandbox given `--uid 0 --gid 0 --cap-add ALL`, after writing 64 to `/proc/sys/user/max_user_namespaces` | Refused, with the same message | The same |
+| The outer sandbox with the filter of the seccomp check | Starts, with `Seccomp: 2` and `Seccomp_filters: 1` | The same |
+| The control: the outer sandbox without the option, and the second `bwrap` inside it | ok | ok |
+| `bwrap --unshare-all --disable-userns`, with the mounts of basic | Does not start: `bwrap: --disable-userns requires --unshare-user` | The same |
+| Network interfaces inside the outer sandbox | `lo` alone | `lo` alone |
+
+Every line was the same in all 6 jobs of the second run, and the first run's 2 jobs gave the same for each case they share. The message of the second row is the one the server gave with 0.12.0 (P-6).
+
+As the image is provisioned, before the sysctl is set, nothing starts, the outer sandbox included: `bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted`, with `apparmor="DENIED" operation="capable" profile="unprivileged_userns"` in the kernel log. That is what P-16 saw.
+
+Inside the outer sandbox, `/proc/sys/user/max_user_namespaces` reads 2147483647. The limit that refuses the namespace is not the one a process inside can read, so a check cannot learn from that file whether it runs under the option. The case with every capability goes further than P-6 did and than a worker can: a worker is given no capability.
+
+### In the Lima guest
+
+`userns-probe.sh` gave, case for case, what the table above gives, on the guest and in the network namespace, with no setup step: the guest has no `kernel.apparmor_restrict_unprivileged_userns`, and `kernel.unprivileged_userns_clone` is 1, as on the server (4.4). The refusal messages are the same as on the runners.
+
+| `/dev/kvm` | |
+|---|---|
+| The device | `crw-rw---- root kvm` |
+| As Lima's account | Cannot open it: `Permission denied` |
+| As the same account with `kvm` as a supplementary group, through `sudo setpriv --groups=kvm` | Opens it. `KVM_GET_API_VERSION` returns 12. `KVM_CREATE_VM` with the argument 0, which on arm64 asks for a guest address space of 40 bits, succeeds; `KVM_CHECK_EXTENSION` for `KVM_CAP_ARM_VM_IPA_SIZE` returns 40. `KVM_CREATE_VCPU` on that VM succeeds |
+| The kernel log | `kvm [1]: nv: 554 coarse grained trap handlers`, `kvm [1]: IPA Size Limit: 40 bits`, `kvm [1]: Hyp nVHE mode initialized successfully` |
+
+The script of P-6 ran all fifteen cases. Its preflight gave `nested ok` under `bwrap` and the ENOSPC refusal under `nouserns`. Each session ended with exit code 0 and a `result` of subtype `success`, and each case gave what the server gave with `socat`: the Bash tool ran in the CLI's own namespaces with no `sandbox` block and with `enabled: false`, under both stand-ins; the CLI's sandbox nested under `bwrap` and failed each command under `nouserns`; `nouserns-on` ended with a second, unsandboxed call; and `enabled: false` in `--settings` won over `enabled: true` in the config directory. The CLI is fifteen patch versions later than the one the server ran.
+
+### Where the CLI writes
+
+What `strace` showed in `trace`, a session with one subagent and a `TMPDIR` whose whole path is private: 3,544 calls that name a path. Of those that name an absolute path outside `/dev`, `/proc` and `/sys`, none writes, creates or removes anything outside the working directory, the session's home directory, which holds the config directory, and `TMPDIR`, but for one write in the guest's `/tmp`, which is the script's own. The 342 calls with a relative path and the calls on those three trees were not sorted into writes and reads.
+
+| What | Where, on Linux | Where the stream names it |
+|---|---|---|
+| The output of a subagent's task | `$TMPDIR/claude-<uid>/<the working directory's path, with - for each />/<session id>/tasks/<agent id>.output`, a symbolic link. The subagent's transcript is a file of the config directory, under `projects/<the same name>/<session id>/subagents/`. What the link points to was not read | `output_file` of `system/task_notification` |
+| A directory the CLI makes when it starts, to test file watching | `$TMPDIR/claude-<uid>/fswatch-probe-<random>/`, in the sessions without a login; gone after a whole session | Nowhere |
+| The socket for injected messages | `$TMPDIR/cc-socks/<pid>.sock` | `messaging_socket_path` of `system/init`, and the variable `CLAUDE_CODE_MESSAGING_SOCKET` of every tool command |
+| What a tool command writes with `mktemp` | `TMPDIR`: the CLI hands the variable on | Nowhere |
+
+The socket's directory is taken only on a condition. The debug log, where it was not met:
+
+```
+[WARN] [uds-messaging] sockets directory <scratch>/trace-tmpdir-0775/tmpdir/cc-socks refused (a sockets-directory component is not a private-or-sticky directory owned by us or root — refusing to use it; refused component: '<scratch>/trace-tmpdir-0775/tmpdir' is group-writable without the sticky bit (owner 502:1000, mode 0775) — chmod g-w <scratch>/trace-tmpdir-0775/tmpdir, or pass --messaging-socket-path); trying the per-uid fallback /tmp/cc-socks-502
+```
+
+The test is of every directory on the way, not of the last alone, and of its owner as well as of its mode. `socket-dir-probe.sh`, with the directory above `TMPDIR` and `TMPDIR` itself below a home directory of mode 0700:
+
+| The directory above `TMPDIR` | `TMPDIR` | The socket |
+|---|---|---|
+| 0700, the user's | 0700, the user's | Under `TMPDIR` |
+| 0700, the user's | 0770, the user's | Refused: "is group-writable without the sticky bit". Under `/tmp/cc-socks-502/` |
+| 0700, the user's | 0707, the user's | Refused: "is world-writable without the sticky bit". Under `/tmp/cc-socks-502/` |
+| 0700, the user's | 1777, the user's | Under `TMPDIR` |
+| 0775, the user's | 0700, the user's | Refused, naming the directory above. Under `/tmp/cc-socks-502/` |
+| 1777, the user's | 0700, the user's | Under `TMPDIR` |
+| 0755, the user's | 1777, root's | Under `TMPDIR` |
+| 0755, the user's | 1777, another user's | Refused: "is not owned by you or root". Under `/tmp/cc-socks-502/` |
+| 0755, another user's | 0700, the user's | Refused, with the same words for the directory above. Under `/tmp/cc-socks-502/` |
+
+The script removed `/tmp/cc-socks-502` before its cases. Afterwards the directory was there again with mode 0700, the user's, and empty: the CLI makes it and removes each socket when it ends.
+
+In the sessions of `cli_paths_probe.py`:
+
+| Case | The socket | The session |
+|---|---|---|
+| `trace`, `standin`, `standin-tmp-ro`, the two `managed` cases | `$TMPDIR/cc-socks/<pid>.sock` | `success`; where it was asked for, a subagent of 3 model calls on the stream, and both runs of the script |
+| `trace-tmpdir-0775` | `/tmp/cc-socks-502/<pid>.sock` | `success` |
+| `standin-tmp-ro-0775`: `TMPDIR` refused and `/tmp` read-only | None. The debug log: `[ERROR] [uds-messaging] Failed to set up sockets directory /tmp/cc-socks-0 (refusing to bind — cross-session messaging is OFF for this session): EROFS`. `system/init` has no `messaging_socket_path`, and nothing is on stderr | `success`, with the subagent's 3 calls and both runs of the script |
+
+In the stand-in the fallback is named `cc-socks-0` and outside it `cc-socks-502`, for the same uid. Why was not looked into.
+
+In the three `standin` cases the directory bound at `/tmp` held nothing of the CLI's afterwards: it was empty where it was read-only, and held the script's own file where it was not.
+
+Of the config directory the CLI wrote `.claude.json`, `backups/`, `plugins/store/`, `projects/` with the transcripts, `session-env/`, `sessions/`, `shell-snapshots/`, `.last-cleanup` and, with the login, `policy-limits.json` with two files beside it, `remote-settings.json` and `remote-settings.json.synced-at`. It wrote none of the names that AG-4 makes read-only.
+
+### Where the CLI reads
+
+The CLI's directory for managed settings on Linux is `/etc/claude-code/`. In each traced session, with a login and without, the CLI looked there for all of these, and nothing was there:
+
+| Path under `/etc/claude-code/` | |
+|---|---|
+| `managed-settings.json`, `managed-settings.d/` | Settings |
+| `managed-mcp.json` | MCP servers |
+| `CLAUDE.md`, `.claude/rules/` | Instructions |
+| `.claude/skills/`, `.claude/agents/`, `.claude/commands/`, `.claude/output-styles/` | The rest of what a config directory holds |
+
+The session's flags are those of AG-3a: `--setting-sources user`, `--strict-mcp-config`, and a `--settings` file.
+
+| Case | `SF_P36_MANAGED` in the Bash tool's command |
+|---|---|
+| `managed-visible`: the file planted, `/etc` bound as it is | `set-by-managed-settings` |
+| `managed-hidden`: the file planted, an empty directory mounted over `/etc/claude-code` | Unset |
+| The five cases before the file was planted | Unset |
+
+Where the directory exists, the debug log lists `/etc/claude-code/managed-settings.json` among the settings files the CLI watches for changes, beside the one of the config directory. The script planted the file with `sudo` and removed the directory when it ended; the guest holds none now.
+
+A third source is not a file of the machine. With the login, the debug log shows the CLI waiting on a "remote managed-settings load" and fetching "policy limits" before the session starts, with `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1` set. It kept the answers in the config directory: `remote-settings.json`, 2 bytes, and `policy-limits.json`, 409 bytes. For the operator's account the settings file is those 2 bytes, and the log replaces the allow, deny and ask rules of that source with 0 rules each. The policy limits are another matter: the log says "Applied new restrictions successfully", and what the 409 bytes hold was not read. Which host was asked was not traced.
+
+What else `strace` showed the CLI looking up outside the directories a session is given, in `trace`:
+
+- **A fixed home directory.** `/home/claude/.claude/remote/.api_key` and `.session_ingress_token`, and without a token in the environment `.oauth_token` too, whatever `HOME` says. None exists in the guest.
+- **Every directory above the working directory.** In each, up to `/`: `.claude/agents`, `.claude/commands`, `.claude/output-styles`, `.claude/skills`, `.claude/workflows`, `.git` and `HEAD`. Nothing was there. P-21 planted in the working directory and below it, not above it.
+- **Name resolution and certificates.** `/etc/hosts`, `/etc/resolv.conf`, `/etc/nsswitch.conf`, `/etc/gai.conf`, `/etc/host.conf`, the certificates under `/etc/ssl/certs`, and a connection to the socket `/run/systemd/resolve/io.systemd.Resolve`, which succeeded.
+- **`/etc/machine-id`,** which it read, and `/etc/localtime`.
+- **The shell of the Bash tool,** a `bash` that reads `/etc/profile`, `/etc/profile.d/` and `/etc/bash.bashrc`.
+- **Paths of other systems,** none of which exists: `/opt/homebrew/bin/zsh`, `/System/Library/OpenSSL/certs`, `/.dockerenv`, and the places where other distributions keep a certificate bundle.
+
+### Findings
+
+**The required check of DEV-8 is not at risk from the option.** E5 feared that 0.9.0 lacks it or that it behaves differently under the runner's AppArmor setup. It is there and does the same, in the network namespace too.
+
+**`--unshare-user` has to be written out.** A backend that asks for its namespaces with `--unshare-all` does not start with `--disable-userns`. P-6's stand-in had the flag by name, so its record did not show this.
+
+**The development VM gives level `process` what the server gives it, and the device of level `hardened`.** The guest's `bubblewrap` is the server's package version; its kernel is one patch release earlier, built for arm64. The device needs group `kvm`, as on the server (P-24), and Lima's account is not in it: the configuration of DEV-3 has to add it. That a guest boots there is not shown.
+
+**On Linux the session's `TMPDIR` is enough for the CLI.** P-26 saw the transcript link and the socket under `/tmp` on macOS, with `TMPDIR` set elsewhere, and E7 feared the same in the sandbox. The documentation gives the reason for the difference, of `CLAUDE_CODE_TMPDIR`: "Default: `/tmp` on macOS, `os.tmpdir()` on Linux and Windows". A session with a subagent completed with `/tmp` read-only.
+
+**The socket depends on the modes and owners of the path, and its loss is silent.** A `TMPDIR` that the group or others may write, or that lies below such a directory or below another user's, sends the socket to `/tmp`; where that cannot be written either, the session runs without it and says so in the debug log alone. The factory does not use the socket. What matters is that the host makes the directory, so its mode is the host's choice, and that a default umask of 002 gives 0775.
+
+**`/etc/claude-code` on the host is configuration that no flag of AG-3a switches off.** The documentation says as much of the settings: "Nothing in your own settings files or `--settings` overrides a managed key". What keeps it out of a session is that the sandbox does not show the directory. The stand-in of P-6 binds `/etc` whole and therefore shows it.
+
+**The account is a source of settings too.** The settings the operator's account returned were empty; its policy limits were not read. A worker cannot change either, and neither can the host.
+
+**Nothing else the CLI looked for outside its directories is something the sandbox has to provide,** beyond what any program needs to resolve a name and check a certificate. The lookups above the working directory end in directories that the sandbox itself makes.
+
+### Against the documentation
+
+- "`/etc/claude-code/` on Linux and WSL" for `managed-settings.json`, `managed-settings.d/` and `managed-mcp.json`: confirmed. That the CLI also looks there for `CLAUDE.md` and for a `.claude` directory was not on the pages read.
+- The default of `CLAUDE_CODE_TMPDIR`, quoted above: confirmed for Linux, and it fits what P-26 saw on macOS. The variable was not set in any session.
+- The condition on the socket's directory, the fallback and the flag `--messaging-socket-path` that the warning names were not on the pages read.
+
+### What changed in the spec
+
+1. SEC-6b says that the option takes `--unshare-user` by name, and where each refusal was observed: a second `bwrap` on the server (P-6), and that and `unshare --user` on the hosted runners with 0.9.0 and in the development VM.
+2. SEC-6c is new and says what the "temp" of SEC-6 is and how the host makes it. SEC-6d is new and keeps `/etc/claude-code` out of the baseline of SEC-6. Both rows of SEC-6 cite them.
+3. AG-3a names the two sources of configuration that its flags do not reach: `/etc/claude-code`, which SEC-6d keeps out, and the account.
+4. DEV-3 no longer states as known what nobody had seen: it cites this probe for the device, names the group, and says what Lima's documentation asks of the Mac.
+5. Of the tests of 19.4, the sandbox tests gain two cases, a user namespace and `/etc/claude-code`, and the contract test asserts where the CLI keeps a subagent's task output and its socket.
+6. P-36 is a row of 23.2, and the status row and the entry of `16-spec-draft-4-review` in the references count E5, E7 and E8 as addressed.
+
+The issue named SEC-6b, SEC-6 and DEV-3. SEC-6c and SEC-6d, the sentence of AG-3a, the cases of 19.4 and the group in DEV-3 are this session's, drawn from the observations and from the proposed fixes of E7 and E8. The operator was not asked about any of them before the pull request.
+
+### Still open
+
+- **The factory's sandbox** in place of the stand-ins: its seccomp filter, its own network namespace and the proxy of SEC-10, and the mounts of SEC-6 in place of a bound `/usr` and `/etc`. A seccomp filter that refuses a user namespace was still not tried.
+- **A build under the option.** No session here compiled anything. The exit check of M0 is the first (SEC-6b).
+- **A private `/tmp` in the sandbox.** The CLI did not need one. Whether a build tool does, one that ignores `TMPDIR`, was not looked at, and SEC-6c leaves it to the change that specifies the backend.
+- **A guest in the guest.** `KVM_CREATE_VCPU` succeeded; whether a Firecracker or Cloud Hypervisor microVM boots under Lima on arm64 is M2 work (D-5).
+- **Another Mac.** One machine, an M4 Max. Lima's template names M3 and macOS 15 as the least it takes.
+- **The account's managed settings and policy limits.** What the policy limits of the operator's account hold, which host the CLI asks, whether the proxy of SEC-10 lets the request through, and what a session does when it cannot ask.
+- **Whether a `.claude` directory above the working directory takes effect** under the flags of AG-3a. The CLI looks there; nothing was planted there. In the sandbox those directories are the backend's own.
+- **`--messaging-socket-path` and `CLAUDE_CODE_TMPDIR`.** Neither was set.
+- **The other managed files.** Only `managed-settings.json` was planted, with an `env` block. That a managed `CLAUDE.md`, MCP file, skill or hook takes effect alike is an inference from the lookups.
+- **Other CLI versions,** and the 26.04 runner images, which the workflow does not use (DEV-5).

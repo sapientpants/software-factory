@@ -1225,7 +1225,7 @@ A rename is an event, and events have an order. The ids of the 87 events of #6 i
 - **An installation token of the factory's App.** The workflow's token is an installation token of another App and read everything. What the factory's App reads with the permissions of 5.7 was not observed. Observed with the scratch App's token on 2026-11-25 for #82: see "P-5, P-1, P-8 and P-25 under the scratch App's installation token" below.
 - **An editor that cannot be identified.** 7.5 and 7.7 provide for one. No actor was null in any read; an account deleted after its edit is the likely case, and it was not made.
 - **A second human.** Every user edit here is the operator's. An edit by a collaborator, or by the author of an issue who has no write permission, should name that account in the same places. It was not seen.
-- **More edits than one page.** The longest history here has 20 entries and the longest timeline 87 items. Paging through either was not tried.
+- **More edits than one page.** The longest history here has 20 entries and the longest timeline 87 items. Paging through either was not tried. Observed on 2026-11-26 for #91: see "P-8, the paging part: an issue with more entries than one page" below.
 - **The order of the timeline within one second,** for the four pairs sent at once and in general. Rule 6 does not depend on it.
 - **An edit of a comment.** PLAN-2 compares a `labeled` event with the last edit of the plan comment, and SEC-3 reads comments. Comments have their own `lastEditedAt` and history, which this probe did not touch. PLAN-2 asks for an event "later than" the edit, which a tie does not satisfy, so it already reads as rule 6 now does.
 - **A transferred issue, and one created by email.** Not tried.
@@ -4070,3 +4070,151 @@ The operator answered six questions on the same day, each as recommended, with t
 - **The spellings that VAL-5d does not fold.** A name with a code point that HFS+ ignores, or a short name of NTFS, in the place of `HEAD`, `objects` or `refs`, or beside its counterpart in a pair.
 - **A file system that is case-sensitive and normalises,** or the reverse.
 - **A layout as a fixture.** What an issue does whose tests need a repository on disk. A round cannot commit one; a test can build it when it runs.
+
+## P-8, the paging part: an issue with more entries than one page
+
+Answered 2026-11-26 for #91, on issue 133 of `sapientpants/sf-scratch`, between 12:29 and 12:38 UTC. The first run of P-8 left open what a read returns where an issue holds more edits or events than one page, and the run under the scratch App's token did not touch it. The review of draft 4 found that rule 6 of 5.3 says "one GraphQL read" all the same (`16-spec-draft-4-review`, finding E2). One script made the issue, wrote to it and read it, with `curl` 8.7.1 on macOS 27.0.1: the writes with the operator's OAuth token, as `gh` 2.105.0 holds it, but for three that an installation token of the scratch App made (`17-scratch-app`), and every read that was made before the issue was changed once more, once with each token. GitHub's documentation was not read for any of this.
+
+**Answer.**
+
+- **The events and the comments page, and they come oldest first.** `timelineItems(last: 100, …)` and `comments(last: 100)` return the newest 100, and the same connection with `before` set to the `startCursor` of that page returns the ones before them. `first: 100` returns the oldest 100. `totalCount` is the size of the whole list on every page.
+- **A cursor holds after the issue changed.** The page before an old cursor was the same after the issue had gained an edit, a rename, a comment and a label event, and after the comment that the cursor names was deleted.
+- **The edit history ends at 100 entries.** Within those it paged, 50 at a time. After 105 body edits the read held the text as created and the newest 99 edits, said `totalCount: 100` and offered no further page. The six oldest edits were gone from it, an edit by the scratch App among them. After one more edit the oldest of the 99 was gone too. Nothing in the response says that an entry is missing.
+- **The App's token read what the operator's read,** in each of 25 pairs of responses.
+
+### Method
+
+The script signed a JSON Web Token with the App's private key, through `openssl` 4.1.0, asked for one installation token restricted to the scratch repository, kept it in a shell variable and revoked it when it ended, as the scripts of #82 did. Every request went out under `X-GitHub-Api-Version: 2026-03-10`, the version GH-17 pins.
+
+What the script wrote to issue 133, in this order, with a second between two writes:
+
+| Write | By | Count |
+|---|---|---|
+| The issue, with the title `P-8 probe: paging, title 0` and a body that ends `Body 0.` | The operator | 1 |
+| A body edit, a rename and a comment, each a call of its own | The scratch App | 3 |
+| The label `probe:p-8` added, then removed | The operator | 2 |
+| For each number from 2 to 105: one `PATCH` that sets a new title and a new body, then a comment | The operator | 208 |
+| The label added once more, after the `PATCH` of number 50 | The operator | 1 |
+| The label removed and added again, then a rename without an edit | The operator | 3 |
+
+So when the reads began the issue had been given 105 body edits after its text as created, 106 renames, three `labeled` and two `unlabeled` events, and 105 comments. The App's edit is the oldest body edit, its rename the oldest event and its comment the oldest comment, so that each stands on the last page of a read that begins at the newest.
+
+Each connection was asked with `first` and with `last`, with and without a cursor, each time with `totalCount` and `pageInfo`, and the events also with `filteredCount` and `pageCount`. The events were asked with `itemTypes: [RENAMED_TITLE_EVENT, LABELED_EVENT, UNLABELED_EVENT]`, as the query of the first run has it, unless a row says otherwise. Every query also asked for `rateLimit { cost }`.
+
+The scripts and every response are on the branch `prototype/issue-history-paging`, at commit [`745f909`](https://github.com/sapientpants/software-factory/tree/745f909a2226c2ffc3c9f44e22a74589c0048715/crates/factory-github/prototype/issue-paging). They are throwaway code. Issue 133 stays on the scratch repository, closed.
+
+### The edit history
+
+`userContentEdits` lists the newest entry first, as the first run found.
+
+| Asked | Returned |
+|---|---|
+| `first: 100` | 100 entries: the edits numbered 105 down to 7, and the text as created. `totalCount` 100, `hasNextPage` false |
+| `first: 100`, `after` the `endCursor` of that page | No entry. `hasNextPage` false, both cursors null |
+| `last: 100` | The same 100 entries in the same order. `hasPreviousPage` false |
+| `last: 100`, `before` the `startCursor` of that page | No entry |
+| `first: 50`, then `after` its `endCursor`, then once more | The edits 105 to 56 with `hasNextPage` true; the edits 55 to 7 and the text as created with `hasNextPage` false; no entry |
+| `first: 101` | An error of type `EXCESSIVE_PAGINATION`: "Requesting 101 records on the `userContentEdits` connection exceeds the `first` limit of 100 records." |
+| Neither `first` nor `last` | An error of type `MISSING_PAGINATION_BOUNDARIES` |
+| `first: 100`, after one more body edit, number 107 | 100 entries: the edit 107, the edits 105 down to 8, and the text as created. `totalCount` 100 |
+
+The edits numbered 1 to 6 are in no response, and after the last edit number 7 is in none either. Number 1 is the App's, made two seconds after the issue was created. Every one of the 100 entries names the operator as its `editor`. `includesCreatedEdit` is true, `lastEditedAt` is the time of the newest edit, and the issue's `author` and `editor` name the operator.
+
+The entry for the text as created stayed in the list at both reads, as its last entry. It carries the author as `editor`, as the first run found.
+
+### The events
+
+| Asked | Returned |
+|---|---|
+| `first: 100` | The oldest 100: from the App's rename to the rename numbered 97. `totalCount` 111, `hasNextPage` true |
+| `first: 100`, `after` the `endCursor` of that page | The other 11, to the last rename. `hasNextPage` false, and `hasPreviousPage` false as well |
+| `last: 100` | The newest 100: from the rename numbered 10 to the last rename, number 106. `totalCount` 111, `hasPreviousPage` true |
+| `last: 100`, `before` the `startCursor` of that page | The other 11, the oldest: the App's rename, the first `labeled` and `unlabeled` event, and the renames 2 to 9. `hasPreviousPage` false, and `hasNextPage` false as well |
+| `last: 1`, with `itemTypes: [LABELED_EVENT]` | The last `labeled` event, of 12:35:59. `totalCount` 3 |
+| `last: 1`, with `itemTypes: [RENAMED_TITLE_EVENT]` | The last rename, of 12:36:01. `totalCount` 106 |
+| `last: 101` | 101 events and no error |
+| `last: 100`, with no `itemTypes` | The newest 100 of 216 items: 49 comments among them, since a comment is an item of the timeline |
+
+`totalCount` was the count of the items of the types asked for, on every page: 111 for the three types, with a cursor or without. `filteredCount` was 111 without a cursor and 11 with one, so it counts what lies on the asked side of the cursor. `pageCount` was the number of items in the response.
+
+`pageInfo` says of a page only what lies in the direction that was asked: with `first` and `after`, `hasPreviousPage` was false on the second page, and with `last` and `before`, `hasNextPage` was false on the page of the 11 oldest, where 100 newer ones exist.
+
+### The comments
+
+| Asked | Returned |
+|---|---|
+| `last: 100` | The newest 100, numbers 6 to 105. `totalCount` 105, `hasPreviousPage` true |
+| `last: 100`, `before` the `startCursor` of that page | The other 5: the App's comment and the numbers 2 to 5 |
+| `first: 100` | The oldest 100, from the App's comment to number 100. `hasNextPage` true |
+
+### One query for all three
+
+One query asked for the issue's title, body, `lastEditedAt`, `author` and `editor`, and for the newest page of each list: `userContentEdits(first: 100)`, `timelineItems(last: 100, …)` and `comments(last: 100)`. It returned what the three single queries had returned. Its `rateLimit.cost` was 1, as that of every query of this run.
+
+### A cursor after the issue changed
+
+The script kept the `startCursor` of the newest page of the events and of the comments, as read at 12:36. At 12:37:17 the operator's token edited the body and the title in one call, added a comment and removed the label. The next page was then asked with the old cursor.
+
+| Asked with the old cursor | Returned |
+|---|---|
+| The events, `last: 100`, `before` | The same 11 events as before the change. `totalCount` now 113 |
+| The comments, `last: 100`, `before` | The same 5 comments. `totalCount` now 106 |
+| The comments again, after the comment that the cursor names was deleted through REST | The same 5 comments. `totalCount` 105 |
+
+A read without a cursor, made after the change, returned the newest 100 as they then were: the events from the rename numbered 12 to the `unlabeled` event, and the comments 7 to 106.
+
+A cursor is the string `cursor:v2:` and a few bytes after it, in base64. For a comment those bytes hold the comment's `databaseId`, and for an event its time in milliseconds and the id that REST gives the event. That reading of the bytes is an **(inference)** from four cursors. It fits what was seen: a cursor names a place in the list by what the item is, and not by how many items stand before it.
+
+For the edit history the same question has no answer here: its first page was its only page.
+
+### REST
+
+`GET /issues/133/events`, which holds the rename and label events and nothing of the edit history (P-8).
+
+| Asked | Returned |
+|---|---|
+| No `per_page` | The oldest 30, and a `Link` header whose `last` is page 4 |
+| `per_page=100` | The oldest 100, `last` page 2 |
+| `per_page=100&page=2` | The other 11, to the last rename |
+| `per_page=100&page=9` | An empty list, with status 200 |
+
+### The App's token against the operator's
+
+Each of the 25 reads of the sections above but the one on a changed issue was made with both tokens, the App's 37 seconds after the operator's with no write between. The two responses were the same in all 25 pairs, compared as JSON with sorted keys and without `rateLimit`, which is each token's own.
+
+### Findings
+
+**A read that asks for the first page of the events gets the oldest, and what rule 6 needs is at the other end.** The last rename, the last `labeled` event and every later `unlabeled` one are on the page that `last: 100` returns, or on a page before it where 100 later events follow them. The first run said so of the first page; this one made the read from the end.
+
+**The events and the comments can be read to their end, one page of 100 at a time.** The 111 events came back as 100 and 11 from either end, and the 105 comments as 100 and 5. The 11 oldest events hold the App's rename, and the 5 oldest comments the App's comment: a claim that stops at the newest page of such an issue has not seen every actor of a rename, which SEC-2 asks for.
+
+**A later page does not depend on when it is asked.** The page before an old cursor was the same after the issue had changed at its newest end, and after the item that the cursor names was gone. So the claim can take the title, the body and the time of the last body edit from one read, and fetch what is older afterwards: what was added to the issue in between is on no older page. What changes after that first read is a change during a run, which 7.7 is for. No item of an older page was itself changed between the two reads, so what a read then returns for it was not seen.
+
+**The edit history cannot be read to its end, because the API ends it at 100 entries.** Whether GitHub keeps an older edit anywhere was not seen: no read returned one. For SEC-2 that makes no difference. An issue whose history holds 100 entries may have had editors that the list no longer names, and nothing tells such a list from a whole one: `totalCount` is 100 and there is no next page. Here an App's edit of the body fell out of the list after 99 later edits by the operator.
+
+**The text as created is not what falls out.** It stayed as the last entry while edits older than the newest 99 went. So the author of the first text is named by the history as long as the body was ever edited, and by `author` in any case.
+
+**One query is still enough for an ordinary issue,** and it costs one point of the GraphQL rate limit however many of the three lists it asks for.
+
+**`hasPreviousPage` is the flag to read when paging back, and `totalCount` is no test for a whole list of events.** `totalCount` counts the list as it is when the page is asked, and it had moved from 111 to 113 between the first page and the second. The count of the pages read by one cursor chain does not add up to it once the issue has changed.
+
+**The timeline did not hold a page to 100.** `last: 101` returned 101 events. The edit history refused `first: 101`. The claim asks for 100 of each.
+
+### What changed in the spec
+
+The operator answered eight questions on the same day for #91, each as recommended, two of them with these observations before them: how the claim reads a list of more than one page, and what it does with an edit history of 100 entries. D-45 records the answers, and the one point in which the text differs from them after the review of the change.
+
+1. GH-21 is new, in 5.3: what the claim reads of an issue, from which end, how it pages back, and when it holds a list whole. Rule 6 of 5.3 and step 1 of 8.2 no longer say that one read is enough, and rule 6 says which of its times come from the first read and which from all the events.
+2. Rule 7 of 5.3 is new and is where SEC-2 is checked. SEC-2 says that an issue whose edit history is not known to be whole is not dispatched, and neither is one with an account that GitHub does not name.
+3. SEC-1, SEC-3 and SEC-4 name GH-21 for the events and the comments they read, and SEC-4 says how the comments that were not read are counted.
+4. The P-8 row of 23.2 carries the answer.
+
+### Still open
+
+- **Whether GitHub keeps an edit that the list no longer names,** and whether the page of the issue shows it. Only the API was read.
+- **A cursor of the edit history after an edit.** The history had one page.
+- **An item of an older page that changes between two reads.** A comment there that is edited, minimised or deleted after the first page was read. The issue was changed at its newest end alone.
+- **A list of more than two pages.** The events and the comments were each read as a page of 100 and one after it. The longest list here is the timeline without a filter, of 216 items, of which one page was read.
+- **What a deleted label does to its events,** and what an account that was deleted leaves as the actor of an event, the editor of an entry or the author of a comment. No actor was null in any read here, as in the first run.
+- **An edit of a comment, and who made it.** As the first run left it.
+- **The page limit of the timeline.** 101 came back; a larger number was not asked for.

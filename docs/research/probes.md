@@ -3557,3 +3557,155 @@ The issue named SEC-6b, SEC-6 and DEV-3. SEC-6c and SEC-6d, the sentence of AG-3
 - **`--messaging-socket-path` and `CLAUDE_CODE_TMPDIR`.** Neither was set.
 - **The other managed files.** Only `managed-settings.json` was planted, with an `env` block. That a managed `CLAUDE.md`, MCP file, skill or hook takes effect alike is an inference from the lookups.
 - **Other CLI versions,** and the 26.04 runner images, which the workflow does not use (DEV-5).
+
+## P-38: `cargo deny` without its database, `cargo mutants` on macOS, and a bypass beside a second ruleset
+
+Answered 2026-11-26 for #87. The review of draft 4 (`16-spec-draft-4-review`) found that two steps of `cargo xtask check` have no defined outcome in a place where the command runs, and that nothing holds a pull request of the operator's to CI once the ruleset of 20.3 is in place: findings B6, C1 and C2. Two of them rest on statements that the reviewer marked as not checked: that `cargo deny check` fails without the advisory database, and that a bypass covers a whole ruleset. Both were observed before the operator was asked, and two more facts came up on the way. The `cargo` cases ran on the operator's Mac, the rulesets on `sapientpants/sf-scratch`.
+
+**Answer.**
+
+- **`cargo deny` 0.22.1 fetches unless it is given `--offline`,** alone or as part of `--frozen`. `check --disable-fetch`, which the review's fix names and 0.18.5 has, is refused as an unknown argument. Without `--offline` the tool clones the database from `github.com` with `git`, or fetches into its clone, in every run, and exits with 1 where it cannot.
+- **Without the database the advisories fail and nothing else does.** `--offline check` exits with 1 where no database lies. `--offline check bans licenses sources` passes there, without a network.
+- **The database lies under `$CARGO_HOME/advisory-dbs`,** in `advisory-db-3157b0e258782691`, beside a lock file `db.lock`. `db-path` in `deny.toml` moves that root and may name a variable. A clone that `git clone --depth=1` made under the directory name was taken as the tool's own.
+- **A root directory that cannot be written fails the run.** The tool takes a lock on `db.lock` in every run, with `--offline` too, and where it cannot open the file for writing it exits with 1: on a file system mounted read-only, and in a directory without write permission that holds no writable `db.lock`. With a writable root and the database on a read-only mount below it, it passes.
+- **An old database fails the run, and a fetch that fails makes it young again.** With `--offline` the tool exits with 1 when the last fetch is older than `maximum-db-staleness`, 90 days by default. It reads that time from the file `FETCH_HEAD` of the clone. A fetch that fails leaves an empty `FETCH_HEAD` with the time of the attempt, and the next run passes. With the file's time put back after such a fetch, the next run fails as before it.
+- **`cargo mutants` 27.1.0 on macOS reports every mutant of Linux-only code as missed.** Of the ten mutants of a crate with one function under `cfg(target_os = "linux")` and one without, the five of the first were missed, and the command exited with 2.
+- **A bypass took the pull-request rule and the required checks of its own ruleset, and no rule of another.** Under a ruleset that names the repository admin as a bypass actor with the mode `pull_request`, the operator's token merged a pull request with no approval and neither required check; a direct update of the branch was refused. With a second ruleset that names no bypass actor, the merge was refused until that ruleset's one check was green, and then went through, still without the approval and the other check of the first.
+- **`GET /rules/branches/{branch}` merges nothing.** With two rulesets it returned eight entries: each rule once for each ruleset, with its own parameters and `ruleset_id`.
+
+### Method
+
+Throwaway scripts on the branch `prototype/check-places`, at commit [`042265d`](https://github.com/sapientpants/software-factory/tree/042265d68af137fe87f37c332ae723297058fc58/xtask/prototype/check-places), with the output of each under `results/`.
+
+- **`deny-cases.sh`** runs twelve groups of cases on a copy of this repository's workspace at `7a01435`, which resolves 17 packages, with a `CARGO_HOME` of its own. The copy holds a `deny.toml` that allows the licences `MIT` and `Apache-2.0` and sets nothing else, so that a failure is the database's. `sandbox-exec` with the profile `(deny network*)` takes the network away: under it `curl` could not resolve `static.crates.io`. A disk image attached read-only stands in for a read-only mount. The output is `results/deny-cases.txt`, of one run from an empty `CARGO_HOME` at 03:56 UTC. A first pass had run most of the cases by hand, and a review of this record then asked for the mounts, for the older version and for output behind each number here; none of the first pass is kept.
+- **`mutants-case/`** is a crate of two functions, each with one test: `linux_only` and its test are under `cfg(target_os = "linux")`. `cargo mutants --no-shuffle -j 2` ran on it; the output is `results/mutants-case.txt`.
+- **`ruleset/`** holds six scripts that ran in order against the scratch repository with the operator's token. `results/ruleset-responses.log` holds every call with its status line and its body, and no times: the two pull requests were merged at 03:33:45 and 03:34:18 UTC, as `results/read-afterwards.txt` has them. The rulesets targeted one branch, `probe/p-38-base`, and never `main`.
+
+| | |
+|---|---|
+| The Mac | An Apple M4 Max with macOS 27.0.1, `git` 2.56.1, cargo 1.100.0 |
+| `cargo deny` | 0.22.1, published on 2026-11-24, built that day with `cargo install --locked`. The Mac's own is 0.18.5: its help text and its source were read, and the last group of the script runs two cases with it |
+| `cargo mutants` | 27.1.0, built the same way |
+| The sources read | `cargo-deny` 0.22.1 and 0.18.5 and `tame-index` 0.27.2, as crates.io serves them |
+| The two rulesets | `p38-gates`, id 28133233: a pull request with one approval, approval of the last push by someone else, the required checks `p38/factory-check` and `p38/ci`, no force push, no deletion; the bypass actor is the repository role with id 5, the admin, with `bypass_mode` `pull_request`. `p38-ci`, id 28133244: a pull request with zero approvals, the required check `p38/ci`, no force push, no deletion; no bypass actor |
+| The pull requests | [sf-scratch#131](https://github.com/sapientpants/sf-scratch/pull/131) and [sf-scratch#132](https://github.com/sapientpants/sf-scratch/pull/132), each one commit that adds a file, from a branch of the same repository, opened and merged by the operator's token. Nothing reported a check on either; `p38/ci` on the second is a commit status that the same token created |
+
+The scripts deleted both rulesets and the four branches `probe/p-38-*`. The two pull requests stay, merged into a branch that no longer exists.
+
+### `cargo deny` without the database and without a network
+
+Each line is one run. "No network" is `sandbox-exec`.
+
+| Case | Command | Exit | What it said |
+|---|---|---|---|
+| The option of 0.18.5 | `check --disable-fetch` | 2 | `error: unexpected argument '--disable-fetch' found` |
+| No database, no network | `--offline check` | 1 | `failed to get 'FETCH_HEAD' metadata: failed to get HEAD timestamp`, and git's `cannot change to '…/advisory-dbs/advisory-db-3157b0e258782691'` |
+| The same | `check` | 1 | `failed to fetch advisory database https://github.com/RustSec/advisory-db with cli: failed to clone`, with the arguments `clone --depth=1 --branch main` |
+| The same | `--offline check bans licenses sources` | 0 | `bans ok, licenses ok, sources ok` |
+| The fetch, with a network | `fetch db` | 0 | Nothing. `advisory-dbs/` then holds `advisory-db-3157b0e258782691`, a shallow clone of 7.7 MB with no `FETCH_HEAD`, and an empty `db.lock` |
+| The database, no network | `--locked --offline check` | 0 | `advisories ok, bans ok, licenses ok, sources ok` |
+| The same | `--frozen check advisories` | 0 | `advisories ok` |
+| The same | `check advisories` | 1 | `failed to fetch latest changes`, with the arguments `fetch --depth=1 -u origin +main:main`. `FETCH_HEAD` was there afterwards, with 0 bytes |
+| Nothing below the root `advisory-dbs/` writable, `db.lock` in it | `--offline check advisories` | 1 | `failed to acquire advisory database lock: file lock error: failed to obtain lock file '…/db.lock': attempted to take an exclusive lock on a read-only path` |
+| The root without write permission and without `db.lock` | the same | 1 | The same message |
+| The root without write permission, a writable `db.lock` in it | the same | 0 | `advisories ok` |
+| The root a disk image attached read-only, `db.lock` in it; `touch` there says `Read-only file system` | the same | 1 | The same message as in the first of these four |
+| A writable root with no `db.lock`, the database directory without write permission | `--offline check advisories` | 0 | `advisories ok`. The run created `db.lock`. The same with `FETCH_HEAD` removed, where the tool runs `git show` in the clone |
+| `FETCH_HEAD` 89 days old | `--offline check advisories` | 0 | |
+| 91 days old | the same | 1 | `repository is stale (last update: 2026-08-27T02:56:00Z)` |
+| `maximum-db-staleness = "P7D"`, 6 days old | the same | 0 | |
+| The same limit, 8 days old | the same | 1 | `repository is stale` |
+| Then `fetch db` without a network, which exits with 1 | the same | 0 | `advisories ok` |
+| 8 days old again, the same failing fetch, and the time of `FETCH_HEAD` put back with `touch -r` | the same | 1 | `repository is stale (last update: 2026-11-18T03:57:00Z)` |
+| No `FETCH_HEAD`, the file `HEAD` 8 days old, the commit of `HEAD` one day old | the same | 0 | |
+| `db-path = "$SF_P38/elsewhere"`, the variable set | the same | 0 | |
+| The same, the variable not set | the same | 1 | `error: failed to find variable` |
+| `db-path` naming a directory that holds a clone made by `git clone --depth=1` under the name | the same | 0 | |
+| That clone on a disk image, attached read-only at `advisory-dbs/advisory-db-3157b0e258782691` in the default place, below a writable root with no `db.lock` | `--locked --offline check` | 0 | `advisories ok, bans ok, licenses ok, sources ok`. The run created `db.lock` beside the mount |
+| The same arrangement, with the 0.18.5 that the Mac holds | `--locked --offline check` | 1 | `failed to load advisory database: parse error`, at `crates/libcrux-poly1305/RUSTSEC-2026-0073.md`: `unsupported CVSS version: 4.0` |
+| No database, with 0.18.5 | `--locked --offline check advisories` | 1 | `failed to open advisory database`: the directory `does not appear to be a git repository` |
+
+With `-L info` the run that passed logged `gathered 17 crates` and `cached index metadata loaded`: the check for yanked crates read the index entries that `cargo fetch --locked` had left in `CARGO_HOME`, and warned of nothing.
+
+What the source says on the same points, read and not run:
+
+- **The lock.** `DbSet::load` in `src/advisories/helpers/db.rs` of 0.22.1 takes the lock before it looks at the kind of run, with `LockOptions::new(&lock_path).exclusive(false)`. In `tame-index` 0.27.2, `src/flock.rs`, the argument is whether a shared lock may stand in where the path is read-only, and `open` turns a permission error or the error number 30, `EROFS`, into `LockError::Readonly`. The disk image attached read-only gave that error on macOS. A read-only mount on Linux gives the same error number and therefore takes the same way; that was not run.
+- **The time.** `get_fetch_time` in `src/git.rs` takes the modification time of `FETCH_HEAD`, and where the file is missing the later of the commit date of `HEAD`, which it asks `git show` for, and the modification time of the file `HEAD`.
+- **The option.** `src/cargo-deny/check.rs` passes `Fetch::Disallow(maximum_db_staleness)` when `--offline` is set and `Fetch::Allow` otherwise, and `src/cargo-deny/main.rs` sets it for `--frozen` too. The changelog has under 0.20.0, of 2026-07-09: "refactored the CLI, moving some duplicated options/flags into the root and removing several deprecated options/flags/values". It names no option. The help text of 0.18.5 lists `-d, --disable-fetch` and that of 0.22.1 does not; that the option went with 0.20.0 is an inference from the two.
+- **The name.** `url_to_db_path` in 0.18.5 joins the last segment of the address with a hash of the address in lower case. 0.22.1 gave the same name.
+
+### `cargo mutants` and code that the build leaves out
+
+```text
+MISSED   src/lib.rs:3:5: replace linux_only -> i32 with 1 in 0s build + 0s test
+MISSED   src/lib.rs:3:5: replace linux_only -> i32 with 0 in 0s build + 0s test
+MISSED   src/lib.rs:3:5: replace linux_only -> i32 with -1 in 0s build + 0s test
+MISSED   src/lib.rs:3:7: replace + with - in linux_only in 0s build + 0s test
+MISSED   src/lib.rs:3:7: replace + with * in linux_only in 0s build + 0s test
+10 mutants tested in 2s: 5 missed, 5 caught
+```
+
+The five mutants of the function that every target builds were caught. The command exited with 2.
+
+### A bypass and a second ruleset
+
+In the order of the calls. The actor is the operator's token throughout; the operator is the repository's admin.
+
+| Rulesets on the base | Call | Answer |
+|---|---|---|
+| `p38-gates` | The ruleset as created | `current_user_can_bypass` is `pull_requests_only` |
+| `p38-gates` | `PATCH /git/refs/heads/probe/p-38-base` to the head of the first branch | 422 `Repository rule violations found`, naming the approval of the last push and "2 of 2 required status checks are expected" |
+| `p38-gates` | The pull request, read | `mergeable_state` is `blocked`. GraphQL: `mergeStateStatus` `BLOCKED`, `reviewDecision` `REVIEW_REQUIRED`, `viewerCanMergeAsAdmin` `false` |
+| `p38-gates` | `PUT /pulls/131/merge` | 200, `merged: true`. No approval, no check |
+| Both | The second ruleset as created | `current_user_can_bypass` is `never` |
+| Both | `GET /rules/branches/probe/p-38-base` | Eight entries: `pull_request`, `required_status_checks`, `non_fast_forward` and `deletion`, once with `ruleset_id` 28133244 and once with 28133233, each with the parameters of its own ruleset |
+| Both | `PUT /pulls/132/merge` | 405 `Repository rule violations found`, naming `Required status check "p38/ci" is expected.` and nothing else |
+| Both | The GraphQL mutation `mergePullRequest` | An error of type `UNPROCESSABLE` with the same message |
+| Both | `POST /statuses/{sha}` with the context `p38/ci` and the state `success`, then `PUT /pulls/132/merge` | 201, then 200, `merged: true`. No approval, and `p38/factory-check` was never reported |
+
+Read the same day on this repository, as a reading of its own state and no part of the probe (`results/read-afterwards.txt`): `GET /rulesets/27671324` returns a ruleset named `main`, active, created on 2026-11-19 at 20:58 +01:00, for the default branch, with the rules `pull_request` with zero approvals, `non_fast_forward` and `deletion`, and no bypass actor. It holds no required check: the workflow of DEV-5 does not exist yet.
+
+### Findings
+
+**The review's fix for the step names an option that is gone.** `--offline` does what `--disable-fetch` did, and it also keeps `cargo` from the network when the tool reads the crate graph. Both versions take it.
+
+**A pinned `cargo deny` can stop passing with no change to the repository.** The 0.18.5 on the Mac found the database and could not parse it: an advisory of 2026 holds a CVSS 4.0 score, which that version does not know. The database is fetched fresh and the tool is pinned (DEV-2), so the same can happen to any pin, in a session, in CI and in a worker on the same day.
+
+**A worker cannot be shown the database's root read-only.** VAL-1 and SEC-6 had "read-only" for verify, and nothing had run it. What can be read-only is the database's own directory. The directory above it has to be the instance's own, since the tool opens its lock file there for writing. With git's own clone mounted read-only in the default place, the whole step passed.
+
+**The limit on the age of the database cannot tell a fetch that failed from one that worked.** A session whose fetch fails at every start would keep a database that grows old while each run passes. Whoever fetches can keep the limit: with the time of `FETCH_HEAD` put back after the fetch that failed, the run failed again. DEV-14 asks that of the task. On a hosted runner a fetch that fails fails the job.
+
+**The Mac cannot run the mutation step either.** The review found that the sandbox step has no place on the Mac. The mutation step joins it: a mutant in code that the build leaves out changes nothing that a test sees, and the tool counts it as missed. Any change to Linux-only code would fail the step there.
+
+**Under the ruleset of 20.3 alone a pull request of the operator's needs no check.** The bypass took the approval, the approval of the last push and both required checks at once. `viewerCanMergeAsAdmin` said `false` and the pull request read as blocked, and the merge call succeeded all the same.
+
+**A second ruleset is what holds a bypass actor to a check.** The bypass did not reach it. The refusal names the rule, over REST with status 405 and over GraphQL as an error, so a client can tell it from a conflict.
+
+**Mode detection sees every ruleset's rules side by side.** A rule of a second ruleset does not replace or hide the first one's: the pull-request rule with zero approvals stood beside the one with one approval.
+
+### Against the documentation
+
+GitHub's documentation of rulesets was not read. A fetch tool asked for two pages of it, "About rulesets" and "Creating rulesets for a repository", at the addresses it had on record, and both returned 404. That rulesets which target the same branch are enforced together is therefore the observation above and nothing more, and it was observed for a bypass actor alone.
+
+### What changed in the spec
+
+The operator answered four questions on the same day, with these observations before them, each as recommended. D-41 records the answers.
+
+1. DEV-3 has the whole set run in the development VM on the Mac, and clippy and the tests on the host. DEV-7 gains a column for the Mac outside the VM, and DEV-11 says that no step is reported as not run there.
+2. DEV-2a gives the `cargo deny` step its form, `cargo deny --locked --offline check`, and the limit of 7 days. DEV-14 is new and says what `cargo xtask fetch` fetches, who runs it, and that it puts the time of the last fetch back when a fetch fails. DEV-6 has the job run it.
+3. VAL-1 shows the database to an implementer session too. VAL-1a is new and says where and how. SEC-6 no longer shows the root read-only, 9.1 gives the host's clone a place, and the item of 20.1 cites VAL-1a.
+4. VAL-5g and 13.1 say that `cargo deny` runs in verify or in CI.
+5. DEV-8 keeps its ruleset beside the one of 20.3 and says that the repository has had the ruleset since 2026-11-19. DEV-9, BOOT-6 and the row of D-20 follow. DEP-5 is new and says how the mode detection reads more than one ruleset and what a further ruleset can still stop, DEP-4 accepts a ruleset with no bypass actor, and 20.3 names the second ruleset as an option.
+6. P-38 and D-41 are rows of section 23, the roadmap names the fetch task in M0 and the host's database in M1b, and the status row and the entry of `16-spec-draft-4-review` count B6, C1 and C2 as addressed.
+
+### Still open
+
+- **Linux.** Every `cargo` case ran on macOS. That a read-only bind mount on Linux does what the read-only disk image did is read from `tame-index` and was not run. The development VM and a hosted runner can run `deny-cases.sh` once `sandbox-exec` is exchanged for a network namespace.
+- **A worker's sandbox.** No sandbox showed the database to anything. Git refuses a repository that belongs to another user, and the tool runs `git show` in the clone where `FETCH_HEAD` is missing; whether the clone reads as the worker's own under bubblewrap's user namespace was not tried.
+- **What the host does when its daily fetch fails,** given that the failure renews `FETCH_HEAD`.
+- **A second advisory database, and `bans.std-replacements`,** which fetches data of its own and is off unless `deny.toml` turns it on.
+- **An account without a bypass.** The scratch repository has one human account. That such an account needs the rules of both rulesets was not observed.
+- **A bypass with the mode `always`,** a bypass through a team or an App, an organisation's ruleset and a classic branch protection beside a ruleset.
+- **Other versions.** `cargo deny` 0.22.1 and `cargo mutants` 27.1.0 were run, and `cargo deny` 0.18.5 in two cases.
+- **A further ruleset that asks more than the factory gives,** a required check that `required_checks` does not list for example. The mode does not show it (DEP-5).
+- **A pin that the database outgrows.** Nothing says yet what a session, CI or the factory does on the day a pinned `cargo deny` cannot read the fresh database.

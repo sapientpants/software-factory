@@ -1,0 +1,139 @@
+2 name	p44/name/cargo-new/Cargo.lock	generated.rb cargo_lock?
+2 name control	p44/name/cargo-new/control.txt	control for Cargo.lock
+2 name	p44/name/cargo-orig/Cargo.toml.orig	generated.rb cargo_orig?
+2 name control	p44/name/cargo-orig/control.txt	control for Cargo.toml.orig
+2 name	p44/name/sqlx/.sqlx/query-172c374264032764e4ec85bd5130a34207cae04a121a80634e56c907c5a5c93c.json	generated.rb generated_sqlx_query?
+2 name control	p44/name/sqlx/control.txt	control for .sqlx/query-172c374264032764e4ec85bd5130a34207cae04a121a80634e56c907c5a5c93c.json
+2 name	p44/name/package-lock/package-lock.json	generated.rb npm_shrinkwrap_or_package_lock?
+2 name control	p44/name/package-lock/control.txt	control for package-lock.json
+2 name	p44/name/npm-shrinkwrap/npm-shrinkwrap.json	generated.rb npm_shrinkwrap_or_package_lock?
+2 name control	p44/name/npm-shrinkwrap/control.txt	control for npm-shrinkwrap.json
+2 name	p44/name/yarn-lock/yarn.lock	not in generated.rb
+2 name control	p44/name/yarn-lock/control.txt	control for yarn.lock
+2 name	p44/name/pnpm-lock/pnpm-lock.yaml	generated.rb pnpm_lock?
+2 name control	p44/name/pnpm-lock/control.txt	control for pnpm-lock.yaml
+2 name	p44/name/go-sum/go.sum	not in generated.rb
+2 name control	p44/name/go-sum/control.txt	control for go.sum
+2 name	p44/name/gopkg-lock/Gopkg.lock	generated.rb go_lock?
+2 name control	p44/name/gopkg-lock/control.txt	control for Gopkg.lock
+2 name	p44/name/glide-lock/glide.lock	generated.rb go_lock?
+2 name control	p44/name/glide-lock/control.txt	control for glide.lock
+2 name	p44/name/poetry-lock/poetry.lock	generated.rb poetry_lock?
+2 name control	p44/name/poetry-lock/control.txt	control for poetry.lock
+2 name	p44/name/uv-lock/uv.lock	generated.rb uv_lock?
+2 name control	p44/name/uv-lock/control.txt	control for uv.lock
+2 name	p44/name/pdm-lock/pdm.lock	generated.rb pdm_lock?
+2 name control	p44/name/pdm-lock/control.txt	control for pdm.lock
+2 name	p44/name/pixi-lock/pixi.lock	generated.rb pixi_lock?
+2 name control	p44/name/pixi-lock/control.txt	control for pixi.lock
+2 name	p44/name/esy-lock/esy.lock	generated.rb esy_lock?
+2 name control	p44/name/esy-lock/control.txt	control for esy.lock
+2 name	p44/name/pipfile-lock/Pipfile.lock	generated.rb pipenv_lock?
+2 name control	p44/name/pipfile-lock/control.txt	control for Pipfile.lock
+2 name	p44/name/composer-lock/composer.lock	generated.rb composer_lock?
+2 name control	p44/name/composer-lock/control.txt	control for composer.lock
+2 name	p44/name/deno-lock/deno.lock	generated.rb deno_lock?
+2 name control	p44/name/deno-lock/control.txt	control for deno.lock
+2 name	p44/name/flake-lock/flake.lock	generated.rb flake_lock?
+2 name control	p44/name/flake-lock/control.txt	control for flake.lock
+2 name	p44/name/bazel-lock/MODULE.bazel.lock	generated.rb bazel_lock?
+2 name control	p44/name/bazel-lock/control.txt	control for MODULE.bazel.lock
+2 name	p44/name/bun-lock/bun.lock	generated.rb bun_lock?
+2 name control	p44/name/bun-lock/control.txt	control for bun.lock
+2 name	p44/name/apm-lock/apm.lock.yaml	generated.rb apm_lock?
+2 name control	p44/name/apm-lock/control.txt	control for apm.lock.yaml
+2 name	p44/name/terraform-lock/.terraform.lock.hcl	generated.rb terraform_lock?
+2 name control	p44/name/terraform-lock/control.txt	control for .terraform.lock.hcl
+2 name	p44/name/mise-lock/mise.lock	generated.rb mise_lock?
+2 name control	p44/name/mise-lock/control.txt	control for mise.lock
+2 name	p44/name/package-resolved/Package.resolved	generated.rb package_resolved?
+2 name control	p44/name/package-resolved/control.txt	control for Package.resolved
+2 name	p44/name/secrets-baseline/.secrets.baseline	generated.rb secrets_baseline?
+2 name control	p44/name/secrets-baseline/control.txt	control for .secrets.baseline
+2 name	p44/name/julia-manifest/Manifest.toml	generated.rb julia_manifest?
+2 name control	p44/name/julia-manifest/control.txt	control for Manifest.toml
+2 name	p44/name/gemfile-lock/Gemfile.lock	not in generated.rb
+2 name control	p44/name/gemfile-lock/control.txt	control for Gemfile.lock
+2 name	p44/name/min-js/lib.min.js	vendor.yml (\.|-)min\.(js|css)$; short lines so minified_files? is false
+2 name control	p44/name/min-js/control.txt	control for lib.min.js
+2 name	p44/name/min-css/lib.min.css	vendor.yml (\.|-)min\.(js|css)$; short lines
+2 name control	p44/name/min-css/control.txt	control for lib.min.css
+2 name	p44/name/pb-go/api.pb.go	name only, no header: not in generated.rb
+2 name control	p44/name/pb-go/control.txt	control for api.pb.go
+2 name	p44/name/node-modules/node_modules/pkg/index.js	generated.rb node_modules?; vendor.yml
+2 name control	p44/name/node-modules/control.txt	control for node_modules/pkg/index.js
+2 name	p44/name/vendor-dir/vendor/lib/thing.rs	vendor.yml (^|/)vendors?/
+2 name control	p44/name/vendor-dir/control.txt	control for vendor/lib/thing.rs
+2 name	p44/name/go-vendor/vendor/github.com/acme/lib/thing.go	generated.rb go_vendor?
+2 name control	p44/name/go-vendor/control.txt	control for vendor/github.com/acme/lib/thing.go
+2 name	p44/name/godeps/Godeps/Godeps.json	generated.rb godeps?
+2 name control	p44/name/godeps/control.txt	control for Godeps/Godeps.json
+2 name	p44/name/snap-jest/__snapshots__/thing.test.js.snap	not in generated.rb
+2 name control	p44/name/snap-jest/control.txt	control for __snapshots__/thing.test.js.snap
+2 name	p44/name/snap-insta/snapshots/thing__case.snap	not in generated.rb (insta snapshot)
+2 name control	p44/name/snap-insta/control.txt	control for snapshots/thing__case.snap
+2 name	p44/name/generated-relay/__generated__/Query.graphql.js	generated.rb generated_graphql_relay?
+2 name control	p44/name/generated-relay/control.txt	control for __generated__/Query.graphql.js
+2 name	p44/name/idea/.idea/workspace.xml	generated.rb intellij_file?
+2 name control	p44/name/idea/control.txt	control for .idea/workspace.xml
+2 name	p44/name/pods/Pods/Lib/lib.m	generated.rb cocoapods?
+2 name control	p44/name/pods/control.txt	control for Pods/Lib/lib.m
+2 name	p44/name/carthage/Carthage/Build/lib.h	generated.rb carthage_build?
+2 name control	p44/name/carthage/control.txt	control for Carthage/Build/lib.h
+2 name	p44/name/htmlcov/htmlcov/index.html	generated.rb htmlcov?
+2 name control	p44/name/htmlcov/control.txt	control for htmlcov/index.html
+2 name	p44/name/dist/dist/bundle.js	vendor.yml (^|/)dist/
+2 name control	p44/name/dist/control.txt	control for dist/bundle.js
+2 name	p44/name/testdata/testdata/input.txt	vendor.yml (^|/)testdata/
+2 name control	p44/name/testdata/control.txt	control for testdata/input.txt
+2 name	p44/name/fixtures/tests/fixtures/input.txt	vendor.yml (^|/)[Tt]ests?/fixtures/
+2 name control	p44/name/fixtures/control.txt	control for tests/fixtures/input.txt
+2 name	p44/name/js-map/bundle.js.map	generated.rb source_map? by name
+2 name control	p44/name/js-map/control.txt	control for bundle.js.map
+2 name	p44/name/css-map/style.css.map	generated.rb source_map? by name
+2 name control	p44/name/css-map/control.txt	control for style.css.map
+2 name	p44/name/gradlew/gradlew	generated.rb gradle_wrapper?
+2 name control	p44/name/gradlew/control.txt	control for gradlew
+2 name	p44/name/mvnw/mvnw	generated.rb maven_wrapper?
+2 name control	p44/name/mvnw/control.txt	control for mvnw
+2 name	p44/name/pnp/.pnp.cjs	generated.rb generated_yarn_plugnplay?
+2 name control	p44/name/pnp/control.txt	control for .pnp.cjs
+2 name	p44/name/nib/view.nib	generated.rb xcode_file? (.nib, text content)
+2 name control	p44/name/nib/control.txt	control for view.nib
+2 name	p44/name/xcworkspacedata/contents.xcworkspacedata	generated.rb xcode_file?
+2 name control	p44/name/xcworkspacedata/control.txt	control for contents.xcworkspacedata
+2 name	p44/name/zephir/thing.zep.c	generated.rb generated_by_zephir?
+2 name control	p44/name/zephir/control.txt	control for thing.zep.c
+2 name	p44/name/feature-cs/login.feature.cs	generated.rb generated_net_specflow_feature_file?
+2 name control	p44/name/feature-cs/control.txt	control for login.feature.cs
+2 name	p44/name/designer-cs/Form.designer.cs	generated.rb generated_net_code? by name
+2 name control	p44/name/designer-cs/control.txt	control for Form.designer.cs
+2 name	p44/name/tlb-pas/lib_tlb.pas	generated.rb generated_pascal_tlb?
+2 name control	p44/name/tlb-pas/control.txt	control for lib_tlb.pas
+2 name	p44/name/d-ts/types.d.ts	vendor.yml (.*?)\.d\.ts$
+2 name control	p44/name/d-ts/control.txt	control for types.d.ts
+2 name	p44/name/cargo-mod/Cargo.lock	Cargo.lock modified (subdirectory)
+2 name control	p44/name/cargo-mod/control.txt	control for modified Cargo.lock
+2 name	Cargo.lock	Cargo.lock new at repository root
+2 name adversarial	p44/adv/Cargo.lock.rs	Cargo\.lock unanchored: file name Cargo.lock.rs
+2 name adversarial	p44/adv/Cargo.lock/evil.rs	Cargo\.lock unanchored: directory named Cargo.lock
+2 name adversarial	p44/adv/myCargo.locked.rs	Cargo\.lock unanchored: substring of a file name
+2 name adversarial	p44/adv/Cargo.toml.orig.rs	Cargo\.toml\.orig unanchored
+2 name adversarial	p44/adv/uv.lock.rs	uv\.lock unanchored
+2 name adversarial	p44/adv/poetry.lock.d/evil.rs	poetry\.lock unanchored: directory
+2 name adversarial	p44/adv/package-lock.json.rs	package-lock\.json unanchored
+2 name adversarial	p44/adv/fake_node_modules/evil.rs	node_modules\/ unanchored
+2 name adversarial	p44/adv/Godeps/evil.rs	Godeps\/ unanchored
+2 name adversarial	p44/adv/__generated__/evil.rs	__generated__\/
+2 name adversarial	p44/adv/.idea/evil.rs	.idea/
+2 name adversarial	p44/adv/Pods/evil.rs	Pods/
+2 name adversarial	p44/adv/htmlcov/evil.rs	htmlcov/
+2 name adversarial	p44/adv/vendor/a.io/evil.rs	go_vendor? vendor/<host>.<tld>
+2 name adversarial	p44/adv/vendor/evil.rs	vendor.yml vendors?/ only
+2 name adversarial	p44/adv/Package.resolved.rs	Package\.resolved unanchored
+2 name adversarial	p44/adv/Pipfile.lock.rs	Pipfile\.lock unanchored
+2 name adversarial	p44/adv/composer.lock.rs	composer\.lock unanchored
+2 name adversarial	p44/adv/deno.lock.rs	deno\.lock unanchored
+2 name adversarial	p44/adv/pnpm-lock.yaml.rs	pnpm-lock\.yaml unanchored
+2 name adversarial	p44/adv/glide.lock.rs	(Gopkg|glide)\.lock unanchored
+2 name adversarial	p44/adv/control.rs	control: neutral name

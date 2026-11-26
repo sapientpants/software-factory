@@ -1,0 +1,306 @@
+## versions
+cargo 1.100.0 (3acc79c0c 2026-11-05)
+clippy 0.1.100 (0ef1bc3860 2026-11-09)
+
+## A. baseline: no clippy configuration anywhere
+$ (cd outer/repo &&  cargo clippy --workspace --all-targets --locked -- -D warnings)
+  -> exit 0
+
+## B. one candidate at a time
+
+# only outer/repo/clippy.toml (CANARY-1)
+$ (cd outer/repo &&  cargo clippy --workspace --all-targets --locked -- -D warnings)
+      = note: CANARY-1
+    error: use of a disallowed method `std::env::var`
+    warning: build failed, waiting for other jobs to finish...
+  -> exit 101
+
+# only outer/repo/.clippy.toml (CANARY-2)
+$ (cd outer/repo &&  cargo clippy --workspace --all-targets --locked -- -D warnings)
+      = note: CANARY-2
+    error: use of a disallowed method `std::env::var`
+    warning: build failed, waiting for other jobs to finish...
+  -> exit 101
+
+# only outer/repo/member/clippy.toml (CANARY-3)
+$ (cd outer/repo &&  cargo clippy --workspace --all-targets --locked -- -D warnings)
+      = note: CANARY-3
+    error: use of a disallowed method `std::env::var`
+    warning: build failed, waiting for other jobs to finish...
+  -> exit 101
+
+# only outer/repo/member/.clippy.toml (CANARY-4)
+$ (cd outer/repo &&  cargo clippy --workspace --all-targets --locked -- -D warnings)
+      = note: CANARY-4
+    error: use of a disallowed method `std::env::var`
+    warning: build failed, waiting for other jobs to finish...
+  -> exit 101
+
+# only outer/repo/member/src/clippy.toml (CANARY-5)
+$ (cd outer/repo &&  cargo clippy --workspace --all-targets --locked -- -D warnings)
+  -> exit 0
+
+# only outer/repo/member/src/.clippy.toml (CANARY-6)
+$ (cd outer/repo &&  cargo clippy --workspace --all-targets --locked -- -D warnings)
+  -> exit 0
+
+# only outer/clippy.toml (CANARY-7)
+$ (cd outer/repo &&  cargo clippy --workspace --all-targets --locked -- -D warnings)
+      = note: CANARY-7
+    error: use of a disallowed method `std::env::var`
+    warning: build failed, waiting for other jobs to finish...
+  -> exit 101
+
+# only outer/.clippy.toml (CANARY-8)
+$ (cd outer/repo &&  cargo clippy --workspace --all-targets --locked -- -D warnings)
+      = note: CANARY-8
+    error: use of a disallowed method `std::env::var`
+    warning: build failed, waiting for other jobs to finish...
+  -> exit 101
+
+# only clippy.toml (CANARY-9)
+$ (cd outer/repo &&  cargo clippy --workspace --all-targets --locked -- -D warnings)
+      = note: CANARY-9
+    error: use of a disallowed method `std::env::var`
+    warning: build failed, waiting for other jobs to finish...
+  -> exit 101
+
+# only $HOME/clippy.toml (CANARY-10)
+$ (cd outer/repo &&  cargo clippy --workspace --all-targets --locked -- -D warnings)
+  -> exit 0
+
+# only $HOME/.clippy.toml (CANARY-11)
+$ (cd outer/repo &&  cargo clippy --workspace --all-targets --locked -- -D warnings)
+  -> exit 0
+
+# only $HOME/.config/clippy.toml (CANARY-12)
+$ (cd outer/repo &&  cargo clippy --workspace --all-targets --locked -- -D warnings)
+  -> exit 0
+
+# only $HOME/.config/clippy/clippy.toml (CANARY-13)
+$ (cd outer/repo &&  cargo clippy --workspace --all-targets --locked -- -D warnings)
+  -> exit 0
+
+# only outer/repo/.config/clippy.toml (CANARY-14)
+$ (cd outer/repo &&  cargo clippy --workspace --all-targets --locked -- -D warnings)
+  -> exit 0
+
+# only outer/repo/.cargo/clippy.toml (CANARY-15)
+$ (cd outer/repo &&  cargo clippy --workspace --all-targets --locked -- -D warnings)
+  -> exit 0
+
+# only outer/repo/.clippy (CANARY-16)
+$ (cd outer/repo &&  cargo clippy --workspace --all-targets --locked -- -D warnings)
+  -> exit 0
+
+# only outer/repo/Clippy.toml (CANARY-17)
+$ (cd outer/repo &&  cargo clippy --workspace --all-targets --locked -- -D warnings)
+      = note: CANARY-17
+    error: use of a disallowed method `std::env::var`
+    warning: build failed, waiting for other jobs to finish...
+  -> exit 101
+
+## C. same directory: repo/clippy.toml (CANARY-protected) and repo/.clippy.toml
+# both carry a canary
+$ (cd outer/repo &&  cargo clippy --workspace --all-targets --locked -- -D warnings)
+      = note: CANARY-dotfile
+    error: use of a disallowed method `std::env::var`
+    warning: `member` (lib test) generated 1 warning (1 duplicate)
+    warning: `member` (lib) generated 1 warning
+    warning: build failed, waiting for other jobs to finish...
+    warning: using config file `outer/repo/.clippy.toml`, `outer/repo/clippy.toml` will be ignored
+  -> exit 101
+# full output of that run:
+    Checking member v0.1.0 (outer/repo/member)
+warning: using config file `outer/repo/.clippy.toml`, `outer/repo/clippy.toml` will be ignored
+
+error: use of a disallowed method `std::env::var`
+ --> member/src/lib.rs:2:5
+  |
+2 |     std::env::var("X").ok()
+  |     ^^^^^^^^^^^^^
+  |
+  = note: CANARY-dotfile
+  = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#disallowed_methods
+  = note: `-D clippy::disallowed-methods` implied by `-D warnings`
+  = help: to override `-D warnings` add `#[allow(clippy::disallowed_methods)]`
+
+warning: `member` (lib test) generated 1 warning (1 duplicate)
+error: could not compile `member` (lib test) due to 1 previous error; 1 warning emitted
+warning: build failed, waiting for other jobs to finish...
+warning: `member` (lib) generated 1 warning
+error: could not compile `member` (lib) due to 1 previous error; 1 warning emitted
+# repo/.clippy.toml is empty (the attack: switch the protected rules off)
+$ (cd outer/repo &&  cargo clippy --workspace --all-targets --locked -- -D warnings)
+    warning: `member` (lib test) generated 1 warning (1 duplicate)
+    warning: `member` (lib) generated 1 warning
+    warning: using config file `outer/repo/.clippy.toml`, `outer/repo/clippy.toml` will be ignored
+  -> exit 0
+# full output of that run:
+    Checking member v0.1.0 (outer/repo/member)
+warning: using config file `outer/repo/.clippy.toml`, `outer/repo/clippy.toml` will be ignored
+
+warning: `member` (lib test) generated 1 warning (1 duplicate)
+warning: `member` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.14s
+[exit 0]
+
+## D. across directories
+# repo/clippy.toml=CANARY-protected, member/.clippy.toml empty
+$ (cd outer/repo &&  cargo clippy --workspace --all-targets --locked -- -D warnings)
+  -> exit 0
+# repo/clippy.toml=CANARY-protected, member/clippy.toml empty
+$ (cd outer/repo &&  cargo clippy --workspace --all-targets --locked -- -D warnings)
+  -> exit 0
+# repo/clippy.toml=CANARY-protected, member/src/.clippy.toml=CANARY-src (not a manifest directory)
+$ (cd outer/repo &&  cargo clippy --workspace --all-targets --locked -- -D warnings)
+      = note: CANARY-protected
+    error: use of a disallowed method `std::env::var`
+    warning: build failed, waiting for other jobs to finish...
+  -> exit 101
+# repo/clippy.toml=CANARY-protected, outer/.clippy.toml=CANARY-outer
+$ (cd outer/repo &&  cargo clippy --workspace --all-targets --locked -- -D warnings)
+      = note: CANARY-protected
+    error: use of a disallowed method `std::env::var`
+    warning: build failed, waiting for other jobs to finish...
+  -> exit 101
+# are files merged? outer/clippy.toml=CANARY-outer, member/.clippy.toml sets another key only
+$ (cd outer/repo &&  cargo clippy --workspace --all-targets --locked -- -D warnings)
+  -> exit 0
+
+## E. other working directories
+# from the member directory
+$ (cd outer/repo/member &&  cargo clippy --workspace --all-targets --locked -- -D warnings)
+      = note: CANARY-root-dot
+    error: use of a disallowed method `std::env::var`
+    warning: build failed, waiting for other jobs to finish...
+  -> exit 101
+# from outside the tree with --manifest-path
+  = note: CANARY-root-dot
+error: could not compile `member` (lib test) due to 1 previous error
+error: could not compile `member` (lib) due to 1 previous error
+error: use of a disallowed method `std::env::var`
+[exit 101]
+
+## F. CLIPPY_CONF_DIR
+# F1: CLIPPY_CONF_DIR=repo, repo/clippy.toml=CANARY-protected, repo/.clippy.toml empty
+$ (cd outer/repo && CLIPPY_CONF_DIR=outer/repo cargo clippy --workspace --all-targets --locked -- -D warnings)
+    warning: `member` (lib test) generated 1 warning
+    warning: `member` (lib) generated 1 warning (1 duplicate)
+    warning: using config file `outer/repo/.clippy.toml`, `outer/repo/clippy.toml` will be ignored
+  -> exit 0
+# F2: CLIPPY_CONF_DIR=repo, repo/clippy.toml=CANARY-protected, member/.clippy.toml empty
+$ (cd outer/repo && CLIPPY_CONF_DIR=outer/repo cargo clippy --workspace --all-targets --locked -- -D warnings)
+      = note: CANARY-protected
+    error: use of a disallowed method `std::env::var`
+    warning: build failed, waiting for other jobs to finish...
+  -> exit 101
+# F3: CLIPPY_CONF_DIR=<dir outside the tree> holding clippy.toml=CANARY-trusted; empty .clippy.toml/clippy.toml in repo and member
+$ (cd outer/repo && CLIPPY_CONF_DIR=trusted cargo clippy --workspace --all-targets --locked -- -D warnings)
+      = note: CANARY-trusted
+    error: use of a disallowed method `std::env::var`
+    warning: build failed, waiting for other jobs to finish...
+  -> exit 101
+# F4: CLIPPY_CONF_DIR=outer/confdir holds no file; outer/.clippy.toml=CANARY-outer-of-confdir (upward search from the named directory?)
+$ (cd outer/repo && CLIPPY_CONF_DIR=outer/confdir cargo clippy --workspace --all-targets --locked -- -D warnings)
+      = note: CANARY-outer-of-confdir
+    error: use of a disallowed method `std::env::var`
+    warning: build failed, waiting for other jobs to finish...
+  -> exit 101
+# F5: CLIPPY_CONF_DIR=trusted in the environment AND repo/.cargo/config.toml [env] CLIPPY_CONF_DIR=evil (no force)
+$ (cd outer/repo && CLIPPY_CONF_DIR=trusted cargo clippy --workspace --all-targets --locked -- -D warnings)
+      = note: CANARY-trusted
+    error: use of a disallowed method `std::env::var`
+    warning: build failed, waiting for other jobs to finish...
+  -> exit 101
+# F6: same with force = true
+$ (cd outer/repo && CLIPPY_CONF_DIR=trusted cargo clippy --workspace --all-targets --locked -- -D warnings)
+  -> exit 0
+# F7: no variable in the environment; repo/.cargo/config.toml [env] CLIPPY_CONF_DIR=evil (empty clippy.toml there); repo/clippy.toml=CANARY-protected
+$ (cd outer/repo &&  cargo clippy --workspace --all-targets --locked -- -D warnings)
+  -> exit 0
+
+## G. other inputs that switch the lint off (repo/clippy.toml=CANARY-protected throughout)
+# G1: member/Cargo.toml [lints.clippy] disallowed_methods = "allow"
+$ (cd outer/repo &&  cargo clippy --workspace --all-targets --locked -- -D warnings)
+  -> exit 0
+# G2: [workspace.lints.clippy] in the root Cargo.toml, inherited
+$ (cd outer/repo &&  cargo clippy --workspace --all-targets --locked -- -D warnings)
+  -> exit 0
+# G3: .cargo/config.toml [build] rustflags = ["-Aclippy::disallowed_methods"]
+$ (cd outer/repo &&  cargo clippy --workspace --all-targets --locked -- -D warnings)
+  -> exit 0
+# G4: .cargo/config.toml [build] rustflags = ["--cap-lints", "allow"]
+$ (cd outer/repo &&  cargo clippy --workspace --all-targets --locked -- -D warnings)
+  -> exit 0
+# G5: the same in the legacy file name .cargo/config
+$ (cd outer/repo &&  cargo clippy --workspace --all-targets --locked -- -D warnings)
+    warning: `outer/repo/.cargo/config` is deprecated in favor of `config.toml`
+  -> exit 0
+# G6: member/.cargo/config.toml, run from the workspace root, then from the member directory
+$ (cd outer/repo &&  cargo clippy --workspace --all-targets --locked -- -D warnings)
+      = note: CANARY-protected
+    error: use of a disallowed method `std::env::var`
+    warning: build failed, waiting for other jobs to finish...
+  -> exit 101
+$ (cd outer/repo/member &&  cargo clippy --workspace --all-targets --locked -- -D warnings)
+  -> exit 0
+# G7: outer/.cargo/config.toml (above the git root)
+$ (cd outer/repo &&  cargo clippy --workspace --all-targets --locked -- -D warnings)
+  -> exit 0
+# G8: #![allow(clippy::disallowed_methods)] in the source
+$ (cd outer/repo &&  cargo clippy --workspace --all-targets --locked -- -D warnings)
+  -> exit 0
+# G9: .cargo/config.toml [alias] clippy = "check"
+warning: user-defined alias `clippy` is shadowing an external subcommand found at `<home>/.cargo/bin/cargo-clippy`
+  |
+  = note: this was previously accepted but will become a hard error in the future; see <https://github.com/rust-lang/cargo/issues/10049>
+error: unexpected argument '-D' found
+
+Usage: check [OPTIONS]
+
+For more information, try '--help'.
+[exit 1]
+
+## H. does a cached build notice a NEW .clippy.toml? (same target dir, source untouched)
+run 1 (clippy.toml only): exit 101
+    Checking member v0.1.0 (outer/repo/member)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.03s
+warning: using config file `outer/repo/.clippy.toml`, `outer/repo/clippy.toml` will be ignored
+run 2 (after adding empty .clippy.toml): exit 0
+    Checking member v0.1.0 (outer/repo/member)
+  = note: CANARY-protected
+run 3 (after removing it again): exit 101
+    Checking member v0.1.0 (outer/repo/member)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.04s
+run 4 (after adding empty member/.clippy.toml): exit 0
+
+## I. file-lookup trace, no config present: every clippy.toml-like name probed
+   2  getattrlist ENOENT/ERR .clippy.toml
+   2  getattrlist ENOENT/ERR /.clippy.toml
+   2  getattrlist ENOENT/ERR /clippy.toml
+   2  getattrlist ENOENT/ERR /private/.clippy.toml
+   2  getattrlist ENOENT/ERR /private/clippy.toml
+   2  getattrlist ENOENT/ERR /private/tmp/.clippy.toml
+   2  getattrlist ENOENT/ERR <scratch-parent>/.clippy.toml
+   2  getattrlist ENOENT/ERR <scratch-parent>/.clippy.toml
+   2  getattrlist ENOENT/ERR <scratch-parent>/clippy.toml
+   2  getattrlist ENOENT/ERR <scratch>/.clippy.toml
+   2  getattrlist ENOENT/ERR <scratch>/clippy.toml
+   2  getattrlist ENOENT/ERR <scratch-parent>/clippy.toml
+   2  getattrlist ENOENT/ERR <tmp>/.clippy.toml
+   2  getattrlist ENOENT/ERR <tmp>/clippy.toml
+   2  getattrlist ENOENT/ERR /private/tmp/clippy.toml
+   2  getattrlist ENOENT/ERR $S/.clippy.toml
+   2  getattrlist ENOENT/ERR $S/clippy.toml
+   2  getattrlist ENOENT/ERR $S/fx/.clippy.toml
+   2  getattrlist ENOENT/ERR $S/fx/clippy.toml
+   2  getattrlist ENOENT/ERR clippy.toml
+   2  getattrlist ENOENT/ERR outer/.clippy.toml
+   2  getattrlist ENOENT/ERR outer/clippy.toml
+   2  getattrlist ENOENT/ERR outer/repo/.clippy.toml
+   2  getattrlist ENOENT/ERR outer/repo/clippy.toml
+   2  getattrlist ENOENT/ERR outer/repo/member/.clippy.toml
+   2  getattrlist ENOENT/ERR outer/repo/member/clippy.toml
+  30  getattrlist OK $S/fx/clippy
+   2  stat OK $S/fx/clippy

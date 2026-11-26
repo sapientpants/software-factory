@@ -1,0 +1,124 @@
+## versions
+cargo 1.100.0 (3acc79c0c 2026-11-05)
+rustdoc 1.100.0 (0ef1bc386 2026-11-09)
+
+## A. baseline: a broken intra-doc link, RUSTDOCFLAGS=-Dwarnings in the environment
+$ env RUSTDOCFLAGS=-Dwarnings cargo doc --workspace --no-deps --locked
+     Documenting member v0.1.0 (outer/repo/member)
+    error: unresolved link to `nope`
+    -> exit 101
+# without the variable
+$ cargo doc --workspace --no-deps --locked
+       Generated $S/target/doc/doc/member/index.html
+     Documenting member v0.1.0 (outer/repo/member)
+    warning: `member` (lib doc) generated 1 warning
+    warning: unresolved link to `nope`
+    -> exit 0
+
+## B. candidate config files (none is expected to exist for rustdoc): each holds lint-silencing text
+# only repo/rustdoc.toml
+$ env RUSTDOCFLAGS=-Dwarnings cargo doc --workspace --no-deps --locked
+     Documenting member v0.1.0 (outer/repo/member)
+    error: unresolved link to `nope`
+    -> exit 101
+# only repo/.rustdoc.toml
+$ env RUSTDOCFLAGS=-Dwarnings cargo doc --workspace --no-deps --locked
+     Documenting member v0.1.0 (outer/repo/member)
+    error: unresolved link to `nope`
+    -> exit 101
+# only repo/doc.toml
+$ env RUSTDOCFLAGS=-Dwarnings cargo doc --workspace --no-deps --locked
+     Documenting member v0.1.0 (outer/repo/member)
+    error: unresolved link to `nope`
+    -> exit 101
+# only repo/.config/rustdoc.toml
+$ env RUSTDOCFLAGS=-Dwarnings cargo doc --workspace --no-deps --locked
+     Documenting member v0.1.0 (outer/repo/member)
+    error: unresolved link to `nope`
+    -> exit 101
+# only repo/.cargo/rustdoc.toml
+$ env RUSTDOCFLAGS=-Dwarnings cargo doc --workspace --no-deps --locked
+     Documenting member v0.1.0 (outer/repo/member)
+    error: unresolved link to `nope`
+    -> exit 101
+
+## C. inputs that change the verdict
+# C1 repo/.cargo/config.toml [build] rustdocflags = ["--cap-lints","allow"], RUSTDOCFLAGS=-Dwarnings in the environment
+$ env RUSTDOCFLAGS=-Dwarnings cargo doc --workspace --no-deps --locked
+     Documenting member v0.1.0 (outer/repo/member)
+    error: unresolved link to `nope`
+    -> exit 101
+# C1b the same file, no variable in the environment (the gate is then expected in the file itself)
+$ cargo doc --workspace --no-deps --locked
+     Documenting member v0.1.0 (outer/repo/member)
+    error: unresolved link to `nope`
+    -> exit 101
+# C1c [build] rustdocflags = ["-Dwarnings"] in repo/.cargo/config.toml and [build] rustdocflags = ["--cap-lints","allow"] in member/.cargo/config.toml, cwd = member
+$ (cd member && cargo doc --no-deps --locked)
+    -> exit 0
+# C2 member/Cargo.toml [lints.rustdoc] broken_intra_doc_links = "allow"
+$ env RUSTDOCFLAGS=-Dwarnings cargo doc --workspace --no-deps --locked
+       Generated $S/target/doc/doc/member/index.html
+     Documenting member v0.1.0 (outer/repo/member)
+    -> exit 0
+# C3 member/Cargo.toml [lib] doc = false
+$ env RUSTDOCFLAGS=-Dwarnings cargo doc --workspace --no-deps --locked
+    -> exit 0
+# C4 member/Cargo.toml [package.metadata.docs.rs] rustdoc-args
+$ env RUSTDOCFLAGS=-Dwarnings cargo doc --workspace --no-deps --locked
+     Documenting member v0.1.0 (outer/repo/member)
+    error: unresolved link to `nope`
+    -> exit 101
+# C5 source: #![allow(rustdoc::broken_intra_doc_links)]
+$ env RUSTDOCFLAGS=-Dwarnings cargo doc --workspace --no-deps --locked
+       Generated $S/target/doc/doc/member/index.html
+     Documenting member v0.1.0 (outer/repo/member)
+    -> exit 0
+# C6 repo/.cargo/config.toml [build] rustdoc = "/usr/bin/true"
+$ env RUSTDOCFLAGS=-Dwarnings cargo doc --workspace --no-deps --locked
+     Documenting member v0.1.0 (outer/repo/member)
+    -> exit 0
+# C6b the same with RUSTDOC=rustdoc in the environment
+$ env RUSTDOC=rustdoc env RUSTDOCFLAGS=-Dwarnings cargo doc --workspace --no-deps --locked
+     Documenting member v0.1.0 (outer/repo/member)
+    error: unresolved link to `nope`
+    -> exit 101
+# C7 repo/.cargo/config.toml [env] RUSTDOCFLAGS forced (does cargo itself take its flags from [env]?)
+$ env RUSTDOCFLAGS=-Dwarnings cargo doc --workspace --no-deps --locked
+     Documenting member v0.1.0 (outer/repo/member)
+    error: unresolved link to `nope`
+    -> exit 101
+# C8 repo/.cargo/config.toml [alias] doc = "help" (doc is built in)
+$ env RUSTDOCFLAGS=-Dwarnings cargo doc --workspace --no-deps --locked
+     Documenting member v0.1.0 (outer/repo/member)
+    error: unresolved link to `nope`
+    warning: user-defined alias `doc` is ignored, because it is shadowed by a built-in command
+    -> exit 101
+
+## D. file-lookup trace: paths in the tree opened or probed, outside target/
+      ENOENT/ERR outer/.cargo
+      ENOENT/ERR outer/.cargo/config
+      ENOENT/ERR outer/.cargo/config.toml
+      ENOENT/ERR outer/repo/.cargo
+      ENOENT/ERR outer/repo/.cargo/config
+      ENOENT/ERR outer/repo/.cargo/config.toml
+      ENOENT/ERR outer/repo/member/.git
+      ENOENT/ERR outer/repo/member/benches
+      ENOENT/ERR outer/repo/member/build.rs
+      ENOENT/ERR outer/repo/member/examples
+      ENOENT/ERR outer/repo/member/HEAD
+      ENOENT/ERR outer/repo/member/README
+      ENOENT/ERR outer/repo/member/README.md
+      ENOENT/ERR outer/repo/member/README.txt
+      ENOENT/ERR outer/repo/member/src/bin
+      ENOENT/ERR outer/repo/member/src/main.rs
+      ENOENT/ERR outer/repo/member/tests
+      OK outer
+      OK outer/repo
+      OK outer/repo/.git
+      OK outer/repo/Cargo.lock
+      OK outer/repo/Cargo.toml
+      OK outer/repo/member
+      OK outer/repo/member/Cargo.toml
+      OK outer/repo/member/src
+      OK outer/repo/member/src/lib.rs

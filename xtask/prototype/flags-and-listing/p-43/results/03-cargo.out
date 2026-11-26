@@ -1,0 +1,243 @@
+## versions
+cargo 1.100.0 (3acc79c0c 2026-11-05)
+
+## A. baseline
+$ (cd outer/repo &&  cargo metadata | target_directory ; cargo --list | grep canary)
+    target_directory = outer/repo/target
+
+## B. one candidate at a time, cwd = workspace root
+
+# only outer/repo/.cargo/config.toml (ID 1)
+$ (cd outer/repo &&  cargo metadata | target_directory ; cargo --list | grep canary)
+    target_directory = outer/repo/td-1
+    alias: canary-1             alias: version
+
+# only outer/repo/.cargo/config (ID 2)
+$ (cd outer/repo &&  cargo metadata | target_directory ; cargo --list | grep canary)
+    stderr: warning: `outer/repo/.cargo/config` is deprecated in favor of `config.toml`
+    target_directory = outer/repo/td-2
+    alias: canary-2             alias: version
+
+# only outer/repo/member/.cargo/config.toml (ID 3)
+$ (cd outer/repo &&  cargo metadata | target_directory ; cargo --list | grep canary)
+    target_directory = outer/repo/target
+
+# only outer/repo/member/.cargo/config (ID 4)
+$ (cd outer/repo &&  cargo metadata | target_directory ; cargo --list | grep canary)
+    target_directory = outer/repo/target
+
+# only outer/repo/member/src/.cargo/config.toml (ID 5)
+$ (cd outer/repo &&  cargo metadata | target_directory ; cargo --list | grep canary)
+    target_directory = outer/repo/target
+
+# only outer/.cargo/config.toml (ID 6)
+$ (cd outer/repo &&  cargo metadata | target_directory ; cargo --list | grep canary)
+    target_directory = outer/td-6
+    alias: canary-6             alias: version
+
+# only outer/.cargo/config (ID 7)
+$ (cd outer/repo &&  cargo metadata | target_directory ; cargo --list | grep canary)
+    stderr: warning: `outer/.cargo/config` is deprecated in favor of `config.toml`
+    target_directory = outer/td-7
+    alias: canary-7             alias: version
+
+# only .cargo/config.toml (ID 8)
+$ (cd outer/repo &&  cargo metadata | target_directory ; cargo --list | grep canary)
+    target_directory = td-8
+    alias: canary-8             alias: version
+
+# only $HOME/.cargo/config.toml (ID 9)
+$ (cd outer/repo &&  cargo metadata | target_directory ; cargo --list | grep canary)
+    target_directory = $HOME/td-9
+    alias: canary-9             alias: version
+
+# only $HOME/.cargo/config (ID 10)
+$ (cd outer/repo &&  cargo metadata | target_directory ; cargo --list | grep canary)
+    stderr: warning: `$HOME/.cargo/config` is deprecated in favor of `config.toml`
+    target_directory = $HOME/td-10
+    alias: canary-10            alias: version
+
+# only outer/repo/.cargo/config.json (ID 11)
+$ (cd outer/repo &&  cargo metadata | target_directory ; cargo --list | grep canary)
+    target_directory = outer/repo/target
+
+# only outer/repo/.cargo/config.d/extra.toml (ID 12)
+$ (cd outer/repo &&  cargo metadata | target_directory ; cargo --list | grep canary)
+    target_directory = outer/repo/target
+
+# only outer/repo/cargo.toml.d/x.toml (ID 13)
+$ (cd outer/repo &&  cargo metadata | target_directory ; cargo --list | grep canary)
+    target_directory = outer/repo/target
+
+# only outer/repo/.config/cargo.toml (ID 14)
+$ (cd outer/repo &&  cargo metadata | target_directory ; cargo --list | grep canary)
+    target_directory = outer/repo/target
+
+# only outer/repo/.config/cargo/config.toml (ID 15)
+$ (cd outer/repo &&  cargo metadata | target_directory ; cargo --list | grep canary)
+    target_directory = outer/repo/target
+
+# only outer/repo/config.toml (ID 16)
+$ (cd outer/repo &&  cargo metadata | target_directory ; cargo --list | grep canary)
+    target_directory = outer/repo/target
+
+# only outer/repo/.cargo.toml (ID 17)
+$ (cd outer/repo &&  cargo metadata | target_directory ; cargo --list | grep canary)
+    target_directory = outer/repo/target
+
+# only outer/repo/cargo-config.toml (ID 18)
+$ (cd outer/repo &&  cargo metadata | target_directory ; cargo --list | grep canary)
+    target_directory = outer/repo/target
+
+# only outer/repo/.cargo/Config.TOML (ID 19)
+$ (cd outer/repo &&  cargo metadata | target_directory ; cargo --list | grep canary)
+    target_directory = outer/repo/td-19
+    alias: canary-19            alias: version
+
+## C. cwd = member directory
+# member, root, outer and CARGO_HOME files all present
+$ (cd outer/repo/member &&  cargo metadata | target_directory ; cargo --list | grep canary)
+    target_directory = outer/repo/member/td-member
+    alias: canary-home          alias: version
+    alias: canary-member        alias: version
+    alias: canary-outer         alias: version
+    alias: canary-root          alias: version
+# same files, cwd = workspace root
+$ (cd outer/repo &&  cargo metadata | target_directory ; cargo --list | grep canary)
+    target_directory = outer/repo/td-root
+    alias: canary-home          alias: version
+    alias: canary-outer         alias: version
+    alias: canary-root          alias: version
+# same files, cwd outside the tree, --manifest-path into it
+    target_directory = $HOME/td-home
+
+## D. config and config.toml in the same directory
+$ (cd outer/repo &&  cargo metadata | target_directory ; cargo --list | grep canary)
+    stderr: warning: both `outer/repo/.cargo/config` and `outer/repo/.cargo/config.toml` exist. Using `outer/repo/.cargo/config`
+    target_directory = outer/repo/td-legacy
+    alias: canary-legacy        alias: version
+# full stderr:
+warning: both `outer/repo/.cargo/config` and `outer/repo/.cargo/config.toml` exist. Using `outer/repo/.cargo/config`
+{"packages":[{"name":"member","version":"0.1.0","id":"path+file://outer/repo/member#0.1.0","license":"MIT","license_file":null,"description":null,"source":null,"dependencies":[],"targets":[{"kind":["lib"],"crate_types":["lib"],"name":"member","src_path":"outer/repo/member/src/lib.rs","edition":"2024","doc":true,"doctest":true,"test":true}],"features":{},"manifest_path":"outer/repo/member/Cargo.toml","metadata":null,"publish":[],"authors":[],"categories":[],"keywords":[],"readme":null,"repository":null,"homepage":null,"documentation":null,"edition":"2024","links":null,"default_run":null,"rust_version":null}],"workspace_members":["path+file://outer/repo/member#0.1.0"],"workspace_default_members":["path+file://outer/repo/member#0.1.0"],"resolve":null,"target_directory":"outer/repo/td-legacy","build_directory":"outer/repo/td-legacy","version":1,"workspace_root":"outer/repo","metadata":null}
+
+## E. explicit settings against an in-tree file (repo/.cargo/config.toml sets target-dir=td-root)
+# E1: CARGO_BUILD_TARGET_DIR / CARGO_TARGET_DIR in the environment
+$ (cd outer/repo && CARGO_TARGET_DIR=/tmp/td-env cargo metadata | target_directory ; cargo --list | grep canary)
+    target_directory = /tmp/td-env
+    alias: canary-root          alias: version
+# E2: --config on the command line
+    target_directory = outer/repo/td-cli
+# E3: the in-tree alias is still defined with the variable set (the file is still read):
+    canary-root          alias: version
+# E4: include = [...] inside .cargo/config.toml pulling an unprotected path
+$ (cd outer/repo &&  cargo metadata | target_directory ; cargo --list | grep canary)
+    target_directory = outer/td-included
+    alias: canary-included      alias: version
+
+## F. rustflags: environment against file (clippy canary: clippy.toml disallows std::env::var, the source calls it)
+# F1: [build] rustflags = ["--cap-lints","allow"] in repo/.cargo/config.toml, no variable
+$ cargo clippy --workspace --all-targets --locked -- -D warnings
+        Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.14s
+  -> exit 0
+# F2: plus RUSTFLAGS=--cfg=x in the environment
+$ RUSTFLAGS=--cfg=x cargo clippy --workspace --all-targets --locked -- -D warnings
+      = note: CANARY
+    error: could not compile `member` (lib test) due to 1 previous error
+    error: could not compile `member` (lib) due to 1 previous error
+    error: use of a disallowed method `std::env::var`
+  -> exit 101
+# F3: plus RUSTFLAGS= (set, empty)
+$ RUSTFLAGS= cargo clippy --workspace --all-targets --locked -- -D warnings
+      = note: CANARY
+    error: could not compile `member` (lib test) due to 1 previous error
+    error: could not compile `member` (lib) due to 1 previous error
+    error: use of a disallowed method `std::env::var`
+  -> exit 101
+# F4: plus CARGO_ENCODED_RUSTFLAGS= (set, empty)
+$ CARGO_ENCODED_RUSTFLAGS= cargo clippy --workspace --all-targets --locked -- -D warnings
+      = note: CANARY
+    error: could not compile `member` (lib test) due to 1 previous error
+    error: could not compile `member` (lib) due to 1 previous error
+    error: use of a disallowed method `std::env::var`
+  -> exit 101
+# F5: plus CARGO_BUILD_RUSTFLAGS=--cfg=x
+$ CARGO_BUILD_RUSTFLAGS=--cfg=x cargo clippy --workspace --all-targets --locked -- -D warnings
+        Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.05s
+  -> exit 0
+# F6: [target.aarch64-apple-darwin] rustflags in the file, RUSTFLAGS=--cfg=x in the environment
+$ RUSTFLAGS=--cfg=x cargo clippy --workspace --all-targets --locked -- -D warnings
+      = note: CANARY
+    error: could not compile `member` (lib test) due to 1 previous error
+    error: could not compile `member` (lib) due to 1 previous error
+    error: use of a disallowed method `std::env::var`
+  -> exit 101
+# F7: same file, CARGO_BUILD_RUSTFLAGS=--cfg=x
+$ CARGO_BUILD_RUSTFLAGS=--cfg=x cargo clippy --workspace --all-targets --locked -- -D warnings
+        Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.03s
+  -> exit 0
+# F8: same file, --config 'build.rustflags=[]' on the command line
+$ cargo clippy --config build.rustflags=[] --workspace --all-targets --locked -- -D warnings
+        Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.03s
+  -> exit 0
+
+## G. cargo test: inputs that change the verdict of a failing test
+# G0: control
+$ cargo test --workspace --locked
+        Finished `test` profile [unoptimized + debuginfo] target(s) in 0.38s
+    error: test failed, to rerun pass `--lib`
+  -> exit 101
+# G1: repo/.cargo/config.toml [target.aarch64-apple-darwin] runner = "/usr/bin/true"
+$ cargo test --workspace --locked
+        Finished `test` profile [unoptimized + debuginfo] target(s) in 0.09s
+  -> exit 0
+# G2: same, CARGO_TARGET_AARCH64_APPLE_DARWIN_RUNNER= (empty) in the environment
+$ CARGO_TARGET_AARCH64_APPLE_DARWIN_RUNNER= cargo test --workspace --locked
+    error: error in environment variable `CARGO_TARGET_AARCH64_APPLE_DARWIN_RUNNER`: could not load config key `target.aarch64-apple-darwin.runner`
+  -> exit 101
+# G3: [target."cfg(all())"] runner in the file, CARGO_TARGET_AARCH64_APPLE_DARWIN_RUNNER=/usr/bin/env in the environment
+$ CARGO_TARGET_AARCH64_APPLE_DARWIN_RUNNER=/usr/bin/env cargo test --workspace --locked
+        Finished `test` profile [unoptimized + debuginfo] target(s) in 0.09s
+    error: test failed, to rerun pass `--lib`
+  -> exit 101
+# G4: member/Cargo.toml [lib] test = false
+$ cargo test --workspace --locked
+        Finished `test` profile [unoptimized + debuginfo] target(s) in 0.00s
+  -> exit 0
+# G5: member/build.rs added (no Cargo.toml change) emits a cfg that compiles the failing test out
+$ cargo test --workspace --locked
+        Finished `test` profile [unoptimized + debuginfo] target(s) in 0.32s
+  -> exit 0
+
+## H. file-lookup trace of 'cargo metadata' from the member directory: config-like and manifest probes
+   1  open ENOENT/ERR .cargo/config
+   1  open ENOENT/ERR /.cargo/config
+   1  open ENOENT/ERR /private/.cargo/config
+   1  open ENOENT/ERR /private/tmp/.cargo/config
+   1  open ENOENT/ERR <scratch-parent>/.cargo/config
+   1  open ENOENT/ERR <scratch-parent>/.cargo/config
+   1  open ENOENT/ERR <scratch>/.cargo/config
+   1  open ENOENT/ERR <tmp>/.cargo/config
+   1  open ENOENT/ERR $HOME/.cargo/config
+   1  open ENOENT/ERR $S/.cargo/config
+   1  open ENOENT/ERR $S/fx/.cargo/config
+   1  open ENOENT/ERR outer/.cargo/config
+   1  open ENOENT/ERR outer/repo/.cargo/config
+   1  open ENOENT/ERR outer/repo/member/.cargo/config
+   1  open OK outer/repo/Cargo.toml
+   1  open OK outer/repo/member/Cargo.toml
+   1  stat ENOENT/ERR .cargo/config.toml
+   1  stat ENOENT/ERR /.cargo/config.toml
+   1  stat ENOENT/ERR /private/.cargo/config.toml
+   1  stat ENOENT/ERR /private/tmp/.cargo/config.toml
+   1  stat ENOENT/ERR <scratch-parent>/.cargo/config.toml
+   1  stat ENOENT/ERR <scratch-parent>/.cargo/config.toml
+   1  stat ENOENT/ERR <scratch>/.cargo/config.toml
+   1  stat ENOENT/ERR <tmp>/.cargo/config.toml
+   1  stat ENOENT/ERR $HOME/.cargo/config.toml
+   1  stat ENOENT/ERR $S/.cargo/config.toml
+   1  stat ENOENT/ERR $S/fx/.cargo/config.toml
+   1  stat ENOENT/ERR outer/.cargo/config.toml
+   1  stat ENOENT/ERR outer/repo/.cargo/config.toml
+   1  stat ENOENT/ERR outer/repo/member/.cargo/config.toml
+   1  stat OK outer/repo/Cargo.toml
+   1  stat OK outer/repo/member/Cargo.toml

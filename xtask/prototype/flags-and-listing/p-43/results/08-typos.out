@@ -1,0 +1,349 @@
+## versions
+typos-cli 1.52.2
+
+## A. baseline (every word reported in every file)
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: teh recieve seperate occured definately
+    reported in ./NOTES.md: teh recieve seperate occured definately
+    -> exit 2
+
+## B. one candidate at a time, cwd = workspace root (the candidate accepts 'teh')
+
+# only repo/typos.toml
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: recieve seperate occured definately
+    reported in ./NOTES.md: recieve seperate occured definately
+    -> exit 2
+
+# only repo/_typos.toml
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: recieve seperate occured definately
+    reported in ./NOTES.md: recieve seperate occured definately
+    -> exit 2
+
+# only repo/.typos.toml
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: recieve seperate occured definately
+    reported in ./NOTES.md: recieve seperate occured definately
+    -> exit 2
+
+# only repo/.config/typos.toml
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: teh recieve seperate occured definately
+    reported in ./NOTES.md: teh recieve seperate occured definately
+    -> exit 2
+
+# only repo/.cargo/typos.toml
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: teh recieve seperate occured definately
+    reported in ./NOTES.md: teh recieve seperate occured definately
+    -> exit 2
+
+# only repo/typos.yaml
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: teh recieve seperate occured definately
+    reported in ./NOTES.md: teh recieve seperate occured definately
+    reported in ./typos.yaml: teh teh
+    -> exit 2
+
+# only repo/.typos
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: teh recieve seperate occured definately
+    reported in ./NOTES.md: teh recieve seperate occured definately
+    -> exit 2
+
+# only repo/.typosrc
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: teh recieve seperate occured definately
+    reported in ./NOTES.md: teh recieve seperate occured definately
+    -> exit 2
+
+# only repo/pyproject.toml
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: recieve seperate occured definately
+    reported in ./NOTES.md: recieve seperate occured definately
+    -> exit 2
+
+# only repo/member/typos.toml
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: teh recieve seperate occured definately
+    reported in ./NOTES.md: teh recieve seperate occured definately
+    -> exit 2
+
+# only repo/member/_typos.toml
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: teh recieve seperate occured definately
+    reported in ./NOTES.md: teh recieve seperate occured definately
+    -> exit 2
+
+# only repo/member/.typos.toml
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: teh recieve seperate occured definately
+    reported in ./NOTES.md: teh recieve seperate occured definately
+    -> exit 2
+
+# only repo/member/src/typos.toml
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: teh recieve seperate occured definately
+    reported in ./NOTES.md: teh recieve seperate occured definately
+    -> exit 2
+
+# only outer/typos.toml
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: recieve seperate occured definately
+    reported in ./NOTES.md: recieve seperate occured definately
+    -> exit 2
+
+# only outer/.typos.toml
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: recieve seperate occured definately
+    reported in ./NOTES.md: recieve seperate occured definately
+    -> exit 2
+
+# only typos.toml
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: recieve seperate occured definately
+    reported in ./NOTES.md: recieve seperate occured definately
+    -> exit 2
+
+# only $HOME/typos.toml
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: teh recieve seperate occured definately
+    reported in ./NOTES.md: teh recieve seperate occured definately
+    -> exit 2
+
+# only $HOME/.typos.toml
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: teh recieve seperate occured definately
+    reported in ./NOTES.md: teh recieve seperate occured definately
+    -> exit 2
+
+# only $HOME/.config/typos.toml
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: teh recieve seperate occured definately
+    reported in ./NOTES.md: teh recieve seperate occured definately
+    -> exit 2
+
+# only $HOME/.config/typos/typos.toml
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: teh recieve seperate occured definately
+    reported in ./NOTES.md: teh recieve seperate occured definately
+    -> exit 2
+
+# only [workspace.metadata.typos] in repo/Cargo.toml
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: recieve seperate occured definately
+    reported in ./NOTES.md: recieve seperate occured definately
+    -> exit 2
+
+# only [package.metadata.typos] in member/Cargo.toml
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: teh recieve seperate occured definately
+    reported in ./NOTES.md: teh recieve seperate occured definately
+    -> exit 2
+
+## C. several at once: which is read, are they layered?
+# repo: typos.toml=teh, _typos.toml=recieve, .typos.toml=seperate, Cargo.toml=occured, pyproject.toml=definately
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: recieve seperate occured definately
+    reported in ./NOTES.md: recieve seperate occured definately
+    -> exit 2
+# typos.toml removed
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: teh seperate occured definately
+    reported in ./NOTES.md: teh seperate occured definately
+    -> exit 2
+# _typos.toml removed
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: teh recieve occured definately
+    reported in ./NOTES.md: teh recieve occured definately
+    -> exit 2
+# .typos.toml removed
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: teh recieve seperate definately
+    reported in ./NOTES.md: teh recieve seperate definately
+    -> exit 2
+# repo/typos.toml=teh, member/.typos.toml=recieve, outer/.typos.toml=seperate; cwd = workspace root
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: recieve seperate occured definately
+    reported in ./NOTES.md: recieve seperate occured definately
+    -> exit 2
+# same, cwd = member
+$ (cd outer/repo/member && typos )
+    reported in ./src/lib.rs: teh seperate occured definately
+    -> exit 2
+# same, cwd = outer, argument repo
+$ (cd outer && typos repo)
+    reported in repo/member/src/lib.rs: recieve seperate occured definately
+    reported in repo/NOTES.md: recieve seperate occured definately
+    -> exit 2
+# only [package.metadata.typos] in member/Cargo.toml, cwd = member
+$ (cd outer/repo/member && typos )
+    reported in ./src/lib.rs: recieve seperate occured definately
+    -> exit 2
+# only repo/typos.toml=teh, cwd = member (no config file in member but its Cargo.toml)
+$ (cd outer/repo/member && typos )
+    reported in ./src/lib.rs: recieve seperate occured definately
+    -> exit 2
+# only repo/typos.toml=teh, cwd = member/src
+$ (cd outer/repo/member/src && typos )
+    reported in ./lib.rs: recieve seperate occured definately
+    -> exit 2
+
+## D. explicit arguments (repo/typos.toml=teh is the protected file; siblings: repo/.typos.toml? no - member/.typos.toml=recieve, [package.metadata.typos]=seperate, outer/.typos.toml=occured)
+# D0 control
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: recieve seperate occured definately
+    reported in ./NOTES.md: recieve seperate occured definately
+    -> exit 2
+# D1 --config typos.toml
+$ (cd outer/repo && typos --config typos.toml)
+    reported in ./member/src/lib.rs: recieve seperate occured definately
+    reported in ./NOTES.md: recieve seperate occured definately
+    -> exit 2
+# D2 --isolated
+$ (cd outer/repo && typos --isolated)
+    reported in ./member/src/lib.rs: teh recieve seperate occured definately
+    reported in ./NOTES.md: teh recieve seperate occured definately
+    -> exit 2
+# D3 --isolated --config typos.toml
+$ (cd outer/repo && typos --isolated --config typos.toml)
+    reported in ./member/src/lib.rs: recieve seperate occured definately
+    reported in ./NOTES.md: recieve seperate occured definately
+    -> exit 2
+# D4 --config <file outside the tree accepting 'definately'>
+$ (cd outer/repo && typos --config trusted/typos.toml)
+    reported in ./member/src/lib.rs: recieve seperate occured
+    reported in ./NOTES.md: recieve seperate occured
+    -> exit 2
+# D5 --isolated --config <that file>
+$ (cd outer/repo && typos --isolated --config trusted/typos.toml)
+    reported in ./member/src/lib.rs: teh recieve seperate occured
+    reported in ./NOTES.md: teh recieve seperate occured
+    -> exit 2
+
+## E. files that take paths out of the check (no config; NOTES.md and member/src/lib.rs both hold all five words)
+# outer/repo/.ignore contains 'NOTES.md'
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: teh recieve seperate occured definately
+    -> exit 2
+# outer/repo/.gitignore contains 'NOTES.md'
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: teh recieve seperate occured definately
+    -> exit 2
+# outer/repo/.git/info/exclude contains 'NOTES.md'
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: teh recieve seperate occured definately
+    -> exit 2
+# outer/repo/.typosignore contains 'NOTES.md'
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: teh recieve seperate occured definately
+    reported in ./NOTES.md: teh recieve seperate occured definately
+    -> exit 2
+# outer/repo/.rgignore contains 'NOTES.md'
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: teh recieve seperate occured definately
+    reported in ./NOTES.md: teh recieve seperate occured definately
+    -> exit 2
+# outer/repo/member/.ignore contains 'src/'
+$ (cd outer/repo && typos )
+    reported in ./NOTES.md: teh recieve seperate occured definately
+    -> exit 2
+# outer/.ignore contains 'NOTES.md'
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: teh recieve seperate occured definately
+    -> exit 2
+# outer/.gitignore contains 'NOTES.md'
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: teh recieve seperate occured definately
+    reported in ./NOTES.md: teh recieve seperate occured definately
+    -> exit 2
+# outer/repo/.gitattributes contains 'NOTES.md linguist-generated=true -diff binary'
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: teh recieve seperate occured definately
+    reported in ./NOTES.md: teh recieve seperate occured definately
+    -> exit 2
+# $HOME/.config/git/ignore contains 'NOTES.md' (git's global excludes file)
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: teh recieve seperate occured definately
+    -> exit 2
+# a hidden file .hidden.md and sub/x.md, each holding 'teh'
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: teh recieve seperate occured definately
+    reported in ./NOTES.md: teh recieve seperate occured definately
+    reported in ./sub/x.md: teh
+    -> exit 2
+# same with --hidden
+$ (cd outer/repo && typos --hidden)
+    reported in ./.hidden.md: teh
+    reported in ./member/src/lib.rs: teh recieve seperate occured definately
+    reported in ./NOTES.md: teh recieve seperate occured definately
+    reported in ./sub/x.md: teh
+    -> exit 2
+# E2 the ignore files against explicit arguments: repo/.ignore and repo/.gitignore both list NOTES.md
+# control
+$ (cd outer/repo && typos )
+    -> exit 0
+# --isolated
+$ (cd outer/repo && typos --isolated)
+    -> exit 0
+# --no-ignore
+$ (cd outer/repo && typos --no-ignore)
+    reported in ./member/src/lib.rs: teh recieve seperate occured definately
+    reported in ./NOTES.md: teh recieve seperate occured definately
+    -> exit 2
+# --no-ignore-dot
+$ (cd outer/repo && typos --no-ignore-dot)
+    reported in ./NOTES.md: teh recieve seperate occured definately
+    -> exit 2
+# --no-ignore-vcs
+$ (cd outer/repo && typos --no-ignore-vcs)
+    reported in ./member/src/lib.rs: teh recieve seperate occured definately
+    -> exit 2
+# --isolated --no-ignore --hidden
+$ (cd outer/repo && typos --isolated --no-ignore --hidden)
+    reported in ./member/src/lib.rs: teh recieve seperate occured definately
+    reported in ./NOTES.md: teh recieve seperate occured definately
+    -> exit 2
+# E3 exclusion through a config key: repo/.typos.toml: [files] extend-exclude = ["*"]
+$ (cd outer/repo && typos )
+    -> exit 0
+# E4 [default] extend-ignore-re = [".*"] in member/.typos.toml
+$ (cd outer/repo && typos )
+    reported in ./member/src/lib.rs: teh recieve seperate occured definately
+    reported in ./NOTES.md: teh recieve seperate occured definately
+    -> exit 2
+
+## F. file-lookup trace, no config, cwd = workspace root: config- and ignore-like names probed in the workspace root and above
+       1 getattrlist OK outer/repo/Cargo.lock
+       1 getattrlist OK outer/repo/member
+       1 getattrlist OK outer/repo/member/src
+       1 getattrlist OK outer/repo/member/src/lib.rs
+       1 getattrlist OK outer/repo/NOTES.md
+       1 open ENOENT/ERR /etc/gitconfig
+       1 open ENOENT/ERR $HOME/.config/git/config
+       1 open ENOENT/ERR $HOME/.gitconfig
+       1 open OK outer/repo/Cargo.toml
+       1 stat ENOENT/ERR /private/tmp/_typos.toml
+       1 stat ENOENT/ERR /private/tmp/.gitignore
+       1 stat ENOENT/ERR /private/tmp/.ignore
+       1 stat ENOENT/ERR /private/tmp/.typos.toml
+       1 stat ENOENT/ERR /private/tmp/pyproject.toml
+       1 stat ENOENT/ERR /private/tmp/typos.toml
+       1 stat ENOENT/ERR $HOME/.config/git/ignore
+       1 stat ENOENT/ERR outer/_typos.toml
+       1 stat ENOENT/ERR outer/.git
+       1 stat ENOENT/ERR outer/.git/info/exclude
+       1 stat ENOENT/ERR outer/.gitignore
+       1 stat ENOENT/ERR outer/.ignore
+       1 stat ENOENT/ERR outer/.jj
+       1 stat ENOENT/ERR outer/.typos.toml
+       1 stat ENOENT/ERR outer/Cargo.toml
+       1 stat ENOENT/ERR outer/pyproject.toml
+       1 stat ENOENT/ERR outer/repo/_typos.toml
+       1 stat ENOENT/ERR outer/repo/.typos.toml
+       1 stat ENOENT/ERR outer/repo/pyproject.toml
+       1 stat ENOENT/ERR outer/repo/typos.toml
+       1 stat ENOENT/ERR outer/typos.toml
+      12 stat OK outer/repo
+       1 stat OK outer/repo/Cargo.toml

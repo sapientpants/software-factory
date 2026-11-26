@@ -1,0 +1,260 @@
+## versions
+cargo 1.100.0 (3acc79c0c 2026-11-05)
+rustfmt 1.11.0-stable (0ef1bc3860 2026-11-09)
+rustfmt 1.11.0-stable (0ef1bc3860 2026-11-09)
+
+## A. baseline: no configuration file anywhere
+$ (cd outer/repo && cargo fmt --all --check -- -v)
+  -> exit 0; no space-indent diff
+
+## B. one candidate at a time (workspace root as cwd). tab_spaces value identifies the file.
+
+# only outer/repo/rustfmt.toml (tab_spaces = 11)
+$ (cd outer/repo && cargo fmt --all --check -- -v)
+Using rustfmt config file outer/repo/rustfmt.toml for outer/repo/member/src/lib.rs
+  -> exit 1; rustfmt wants an indent of 11 spaces
+
+# only outer/repo/.rustfmt.toml (tab_spaces = 12)
+$ (cd outer/repo && cargo fmt --all --check -- -v)
+Using rustfmt config file outer/repo/.rustfmt.toml for outer/repo/member/src/lib.rs
+  -> exit 1; rustfmt wants an indent of 12 spaces
+
+# only outer/repo/member/rustfmt.toml (tab_spaces = 13)
+$ (cd outer/repo && cargo fmt --all --check -- -v)
+Using rustfmt config file outer/repo/member/rustfmt.toml for outer/repo/member/src/lib.rs
+  -> exit 1; rustfmt wants an indent of 13 spaces
+
+# only outer/repo/member/.rustfmt.toml (tab_spaces = 14)
+$ (cd outer/repo && cargo fmt --all --check -- -v)
+Using rustfmt config file outer/repo/member/.rustfmt.toml for outer/repo/member/src/lib.rs
+  -> exit 1; rustfmt wants an indent of 14 spaces
+
+# only outer/repo/member/src/rustfmt.toml (tab_spaces = 15)
+$ (cd outer/repo && cargo fmt --all --check -- -v)
+Using rustfmt config file outer/repo/member/src/rustfmt.toml for outer/repo/member/src/lib.rs
+  -> exit 1; rustfmt wants an indent of 15 spaces
+
+# only outer/repo/member/src/.rustfmt.toml (tab_spaces = 16)
+$ (cd outer/repo && cargo fmt --all --check -- -v)
+Using rustfmt config file outer/repo/member/src/.rustfmt.toml for outer/repo/member/src/lib.rs
+  -> exit 1; rustfmt wants an indent of 16 spaces
+
+# only outer/rustfmt.toml (tab_spaces = 17)
+$ (cd outer/repo && cargo fmt --all --check -- -v)
+Using rustfmt config file outer/rustfmt.toml for outer/repo/member/src/lib.rs
+  -> exit 1; rustfmt wants an indent of 17 spaces
+
+# only outer/.rustfmt.toml (tab_spaces = 18)
+$ (cd outer/repo && cargo fmt --all --check -- -v)
+Using rustfmt config file outer/.rustfmt.toml for outer/repo/member/src/lib.rs
+  -> exit 1; rustfmt wants an indent of 18 spaces
+
+# only rustfmt.toml (tab_spaces = 19)
+$ (cd outer/repo && cargo fmt --all --check -- -v)
+Using rustfmt config file rustfmt.toml for outer/repo/member/src/lib.rs
+  -> exit 1; rustfmt wants an indent of 19 spaces
+
+# only $HOME/rustfmt.toml (tab_spaces = 20)
+$ (cd outer/repo && cargo fmt --all --check -- -v)
+Using rustfmt config file $HOME/rustfmt.toml for outer/repo/member/src/lib.rs
+  -> exit 1; rustfmt wants an indent of 20 spaces
+
+# only $HOME/.rustfmt.toml (tab_spaces = 21)
+$ (cd outer/repo && cargo fmt --all --check -- -v)
+Using rustfmt config file $HOME/.rustfmt.toml for outer/repo/member/src/lib.rs
+  -> exit 1; rustfmt wants an indent of 21 spaces
+
+# only $HOME/.config/rustfmt/rustfmt.toml (tab_spaces = 22)
+$ (cd outer/repo && cargo fmt --all --check -- -v)
+  -> exit 0; no space-indent diff
+
+# only $HOME/.config/rustfmt/.rustfmt.toml (tab_spaces = 23)
+$ (cd outer/repo && cargo fmt --all --check -- -v)
+  -> exit 0; no space-indent diff
+
+# only $HOME/.config/rustfmt.toml (tab_spaces = 24)
+$ (cd outer/repo && cargo fmt --all --check -- -v)
+  -> exit 0; no space-indent diff
+
+# only $HOME/Library/Application Support/rustfmt/rustfmt.toml (tab_spaces = 25)
+$ (cd outer/repo && cargo fmt --all --check -- -v)
+Using rustfmt config file $HOME/Library/Application Support/rustfmt/rustfmt.toml for outer/repo/member/src/lib.rs
+  -> exit 1; rustfmt wants an indent of 25 spaces
+
+# only $HOME/Library/Application Support/rustfmt/.rustfmt.toml (tab_spaces = 26)
+$ (cd outer/repo && cargo fmt --all --check -- -v)
+Using rustfmt config file $HOME/Library/Application Support/rustfmt/.rustfmt.toml for outer/repo/member/src/lib.rs
+  -> exit 1; rustfmt wants an indent of 26 spaces
+
+# only outer/repo/.config/rustfmt.toml (tab_spaces = 27)
+$ (cd outer/repo && cargo fmt --all --check -- -v)
+  -> exit 0; no space-indent diff
+
+# only outer/repo/.cargo/rustfmt.toml (tab_spaces = 28)
+$ (cd outer/repo && cargo fmt --all --check -- -v)
+  -> exit 0; no space-indent diff
+
+# only outer/repo/.rustfmt (tab_spaces = 29)
+$ (cd outer/repo && cargo fmt --all --check -- -v)
+  -> exit 0; no space-indent diff
+
+# only outer/repo/rustfmt (tab_spaces = 30)
+$ (cd outer/repo && cargo fmt --all --check -- -v)
+  -> exit 0; no space-indent diff
+
+# only outer/repo/rustfmt.TOML (tab_spaces = 31)
+$ (cd outer/repo && cargo fmt --all --check -- -v)
+Using rustfmt config file outer/repo/rustfmt.TOML for outer/repo/member/src/lib.rs
+  -> exit 1; rustfmt wants an indent of 31 spaces
+
+## C. precedence, same directory: repo/rustfmt.toml=2 and repo/.rustfmt.toml=3
+$ (cd outer/repo && cargo fmt --all --check -- -v)
+Using rustfmt config file outer/repo/.rustfmt.toml for outer/repo/member/src/lib.rs
+  -> exit 1; rustfmt wants an indent of 3 spaces
+# raw output of the same run:
+Diff in outer/repo/member/src/lib.rs:1:
+ pub fn f() -> u32 {
+[31m-    1
+(B[m[32m+   1
+(B[m }
+ 
+
+## D. precedence across directories
+# repo/rustfmt.toml=2, member/.rustfmt.toml=3
+$ (cd outer/repo && cargo fmt --all --check -- -v)
+Using rustfmt config file outer/repo/member/.rustfmt.toml for outer/repo/member/src/lib.rs
+  -> exit 1; rustfmt wants an indent of 3 spaces
+# repo/rustfmt.toml=2, member/src/.rustfmt.toml=3
+$ (cd outer/repo && cargo fmt --all --check -- -v)
+Using rustfmt config file outer/repo/member/src/.rustfmt.toml for outer/repo/member/src/lib.rs
+  -> exit 1; rustfmt wants an indent of 3 spaces
+# repo/rustfmt.toml=2, outer/.rustfmt.toml=3
+$ (cd outer/repo && cargo fmt --all --check -- -v)
+Using rustfmt config file outer/repo/rustfmt.toml for outer/repo/member/src/lib.rs
+  -> exit 1; rustfmt wants an indent of 2 spaces
+# outer/rustfmt.toml=2, $HOME/.rustfmt.toml=3
+$ (cd outer/repo && cargo fmt --all --check -- -v)
+Using rustfmt config file outer/rustfmt.toml for outer/repo/member/src/lib.rs
+  -> exit 1; rustfmt wants an indent of 2 spaces
+# is the nearer file merged with the farther one? repo/rustfmt.toml: max_width=20 ; member/.rustfmt.toml: tab_spaces=3
+Diff in outer/repo/member/src/lib.rs:1:
+ pub fn f() -> u32 {
+-    1
++   1
+ }
+ 
+[exit 1]
+# control: hard_tabs = true alone in repo/rustfmt.toml
+Diff in outer/repo/member/src/lib.rs:1:
+ pub fn f() -> u32 {
+-    1
++^I1
+ }
+ 
+[exit 1]
+
+## E. run from the member directory, and with --manifest-path from outside the tree
+$ (cd outer/repo/member && cargo fmt --all --check -- -v)
+Using rustfmt config file outer/repo/.rustfmt.toml for outer/repo/member/src/lib.rs
+  -> exit 1; rustfmt wants an indent of 3 spaces
+$ (cd <scratch>/p43-tools && cargo fmt --all --check --manifest-path repo/Cargo.toml -- -v)
+Using rustfmt config file outer/repo/.rustfmt.toml for outer/repo/member/src/lib.rs
++   1⏎
+[exit 1]
+
+## F. explicit arguments with a sibling present
+# F1: --config-path repo/rustfmt.toml(=4, the trusted file) while member/.rustfmt.toml=3 and repo/.rustfmt.toml=5 exist
+$ (cd outer/repo && cargo fmt --all --check -- -v)
+Using rustfmt config file outer/repo/member/.rustfmt.toml for outer/repo/member/src/lib.rs
+  -> exit 1; rustfmt wants an indent of 3 spaces
+$ (cd outer/repo && cargo fmt --all --check -- -v --config-path outer/repo/rustfmt.toml)
+Using rustfmt config file outer/repo/rustfmt.toml
+  -> exit 0; no space-indent diff
+$ (cd outer/repo && cargo fmt --all --check -- -v --config-path outer/repo)
+Using rustfmt config file outer/repo/.rustfmt.toml
+  -> exit 1; rustfmt wants an indent of 5 spaces
+# F2: --config tab_spaces=4 (inline key) while repo/.rustfmt.toml=5 and member/.rustfmt.toml: max_width=20
+Diff in outer/repo/member/src/lib.rs:1:
+ pub fn f() -> u32 {
+-    1
++^I1
+ }
+ 
+[exit 1]
+# F3: --config-path pointing at a file outside the tree, siblings in the tree
+$ (cd outer/repo && cargo fmt --all --check -- -v --config-path trusted/rustfmt.toml)
+Using rustfmt config file trusted/rustfmt.toml
+  -> exit 0; no space-indent diff
+
+## G. other inputs
+# G1: a file no target reaches (member/src/orphan.rs, badly formatted, no 'mod orphan;') is not checked
+[exit 0]
+# G2: #[rustfmt::skip] on the item
+[exit 0]
+# G3: unstable key 'ignore' in .rustfmt.toml on the stable toolchain
+Warning: can't set `ignore = IgnoreList { path_set: {"member/src/lib.rs"}, rustfmt_toml_path: "" }`, unstable features are only available in nightly channel.
+Diff in outer/repo/member/src/lib.rs:1:
+ pub fn f() -> u32 {
+-1
++    1
+ }
+ 
+[exit 1]
+# G4: disable_all_formatting = true in .rustfmt.toml (stable key), source badly formatted
+[exit 0]
+# G5: RUSTFMT set through .cargo/config.toml [env] (does cargo fmt see it?)
+Diff in outer/repo/member/src/lib.rs:1:
+ pub fn f() -> u32 {
+-1
++    1
+ }
+ 
+[exit 1]
+# G5b: RUSTFMT=/usr/bin/true in the real environment (control: the variable works)
+[exit 0]
+# G6: [alias] fmt = "--version" in .cargo/config.toml
+warning: user-defined alias `fmt` is shadowing an external subcommand found at `<home>/.cargo/bin/cargo-fmt`
+  |
+  = note: this was previously accepted but will become a hard error in the future; see <https://github.com/rust-lang/cargo/issues/10049>
+error: unexpected argument '--all' found
+
+Usage: cargo [+toolchain] [OPTIONS] [COMMAND]
+       cargo [+toolchain] [OPTIONS] -Zscript <MANIFEST_RS> [ARGS]...
+
+[exit 1]
+
+## H. file-lookup trace (interposed open/stat), no config present: every rustfmt.toml-like name probed
+   9  getattrlist OK <scratch>/p43-tools/fx/rustfmt
+   1  stat ENOENT/ERR .rustfmt.toml
+   1  stat ENOENT/ERR /.rustfmt.toml
+   1  stat ENOENT/ERR /private/.rustfmt.toml
+   1  stat ENOENT/ERR /private/rustfmt.toml
+   1  stat ENOENT/ERR /private/tmp/.rustfmt.toml
+   1  stat ENOENT/ERR <scratch-parent>/.rustfmt.toml
+   1  stat ENOENT/ERR <scratch-parent>/.rustfmt.toml
+   1  stat ENOENT/ERR <scratch-parent>/rustfmt.toml
+   1  stat ENOENT/ERR <scratch>/.rustfmt.toml
+   1  stat ENOENT/ERR <scratch>/p43-tools/.rustfmt.toml
+   1  stat ENOENT/ERR <scratch>/p43-tools/fx/.rustfmt.toml
+   1  stat ENOENT/ERR <scratch>/p43-tools/fx/rustfmt.toml
+   1  stat ENOENT/ERR <scratch>/p43-tools/rustfmt.toml
+   1  stat ENOENT/ERR <scratch>/rustfmt.toml
+   1  stat ENOENT/ERR <scratch-parent>/rustfmt.toml
+   1  stat ENOENT/ERR <tmp>/.rustfmt.toml
+   1  stat ENOENT/ERR <tmp>/rustfmt.toml
+   1  stat ENOENT/ERR /private/tmp/rustfmt.toml
+   1  stat ENOENT/ERR /rustfmt.toml
+   1  stat ENOENT/ERR $HOME/.rustfmt.toml
+   1  stat ENOENT/ERR $HOME/Library/Application Support/rustfmt/.rustfmt.toml
+   1  stat ENOENT/ERR $HOME/Library/Application Support/rustfmt/rustfmt.toml
+   1  stat ENOENT/ERR $HOME/rustfmt.toml
+   1  stat ENOENT/ERR outer/.rustfmt.toml
+   1  stat ENOENT/ERR outer/repo/.rustfmt.toml
+   1  stat ENOENT/ERR outer/repo/member/.rustfmt.toml
+   1  stat ENOENT/ERR outer/repo/member/rustfmt.toml
+   1  stat ENOENT/ERR outer/repo/member/src/.rustfmt.toml
+   1  stat ENOENT/ERR outer/repo/member/src/rustfmt.toml
+   1  stat ENOENT/ERR outer/repo/rustfmt.toml
+   1  stat ENOENT/ERR outer/rustfmt.toml
+   1  stat ENOENT/ERR rustfmt.toml
+   2  stat OK <scratch>/p43-tools/fx/rustfmt

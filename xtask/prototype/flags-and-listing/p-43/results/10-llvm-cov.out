@@ -1,0 +1,116 @@
+## versions
+cargo-llvm-cov 0.9.2
+cargo 1.100.0 (3acc79c0c 2026-11-05)
+rustc 1.100.0 (0ef1bc386 2026-11-09)
+
+## A. baseline: one function of two is covered, the gate is 100% of lines
+$ cargo llvm-cov --workspace --locked --fail-under-lines 100
+    TOTAL: lines 9, missed 3, cover 66.67%
+    -> exit 1
+
+## B. files a coverage tool might read: one at a time, each present with plausible content; a changed verdict would show it was read
+# only repo/llvm-cov.toml
+$ cargo llvm-cov --workspace --locked --fail-under-lines 100
+    TOTAL: lines 9, missed 3, cover 66.67%
+    -> exit 1
+# only repo/.llvm-cov.toml
+$ cargo llvm-cov --workspace --locked --fail-under-lines 100
+    TOTAL: lines 9, missed 3, cover 66.67%
+    -> exit 1
+# only repo/cargo-llvm-cov.toml
+$ cargo llvm-cov --workspace --locked --fail-under-lines 100
+    TOTAL: lines 9, missed 3, cover 66.67%
+    -> exit 1
+# only repo/.config/llvm-cov.toml
+$ cargo llvm-cov --workspace --locked --fail-under-lines 100
+    TOTAL: lines 9, missed 3, cover 66.67%
+    -> exit 1
+# only repo/.cargo/llvm-cov.toml
+$ cargo llvm-cov --workspace --locked --fail-under-lines 100
+    TOTAL: lines 9, missed 3, cover 66.67%
+    -> exit 1
+# only repo/codecov.yml
+$ cargo llvm-cov --workspace --locked --fail-under-lines 100
+    TOTAL: lines 9, missed 3, cover 66.67%
+    -> exit 1
+# only repo/.codecov.yml
+$ cargo llvm-cov --workspace --locked --fail-under-lines 100
+    TOTAL: lines 9, missed 3, cover 66.67%
+    -> exit 1
+# only repo/tarpaulin.toml
+$ cargo llvm-cov --workspace --locked --fail-under-lines 100
+    TOTAL: lines 9, missed 3, cover 66.67%
+    -> exit 1
+# only repo/.tarpaulin.toml
+$ cargo llvm-cov --workspace --locked --fail-under-lines 100
+    TOTAL: lines 9, missed 3, cover 66.67%
+    -> exit 1
+# [workspace.metadata.llvm-cov] / [package.metadata.llvm-cov] tables
+$ cargo llvm-cov --workspace --locked --fail-under-lines 100
+    TOTAL: lines 9, missed 3, cover 66.67%
+    -> exit 1
+
+## C. inputs that do change the verdict
+# C1 source: #[cfg(not(coverage))] on the uncovered function
+$ cargo llvm-cov --workspace --locked --fail-under-lines 100
+    TOTAL: lines 6, missed 0, cover 100.00%
+    -> exit 0
+# C2 the uncovered function lives in member/src/benches/mod.rs
+$ cargo llvm-cov --workspace --locked --fail-under-lines 100
+    TOTAL: lines 6, missed 0, cover 100.00%
+    -> exit 0
+# C2 the uncovered function lives in member/src/tests/mod.rs
+$ cargo llvm-cov --workspace --locked --fail-under-lines 100
+    TOTAL: lines 6, missed 0, cover 100.00%
+    -> exit 0
+# C2 the uncovered function lives in member/src/examples/mod.rs
+$ cargo llvm-cov --workspace --locked --fail-under-lines 100
+    TOTAL: lines 6, missed 0, cover 100.00%
+    -> exit 0
+# C2 the uncovered function lives in member/src/extra/mod.rs
+$ cargo llvm-cov --workspace --locked --fail-under-lines 100
+    TOTAL: lines 9, missed 3, cover 66.67%
+    -> exit 1
+# C3 repo/.cargo/config.toml [build] rustflags = ["--cfg","skipcov"] and the function under #[cfg(not(skipcov))] (do config rustflags reach the instrumented build?)
+$ cargo llvm-cov --workspace --locked --fail-under-lines 100
+    TOTAL: lines 6, missed 0, cover 100.00%
+    -> exit 0
+# C4 repo/.cargo/config.toml [env] with cargo-llvm-cov's own variables
+$ cargo llvm-cov --workspace --locked --fail-under-lines 100
+    TOTAL: lines 9, missed 3, cover 66.67%
+    -> exit 1
+# C4 control: the variable in the real environment
+$ env CARGO_LLVM_COV_FLAGS=--ignore-filename-regex=lib LLVM_COV_FLAGS=--ignore-filename-regex=lib cargo llvm-cov --workspace --locked --fail-under-lines 100
+    TOTAL: lines 0, missed 0, cover -
+    -> exit 1
+# C5 repo/.cargo/config.toml [alias] llvm-cov = "help"
+$ cargo llvm-cov --workspace --locked --fail-under-lines 100
+    warning: user-defined alias `llvm-cov` is shadowing an external subcommand found at `$S/tools/bin/cargo-llvm-cov`
+    error: unexpected argument '--workspace' found
+    -> exit 1
+# C6 repo/.cargo/config.toml runner = /usr/bin/true (no test runs, so no profile data)
+$ cargo llvm-cov --workspace --locked --fail-under-lines 100
+    error: failed to merge profile data: not found *.profraw files in $S/target/llvmcov/llvm-cov-target; this may occur if target directory is accidentally cleared, or running report subcommand without running any tests or binaries
+    -> exit 1
+
+## D. file-lookup trace, cwd = workspace root: paths in the tree that are opened or probed, outside target/ and src/
+      ENOENT/ERR outer/.cargo
+      ENOENT/ERR outer/.cargo/config
+      ENOENT/ERR outer/.cargo/config.toml
+      ENOENT/ERR outer/repo/.cargo
+      ENOENT/ERR outer/repo/.cargo/config
+      ENOENT/ERR outer/repo/.cargo/config.toml
+      ENOENT/ERR outer/repo/member/benches
+      ENOENT/ERR outer/repo/member/build.rs
+      ENOENT/ERR outer/repo/member/examples
+      ENOENT/ERR outer/repo/member/README
+      ENOENT/ERR outer/repo/member/README.md
+      ENOENT/ERR outer/repo/member/README.txt
+      ENOENT/ERR outer/repo/member/tests
+      OK outer
+      OK outer/repo
+      OK outer/repo/Cargo.lock
+      OK outer/repo/Cargo.toml
+      OK outer/repo/member
+      OK outer/repo/member/Cargo.toml
+      OK outer/repo/member/src

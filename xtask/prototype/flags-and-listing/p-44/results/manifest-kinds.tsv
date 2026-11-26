@@ -1,0 +1,30 @@
+1 binary	p44/bin/new.bin	new small binary (random bytes with NULs)
+1 binary	p44/bin/new.png	new valid 8x8 PNG
+1 binary	p44/bin/new.pdf	new PDF-like blob
+1 binary	p44/bin/new.svg	new SVG (text image)
+1 binary	p44/bin/modified.bin	modified binary
+1 binary	p44/bin/deleted.bin	deleted binary
+1 binary	p44/bin/text-to-binary.dat	text at base, binary at head
+1 binary	p44/bin/binary-to-text.dat	binary at base, text at head
+1 binary	p44/bin/utf16le-bom.txt	new UTF-16LE text with BOM
+1 binary	p44/bin/utf16be-bom.txt	new UTF-16BE text with BOM
+1 binary	p44/bin/empty.txt	new empty file
+1 binary	p44/bin/nul-late.txt	new text with one NUL byte after offset 12000
+1 binary	p44/bin/nul-early.txt	new text with one NUL byte in first line
+1 binary	p44/bin/latin1.txt	new ISO-8859-1 text (invalid UTF-8)
+5 other	p44/other/deleted.txt	deleted text file (30 lines)
+5 other	p44/other/rename-pure-new.txt	pure rename (same directory)
+5 other	p44/other/rename-dir-new/moved.txt	pure rename (directory moved)
+5 other	p44/other/rename-edit-new.txt	rename with one line edited
+5 other	p44/other/mode.sh	mode change only 100644 -> 100755
+5 other	p44/other/mode-and-edit.sh	mode change and one-line edit
+5 other	p44/other/link-new	new symbolic link -> modified.txt
+5 other	p44/other/whitespace.txt	whitespace-only change (3 lines)
+5 other	p44/other/eol-added.txt	only change: trailing newline added
+5 other	p44/other/eol-removed.txt	only change: trailing newline removed
+5 other	p44/other/crlf.txt	only change: LF -> CRLF on every line
+5 other	p44/other/modified.txt	control: one-line modification
+5 other	p44/other/bidi.rs	new file with bidirectional control characters (U+202E, U+2066, U+2069, U+202B, U+2067)
+5 other	p44/other/bidi-control.rs	control for bidi.rs
+5 other	p44/other/new-plain.txt	control: new 20-line text file
+5 other	p44/other/zero-width.rs	new file with zero-width characters U+200B, U+200D

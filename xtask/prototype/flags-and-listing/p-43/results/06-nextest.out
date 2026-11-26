@@ -1,0 +1,216 @@
+## versions
+cargo-nextest 0.9.152 (26ebeda79 2026-11-13)
+cargo 1.100.0 (3acc79c0c 2026-11-05)
+
+## A. baseline (one passing, one failing test; no config)
+$ (cd outer/repo && cargo nextest run --workspace --locked)
+         Summary [   0.014s] 2 tests run: 1 passed, 1 failed, 0 skipped
+      Cancelling due to test failure
+    error: test run failed
+    -> exit 100
+
+## B. one candidate at a time, cwd = workspace root
+
+# only outer/repo/.config/nextest.toml
+$ (cd outer/repo && cargo nextest run --workspace --locked)
+         Summary [   0.007s] 1 test run: 1 passed, 1 skipped
+    -> exit 0
+
+# only outer/repo/nextest.toml
+$ (cd outer/repo && cargo nextest run --workspace --locked)
+         Summary [   0.007s] 2 tests run: 1 passed, 1 failed, 0 skipped
+      Cancelling due to test failure
+    error: test run failed
+    -> exit 100
+
+# only outer/repo/.nextest.toml
+$ (cd outer/repo && cargo nextest run --workspace --locked)
+         Summary [   0.007s] 2 tests run: 1 passed, 1 failed, 0 skipped
+      Cancelling due to test failure
+    error: test run failed
+    -> exit 100
+
+# only outer/repo/.config/nextest/config.toml
+$ (cd outer/repo && cargo nextest run --workspace --locked)
+         Summary [   0.007s] 2 tests run: 1 passed, 1 failed, 0 skipped
+      Cancelling due to test failure
+    error: test run failed
+    -> exit 100
+
+# only outer/repo/.cargo/nextest.toml
+$ (cd outer/repo && cargo nextest run --workspace --locked)
+         Summary [   0.007s] 2 tests run: 1 passed, 1 failed, 0 skipped
+      Cancelling due to test failure: 1 test still running
+    error: test run failed
+    -> exit 100
+
+# only outer/repo/.nextest/config.toml
+$ (cd outer/repo && cargo nextest run --workspace --locked)
+         Summary [   0.007s] 2 tests run: 1 passed, 1 failed, 0 skipped
+      Cancelling due to test failure
+    error: test run failed
+    -> exit 100
+
+# only outer/repo/member/.config/nextest.toml
+$ (cd outer/repo && cargo nextest run --workspace --locked)
+         Summary [   0.007s] 2 tests run: 1 passed, 1 failed, 0 skipped
+      Cancelling due to test failure
+    error: test run failed
+    -> exit 100
+
+# only outer/repo/member/nextest.toml
+$ (cd outer/repo && cargo nextest run --workspace --locked)
+         Summary [   0.007s] 2 tests run: 1 passed, 1 failed, 0 skipped
+      Cancelling due to test failure
+    error: test run failed
+    -> exit 100
+
+# only outer/.config/nextest.toml
+$ (cd outer/repo && cargo nextest run --workspace --locked)
+         Summary [   0.007s] 2 tests run: 1 passed, 1 failed, 0 skipped
+      Cancelling due to test failure
+    error: test run failed
+    -> exit 100
+
+# only .config/nextest.toml
+$ (cd outer/repo && cargo nextest run --workspace --locked)
+         Summary [   0.007s] 2 tests run: 1 passed, 1 failed, 0 skipped
+      Cancelling due to test failure
+    error: test run failed
+    -> exit 100
+
+# only $HOME/.config/nextest.toml
+$ (cd outer/repo && cargo nextest run --workspace --locked)
+         Summary [   0.007s] 2 tests run: 1 passed, 1 failed, 0 skipped
+      Cancelling due to test failure
+    error: test run failed
+    -> exit 100
+
+# only $HOME/.config/nextest/config.toml
+$ (cd outer/repo && cargo nextest run --workspace --locked)
+         Summary [   0.007s] 2 tests run: 1 passed, 1 failed, 0 skipped
+      Cancelling due to test failure
+    error: test run failed
+    warning: in user config file $HOME/.config/nextest/config.toml, ignoring unknown configuration key: profile
+    -> exit 100
+
+# only $HOME/Library/Application Support/nextest/config.toml
+$ (cd outer/repo && cargo nextest run --workspace --locked)
+         Summary [   0.007s] 2 tests run: 1 passed, 1 failed, 0 skipped
+      Cancelling due to test failure
+    error: test run failed
+    -> exit 100
+
+# only outer/repo/.config/Nextest.TOML
+$ (cd outer/repo && cargo nextest run --workspace --locked)
+         Summary [   0.007s] 1 test run: 1 passed, 1 skipped
+    -> exit 0
+
+## C. cwd = member, and --manifest-path from outside
+# repo/.config/nextest.toml present
+$ (cd outer/repo/member && cargo nextest run --workspace --locked)
+         Summary [   0.007s] 1 test run: 1 passed, 1 skipped
+    -> exit 0
+$ (cd $S && cargo nextest run --workspace --locked --manifest-path outer/repo/Cargo.toml)
+         Summary [   0.007s] 1 test run: 1 passed, 1 skipped
+    -> exit 0
+# only member/.config/nextest.toml, cwd = member
+$ (cd outer/repo/member && cargo nextest run --workspace --locked)
+         Summary [   0.007s] 2 tests run: 1 passed, 1 failed, 0 skipped
+      Cancelling due to test failure
+    error: test run failed
+    -> exit 100
+
+## D. explicit arguments with repo/.config/nextest.toml (the canary) present
+# D1 --config-file <file outside the tree>
+$ (cd outer/repo && cargo nextest run --workspace --locked --config-file trusted/nextest.toml)
+         Summary [   0.007s] 2 tests run: 1 passed, 1 failed, 0 skipped
+      Cancelling due to test failure
+    error: test run failed
+    -> exit 100
+# D2 --ignore-default-filter
+$ (cd outer/repo && cargo nextest run --workspace --locked --ignore-default-filter)
+         Summary [   0.007s] 2 tests run: 1 passed, 1 failed, 0 skipped
+      Cancelling due to test failure
+    error: test run failed
+    -> exit 100
+# D3 --tool-config-file t:<trusted file> (tool config sits below the repository config)
+$ (cd outer/repo && cargo nextest run --workspace --locked --tool-config-file t:trusted/nextest.toml)
+         Summary [   0.007s] 1 test run: 1 passed, 1 skipped
+    -> exit 0
+# D4 NEXTEST_CONFIG_FILE=<trusted> (is there such a variable?)
+$ (cd outer/repo && env NEXTEST_CONFIG_FILE=trusted/nextest.toml cargo nextest run --workspace --locked)
+         Summary [   0.007s] 1 test run: 1 passed, 1 skipped
+    -> exit 0
+# D5 -E 'all()' on the command line
+$ (cd outer/repo && cargo nextest run --workspace --locked -E all())
+         Summary [   0.007s] 1 test run: 1 passed, 1 skipped
+    -> exit 0
+# D6 --profile ci where repo/.config/nextest.toml defines [profile.ci] default-filter
+$ (cd outer/repo && cargo nextest run --workspace --locked --profile ci)
+         Summary [   0.007s] 1 test run: 1 passed, 1 skipped
+    -> exit 0
+
+## E. other keys of the repository config
+# E1 per-test override (retries; shows the file steers single tests)
+$ (cd outer/repo && cargo nextest run --workspace --locked)
+         Summary [   0.023s] 2 tests run: 1 passed, 1 failed, 0 skipped
+      Cancelling due to test failure
+    error: test run failed
+    -> exit 100
+# E2 a setup script declared and switched on by the file itself
+$ (cd outer/repo && cargo nextest run --workspace --locked)
+           SETUP [      1/1] s: /bin/sh -c 'echo SETUP-SCRIPT-RAN >&2'
+         Summary [   0.015s] 2 tests run: 1 passed, 1 failed, 0 skipped
+      Cancelling due to test failure
+      SETUP PASS [   0.008s] s: /bin/sh -c 'echo SETUP-SCRIPT-RAN >&2'
+    error: test run failed
+    info: experimental features enabled: setup-scripts
+    SETUP-SCRIPT-RAN
+    -> exit 100
+# E3 a wrapper script /usr/bin/true around every test
+$ (cd outer/repo && cargo nextest run --workspace --locked)
+         Summary [   0.006s] 2 tests run: 2 passed, 0 skipped
+    info: experimental features enabled: wrapper-scripts
+    -> exit 0
+# E4 nextest-version required = 99.0.0
+$ (cd outer/repo && cargo nextest run --workspace --locked)
+    error: this repository requires nextest version 99.0.0, but the current version is 0.9.152
+    info: update nextest with cargo nextest self update, or bypass check with --override-version-check
+    -> exit 92
+# E5 an unknown key in the file
+$ (cd outer/repo && cargo nextest run --workspace --locked)
+         Summary [   0.007s] 1 test run: 1 passed, 1 skipped
+    warning: in config file .config/nextest.toml, ignoring unknown configuration key: profile.default.no_such_key
+    -> exit 0
+
+## F. inputs that are not nextest's own file
+# F1 repo/.cargo/config.toml [target.aarch64-apple-darwin] runner = "/usr/bin/true"
+$ (cd outer/repo && cargo nextest run --workspace --locked)
+         Summary [   0.000s] 0 tests run: 0 passed, 0 skipped
+    error: no tests to run
+    info: using target runner `/usr/bin/true` defined by `target.aarch64-apple-darwin.runner` within `outer/repo/.cargo/config.toml`
+    -> exit 4
+# F2 repo/.cargo/config.toml [env] NEXTEST_* (does nextest take its own options from cargo's [env]?)
+$ (cd outer/repo && cargo nextest run --workspace --locked)
+         Summary [   0.007s] 2 tests run: 1 passed, 1 failed, 0 skipped
+      Cancelling due to test failure
+    error: test run failed
+    -> exit 100
+# F3 [workspace.metadata.nextest] / [package.metadata.nextest] tables in Cargo.toml
+$ (cd outer/repo && cargo nextest run --workspace --locked)
+         Summary [   0.007s] 2 tests run: 1 passed, 1 failed, 0 skipped
+      Cancelling due to test failure
+    error: test run failed
+    -> exit 100
+# F4 user config: $HOME/.config/nextest/config.toml with a repository-style key (default-filter)
+$ (cd outer/repo && cargo nextest run --workspace --locked)
+         Summary [   0.007s] 2 tests run: 1 passed, 1 failed, 0 skipped
+      Cancelling due to test failure
+    error: test run failed
+    warning: in user config file $HOME/.config/nextest/config.toml, ignoring unknown configuration key: profile
+    -> exit 100
+
+## G. file-lookup trace, no config: nextest-named paths probed
+       1  open ENOENT/ERR $HOME/.config/nextest/config.toml
+       2  open ENOENT/ERR outer/repo/.config/nextest.toml

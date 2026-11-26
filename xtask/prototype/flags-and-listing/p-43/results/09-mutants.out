@@ -1,0 +1,140 @@
+## versions
+cargo-mutants 27.1.0
+cargo 1.100.0 (3acc79c0c 2026-11-05)
+
+## A. baseline
+$ (cd outer/repo && cargo mutants --list)
+    -> exit 0; mutants listed: 4
+
+## B. one candidate at a time, cwd = workspace root
+# only outer/repo/.cargo/mutants.toml
+$ (cd outer/repo && cargo mutants --list)
+    -> exit 0; mutants listed: 0
+# only outer/repo/mutants.toml
+$ (cd outer/repo && cargo mutants --list)
+    -> exit 0; mutants listed: 4
+# only outer/repo/.mutants.toml
+$ (cd outer/repo && cargo mutants --list)
+    -> exit 0; mutants listed: 4
+# only outer/repo/.config/mutants.toml
+$ (cd outer/repo && cargo mutants --list)
+    -> exit 0; mutants listed: 4
+# only outer/repo/.cargo/mutants
+$ (cd outer/repo && cargo mutants --list)
+    -> exit 0; mutants listed: 4
+# only outer/repo/cargo-mutants.toml
+$ (cd outer/repo && cargo mutants --list)
+    -> exit 0; mutants listed: 4
+# only outer/repo/member/.cargo/mutants.toml
+$ (cd outer/repo && cargo mutants --list)
+    -> exit 0; mutants listed: 4
+# only outer/repo/member/mutants.toml
+$ (cd outer/repo && cargo mutants --list)
+    -> exit 0; mutants listed: 4
+# only outer/.cargo/mutants.toml
+$ (cd outer/repo && cargo mutants --list)
+    -> exit 0; mutants listed: 4
+# only $HOME/.cargo/mutants.toml
+$ (cd outer/repo && cargo mutants --list)
+    -> exit 0; mutants listed: 4
+# only $HOME/.config/mutants.toml
+$ (cd outer/repo && cargo mutants --list)
+    -> exit 0; mutants listed: 4
+# only $HOME/.config/cargo-mutants/mutants.toml
+$ (cd outer/repo && cargo mutants --list)
+    -> exit 0; mutants listed: 4
+# only outer/repo/.cargo/Mutants.TOML
+$ (cd outer/repo && cargo mutants --list)
+    -> exit 0; mutants listed: 0
+
+## C. other working directories (repo/.cargo/mutants.toml is the canary)
+# cwd = member
+$ (cd outer/repo/member && cargo mutants --list)
+    -> exit 0; mutants listed: 0
+# cwd outside, --dir repo
+$ (cd $S && cargo mutants --dir outer/repo --list)
+    -> exit 0; mutants listed: 0
+# cwd outside, --manifest-path
+$ (cd $S && cargo mutants --manifest-path outer/repo/Cargo.toml --list)
+    -> exit 0; mutants listed: 0
+# only member/.cargo/mutants.toml, cwd = member
+$ (cd outer/repo/member && cargo mutants --list)
+    -> exit 0; mutants listed: 4
+
+## D. explicit arguments with repo/.cargo/mutants.toml (canary) present
+# D1 --no-config
+$ (cd outer/repo && cargo mutants --no-config --list)
+    -> exit 0; mutants listed: 4
+# D2 --config <file outside the tree>
+$ (cd outer/repo && cargo mutants --config trusted/mutants.toml --list)
+    -> exit 0; mutants listed: 4
+# D3 --config <file that does not exist>
+$ (cd outer/repo && cargo mutants --config trusted/nope.toml --list)
+    -> exit 1; mutants listed: 0 ; Error: read config trusted/nope.toml
+# D4 -f '**/*.rs' on the command line (does an explicit --file beat exclude_globs of the file?)
+$ (cd outer/repo && cargo mutants -f **/*.rs --list)
+    -> exit 0; mutants listed: 0
+
+## E. other inputs
+# E1 [package.metadata.*] / [workspace.metadata.*] tables in Cargo.toml
+$ (cd outer/repo && cargo mutants --list)
+    -> exit 0; mutants listed: 4
+# E2 #[mutants::skip] on the function (no dependency on the mutants crate declared)
+$ (cd outer/repo && cargo mutants --list)
+    -> exit 0; mutants listed: 0
+# E3 a real run, no test covers f: baseline verdict
+$ (cd outer/repo && cargo mutants )
+    -> exit 2; mutants listed: 4 ; 4 mutants tested in 1s: 4 missed
+# E3b a config that only changes how tests are run (additional_cargo_test_args)
+$ (cd outer/repo && cargo mutants )
+    -> exit 2; mutants listed: 4 ; 4 mutants tested in 1s: 4 missed
+# E3c a real run with exclude_re = [".*"]
+$ (cd outer/repo && cargo mutants )
+    -> exit 0; mutants listed: 0
+# E4 .gitignore lists member/src/lib.rs (--list, then a real run)
+$ (cd outer/repo && cargo mutants --list)
+    -> exit 0; mutants listed: 4
+$ (cd outer/repo && cargo mutants )
+    -> exit 2; mutants listed: 4 ; 4 mutants tested in 1s: 4 missed
+# E5 .ignore lists member/src/lib.rs
+$ (cd outer/repo && cargo mutants --list)
+    -> exit 0; mutants listed: 4
+
+## F. file-lookup trace of 'cargo mutants --list', no config, cwd = member: mutants-named paths probed
+       4  getattrlist ENOENT/ERR .cargo
+       4  getattrlist ENOENT/ERR outer/.cargo
+       4  getattrlist ENOENT/ERR outer/repo/.cargo
+       3  getattrlist ENOENT/ERR outer/repo/member/.cargo
+      15  getattrlist OK $S/fx/mutants
+      11  getattrlist OK outer
+       7  getattrlist OK outer/repo
+       3  getattrlist OK outer/repo/member
+       4  open ENOENT/ERR .cargo/config
+       4  open ENOENT/ERR outer/.cargo/config
+       4  open ENOENT/ERR outer/repo/.cargo/config
+       3  open ENOENT/ERR outer/repo/member/.cargo/config
+       2  open OK outer/repo/Cargo.toml
+       2  open OK outer/repo/member/Cargo.toml
+       1  open OK outer/repo/member/src/lib.rs
+       2  opendir ENOENT/ERR outer/repo/member/benches
+       2  opendir ENOENT/ERR outer/repo/member/examples
+       2  opendir ENOENT/ERR outer/repo/member/src/bin
+       2  opendir ENOENT/ERR outer/repo/member/tests
+       4  stat ENOENT/ERR .cargo/config.toml
+       1  stat ENOENT/ERR $HOME/.cargo/bin/cargo-mutants
+       4  stat ENOENT/ERR outer/.cargo/config.toml
+       4  stat ENOENT/ERR outer/repo/.cargo/config.toml
+       1  stat ENOENT/ERR outer/repo/.cargo/mutants.toml
+       3  stat ENOENT/ERR outer/repo/member/.cargo/config.toml
+       2  stat ENOENT/ERR outer/repo/member/build.rs
+       2  stat ENOENT/ERR outer/repo/member/README
+       2  stat ENOENT/ERR outer/repo/member/README.md
+       2  stat ENOENT/ERR outer/repo/member/README.txt
+       2  stat ENOENT/ERR outer/repo/member/src/main.rs
+       4  stat OK $S/fx/mutants
+       4  stat OK outer
+       6  stat OK outer/repo
+       4  stat OK outer/repo/Cargo.toml
+      17  stat OK outer/repo/member
+       3  stat OK outer/repo/member/Cargo.toml
+       2  stat OK outer/repo/member/src/lib.rs

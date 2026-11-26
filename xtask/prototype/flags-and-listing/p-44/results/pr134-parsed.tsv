@@ -1,0 +1,34 @@
+path	deleted	state	details	rows	diffstat	message	notes
+p44/bin/binary-to-text.dat	false	nocontent	open	0	BIN +308 Bytes (160%)	Binary file not shown.	title=p44/bin/binary-to-text.dat
+p44/bin/deleted.bin	true	nocontent	open	0	BIN -512 Bytes	Binary file not shown.	title=p44/bin/deleted.bin
+p44/bin/empty.txt	false	nocontent	open	0	0	Empty file.	title=p44/bin/empty.txt
+p44/bin/latin1.txt	false	shown	open	11	10		title=p44/bin/latin1.txt
+p44/bin/modified.bin	false	nocontent	open	0	BIN +0 Bytes (100%)	Binary file not shown.	title=p44/bin/modified.bin
+p44/bin/new.bin	false	nocontent	open	0	BIN +512 Bytes	Binary file not shown.	title=p44/bin/new.bin
+p44/bin/new.pdf	false	nocontent	open	0	BIN +262 Bytes	Binary file not shown.	title=p44/bin/new.pdf
+p44/bin/new.png	false	nocontent	open	0	BIN +165 Bytes	Loading Sorry, something went wrong. Reload? Sorry, we cannot display this file. Sorry, this file is invalid so it cannot be displayed. Viewer requires iframe.	title=p44/bin/new.png
+p44/bin/new.svg	false	nocontent	open	0	3	Loading Sorry, something went wrong. Reload? Sorry, we cannot display this file. Sorry, this file is invalid so it cannot be displayed. Viewer requires iframe.	title=p44/bin/new.svg
+p44/bin/nul-early.txt	false	nocontent	open	0	BIN +213 Bytes	Binary file not shown.	title=p44/bin/nul-early.txt
+p44/bin/nul-late.txt	false	shown	open	302	301		title=p44/bin/nul-late.txt
+p44/bin/text-to-binary.dat	false	nocontent	open	0	BIN -308 Bytes (62%)	Binary file not shown.	title=p44/bin/text-to-binary.dat
+p44/bin/utf16be-bom.txt	false	nocontent	open	0	BIN +1.6 KB	Binary file not shown.	title=p44/bin/utf16be-bom.txt
+p44/bin/utf16le-bom.txt	false	nocontent	open	0	BIN +1.6 KB	Binary file not shown.	title=p44/bin/utf16le-bom.txt
+p44/other/bidi-control.rs	false	shown	open	4	3		title=p44/other/bidi-control.rs
+p44/other/bidi.rs	false	shown	open	4	3		title=p44/other/bidi.rs
+p44/other/crlf.txt	false	shown	open	41	40		title=p44/other/crlf.txt
+p44/other/deleted.txt	true	collapsed	open	0	30	Load diff This file was deleted. Oops, something went wrong. Retry Uh oh! There was an error while loading. Please reload this page .	title=p44/other/deleted.txt
+p44/other/eol-added.txt	false	shown	open	6	2		title=p44/other/eol-added.txt
+p44/other/eol-removed.txt	false	shown	open	6	2		title=p44/other/eol-removed.txt
+p44/other/gitlink	false	nocontent	open	0	1	Submodule gitlink added at 17d846	title=p44/other/gitlink
+p44/other/link-new	false	shown	open	2	1		title=p44/other/link-new
+p44/other/link-retarget	false	shown	open	3	2		title=p44/other/link-retarget
+p44/other/mode-and-edit.sh	false	shown	open	4	2		title=p44/other/mode-and-edit.sh; mode=100644 → 100755
+p44/other/mode.sh	false	nocontent	open	0	0	Empty file.	title=p44/other/mode.sh; mode=100644 → 100755
+p44/other/modified.txt	false	shown	open	10	2		title=p44/other/modified.txt
+p44/other/new-plain.txt	false	shown	open	21	20		title=p44/other/new-plain.txt
+p44/other/rename-dir-new/moved.txt	false	nocontent	open	0	0	File renamed without changes.	title=p44/other/rename-dir-old/moved.txt → p44/other/rename-dir-new/moved.txt
+p44/other/rename-edit-new.txt	false	shown	open	10	2		title=p44/other/rename-edit-old.txt → p44/other/rename-edit-new.txt
+p44/other/rename-pure-new.txt	false	nocontent	open	0	0	File renamed without changes.	title=p44/other/rename-pure-old.txt → p44/other/rename-pure-new.txt
+p44/other/whitespace.txt	false	shown	open	22	6		title=p44/other/whitespace.txt
+p44/other/zero-width.rs	false	shown	open	4	3		title=p44/other/zero-width.rs
+#files	32

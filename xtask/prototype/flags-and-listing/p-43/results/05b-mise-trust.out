@@ -1,0 +1,230 @@
+## versions
+2026.11.14 macos-arm64 (2026-11-24)
+
+## A. which content an untrusted file may carry (commands that only read: mise ls --current, mise env)
+# A1 .mise.toml, [tools] only: mise ls --current
+    rust  1.21.0 (missing)  outer/repo/.mise.toml  1.21.0
+    [exit 0]
+    trust store now: []
+# A2 .tool-versions: mise ls --current
+    rust  1.21.0 (missing)  outer/repo/.tool-versions  1.21.0
+    [exit 0]
+    trust store now: []
+# A3 .mise.toml with [env]: mise env
+    mise ERROR error parsing config file: outer/repo/.mise.toml
+    mise ERROR Config files in outer/repo/.mise.toml are not trusted.
+    [exit 1]
+    trust store now: []
+# A3b same file: mise ls --current
+    mise ERROR error parsing config file: outer/repo/.mise.toml
+    mise ERROR Config files in outer/repo/.mise.toml are not trusted.
+    [exit 1]
+    trust store now: []
+# A4 .mise.toml with [tasks]: mise ls --current
+    [exit 0]
+    trust store now: []
+# A4b same file: mise tasks ls
+    x
+    [exit 0]
+    trust store now: []
+# A5 .mise.toml with [hooks]: mise ls --current
+    mise ERROR error parsing config file: outer/repo/.mise.toml
+    mise ERROR Config files in outer/repo/.mise.toml are not trusted.
+    [exit 1]
+    trust store now: []
+# A6 .mise.toml with a template exec() in [tools]: mise ls --current
+    mise ERROR error parsing config file: outer/repo/.mise.toml
+    mise ERROR Config files in outer/repo/.mise.toml are not trusted.
+    [exit 1]
+    trust store now: []
+# A7 .mise.toml with [settings] only: mise ls --current
+    mise ERROR error parsing config file: outer/repo/.mise.toml
+    mise ERROR Config files in outer/repo/.mise.toml are not trusted.
+    [exit 1]
+    trust store now: []
+# A8 .mise.toml tries to trust itself through [settings]: mise env
+    mise ERROR error parsing config file: outer/repo/.mise.toml
+    mise ERROR Config files in outer/repo/.mise.toml are not trusted.
+    [exit 1]
+    trust store now: []
+# A9 .miserc.toml: yes = true, trusted_config_paths = ["/"]; .mise.toml has [env]: mise env
+    mise ERROR error parsing config file: outer/repo/.mise.toml
+    mise ERROR Config files in outer/repo/.mise.toml are not trusted.
+    [exit 1]
+    trust store now: []
+
+## B. commands that run something, in a directory whose only config is an untrusted .mise.toml with [env] CANARY
+# B1 mise exec -- /usr/bin/env | grep CANARY
+    CANARY=from-untrusted-.mise.toml
+    [exit 0]
+    trust store now: [outer-repo-441dfb3390499aa8 ]
+# B1b straight after, same trust store: mise env | grep CANARY
+    export CANARY=from-untrusted-.mise.toml
+    [exit 0]
+    trust store now: [outer-repo-441dfb3390499aa8 ]
+# B1c mise trust --show
+    outer/repo: trusted
+    [exit 0]
+    trust store now: [outer-repo-441dfb3390499aa8 ]
+# B2 MISE_PARANOID=1 mise exec -- /usr/bin/env | grep CANARY
+    mise ERROR error parsing config file: outer/repo/.mise.toml
+    mise ERROR Config files in outer/repo/.mise.toml are not trusted.
+    [exit 0]
+    trust store now: []
+# B3 MISE_YES=0 mise exec
+    CANARY=from-untrusted-.mise.toml
+    [exit 0]
+    trust store now: [outer-repo-441dfb3390499aa8 ]
+# B4 MISE_IGNORED_CONFIG_PATHS=<repo> mise exec
+    exec-finished
+    [exit 0]
+    trust store now: []
+# B5 MISE_OVERRIDE_CONFIG_FILENAMES=mise.toml mise exec (the untrusted file is .mise.toml)
+    exec-finished
+    [exit 0]
+    trust store now: []
+# B6 MISE_TRUSTED_CONFIG_PATHS=/nonexistent mise exec
+    CANARY=from-untrusted-.mise.toml
+    [exit 0]
+    trust store now: [outer-repo-441dfb3390499aa8 ]
+# B7 mise run x (a task defined in the untrusted file)
+    [x] $ echo TASK-RAN with CANARY=$CANARY
+    TASK-RAN with CANARY=x
+    [exit 0]
+    trust store now: [outer-repo-441dfb3390499aa8 ]
+# B8 mise tasks ls
+    mise ERROR error parsing config file: outer/repo/.mise.toml
+    mise ERROR Config files in outer/repo/.mise.toml are not trusted.
+    [exit 1]
+    trust store now: []
+# B9 [env] with a template exec(): mise exec -- /usr/bin/env | grep CANARY
+    CANARY=TEMPLATE-EXEC-RAN
+    [exit 0]
+    trust store now: [outer-repo-441dfb3390499aa8 ]
+# B10 untrusted .mise.toml: [env] _.path = ["./evil/bin"] (holds a script named cargo), RUSTC_WRAPPER, CLIPPY_CONF_DIR: mise exec -- cargo clippy --workspace
+    PWNED: evil/bin/cargo ran with: clippy --workspace
+    [exit 0]
+    trust store now: [outer-repo-441dfb3390499aa8 ]
+# B10b same: mise exec -- /usr/bin/env | grep -E 'RUSTC_WRAPPER|CLIPPY'
+    CLIPPY_CONF_DIR=/tmp
+    RUSTC_WRAPPER=/usr/bin/true
+    [exit 0]
+    trust store now: [outer-repo-441dfb3390499aa8 ]
+
+## C. what an existing trust covers
+# C0 before trust: mise env
+    mise ERROR error parsing config file: outer/repo/mise.toml
+    mise ERROR Config files in outer/repo/mise.toml are not trusted.
+    [exit 1]
+    trust store now: []
+# C1 mise trust (workspace root, no argument)
+    mise trusted outer/repo
+    [exit 0]
+    trust store now: [outer-repo-441dfb3390499aa8 ]
+# C1b mise trust --show
+    outer/repo: trusted
+    [exit 0]
+    trust store now: [outer-repo-441dfb3390499aa8 ]
+# C2 after trust: mise env | grep CANARY
+    export CANARY=protected-mise.toml
+    [exit 0]
+    trust store now: [outer-repo-441dfb3390499aa8 ]
+# C3 the trusted file's content changes: mise env | grep -E 'CANARY|EVIL'
+    export CANARY=protected-mise.toml-CHANGED-AFTER-TRUST
+    export EVIL=1
+    [exit 0]
+    trust store now: [outer-repo-441dfb3390499aa8 ]
+# C4 a NEW sibling mise.local.toml with [env] beside the trusted mise.toml: mise env
+    export CANARY=sibling-mise.local.toml
+    export SIBLING=loaded
+    [exit 0]
+    trust store now: [outer-repo-441dfb3390499aa8 ]
+# C4 a NEW sibling .mise.toml with [env] beside the trusted mise.toml: mise env
+    export CANARY=sibling-.mise.toml
+    export SIBLING=loaded
+    [exit 0]
+    trust store now: [outer-repo-441dfb3390499aa8 ]
+# C4 a NEW sibling .mise.local.toml with [env] beside the trusted mise.toml: mise env
+    export CANARY=sibling-.mise.local.toml
+    export SIBLING=loaded
+    [exit 0]
+    trust store now: [outer-repo-441dfb3390499aa8 ]
+# C4 a NEW sibling .config/mise.toml with [env] beside the trusted mise.toml: mise env
+    export CANARY=protected-mise.toml
+    export SIBLING=loaded
+    [exit 0]
+    trust store now: [outer-repo-441dfb3390499aa8 ]
+# C4 a NEW sibling .config/mise/conf.d/x.toml with [env] beside the trusted mise.toml: mise env
+    export CANARY=protected-mise.toml
+    export SIBLING=loaded
+    [exit 0]
+    trust store now: [outer-repo-441dfb3390499aa8 ]
+# C4 a NEW sibling .mise/config.toml with [env] beside the trusted mise.toml: mise env
+    export CANARY=protected-mise.toml
+    export SIBLING=loaded
+    [exit 0]
+    trust store now: [outer-repo-441dfb3390499aa8 ]
+# C5 a new member/.mise.toml with [env], cwd = member, workspace root trusted
+    mise ERROR Config files in outer/repo/member/.mise.toml are not trusted.
+# C6 MISE_PARANOID=1, trusted file unchanged: mise env
+    mise ERROR Config files in outer/repo/mise.toml are not trusted.
+    [exit 0]
+    trust store now: [outer-repo-441dfb3390499aa8 ]
+
+## D. variables that grant trust (untrusted .mise.toml with [env])
+# D0 control: mise env
+    mise ERROR Config files in outer/repo/.mise.toml are not trusted.
+    [exit 0]
+    trust store now: []
+# D1 MISE_YES=1 mise env
+    export CANARY=sibling-.mise.toml
+    [exit 0]
+    trust store now: [outer-repo-441dfb3390499aa8 ]
+# D2 MISE_TRUSTED_CONFIG_PATHS=<repo> mise env
+    export CANARY=sibling-.mise.toml
+    [exit 0]
+    trust store now: []
+# D3 CI=true mise env
+    export CANARY=sibling-.mise.toml
+    [exit 0]
+    trust store now: []
+
+## E. idiomatic version files, enabled by the operator (MISE_IDIOMATIC_VERSION_FILE_ENABLE_TOOLS=rust)
+# E1 only rust-toolchain.toml=1.41.0, default settings: mise ls --current
+    [exit 0]
+    trust store now: []
+# E2 same, with the variable
+    rust  1.41.0 (missing)  outer/repo/rust-toolchain.toml  1.41.0
+    [exit 0]
+    trust store now: []
+# E3 plus rust-toolchain=1.42.0
+    rust  1.41.0 (missing)  outer/repo/rust-toolchain.toml  1.41.0
+    [exit 0]
+    trust store now: []
+# E4 plus .rust-version=1.43.0
+    rust  1.41.0 (missing)  outer/repo/rust-toolchain.toml  1.41.0
+    [exit 0]
+    trust store now: []
+# E5 plus mise.toml=1.100.0
+    rust  1.100.0 (missing)  outer/repo/mise.toml  1.100.0
+    [exit 0]
+    trust store now: []
+
+## F. a tools-only (needs no trust) file that points a tool at a directory in the tree
+# F1 .mise.toml: [tools] node = "path:<repo>/evil" (evil/bin/cargo is a script): mise ls --current
+    mise ERROR error parsing config file: outer/repo/.mise.toml
+    mise ERROR Config files in outer/repo/.mise.toml are not trusted.
+    [exit 1]
+    trust store now: []
+# F1b same: MISE_AUTO_INSTALL=0 mise exec -- cargo clippy --workspace
+    PWNED: evil/bin/cargo ran with: clippy --workspace
+    [exit 0]
+    trust store now: [outer-repo-441dfb3390499aa8 ]
+# F2 the same request in .tool-versions: mise exec -- cargo clippy --workspace
+    PWNED: evil/bin/cargo ran with: clippy --workspace
+    [exit 0]
+    trust store now: [outer-repo-441dfb3390499aa8 ]
+# F2b same with MISE_OVERRIDE_CONFIG_FILENAMES=mise.toml MISE_OVERRIDE_TOOL_VERSIONS_FILENAMES=none
+    cargo 1.100.0 (3acc79c0c 2026-11-05)
+    [exit 0]
+    trust store now: []

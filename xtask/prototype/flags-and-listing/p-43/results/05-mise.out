@@ -1,0 +1,393 @@
+## versions
+2026.11.14 macos-arm64 (2026-11-24)
+MISE_* variables in this run: 0
+dirs:
+  cache: ~/Library/Caches/mise
+  config: ~/.config/mise
+  data: ~/.local/share/mise
+  shims: ~/.local/share/mise/shims
+  system_shims: /usr/local/share/mise/shims
+  state: ~/.local/state/mise
+
+
+## A. baseline: no file
+$ (cd outer/repo &&  mise ls --current)
+
+## B. one candidate at a time, cwd = workspace root (each asks for a distinct rust version; the source column names the file)
+
+# only mise.toml (rust 1.11.0)
+$ (cd outer/repo &&  mise ls --current)
+    rust  1.11.0 (missing)  outer/repo/mise.toml  1.11.0
+
+# only .mise.toml (rust 1.12.0)
+$ (cd outer/repo &&  mise ls --current)
+    rust  1.12.0 (missing)  outer/repo/.mise.toml  1.12.0
+
+# only mise.local.toml (rust 1.13.0)
+$ (cd outer/repo &&  mise ls --current)
+    rust  1.13.0 (missing)  outer/repo/mise.local.toml  1.13.0
+
+# only .mise.local.toml (rust 1.14.0)
+$ (cd outer/repo &&  mise ls --current)
+    rust  1.14.0 (missing)  outer/repo/.mise.local.toml  1.14.0
+
+# only mise/config.toml (rust 1.15.0)
+$ (cd outer/repo &&  mise ls --current)
+    rust  1.15.0 (missing)  outer/repo/mise/config.toml  1.15.0
+
+# only .mise/config.toml (rust 1.16.0)
+$ (cd outer/repo &&  mise ls --current)
+    rust  1.16.0 (missing)  outer/repo/.mise/config.toml  1.16.0
+
+# only .config/mise.toml (rust 1.17.0)
+$ (cd outer/repo &&  mise ls --current)
+    rust  1.17.0 (missing)  outer/repo/.config/mise.toml  1.17.0
+
+# only .config/mise/config.toml (rust 1.18.0)
+$ (cd outer/repo &&  mise ls --current)
+    rust  1.18.0 (missing)  outer/repo/.config/mise/config.toml  1.18.0
+
+# only .config/mise/mise.toml (rust 1.19.0)
+$ (cd outer/repo &&  mise ls --current)
+    rust  1.19.0 (missing)  outer/repo/.config/mise/mise.toml  1.19.0
+
+# only mise/config.local.toml (rust 1.20.0)
+$ (cd outer/repo &&  mise ls --current)
+    rust  1.20.0 (missing)  outer/repo/mise/config.local.toml  1.20.0
+
+# only .mise/config.local.toml (rust 1.21.0)
+$ (cd outer/repo &&  mise ls --current)
+    rust  1.21.0 (missing)  outer/repo/.mise/config.local.toml  1.21.0
+
+# only .config/mise.local.toml (rust 1.22.0)
+$ (cd outer/repo &&  mise ls --current)
+    rust  1.22.0 (missing)  outer/repo/.config/mise.local.toml  1.22.0
+
+# only .config/mise/config.local.toml (rust 1.23.0)
+$ (cd outer/repo &&  mise ls --current)
+    rust  1.23.0 (missing)  outer/repo/.config/mise/config.local.toml  1.23.0
+
+# only .config/mise/mise.local.toml (rust 1.24.0)
+$ (cd outer/repo &&  mise ls --current)
+    rust  1.24.0 (missing)  outer/repo/.config/mise/mise.local.toml  1.24.0
+
+# only mise/conf.d/a.toml (rust 1.25.0)
+$ (cd outer/repo &&  mise ls --current)
+    rust  1.25.0 (missing)  outer/repo/mise/conf.d/a.toml  1.25.0
+
+# only .mise/conf.d/a.toml (rust 1.26.0)
+$ (cd outer/repo &&  mise ls --current)
+    rust  1.26.0 (missing)  outer/repo/.mise/conf.d/a.toml  1.26.0
+
+# only .config/mise/conf.d/a.toml (rust 1.27.0)
+$ (cd outer/repo &&  mise ls --current)
+    rust  1.27.0 (missing)  outer/repo/.config/mise/conf.d/a.toml  1.27.0
+
+# only mise/conf.d/sub/mise.toml (rust 1.28.0)
+$ (cd outer/repo &&  mise ls --current)
+    rust  1.28.0 (missing)  outer/repo/mise/conf.d/sub/mise.toml  1.28.0
+
+# only .tool-versions (rust 1.29.0)
+$ (cd outer/repo &&  mise ls --current)
+    rust  1.29.0 (missing)  outer/repo/.tool-versions  1.29.0
+
+# only .rtx.toml (rust 1.30.0)
+$ (cd outer/repo &&  mise ls --current)
+
+# only rust-toolchain.toml (rust 1.31.0)
+$ (cd outer/repo &&  mise ls --current)
+
+# only rust-toolchain (rust 1.32.0)
+$ (cd outer/repo &&  mise ls --current)
+
+# only .rust-version (rust 1.33.0)
+$ (cd outer/repo &&  mise ls --current)
+
+# only mise.ci.toml (rust 1.34.0)
+$ (cd outer/repo &&  mise ls --current)
+
+# only .mise.ci.toml (rust 1.35.0)
+$ (cd outer/repo &&  mise ls --current)
+
+# only mise.ci.local.toml (rust 1.36.0)
+$ (cd outer/repo &&  mise ls --current)
+
+# only .config/mise/config.ci.toml (rust 1.37.0)
+$ (cd outer/repo &&  mise ls --current)
+
+# only .config/mise/conf.d/a.ci.toml (rust 1.38.0)
+$ (cd outer/repo &&  mise ls --current)
+    mise WARN  deprecated [dotted_conf_d_filename]: dots in unconditional conf.d filenames are deprecated because the suffix will become an environment selector; rename fragments such as `node.tools.toml` to `node-tools.toml`, or set `env_conf_d = true` in a miserc.toml file to opt in now This will be removed in mise 2027.8.10.
+    rust  1.38.0 (missing)  outer/repo/.config/mise/conf.d/a.ci.toml  1.38.0
+
+# only mise.json (rust 1.39.0)
+$ (cd outer/repo &&  mise ls --current)
+
+# only mise.yaml (rust 1.40.0)
+$ (cd outer/repo &&  mise ls --current)
+
+# only .config/mise/tools.toml (rust 1.41.0)
+$ (cd outer/repo &&  mise ls --current)
+
+# only config.toml (rust 1.42.0)
+$ (cd outer/repo &&  mise ls --current)
+
+# only .mise-version (rust 1.43.0)
+$ (cd outer/repo &&  mise ls --current)
+
+# only mise.lock (rust 1.44.0)
+$ (cd outer/repo &&  mise ls --current)
+
+# only Mise.toml (rust 1.45.0)
+$ (cd outer/repo &&  mise ls --current)
+    rust  1.45.0 (missing)  outer/repo/mise.toml  1.45.0
+
+## C. every loaded name present at once: order of precedence
+    mise.toml -> rust 1.11.0
+    .mise.toml -> rust 1.12.0
+    mise.local.toml -> rust 1.13.0
+    .mise.local.toml -> rust 1.14.0
+    mise/config.toml -> rust 1.15.0
+    .mise/config.toml -> rust 1.16.0
+    .config/mise.toml -> rust 1.17.0
+    .config/mise/config.toml -> rust 1.18.0
+    .config/mise/mise.toml -> rust 1.19.0
+    mise/config.local.toml -> rust 1.20.0
+    .mise/config.local.toml -> rust 1.21.0
+    .config/mise.local.toml -> rust 1.22.0
+    .config/mise/config.local.toml -> rust 1.23.0
+    .config/mise/mise.local.toml -> rust 1.24.0
+    mise/conf.d/a.toml -> rust 1.25.0
+    .mise/conf.d/a.toml -> rust 1.26.0
+    .config/mise/conf.d/a.toml -> rust 1.27.0
+    mise/conf.d/sub/mise.toml -> rust 1.28.0
+    .tool-versions -> rust 1.29.0
+$ mise cfg
+    outer/repo/.tool-versions                  rust
+    outer/repo/.config/mise/conf.d/a.toml      rust
+    outer/repo/.config/mise/config.toml        rust
+    outer/repo/.config/mise/mise.toml          rust
+    outer/repo/.config/mise.toml               rust
+    outer/repo/.mise/conf.d/a.toml             rust
+    outer/repo/.mise/config.toml               rust
+    outer/repo/mise/conf.d/a.toml              rust
+    outer/repo/mise/conf.d/sub/mise.toml       rust
+    outer/repo/mise/config.toml                rust
+    outer/repo/mise.toml                       rust
+    outer/repo/.mise.toml                      rust
+    outer/repo/.config/mise/config.local.toml  rust
+    outer/repo/.config/mise/mise.local.toml    rust
+    outer/repo/.config/mise.local.toml         rust
+    outer/repo/.mise/config.local.toml         rust
+    outer/repo/mise/config.local.toml          rust
+    outer/repo/mise.local.toml                 rust
+    outer/repo/.mise.local.toml                rust
+$ (cd outer/repo &&  mise ls --current)
+    rust  1.14.0 (missing)  outer/repo/.mise.local.toml  1.14.0
+# knock-out: delete the winner, ask again, until none is left
+    winner: .mise.local.toml
+    winner: mise.local.toml
+    winner: mise/config.local.toml
+    winner: .mise/config.local.toml
+    winner: .config/mise.local.toml
+    winner: .config/mise/mise.local.toml
+    winner: .config/mise/config.local.toml
+    winner: .mise.toml
+    winner: mise.toml
+    winner: mise/config.toml
+    winner: mise/conf.d/sub/mise.toml
+    winner: mise/conf.d/a.toml
+    winner: .mise/config.toml
+    winner: .mise/conf.d/a.toml
+    winner: .config/mise.toml
+    winner: .config/mise/mise.toml
+    winner: .config/mise/config.toml
+    winner: .config/mise/conf.d/a.toml
+    winner: .tool-versions
+
+## D. across directories
+# repo/mise.toml=1.21.0, member/.mise.toml=1.22.0, outer/mise.local.toml=1.23.0
+$ (cd outer/repo &&  mise ls --current)
+    rust  1.21.0 (missing)  outer/repo/mise.toml  1.21.0
+$ (cd outer/repo/member &&  mise ls --current)
+    rust  1.22.0 (missing)  outer/repo/member/.mise.toml  1.22.0
+$ (cd member && mise cfg)
+    outer/mise.local.toml         rust
+    outer/repo/mise.toml          rust
+    outer/repo/member/.mise.toml  rust
+# only outer/.tool-versions (above the git root)
+$ (cd outer/repo/member &&  mise ls --current)
+    rust  1.23.0 (missing)  outer/.tool-versions  1.23.0
+# global $HOME/.config/mise/config.toml=1.30.0 and repo/.config/mise.toml=1.21.0
+$ (cd outer/repo &&  mise ls --current)
+    rust  1.21.0 (missing)  outer/repo/.config/mise.toml  1.21.0
+
+## E. MISE_* variables against siblings (tools-only files: mise.toml=1.100.0 is the protected one)
+# E0 control: no variable
+$ (cd outer/repo &&  mise ls --current)
+    rust  1.22.0 (missing)  outer/repo/mise.local.toml  1.22.0
+$ (cd outer/repo/member &&  mise ls --current)
+    rust  1.26.0 (missing)  outer/repo/member/.mise.local.toml  1.26.0
+# E1 MISE_OVERRIDE_CONFIG_FILENAMES=mise.toml
+$ (cd outer/repo && MISE_OVERRIDE_CONFIG_FILENAMES=mise.toml mise ls --current)
+    rust  1.100.0 (symlink)  outer/repo/mise.toml  1.100.0
+$ (cd outer/repo/member && MISE_OVERRIDE_CONFIG_FILENAMES=mise.toml mise ls --current)
+    rust  1.100.0 (symlink)  outer/repo/mise.toml  1.100.0
+# E2 plus MISE_OVERRIDE_TOOL_VERSIONS_FILENAMES=none
+$ (cd outer/repo && MISE_OVERRIDE_CONFIG_FILENAMES=mise.toml MISE_OVERRIDE_TOOL_VERSIONS_FILENAMES=none mise ls --current)
+    rust  1.100.0 (symlink)  outer/repo/mise.toml  1.100.0
+$ (cd outer/repo/member && MISE_OVERRIDE_CONFIG_FILENAMES=mise.toml MISE_OVERRIDE_TOOL_VERSIONS_FILENAMES=none mise ls --current)
+    rust  1.100.0 (symlink)  outer/repo/mise.toml  1.100.0
+# E2b same variables, and a member/mise.toml=1.27.0 exists
+$ (cd outer/repo/member && MISE_OVERRIDE_CONFIG_FILENAMES=mise.toml MISE_OVERRIDE_TOOL_VERSIONS_FILENAMES=none mise ls --current)
+    rust  1.27.0 (missing)  outer/repo/member/mise.toml  1.27.0
+# E3 MISE_OVERRIDE_CONFIG_FILENAMES=<absolute path of repo/mise.toml>
+$ (cd outer/repo/member && MISE_OVERRIDE_CONFIG_FILENAMES=outer/repo/mise.toml MISE_OVERRIDE_TOOL_VERSIONS_FILENAMES=none mise ls --current)
+    rust  1.100.0 (symlink)  outer/repo/mise.toml  1.100.0
+# E4 MISE_CONFIG_FILE=<repo/mise.toml> (is there such a variable?)
+$ (cd outer/repo && MISE_CONFIG_FILE=outer/repo/mise.toml mise ls --current)
+    rust  1.22.0 (missing)  outer/repo/mise.local.toml  1.22.0
+# E5 MISE_GLOBAL_CONFIG_FILE=<repo/mise.toml>
+$ (cd outer/repo && MISE_GLOBAL_CONFIG_FILE=outer/repo/mise.toml mise ls --current)
+    rust  1.22.0 (missing)  outer/repo/mise.local.toml  1.22.0
+# E6 MISE_IGNORED_CONFIG_PATHS=<repo> (the whole tree ignored)
+$ (cd outer/repo/member && MISE_IGNORED_CONFIG_PATHS=outer/repo mise ls --current)
+# E7 MISE_IGNORED_CONFIG_PATHS=<repo> with MISE_GLOBAL_CONFIG_FILE=<a file outside the tree asking 1.100.0>
+$ (cd outer/repo/member && MISE_IGNORED_CONFIG_PATHS=outer/repo MISE_GLOBAL_CONFIG_FILE=trusted/mise.toml mise ls --current)
+    rust  1.100.0 (symlink)  trusted/mise.toml  1.100.0
+# E8 MISE_RUST_VERSION=1.100.0 (per-tool variable)
+$ (cd outer/repo/member && MISE_RUST_VERSION=1.100.0 mise ls --current)
+    rust  1.100.0 (symlink)  MISE_RUST_VERSION=1.100.0  1.100.0
+# E9 MISE_CEILING_PATHS=<repo>, cwd = member (files at the ceiling and above are not read?)
+$ (cd outer/repo/member && MISE_CEILING_PATHS=outer/repo mise ls --current)
+    rust  1.26.0 (missing)  outer/repo/member/.mise.local.toml  1.26.0
+# E10 MISE_NO_CONFIG=1
+$ (cd outer/repo && MISE_NO_CONFIG=1 mise ls --current)
+# E11 MISE_ENV=ci with mise.ci.toml=1.31.0 and .mise.ci.local.toml=1.32.0 present
+$ (cd outer/repo && MISE_ENV=ci mise ls --current)
+    rust  1.32.0 (missing)  outer/repo/.mise.ci.local.toml  1.32.0
+$ (cd outer/repo &&  mise ls --current)
+    rust  1.22.0 (missing)  outer/repo/mise.local.toml  1.22.0
+
+## F. .miserc.toml in the tree (read before the config files; needs no trust)
+# F1 repo/.miserc.toml: override_config_filenames = ["evil.toml"], evil.toml=1.66.0
+$ (cd outer/repo &&  mise ls --current)
+    rust  1.66.0 (missing)  outer/repo/evil.toml  1.66.0
+# F1b same, with MISE_OVERRIDE_CONFIG_FILENAMES=mise.toml in the environment
+$ (cd outer/repo && MISE_OVERRIDE_CONFIG_FILENAMES=mise.toml mise ls --current)
+    rust  1.100.0 (symlink)  outer/repo/mise.toml  1.100.0
+# F2 .miserc.toml: ignored_config_paths = [<repo/mise.toml>] (only mise.toml=1.100.0 present otherwise)
+$ (cd outer/repo &&  mise ls --current)
+# F2b same, with MISE_IGNORED_CONFIG_PATHS=/nonexistent in the environment
+$ (cd outer/repo && MISE_IGNORED_CONFIG_PATHS=/nonexistent mise ls --current)
+    rust  1.100.0 (symlink)  outer/repo/mise.toml  1.100.0
+# F3 .miserc.toml: env = ["ci"], mise.ci.toml=1.31.0
+$ (cd outer/repo &&  mise ls --current)
+    rust  1.31.0 (missing)  outer/repo/mise.ci.toml  1.31.0
+# F3b same with MISE_ENV=prod in the environment
+$ (cd outer/repo && MISE_ENV=prod mise ls --current)
+    rust  1.100.0 (symlink)  outer/repo/mise.toml  1.100.0
+# F4 the same override in repo/.miserc.local.toml
+$ (cd outer/repo &&  mise ls --current)
+    rust  1.66.0 (missing)  outer/repo/evil.toml  1.66.0
+# F4 the same override in repo/.config/miserc.toml
+$ (cd outer/repo &&  mise ls --current)
+    rust  1.66.0 (missing)  outer/repo/evil.toml  1.66.0
+# F4 the same override in repo/miserc.toml
+$ (cd outer/repo &&  mise ls --current)
+    rust  1.100.0 (symlink)  outer/repo/mise.toml  1.100.0
+# F5 the override in outer/.miserc.toml (above the git root), cwd = member
+$ (cd outer/repo/member &&  mise ls --current)
+    rust  1.66.0 (missing)  outer/repo/evil.toml  1.66.0
+# F6 the override in member/.miserc.toml, cwd = workspace root, then cwd = member
+$ (cd outer/repo &&  mise ls --current)
+    rust  1.100.0 (symlink)  outer/repo/mise.toml  1.100.0
+$ (cd outer/repo/member &&  mise ls --current)
+    rust  1.67.0 (missing)  outer/repo/member/evil.toml  1.67.0
+
+## G. .miserc.toml against the operator's variables (MISE_OVERRIDE_CONFIG_FILENAMES=mise.toml MISE_OVERRIDE_TOOL_VERSIONS_FILENAMES=none throughout)
+# G0 control
+$ (cd outer/repo && MISE_OVERRIDE_CONFIG_FILENAMES=mise.toml MISE_OVERRIDE_TOOL_VERSIONS_FILENAMES=none mise ls --current)
+    rust  1.100.0 (symlink)  outer/repo/mise.toml  1.100.0
+# G1 .miserc.toml: ignored_config_paths = [<repo/mise.toml>]
+$ (cd outer/repo && MISE_OVERRIDE_CONFIG_FILENAMES=mise.toml MISE_OVERRIDE_TOOL_VERSIONS_FILENAMES=none mise ls --current)
+# G1b plus MISE_IGNORED_CONFIG_PATHS=/nonexistent
+$ (cd outer/repo && MISE_OVERRIDE_CONFIG_FILENAMES=mise.toml MISE_OVERRIDE_TOOL_VERSIONS_FILENAMES=none MISE_IGNORED_CONFIG_PATHS=/nonexistent mise ls --current)
+    rust  1.100.0 (symlink)  outer/repo/mise.toml  1.100.0
+# G2 .miserc.toml: env = ["ci"], mise.ci.toml=1.31.0
+$ (cd outer/repo && MISE_OVERRIDE_CONFIG_FILENAMES=mise.toml MISE_OVERRIDE_TOOL_VERSIONS_FILENAMES=none mise ls --current)
+    rust  1.31.0 (missing)  outer/repo/mise.ci.toml  1.31.0
+# G2b plus MISE_ENV= (set, empty)
+$ (cd outer/repo && MISE_OVERRIDE_CONFIG_FILENAMES=mise.toml MISE_OVERRIDE_TOOL_VERSIONS_FILENAMES=none MISE_ENV= mise ls --current)
+    rust  1.100.0 (symlink)  outer/repo/mise.toml  1.100.0
+# G3 .miserc.toml: ceiling_paths = [<repo>]
+$ (cd outer/repo && MISE_OVERRIDE_CONFIG_FILENAMES=mise.toml MISE_OVERRIDE_TOOL_VERSIONS_FILENAMES=none mise ls --current)
+$ (cd outer/repo/member && MISE_OVERRIDE_CONFIG_FILENAMES=mise.toml MISE_OVERRIDE_TOOL_VERSIONS_FILENAMES=none mise ls --current)
+# G4 member/.miserc.toml: ceiling_paths = [<member>], cwd = member
+$ (cd outer/repo/member && MISE_OVERRIDE_CONFIG_FILENAMES=mise.toml MISE_OVERRIDE_TOOL_VERSIONS_FILENAMES=none mise ls --current)
+# G5 .miserc.toml: no_config / global_config_file / idiomatic_version_file_enable_tools
+$ (cd outer/repo && MISE_OVERRIDE_CONFIG_FILENAMES=mise.toml MISE_OVERRIDE_TOOL_VERSIONS_FILENAMES=none mise ls --current)
+    rust  1.100.0 (symlink)  outer/repo/mise.toml  1.100.0
+# G6 .miserc.toml with an unknown key
+$ (cd outer/repo && MISE_OVERRIDE_CONFIG_FILENAMES=mise.toml MISE_OVERRIDE_TOOL_VERSIONS_FILENAMES=none mise ls --current)
+    rust  1.100.0 (symlink)  outer/repo/mise.toml  1.100.0
+# G7 MISE_NO_CONFIG... is there a variable that stops .miserc.toml being read? trace of names opened with the variables set:
+      11  getattrlist OK outer/repo/mise.toml
+       1  lstat ENOENT/ERR outer/repo/mise.lock
+       4  lstat OK outer/repo/mise.toml
+       1  open OK outer/repo/.miserc.toml
+       1  open OK outer/repo/mise.toml
+       1  stat ENOENT/ERR outer/repo/.config/miserc.toml
+       1  stat ENOENT/ERR outer/repo/.miserc.local.toml
+       2  stat ENOENT/ERR outer/repo/mise.local.lock
+       4  stat ENOENT/ERR outer/repo/mise.lock
+       2  stat OK outer/repo/.miserc.toml
+       6  stat OK outer/repo/mise.toml
+
+## H. file-lookup trace in an empty project directory (mise ls --current; mise env; mise tasks ls): names probed in the workspace root
+       9  stat ENOENT/ERR outer/repo/.config/mise.local.toml
+       9  stat ENOENT/ERR outer/repo/.config/mise.toml
+       9  stat ENOENT/ERR outer/repo/.config/mise/conf.d
+       9  stat ENOENT/ERR outer/repo/.config/mise/config.local.toml
+       9  stat ENOENT/ERR outer/repo/.config/mise/config.toml
+       9  stat ENOENT/ERR outer/repo/.config/mise/mise.local.toml
+       9  stat ENOENT/ERR outer/repo/.config/mise/mise.toml
+       2  stat ENOENT/ERR outer/repo/.config/mise/tasks
+       3  stat ENOENT/ERR outer/repo/.config/miserc.toml
+       2  stat ENOENT/ERR outer/repo/.mise-tasks
+       9  stat ENOENT/ERR outer/repo/.mise.local.toml
+       9  stat ENOENT/ERR outer/repo/.mise.toml
+       9  stat ENOENT/ERR outer/repo/.mise/conf.d
+       9  stat ENOENT/ERR outer/repo/.mise/config.local.toml
+       9  stat ENOENT/ERR outer/repo/.mise/config.toml
+       2  stat ENOENT/ERR outer/repo/.mise/tasks
+       3  stat ENOENT/ERR outer/repo/.miserc.local.toml
+       3  stat ENOENT/ERR outer/repo/.miserc.toml
+       3  stat ENOENT/ERR outer/repo/.tool-versions
+       2  stat ENOENT/ERR outer/repo/mise-tasks
+       9  stat ENOENT/ERR outer/repo/mise.local.toml
+       9  stat ENOENT/ERR outer/repo/mise.toml
+       9  stat ENOENT/ERR outer/repo/mise/conf.d
+       9  stat ENOENT/ERR outer/repo/mise/config.local.toml
+       9  stat ENOENT/ERR outer/repo/mise/config.toml
+       2  stat ENOENT/ERR outer/repo/mise/tasks
+# names probed outside the tree (home, /etc):
+     open ENOENT/ERR /etc/mise/miserc.toml
+     open ENOENT/ERR $HOME/.config/mise/miserc.local.toml
+     open ENOENT/ERR $HOME/.config/mise/miserc.toml
+     stat ENOENT/ERR /etc/mise/conf.d
+     stat ENOENT/ERR /etc/mise/config.local.toml
+     stat ENOENT/ERR /etc/mise/config.toml
+     stat ENOENT/ERR /etc/mise/mise.local.toml
+     stat ENOENT/ERR /etc/mise/mise.toml
+     stat ENOENT/ERR /etc/mise/miserc.toml
+     stat ENOENT/ERR $HOME/.config/mise/conf.d
+     stat ENOENT/ERR $HOME/.config/mise/config.local.toml
+     stat ENOENT/ERR $HOME/.config/mise/config.override.toml
+     stat ENOENT/ERR $HOME/.config/mise/config.toml
+     stat ENOENT/ERR $HOME/.config/mise/mise.local.toml
+     stat ENOENT/ERR $HOME/.config/mise/mise.toml
+     stat ENOENT/ERR $HOME/.config/mise/miserc.local.toml
+     stat ENOENT/ERR $HOME/.config/mise/miserc.toml
+     stat ENOENT/ERR $HOME/.config/mise/tasks
+     stat ENOENT/ERR $HOME/.config/mise/trusted-configs

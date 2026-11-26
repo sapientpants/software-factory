@@ -1,0 +1,503 @@
+## versions
+cargo-deny 0.22.1
+cargo 1.100.0 (3acc79c0c 2026-11-05)
+binary: <scratch>/p43-tools/tools/bin/cargo-deny
+where --config goes in this release: before the subcommand (cargo deny --config F check)
+
+## A. baseline, no config
+$ (cd outer/repo && cargo deny check licenses)
+    [WARN] unable to find a config path, falling back to default config
+    [INFO] using config from deny.default.toml
+    error[rejected]: failed to satisfy license requirements
+      ┌─ outer/repo/member/Cargo.toml:5:12
+     licenses FAILED: 1 errors, 0 warnings, 0 notes
+    -> exit 4
+
+## B. one candidate at a time, cwd = workspace root
+
+# only outer/repo/deny.toml
+$ (cd outer/repo && cargo deny check licenses)
+    [INFO] using config from outer/repo/deny.toml
+    warning[license-not-encountered]: license was not encountered
+      ┌─ outer/repo/deny.toml:2:18
+    2 │ allow = ["MIT", "Zlib"]
+    -> exit 0
+
+# only outer/repo/.deny.toml
+$ (cd outer/repo && cargo deny check licenses)
+    [INFO] using config from outer/repo/.deny.toml
+    warning[license-not-encountered]: license was not encountered
+      ┌─ outer/repo/.deny.toml:2:18
+    2 │ allow = ["MIT", "Zlib"]
+    -> exit 0
+
+# only outer/repo/.cargo/deny.toml
+$ (cd outer/repo && cargo deny check licenses)
+    [INFO] using config from outer/repo/.cargo/deny.toml
+    warning[license-not-encountered]: license was not encountered
+      ┌─ outer/repo/.cargo/deny.toml:2:18
+    2 │ allow = ["MIT", "Zlib"]
+    -> exit 0
+
+# only outer/repo/member/deny.toml
+$ (cd outer/repo && cargo deny check licenses)
+    [WARN] unable to find a config path, falling back to default config
+    [INFO] using config from deny.default.toml
+    error[rejected]: failed to satisfy license requirements
+      ┌─ outer/repo/member/Cargo.toml:5:12
+     licenses FAILED: 1 errors, 0 warnings, 0 notes
+    -> exit 4
+
+# only outer/repo/member/.deny.toml
+$ (cd outer/repo && cargo deny check licenses)
+    [WARN] unable to find a config path, falling back to default config
+    [INFO] using config from deny.default.toml
+    error[rejected]: failed to satisfy license requirements
+      ┌─ outer/repo/member/Cargo.toml:5:12
+     licenses FAILED: 1 errors, 0 warnings, 0 notes
+    -> exit 4
+
+# only outer/repo/member/.cargo/deny.toml
+$ (cd outer/repo && cargo deny check licenses)
+    [WARN] unable to find a config path, falling back to default config
+    [INFO] using config from deny.default.toml
+    error[rejected]: failed to satisfy license requirements
+      ┌─ outer/repo/member/Cargo.toml:5:12
+     licenses FAILED: 1 errors, 0 warnings, 0 notes
+    -> exit 4
+
+# only outer/deny.toml
+$ (cd outer/repo && cargo deny check licenses)
+    [INFO] using config from outer/deny.toml
+    warning[license-not-encountered]: license was not encountered
+      ┌─ outer/deny.toml:2:18
+    2 │ allow = ["MIT", "Zlib"]
+    -> exit 0
+
+# only outer/.deny.toml
+$ (cd outer/repo && cargo deny check licenses)
+    [INFO] using config from outer/.deny.toml
+    warning[license-not-encountered]: license was not encountered
+      ┌─ outer/.deny.toml:2:18
+    2 │ allow = ["MIT", "Zlib"]
+    -> exit 0
+
+# only outer/.cargo/deny.toml
+$ (cd outer/repo && cargo deny check licenses)
+    [INFO] using config from outer/.cargo/deny.toml
+    warning[license-not-encountered]: license was not encountered
+      ┌─ outer/.cargo/deny.toml:2:18
+    2 │ allow = ["MIT", "Zlib"]
+    -> exit 0
+
+# only deny.toml
+$ (cd outer/repo && cargo deny check licenses)
+    [INFO] using config from deny.toml
+    warning[license-not-encountered]: license was not encountered
+      ┌─ deny.toml:2:18
+    2 │ allow = ["MIT", "Zlib"]
+    -> exit 0
+
+# only $HOME/deny.toml
+$ (cd outer/repo && cargo deny check licenses)
+    [WARN] unable to find a config path, falling back to default config
+    [INFO] using config from deny.default.toml
+    error[rejected]: failed to satisfy license requirements
+      ┌─ outer/repo/member/Cargo.toml:5:12
+     licenses FAILED: 1 errors, 0 warnings, 0 notes
+    -> exit 4
+
+# only $HOME/.deny.toml
+$ (cd outer/repo && cargo deny check licenses)
+    [WARN] unable to find a config path, falling back to default config
+    [INFO] using config from deny.default.toml
+    error[rejected]: failed to satisfy license requirements
+      ┌─ outer/repo/member/Cargo.toml:5:12
+     licenses FAILED: 1 errors, 0 warnings, 0 notes
+    -> exit 4
+
+# only $HOME/.cargo/deny.toml
+$ (cd outer/repo && cargo deny check licenses)
+    [WARN] unable to find a config path, falling back to default config
+    [INFO] using config from deny.default.toml
+    error[rejected]: failed to satisfy license requirements
+      ┌─ outer/repo/member/Cargo.toml:5:12
+     licenses FAILED: 1 errors, 0 warnings, 0 notes
+    -> exit 4
+
+# only $HOME/.config/cargo-deny/deny.toml
+$ (cd outer/repo && cargo deny check licenses)
+    [WARN] unable to find a config path, falling back to default config
+    [INFO] using config from deny.default.toml
+    error[rejected]: failed to satisfy license requirements
+      ┌─ outer/repo/member/Cargo.toml:5:12
+     licenses FAILED: 1 errors, 0 warnings, 0 notes
+    -> exit 4
+
+# only $HOME/.config/deny.toml
+$ (cd outer/repo && cargo deny check licenses)
+    [WARN] unable to find a config path, falling back to default config
+    [INFO] using config from deny.default.toml
+    error[rejected]: failed to satisfy license requirements
+      ┌─ outer/repo/member/Cargo.toml:5:12
+     licenses FAILED: 1 errors, 0 warnings, 0 notes
+    -> exit 4
+
+# only outer/repo/.config/deny.toml
+$ (cd outer/repo && cargo deny check licenses)
+    [INFO] using config from outer/repo/.config/deny.toml
+    warning[license-not-encountered]: license was not encountered
+      ┌─ outer/repo/.config/deny.toml:2:18
+    2 │ allow = ["MIT", "Zlib"]
+    -> exit 0
+
+# only outer/repo/cargo-deny.toml
+$ (cd outer/repo && cargo deny check licenses)
+    [WARN] unable to find a config path, falling back to default config
+    [INFO] using config from deny.default.toml
+    error[rejected]: failed to satisfy license requirements
+      ┌─ outer/repo/member/Cargo.toml:5:12
+     licenses FAILED: 1 errors, 0 warnings, 0 notes
+    -> exit 4
+
+# only outer/repo/.cargo-deny.toml
+$ (cd outer/repo && cargo deny check licenses)
+    [WARN] unable to find a config path, falling back to default config
+    [INFO] using config from deny.default.toml
+    error[rejected]: failed to satisfy license requirements
+      ┌─ outer/repo/member/Cargo.toml:5:12
+     licenses FAILED: 1 errors, 0 warnings, 0 notes
+    -> exit 4
+
+# only outer/repo/.deny
+$ (cd outer/repo && cargo deny check licenses)
+    [WARN] unable to find a config path, falling back to default config
+    [INFO] using config from deny.default.toml
+    error[rejected]: failed to satisfy license requirements
+      ┌─ outer/repo/member/Cargo.toml:5:12
+     licenses FAILED: 1 errors, 0 warnings, 0 notes
+    -> exit 4
+
+# only outer/repo/Deny.TOML
+$ (cd outer/repo && cargo deny check licenses)
+    [INFO] using config from outer/repo/deny.toml
+    warning[license-not-encountered]: license was not encountered
+      ┌─ outer/repo/deny.toml:2:18
+    2 │ allow = ["MIT", "Zlib"]
+    -> exit 0
+
+## C. precedence in one directory (each file allows a different unused licence)
+# deny.toml=Zlib, .deny.toml=ISC, .cargo/deny.toml=0BSD
+$ (cd outer/repo && cargo deny check licenses)
+    [INFO] using config from outer/repo/deny.toml
+    warning[license-not-encountered]: license was not encountered
+      ┌─ outer/repo/deny.toml:2:18
+    2 │ allow = ["MIT", "Zlib"]
+    -> exit 0
+# .deny.toml=ISC, .cargo/deny.toml=0BSD
+$ (cd outer/repo && cargo deny check licenses)
+    [INFO] using config from outer/repo/.deny.toml
+    warning[license-not-encountered]: license was not encountered
+      ┌─ outer/repo/.deny.toml:2:18
+    2 │ allow = ["MIT", "ISC"]
+    -> exit 0
+# is a second file merged? .deny.toml allows only Apache-2.0, .cargo/deny.toml allows MIT
+$ (cd outer/repo && cargo deny check licenses)
+    [INFO] using config from outer/repo/.deny.toml
+    error[rejected]: failed to satisfy license requirements
+      ┌─ outer/repo/member/Cargo.toml:5:12
+    warning[license-not-encountered]: license was not encountered
+      ┌─ outer/repo/.deny.toml:2:11
+    2 │ allow = ["Apache-2.0"]
+     licenses FAILED: 1 errors, 1 warnings, 0 notes
+    -> exit 4
+# .cargo/deny.toml=0BSD, .config/deny.toml=BSL-1.0
+$ (cd outer/repo && cargo deny check licenses)
+    [INFO] using config from outer/repo/.cargo/deny.toml
+    warning[license-not-encountered]: license was not encountered
+      ┌─ outer/repo/.cargo/deny.toml:2:18
+    2 │ allow = ["MIT", "0BSD"]
+    -> exit 0
+
+## D. across directories
+# repo/deny.toml=Zlib, member/.deny.toml=ISC, outer/.cargo/deny.toml=0BSD; cwd = workspace root
+$ (cd outer/repo && cargo deny check licenses)
+    [INFO] using config from outer/repo/deny.toml
+    warning[license-not-encountered]: license was not encountered
+      ┌─ outer/repo/deny.toml:2:18
+    2 │ allow = ["MIT", "Zlib"]
+    -> exit 0
+# same, cwd = member
+$ (cd outer/repo/member && cargo deny check licenses)
+    [INFO] using config from outer/repo/member/.deny.toml
+    warning[license-not-encountered]: license was not encountered
+      ┌─ outer/repo/member/.deny.toml:2:18
+    2 │ allow = ["MIT", "ISC"]
+    -> exit 0
+# same, cwd outside the tree, --manifest-path repo/Cargo.toml
+$ (cd $S && cargo deny --manifest-path outer/repo/Cargo.toml check licenses)
+    [INFO] using config from outer/repo/deny.toml
+    warning[license-not-encountered]: license was not encountered
+      ┌─ outer/repo/deny.toml:2:18
+    2 │ allow = ["MIT", "Zlib"]
+    -> exit 0
+# same, cwd = workspace root, --manifest-path member/Cargo.toml
+$ (cd outer/repo && cargo deny --manifest-path outer/repo/member/Cargo.toml check licenses)
+    [INFO] using config from outer/repo/member/.deny.toml
+    warning[license-not-encountered]: license was not encountered
+      ┌─ outer/repo/member/.deny.toml:2:18
+    2 │ allow = ["MIT", "ISC"]
+    -> exit 0
+# only outer/.cargo/deny.toml=0BSD (above the git root), cwd = member
+$ (cd outer/repo/member && cargo deny check licenses)
+    [INFO] using config from outer/.cargo/deny.toml
+    warning[license-not-encountered]: license was not encountered
+      ┌─ outer/.cargo/deny.toml:2:18
+    2 │ allow = ["MIT", "0BSD"]
+    -> exit 0
+
+## E. --config with siblings present
+# E1 --config deny.toml (relative, the protected file), .deny.toml and member/.deny.toml present
+$ (cd outer/repo && cargo deny --config deny.toml check licenses)
+    [INFO] using config from outer/repo/deny.toml
+    warning[license-not-encountered]: license was not encountered
+      ┌─ outer/repo/deny.toml:2:18
+    2 │ allow = ["MIT", "Zlib"]
+    -> exit 0
+# E2 same from cwd = member with --config ../deny.toml
+$ (cd outer/repo/member && cargo deny --config ../deny.toml check licenses)
+    [INFO] using config from outer/repo/member/../deny.toml
+    warning[license-not-encountered]: license was not encountered
+      ┌─ outer/repo/member/../deny.toml:2:18
+    2 │ allow = ["MIT", "Zlib"]
+    -> exit 0
+# E3 --config <file outside the tree that allows only Apache-2.0>
+$ (cd outer/repo && cargo deny --config trusted/deny.toml check licenses)
+    [INFO] using config from trusted/deny.toml
+    error[rejected]: failed to satisfy license requirements
+      ┌─ outer/repo/member/Cargo.toml:5:12
+    warning[license-not-encountered]: license was not encountered
+      ┌─ trusted/deny.toml:2:11
+    2 │ allow = ["Apache-2.0"]
+     licenses FAILED: 1 errors, 1 warnings, 0 notes
+    -> exit 4
+# E4 --config pointing at a file that does not exist
+$ (cd outer/repo && cargo deny --config trusted/nope.toml check licenses)
+    [INFO] using config from trusted/nope.toml
+    error[rejected]: failed to satisfy license requirements
+      ┌─ outer/repo/member/Cargo.toml:5:12
+     licenses FAILED: 1 errors, 0 warnings, 0 notes
+    -> exit 4
+# E5 the other placement of --config in this release
+$ (cd outer/repo && cargo deny check --config deny.toml licenses)
+    error: unexpected argument '--config' found
+    -> exit 2
+$ (cd outer/repo && cargo deny --config deny.toml check licenses)
+    [INFO] using config from outer/repo/deny.toml
+    warning[license-not-encountered]: license was not encountered
+      ┌─ outer/repo/deny.toml:2:18
+    2 │ allow = ["MIT", "Zlib"]
+    -> exit 0
+
+## F. other inputs
+# F1 [package.metadata.cargo-deny] / [package.metadata.deny] / [workspace.metadata.*] tables, no config file
+$ (cd outer/repo && cargo deny check licenses)
+    [WARN] unable to find a config path, falling back to default config
+    [INFO] using config from deny.default.toml
+    error[rejected]: failed to satisfy license requirements
+      ┌─ outer/repo/member/Cargo.toml:5:12
+     licenses FAILED: 1 errors, 0 warnings, 0 notes
+    -> exit 4
+# F2 the protected deny.toml sets [licenses.private] ignore = true and allows nothing; member has publish = false (control), then the attacker ... nothing to add: recorded for the Cargo.toml side
+$ (cd outer/repo && cargo deny check licenses)
+    [INFO] using config from outer/repo/deny.toml
+    -> exit 0
+# F3 full 'cargo deny check' with the canary deny.toml (advisory database is fetched into the scratch CARGO_HOME)
+$ (cd outer/repo && cargo deny check)
+    [INFO] using config from outer/repo/deny.toml
+    warning[license-not-encountered]: license was not encountered
+      ┌─ outer/repo/deny.toml:2:18
+    2 │ allow = ["MIT", "Zlib"]
+    -> exit 0
+
+## F2. the exceptions file (deny.exceptions.toml and its other names): the protected deny.toml allows only Apache-2.0, so member (MIT) is rejected
+# control: deny.toml alone
+$ (cd outer/repo && cargo deny check licenses)
+    [INFO] using config from outer/repo/deny.toml
+    error[rejected]: failed to satisfy license requirements
+      ┌─ outer/repo/member/Cargo.toml:5:12
+    warning[license-not-encountered]: license was not encountered
+      ┌─ outer/repo/deny.toml:2:11
+    2 │ allow = ["Apache-2.0"]
+     licenses FAILED: 1 errors, 1 warnings, 0 notes
+    -> exit 4
+# plus repo/deny.exceptions.toml holding an exception for member
+$ (cd outer/repo && cargo deny check licenses)
+    [INFO] using config from outer/repo/deny.toml
+    warning[license-not-encountered]: license was not encountered
+      ┌─ outer/repo/deny.toml:2:11
+    2 │ allow = ["Apache-2.0"]
+    -> exit 0
+# plus repo/.deny.exceptions.toml holding an exception for member
+$ (cd outer/repo && cargo deny check licenses)
+    [INFO] using config from outer/repo/deny.toml
+    warning[license-not-encountered]: license was not encountered
+      ┌─ outer/repo/deny.toml:2:11
+    2 │ allow = ["Apache-2.0"]
+    -> exit 0
+# plus repo/.cargo/deny.exceptions.toml holding an exception for member
+$ (cd outer/repo && cargo deny check licenses)
+    [INFO] using config from outer/repo/deny.toml
+    warning[license-not-encountered]: license was not encountered
+      ┌─ outer/repo/deny.toml:2:11
+    2 │ allow = ["Apache-2.0"]
+    -> exit 0
+# plus repo/.config/deny.exceptions.toml holding an exception for member
+$ (cd outer/repo && cargo deny check licenses)
+    [INFO] using config from outer/repo/deny.toml
+    warning[license-not-encountered]: license was not encountered
+      ┌─ outer/repo/deny.toml:2:11
+    2 │ allow = ["Apache-2.0"]
+    -> exit 0
+# plus member/deny.exceptions.toml, cwd = workspace root
+$ (cd outer/repo && cargo deny check licenses)
+    [INFO] using config from outer/repo/deny.toml
+    error[rejected]: failed to satisfy license requirements
+      ┌─ outer/repo/member/Cargo.toml:5:12
+    warning[license-not-encountered]: license was not encountered
+      ┌─ outer/repo/deny.toml:2:11
+    2 │ allow = ["Apache-2.0"]
+     licenses FAILED: 1 errors, 1 warnings, 0 notes
+    -> exit 4
+# plus outer/deny.exceptions.toml (a directory above the config)
+$ (cd outer/repo && cargo deny check licenses)
+    [INFO] using config from outer/repo/deny.toml
+    warning[license-not-encountered]: license was not encountered
+      ┌─ outer/repo/deny.toml:2:11
+    2 │ allow = ["Apache-2.0"]
+    -> exit 0
+# plus repo/.deny.exceptions.toml, with --config deny.toml given explicitly
+$ (cd outer/repo && cargo deny --config deny.toml check licenses)
+    [INFO] using config from outer/repo/deny.toml
+    warning[license-not-encountered]: license was not encountered
+      ┌─ outer/repo/deny.toml:2:11
+    2 │ allow = ["Apache-2.0"]
+    -> exit 0
+# plus repo/.deny.exceptions.toml, with --config <the same policy in a file outside the tree>
+$ (cd outer/repo && cargo deny --config trusted/deny.toml check licenses)
+    [INFO] using config from trusted/deny.toml
+    warning[license-not-encountered]: license was not encountered
+      ┌─ trusted/deny.toml:2:11
+    2 │ allow = ["Apache-2.0"]
+    -> exit 0
+# an exceptions file with no config file at all
+$ (cd outer/repo && cargo deny check licenses)
+    [WARN] unable to find a config path, falling back to default config
+    [INFO] using config from deny.default.toml
+    -> exit 0
+
+## G. file-lookup trace, no config, cwd = member: deny-named paths probed
+       1  stat ENOENT/ERR .cargo/deny.exceptions.toml
+       1  stat ENOENT/ERR .cargo/deny.toml
+       1  stat ENOENT/ERR .config/deny.exceptions.toml
+       1  stat ENOENT/ERR .config/deny.toml
+       1  stat ENOENT/ERR .deny.exceptions.toml
+       1  stat ENOENT/ERR .deny.toml
+       1  stat ENOENT/ERR /.cargo/deny.exceptions.toml
+       1  stat ENOENT/ERR /.cargo/deny.toml
+       1  stat ENOENT/ERR /.config/deny.exceptions.toml
+       1  stat ENOENT/ERR /.config/deny.toml
+       1  stat ENOENT/ERR /.deny.exceptions.toml
+       1  stat ENOENT/ERR /.deny.toml
+       1  stat ENOENT/ERR /deny.exceptions.toml
+       1  stat ENOENT/ERR /deny.toml
+       1  stat ENOENT/ERR /private/.cargo/deny.exceptions.toml
+       1  stat ENOENT/ERR /private/.cargo/deny.toml
+       1  stat ENOENT/ERR /private/.config/deny.exceptions.toml
+       1  stat ENOENT/ERR /private/.config/deny.toml
+       1  stat ENOENT/ERR /private/.deny.exceptions.toml
+       1  stat ENOENT/ERR /private/.deny.toml
+       1  stat ENOENT/ERR /private/deny.exceptions.toml
+       1  stat ENOENT/ERR /private/deny.toml
+       1  stat ENOENT/ERR /private/tmp/.cargo/deny.exceptions.toml
+       1  stat ENOENT/ERR /private/tmp/.cargo/deny.toml
+       1  stat ENOENT/ERR /private/tmp/.config/deny.exceptions.toml
+       1  stat ENOENT/ERR /private/tmp/.config/deny.toml
+       1  stat ENOENT/ERR /private/tmp/.deny.exceptions.toml
+       1  stat ENOENT/ERR /private/tmp/.deny.toml
+       1  stat ENOENT/ERR <scratch-parent>/.cargo/deny.exceptions.toml
+       1  stat ENOENT/ERR <scratch-parent>/.cargo/deny.toml
+       1  stat ENOENT/ERR <scratch-parent>/.config/deny.exceptions.toml
+       1  stat ENOENT/ERR <scratch-parent>/.config/deny.toml
+       1  stat ENOENT/ERR <scratch-parent>/.deny.exceptions.toml
+       1  stat ENOENT/ERR <scratch-parent>/.deny.toml
+       1  stat ENOENT/ERR <scratch-parent>/.cargo/deny.exceptions.toml
+       1  stat ENOENT/ERR <scratch-parent>/.cargo/deny.toml
+       1  stat ENOENT/ERR <scratch-parent>/.config/deny.exceptions.toml
+       1  stat ENOENT/ERR <scratch-parent>/.config/deny.toml
+       1  stat ENOENT/ERR <scratch-parent>/.deny.exceptions.toml
+       1  stat ENOENT/ERR <scratch-parent>/.deny.toml
+       1  stat ENOENT/ERR <scratch-parent>/deny.exceptions.toml
+       1  stat ENOENT/ERR <scratch-parent>/deny.toml
+       1  stat ENOENT/ERR <scratch>/.cargo/deny.exceptions.toml
+       1  stat ENOENT/ERR <scratch>/.cargo/deny.toml
+       1  stat ENOENT/ERR <scratch>/.config/deny.exceptions.toml
+       1  stat ENOENT/ERR <scratch>/.config/deny.toml
+       1  stat ENOENT/ERR <scratch>/.deny.exceptions.toml
+       1  stat ENOENT/ERR <scratch>/.deny.toml
+       1  stat ENOENT/ERR <scratch>/deny.exceptions.toml
+       1  stat ENOENT/ERR <scratch>/deny.toml
+       1  stat ENOENT/ERR <scratch-parent>/deny.exceptions.toml
+       1  stat ENOENT/ERR <scratch-parent>/deny.toml
+       1  stat ENOENT/ERR <tmp>/.cargo/deny.exceptions.toml
+       1  stat ENOENT/ERR <tmp>/.cargo/deny.toml
+       1  stat ENOENT/ERR <tmp>/.config/deny.exceptions.toml
+       1  stat ENOENT/ERR <tmp>/.config/deny.toml
+       1  stat ENOENT/ERR <tmp>/.deny.exceptions.toml
+       1  stat ENOENT/ERR <tmp>/.deny.toml
+       1  stat ENOENT/ERR <tmp>/deny.exceptions.toml
+       1  stat ENOENT/ERR <tmp>/deny.toml
+       1  stat ENOENT/ERR /private/tmp/deny.exceptions.toml
+       1  stat ENOENT/ERR /private/tmp/deny.toml
+       1  stat ENOENT/ERR $S/.cargo/deny.exceptions.toml
+       1  stat ENOENT/ERR $S/.cargo/deny.toml
+       1  stat ENOENT/ERR $S/.config/deny.exceptions.toml
+       1  stat ENOENT/ERR $S/.config/deny.toml
+       1  stat ENOENT/ERR $S/.deny.exceptions.toml
+       1  stat ENOENT/ERR $S/.deny.toml
+       1  stat ENOENT/ERR $S/deny.exceptions.toml
+       1  stat ENOENT/ERR $S/deny.toml
+       1  stat ENOENT/ERR $S/fx/.cargo/deny.exceptions.toml
+       1  stat ENOENT/ERR $S/fx/.cargo/deny.toml
+       1  stat ENOENT/ERR $S/fx/.config/deny.exceptions.toml
+       1  stat ENOENT/ERR $S/fx/.config/deny.toml
+       1  stat ENOENT/ERR $S/fx/.deny.exceptions.toml
+       1  stat ENOENT/ERR $S/fx/.deny.toml
+       1  stat ENOENT/ERR $S/fx/deny.exceptions.toml
+       1  stat ENOENT/ERR $S/fx/deny.toml
+       1  stat ENOENT/ERR deny.exceptions.toml
+       1  stat ENOENT/ERR deny.toml
+       1  stat ENOENT/ERR outer/.cargo/deny.exceptions.toml
+       1  stat ENOENT/ERR outer/.cargo/deny.toml
+       1  stat ENOENT/ERR outer/.config/deny.exceptions.toml
+       1  stat ENOENT/ERR outer/.config/deny.toml
+       1  stat ENOENT/ERR outer/.deny.exceptions.toml
+       1  stat ENOENT/ERR outer/.deny.toml
+       1  stat ENOENT/ERR outer/deny.exceptions.toml
+       1  stat ENOENT/ERR outer/deny.toml
+       1  stat ENOENT/ERR outer/repo/.cargo/deny.exceptions.toml
+       1  stat ENOENT/ERR outer/repo/.cargo/deny.toml
+       1  stat ENOENT/ERR outer/repo/.config/deny.exceptions.toml
+       1  stat ENOENT/ERR outer/repo/.config/deny.toml
+       1  stat ENOENT/ERR outer/repo/.deny.exceptions.toml
+       1  stat ENOENT/ERR outer/repo/.deny.toml
+       1  stat ENOENT/ERR outer/repo/deny.exceptions.toml
+       1  stat ENOENT/ERR outer/repo/deny.toml
+       1  stat ENOENT/ERR outer/repo/member/.cargo/deny.exceptions.toml
+       1  stat ENOENT/ERR outer/repo/member/.cargo/deny.toml
+       1  stat ENOENT/ERR outer/repo/member/.config/deny.exceptions.toml
+       1  stat ENOENT/ERR outer/repo/member/.config/deny.toml
+       1  stat ENOENT/ERR outer/repo/member/.deny.exceptions.toml
+       1  stat ENOENT/ERR outer/repo/member/.deny.toml
+       1  stat ENOENT/ERR outer/repo/member/deny.exceptions.toml
+       1  stat ENOENT/ERR outer/repo/member/deny.toml

@@ -1,0 +1,292 @@
+## versions
+rustup 1.29.3 (edbc831ce 2026-11-02)
+info: This is the version for the rustup toolchain manager, not the rustc compiler.
+info: the currently active `rustc` version is `rustc 1.100.0 (0ef1bc386 2026-11-09)`
+
+1.100.0-aarch64-apple-darwin (active, default)
+canary-a
+canary-b
+
+## A. baseline, no file
+$ (cd outer/repo &&  rustup show active-toolchain; rustc --version)
+    1.100.0-aarch64-apple-darwin (default)
+    rustc: rustc 1.100.0 (0ef1bc386 2026-11-09)
+
+## B. one candidate at a time (file names canary-b = rustc 1.97.1; default is 1.100.0), cwd = workspace root
+
+# only outer/repo/rust-toolchain.toml
+$ (cd outer/repo &&  rustup show active-toolchain; rustc --version)
+    canary-b (overridden by 'outer/repo/rust-toolchain.toml')
+    rustc: rustc 1.97.1 (8bab26f4f 2026-07-14)
+
+# only outer/repo/rust-toolchain
+$ (cd outer/repo &&  rustup show active-toolchain; rustc --version)
+    canary-b (overridden by 'outer/repo/rust-toolchain')
+    rustc: rustc 1.97.1 (8bab26f4f 2026-07-14)
+
+# only outer/repo/member/rust-toolchain.toml
+$ (cd outer/repo &&  rustup show active-toolchain; rustc --version)
+    1.100.0-aarch64-apple-darwin (default)
+    rustc: rustc 1.100.0 (0ef1bc386 2026-11-09)
+
+# only outer/repo/member/rust-toolchain
+$ (cd outer/repo &&  rustup show active-toolchain; rustc --version)
+    1.100.0-aarch64-apple-darwin (default)
+    rustc: rustc 1.100.0 (0ef1bc386 2026-11-09)
+
+# only outer/repo/member/src/rust-toolchain
+$ (cd outer/repo &&  rustup show active-toolchain; rustc --version)
+    1.100.0-aarch64-apple-darwin (default)
+    rustc: rustc 1.100.0 (0ef1bc386 2026-11-09)
+
+# only outer/rust-toolchain.toml
+$ (cd outer/repo &&  rustup show active-toolchain; rustc --version)
+    canary-b (overridden by 'outer/rust-toolchain.toml')
+    rustc: rustc 1.97.1 (8bab26f4f 2026-07-14)
+
+# only outer/rust-toolchain
+$ (cd outer/repo &&  rustup show active-toolchain; rustc --version)
+    canary-b (overridden by 'outer/rust-toolchain')
+    rustc: rustc 1.97.1 (8bab26f4f 2026-07-14)
+
+# only rust-toolchain
+$ (cd outer/repo &&  rustup show active-toolchain; rustc --version)
+    canary-b (overridden by 'rust-toolchain')
+    rustc: rustc 1.97.1 (8bab26f4f 2026-07-14)
+
+# only $HOME/rust-toolchain.toml
+$ (cd outer/repo &&  rustup show active-toolchain; rustc --version)
+    1.100.0-aarch64-apple-darwin (default)
+    rustc: rustc 1.100.0 (0ef1bc386 2026-11-09)
+
+# only $HOME/rust-toolchain
+$ (cd outer/repo &&  rustup show active-toolchain; rustc --version)
+    1.100.0-aarch64-apple-darwin (default)
+    rustc: rustc 1.100.0 (0ef1bc386 2026-11-09)
+
+# only outer/repo/.rust-toolchain.toml
+$ (cd outer/repo &&  rustup show active-toolchain; rustc --version)
+    1.100.0-aarch64-apple-darwin (default)
+    rustc: rustc 1.100.0 (0ef1bc386 2026-11-09)
+
+# only outer/repo/.rust-toolchain
+$ (cd outer/repo &&  rustup show active-toolchain; rustc --version)
+    1.100.0-aarch64-apple-darwin (default)
+    rustc: rustc 1.100.0 (0ef1bc386 2026-11-09)
+
+# only outer/repo/.rust-version
+$ (cd outer/repo &&  rustup show active-toolchain; rustc --version)
+    1.100.0-aarch64-apple-darwin (default)
+    rustc: rustc 1.100.0 (0ef1bc386 2026-11-09)
+
+# only outer/repo/rust-version
+$ (cd outer/repo &&  rustup show active-toolchain; rustc --version)
+    1.100.0-aarch64-apple-darwin (default)
+    rustc: rustc 1.100.0 (0ef1bc386 2026-11-09)
+
+# only outer/repo/.config/rust-toolchain.toml
+$ (cd outer/repo &&  rustup show active-toolchain; rustc --version)
+    1.100.0-aarch64-apple-darwin (default)
+    rustc: rustc 1.100.0 (0ef1bc386 2026-11-09)
+
+# only outer/repo/.cargo/rust-toolchain.toml
+$ (cd outer/repo &&  rustup show active-toolchain; rustc --version)
+    1.100.0-aarch64-apple-darwin (default)
+    rustc: rustc 1.100.0 (0ef1bc386 2026-11-09)
+
+# only outer/repo/.cargo/rust-toolchain
+$ (cd outer/repo &&  rustup show active-toolchain; rustc --version)
+    1.100.0-aarch64-apple-darwin (default)
+    rustc: rustc 1.100.0 (0ef1bc386 2026-11-09)
+
+# only outer/repo/rust-toolchain.TOML
+$ (cd outer/repo &&  rustup show active-toolchain; rustc --version)
+    canary-b (overridden by 'outer/repo/rust-toolchain.toml')
+    rustc: rustc 1.97.1 (8bab26f4f 2026-07-14)
+
+# only outer/repo/.tool-versions
+$ (cd outer/repo &&  rustup show active-toolchain; rustc --version)
+    1.100.0-aarch64-apple-darwin (default)
+    rustc: rustc 1.100.0 (0ef1bc386 2026-11-09)
+
+# only outer/repo/rust-toolchain, holding TOML ([toolchain] channel = ...) instead of a bare name
+$ (cd outer/repo &&  rustup show active-toolchain; rustc --version)
+    canary-b (overridden by 'outer/repo/rust-toolchain')
+    rustc: rustc 1.97.1 (8bab26f4f 2026-07-14)
+
+# only outer/repo/rust-toolchain.toml, holding a bare name instead of TOML
+$ (cd outer/repo &&  rustup show active-toolchain; rustc --version)
+    error: could not parse override file: 'outer/repo/rust-toolchain.toml': error parsing override file: TOML parse error at line 1, column 9
+      |
+    1 | canary-b
+      |         ^
+    key with no value, expected `=`
+    
+    rustc: error: could not parse override file: 'outer/repo/rust-toolchain.toml': error parsing override file: TOML parse error at line 1, column 9
+    rustc:   |
+    rustc: 1 | canary-b
+    rustc:   |         ^
+    rustc: key with no value, expected `=`
+    rustc: 
+
+## C. both names in one directory: rust-toolchain=canary-b (1.97.1), rust-toolchain.toml=canary-a (1.100.0)
+$ (cd outer/repo &&  rustup show active-toolchain; rustc --version)
+    warn: both outer/repo/rust-toolchain and outer/repo/rust-toolchain.toml exist; using contents of outer/repo/rust-toolchain
+    canary-b (overridden by 'outer/repo/rust-toolchain')
+    rustc: warn: both outer/repo/rust-toolchain and outer/repo/rust-toolchain.toml exist; using contents of outer/repo/rust-toolchain
+    rustc: rustc 1.97.1 (8bab26f4f 2026-07-14)
+# the reverse assignment: rust-toolchain=canary-a, rust-toolchain.toml=canary-b
+$ (cd outer/repo &&  rustup show active-toolchain; rustc --version)
+    warn: both outer/repo/rust-toolchain and outer/repo/rust-toolchain.toml exist; using contents of outer/repo/rust-toolchain
+    canary-a (overridden by 'outer/repo/rust-toolchain')
+    rustc: warn: both outer/repo/rust-toolchain and outer/repo/rust-toolchain.toml exist; using contents of outer/repo/rust-toolchain
+    rustc: rustc 1.100.0 (0ef1bc386 2026-11-09)
+
+## D. across directories
+# repo/rust-toolchain.toml=canary-a, member/rust-toolchain=canary-b; cwd = workspace root
+$ (cd outer/repo &&  rustup show active-toolchain; rustc --version)
+    canary-a (overridden by 'outer/repo/rust-toolchain.toml')
+    rustc: rustc 1.100.0 (0ef1bc386 2026-11-09)
+# same, cwd = member
+$ (cd outer/repo/member &&  rustup show active-toolchain; rustc --version)
+    canary-b (overridden by 'outer/repo/member/rust-toolchain')
+    rustc: rustc 1.97.1 (8bab26f4f 2026-07-14)
+# same, cwd = member/src
+$ (cd outer/repo/member/src &&  rustup show active-toolchain; rustc --version)
+    canary-b (overridden by 'outer/repo/member/rust-toolchain')
+    rustc: rustc 1.97.1 (8bab26f4f 2026-07-14)
+# same, cwd outside the tree, cargo --manifest-path into it
+    cargo metadata exit 0
+    rustc 1.100.0 (0ef1bc386 2026-11-09)
+    1.100.0-aarch64-apple-darwin (default)
+# repo/rust-toolchain.toml=canary-a, outer/rust-toolchain=canary-b (above the git root); cwd = workspace root
+$ (cd outer/repo &&  rustup show active-toolchain; rustc --version)
+    canary-a (overridden by 'outer/repo/rust-toolchain.toml')
+    rustc: rustc 1.100.0 (0ef1bc386 2026-11-09)
+
+## E. explicit selection with files present (repo/rust-toolchain=canary-b, repo/rust-toolchain.toml=canary-b, member/rust-toolchain=canary-b)
+# E1: RUSTUP_TOOLCHAIN=1.100.0
+$ (cd outer/repo && RUSTUP_TOOLCHAIN=1.100.0 rustup show active-toolchain; rustc --version)
+    1.100.0-aarch64-apple-darwin (overridden by environment variable RUSTUP_TOOLCHAIN)
+    rustc: rustc 1.100.0 (0ef1bc386 2026-11-09)
+$ (cd outer/repo/member && RUSTUP_TOOLCHAIN=1.100.0 rustup show active-toolchain; rustc --version)
+    1.100.0-aarch64-apple-darwin (overridden by environment variable RUSTUP_TOOLCHAIN)
+    rustc: rustc 1.100.0 (0ef1bc386 2026-11-09)
+# E2: cargo +1.100.0 / rustc +1.100.0
+    rustc 1.100.0 (0ef1bc386 2026-11-09)
+    cargo 1.100.0 (3acc79c0c 2026-11-05)
+# E3: a directory override (rustup override set, stored in the scratch rustup home) against the files
+info: override toolchain for outer/repo set to canary-a
+$ (cd outer/repo &&  rustup show active-toolchain; rustc --version)
+    canary-a (directory override for 'outer/repo')
+    rustc: rustc 1.100.0 (0ef1bc386 2026-11-09)
+$ (cd outer/repo/member &&  rustup show active-toolchain; rustc --version)
+    canary-b (overridden by 'outer/repo/member/rust-toolchain')
+    rustc: rustc 1.97.1 (8bab26f4f 2026-07-14)
+info: override toolchain for 'outer/repo' removed
+# E4: trace with RUSTUP_TOOLCHAIN set: does rustup even look for the files?
+    probes for rust-toolchain* with the variable set: 0
+
+## F. [toolchain] path = <directory in the tree>: the file names the binaries to run
+# F0a: repo/rust-toolchain.toml: [toolchain] path = "evil-tc" (relative)
+    error: invalid path toolchain 'evil-tc'
+# F0b: path = "./evil-tc" (relative)
+    error: relative path toolchain './evil-tc'
+# F1: path = "<absolute path of repo>/evil-tc" (evil-tc holds only bin/rustc and bin/cargo, two shell scripts)
+    PWNED: this is evil-tc/bin/rustc, run with args: --version
+    PWNED: this is evil-tc/bin/cargo, run with args: clippy --workspace --all-targets --locked -- -D warnings
+    [exit 0]
+    outer/repo/evil-tc (overridden by 'outer/repo/rust-toolchain.toml')
+# F2: the same content in the legacy name repo/rust-toolchain, cwd = member
+    PWNED: this is evil-tc/bin/cargo, run with args: test --workspace --locked
+    [exit 0]
+# F3: with RUSTUP_TOOLCHAIN=1.100.0
+    cargo 1.100.0 (3acc79c0c 2026-11-05)
+# F4: with cargo +1.100.0
+    cargo 1.100.0 (3acc79c0c 2026-11-05)
+
+## G. a file naming a toolchain that is not installed
+# G1: default settings (channel = "1.0.99", which does not exist)
+    info: syncing channel updates for 1.0.99-aarch64-apple-darwin
+    error: could not download nonexistent rust version `1.0.99-aarch64-apple-darwin`: could not download file from 'https://static.rust-lang.org/dist/rust-1.0.99-aarch64-apple-darwin.tar.gz.sha256' to '$S/rustup-home/tmp/e73yifhlyp4_0j51_file': http request returned an unsuccessful status code: 404
+# G2: RUSTUP_AUTO_INSTALL=0
+    error: toolchain '1.0.99-aarch64-apple-darwin' is not installed
+    help: run `rustup toolchain install` to install it
+# G3: an installed custom toolchain plus components/targets keys
+    rustc 1.100.0 (0ef1bc386 2026-11-09)
+
+## H. file-lookup trace from member/src with no file present: every toolchain-file name probed
+   2  access OK <home>/.cargo/bin
+  13  getattrlist OK /private
+  12  getattrlist OK /private/tmp
+  11  getattrlist OK <tmp>
+  10  getattrlist OK <scratch-parent>
+   9  getattrlist OK <scratch-parent>
+   8  getattrlist OK <scratch>
+   2  getattrlist OK <home>/.cargo/bin/rustc
+   7  getattrlist OK $S
+   6  getattrlist OK $S/fx
+   5  getattrlist OK $S/fx/rustup
+   4  getattrlist OK outer
+   3  getattrlist OK outer/repo
+   2  getattrlist OK outer/repo/member
+   1  getattrlist OK outer/repo/member/src
+   1  open ENOENT/ERR /etc/rustup/settings.toml
+   1  open ENOENT/ERR /private/rust-toolchain
+   1  open ENOENT/ERR /private/rust-toolchain.toml
+   1  open ENOENT/ERR <scratch-parent>/rust-toolchain
+   1  open ENOENT/ERR <scratch-parent>/rust-toolchain.toml
+   1  open ENOENT/ERR <scratch>/rust-toolchain
+   1  open ENOENT/ERR <scratch>/rust-toolchain.toml
+   1  open ENOENT/ERR <scratch-parent>/rust-toolchain
+   1  open ENOENT/ERR <scratch-parent>/rust-toolchain.toml
+   1  open ENOENT/ERR <tmp>/rust-toolchain
+   1  open ENOENT/ERR <tmp>/rust-toolchain.toml
+   1  open ENOENT/ERR /private/tmp/rust-toolchain
+   1  open ENOENT/ERR /private/tmp/rust-toolchain.toml
+   1  open ENOENT/ERR /rust-toolchain
+   1  open ENOENT/ERR /rust-toolchain.toml
+   2  open ENOENT/ERR <home>/.cargo/bin/Info.plist
+   1  open ENOENT/ERR $S/fx/rust-toolchain
+   1  open ENOENT/ERR $S/fx/rust-toolchain.toml
+   1  open ENOENT/ERR $S/rust-toolchain
+   1  open ENOENT/ERR $S/rust-toolchain.toml
+   1  open ENOENT/ERR outer/repo/member/rust-toolchain
+   1  open ENOENT/ERR outer/repo/member/rust-toolchain.toml
+   1  open ENOENT/ERR outer/repo/member/src/rust-toolchain
+   1  open ENOENT/ERR outer/repo/member/src/rust-toolchain.toml
+   1  open ENOENT/ERR outer/repo/rust-toolchain
+   1  open ENOENT/ERR outer/repo/rust-toolchain.toml
+   1  open ENOENT/ERR outer/rust-toolchain
+   1  open ENOENT/ERR outer/rust-toolchain.toml
+   1  open ENOENT/ERR rust-toolchain
+   1  open ENOENT/ERR rust-toolchain.toml
+   2  open OK <home>/.cargo/bin
+   1  open OK <home>/.cargo/bin/rustc
+   1  open OK $S/rustup-home/settings.toml
+   2  open OK $S/rustup-home/toolchains
+   2  openat ENOENT/ERR /Library/Preferences/Logging/com.apple.diagnosticd.filter.plist
+   2  openat OK 1.100.0-aarch64-apple-darwin
+   2  opendir OK <home>/.cargo/bin
+   1  readlink ENOENT/ERR /etc/_rjem_malloc.conf
+   1  stat ENOENT/ERR $HOME/.cargo/bin/rustup-init
+   2  stat OK /
+   1  stat OK /private
+   1  stat OK /private/tmp
+   1  stat OK <tmp>
+   1  stat OK <scratch-parent>
+   1  stat OK <scratch-parent>
+   1  stat OK <scratch>
+   1  stat OK <home>
+   1  stat OK <home>/.cargo/bin
+   1  stat OK <home>/.cargo/bin/rustc
+   1  stat OK $S
+   1  stat OK $S/fx
+   1  stat OK $S/fx/rustup
+   1  stat OK $S/rustup-home
+   1  stat OK $S/rustup-home/settings.toml
+   1  stat OK $S/rustup-home/update-hashes
+   1  stat OK outer
+   1  stat OK outer/repo
+   1  stat OK outer/repo/member
+   6  stat OK outer/repo/member/src

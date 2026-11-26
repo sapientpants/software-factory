@@ -36,7 +36,7 @@ Where to read in `SPEC.md`:
 Read in `SPEC.md`:
 
 - **Crate layout (19.1):** before adding a crate or a dependency between crates. `xtask/tests/structure.rs` holds that table as data; change the spec's table and the test together.
-- **Stack (19.2):** before adding an external dependency. It names the crate chosen for each concern, the exact pins and the crates that are not used, and says what a change does for a concern or a pin that it lacks.
+- **Stack (19.2):** before adding an external dependency. It names the crate chosen for each concern, the exact pins and the crates that are not used, and says what a change does where the table lacks a concern or a pin.
 - **Conventions (19.3):** when a workspace lint fails, and before spawning a task or a process.
 - **Testing (19.4):** before writing a test, for the layer it belongs to.
 

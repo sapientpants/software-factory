@@ -3709,3 +3709,109 @@ The operator answered four questions on the same day, with these observations be
 - **Other versions.** `cargo deny` 0.22.1 and `cargo mutants` 27.1.0 were run, and `cargo deny` 0.18.5 in two cases.
 - **A further ruleset that asks more than the factory gives,** a required check that `required_checks` does not list for example. The mode does not show it (DEP-5).
 - **A pin that the database outgrows.** Nothing says yet what a session, CI or the factory does on the day a pinned `cargo deny` cannot read the fresh database.
+
+## P-39: where rustup puts a toolchain, what records its components, and whether its directory works alone
+
+Answered 2026-11-26 for #88. The review of draft 4 (`16-spec-draft-4-review`) found that WS-7 resolves a toolchain "to an installed toolchain directory" without saying which directory, how its name follows from the file, or how presence is tested: finding B3. Its fix proposes rustup's `<channel>-<host triple>` as the name. What rustup makes on disk was observed before the operator was asked, on the operator's Mac.
+
+**Answer.**
+
+- **rustup puts a toolchain in `toolchains/<channel>-<triple>` below its home,** where the triple is that of the machine rustup runs on, here the Mac's. For the channels `1.100.0`, `1.100` and `stable` it made `1.100.0-aarch64-apple-darwin`, `1.100-aarch64-apple-darwin` and `stable-aarch64-apple-darwin`. The directory is named after the channel as it was asked for, not after the compiler it holds: all three held rustc 1.100.0.
+- **`lib/rustlib/components` in the toolchain is a list of what is installed,** one name to a line. `cargo`, `rustc` and `rust-std` stand there with the Mac's triple after the name. `clippy` and `rustfmt` stand there as `clippy-preview` and `rustfmt-preview`, with the triple. A second target is the line `rust-std-<target>`. `rust-src` stands there with no triple.
+- **Removing a component takes its line and its files away together.** After `rustup component remove clippy` the line was gone, and `cargo-clippy` and `clippy-driver` with it. After `rustup target remove` the line `rust-std-<target>` was gone, and the target's directory under `lib/rustlib` with it.
+- **The directory works with no rustup.** With its `bin` first on a cleared `PATH`, and `HOME` and `CARGO_HOME` in new directories, a crate was built, tested, linted with clippy and checked by rustfmt, which formats nothing with `--check`. `rustc --print sysroot` named the directory.
+- **It works from another place, and without write permission.** A copy under another path and name did the same, and so did that copy after `chmod -R a-w`. Through a symbolic link the four commands passed as well, and `rustc` named the directory that the link points at.
+- **Without rustup, a `rust-toolchain.toml` beside the crate does nothing.** The crate's file named `1.97.1`, and the build ran on 1.100.0. `cargo +1.97.1 --version` failed with `no such command`.
+- **A missing component is an unknown command, and a missing target a build error.** On a toolchain installed with the minimal profile, `cargo clippy` and `cargo fmt` exited with 101 and `no such command`. A check for a target whose `rust-std` was not installed exited with 101 and `can't find crate for std`.
+- **rustup installs what a `rust-toolchain.toml` names.** In a directory whose file named `1.100.0` with `clippy`, and with an empty home, `rustup --version` downloaded and installed that toolchain, with the default profile.
+
+### Method
+
+Throwaway scripts on the branch `prototype/toolchain-layout`, at commit [`952ac8a`](https://github.com/sapientpants/software-factory/tree/952ac8a287b00ed9c772f031c9ffd67cd01095f0/xtask/prototype/toolchain-layout), with the output of each under `results/`. Both ran on macOS 27.0.1 on arm64, on one scratch directory that was empty at the start. The times below are those the session noted; the kept output holds none.
+
+- **`install.sh`** runs rustup 1.29.3 with a cleared environment, in an empty directory, with `RUSTUP_HOME`, `CARGO_HOME` and `HOME` below the scratch directory. It installs `1.100.0` with `--profile minimal --component clippy --component rustfmt --target x86_64-unknown-linux-gnu`, and `1.100` and `stable` with `--profile minimal`. It then lists the home, the three directories, and the `components` file and `bin` of two of them, before and after a component and a target are removed and added again. Its last case gives rustup a second, empty home and runs `rustup --version` in a directory that holds a `rust-toolchain.toml`. The output is `results/install.txt`, of one run that ended at 06:53 UTC.
+- **`use.sh`** runs `cargo` and `rustc` with `env -i`, with `PATH` set to the toolchain's `bin`, `/usr/bin` and `/bin`. No rustup and no shim is on that `PATH`, and `RUSTUP_HOME` and `RUSTUP_TOOLCHAIN` are not set. Each command has a target directory of its own, so that none passes on what another built. The crate has no dependency, one test, and a `rust-toolchain.toml` that names `1.97.1`. The copy is made with `cp -cR`. The output is `results/use.txt`, of a run at 07:07 UTC on the directory that `install.sh` had filled. A run at 06:53 had left `cargo test` out of two cases and had only built through the link; a review of this record found that the text said more than that run showed, and the script now runs the four commands in each case.
+
+A first pass ran the same commands by hand, and two earlier runs of `install.sh` followed it; none of them is kept. One thing came out of it by accident and became the last case of `install.sh`: the script was started in this repository's directory, whose `rust-toolchain.toml` names `1.100.0`, and the first rustup command installed that toolchain with the default profile before the script asked for anything.
+
+### What rustup made
+
+```text
+## its toolchains directory
+1.100-aarch64-apple-darwin
+1.100.0-aarch64-apple-darwin
+stable-aarch64-apple-darwin
+## 1.100.0: lib/rustlib/components
+clippy-preview-aarch64-apple-darwin
+cargo-aarch64-apple-darwin
+rust-std-aarch64-apple-darwin
+rust-std-x86_64-unknown-linux-gnu
+rustfmt-preview-aarch64-apple-darwin
+rustc-aarch64-apple-darwin
+## 1.100 (minimal): lib/rustlib/components
+cargo-aarch64-apple-darwin
+rust-std-aarch64-apple-darwin
+rustc-aarch64-apple-darwin
+```
+
+After `rustup component add rust-src` on the second, its file gained the line `rust-src`.
+
+The same directory holds `multirust-channel-manifest.toml`, a file of about 1 MB that rustup keeps of the channel. Its table `renames` maps twelve names to a name with `-preview` after it, `clippy`, `rustfmt`, `llvm-tools`, `miri` and `rust-analyzer` among them. `results/install.txt` lists all twelve. In each, the new name is the old one with `-preview` at the end.
+
+### What the directory did without rustup
+
+| Case | `cargo build` | `cargo test` | `cargo clippy -- -D warnings` | `cargo fmt --check` |
+|---|---|---|---|---|
+| In place | 0 | 0 | 0 | 0 |
+| A copy under another path and name | 0 | 0 | 0 | 0 |
+| That copy after `chmod -R a-w` | 0 | 0 | 0 | 0 |
+| Through a symbolic link | 0 | 0 | 0 | 0 |
+| The toolchain of the minimal profile | 0 | 0 | 101, `no such command: clippy` | 101, `no such command: fmt` |
+
+Each number is an exit status, and each command ran with `--offline` where it takes the option. `cargo check --target x86_64-unknown-linux-gnu` exited with 0 on the toolchain that held that target's `rust-std` and with 101 on the one that did not.
+
+### What the rustup book says
+
+Six pages of the book at `rust-lang.github.io/rustup` were read on 2026-11-26: the pages on overrides, toolchains, components, profiles, environment variables and installation. None says which version of rustup it describes. A script looked for each quotation below, and for the four things that the last point says are missing, in the text of the pages as fetched that day.
+
+- **The file.** rustup reads `rust-toolchain.toml` or `rust-toolchain`, and "If both files are present in a directory, the latter is used for backwards compatibility." The `[toolchain]` table has five settings: `channel`, `path`, `profile`, `components` and `targets`. "`channel` and `path` are mutually exclusive", and with a `path` the other three "have no effect". "The components listed here are additive with the current profile." "The host platform is automatically included; the targets listed here are additive." "The `[toolchain]` section is mandatory, and at least one property must be specified", so a file without a `channel` is one that rustup takes. The page does not say what rustup does with a key it does not know.
+- **A channel.** The grammar is `<channel>[-<date>][-<host>]`, where `<channel>` is `stable`, `beta`, `nightly` or a version, and a version is `<major.minor>` or `<major.minor.patch>`.
+- **The profiles.** The minimal profile holds `rustc`, `rust-std` and `cargo`. The default profile adds `rust-docs`, `rustfmt` and `clippy`.
+- **The home.** `RUSTUP_HOME` "Sets the root `rustup` folder, used for storing installed toolchains and configuration options", with `~/.rustup` as its default.
+- **An installation by itself.** `RUSTUP_AUTO_INSTALL`, 1 by default, "installs the active toolchain when it is absent".
+- **What the book does not say.** It names neither the directory `toolchains` nor the name of a toolchain's directory, and it mentions neither the `components` file nor a name with `-preview`. Those four rest on the observations above and on nothing else.
+
+### Findings
+
+**The review's proposed name is the one rustup uses.** The channel, a hyphen and the triple of the machine is the directory, so a rustup home that the operator fills is a toolchains directory as it stands, and the host needs no layout of its own.
+
+**A channel that is no full version names a directory whose content moves.** `1.100` and `stable` each have a directory, and each holds whatever the last update left there. The path says nothing about the compiler in it. With a full version it does.
+
+**Presence can be read without running anything.** The two programs are files, and every component and target is a line of one small file. A name of `rust-toolchain.toml` is found there as it is or with `-preview` after it, with the machine's triple at the end or without. That rule covers every line seen here and all twelve renames of the channel manifest, so the manifest need not be read.
+
+**The record is rustup's own, and the pages read do not mention it.** A release of rustup that writes the file otherwise would make a present component read as missing. That stops a claim and names the component. It does not let a build run without one.
+
+**A toolchain's directory is all that a worker needs of rustup.** It built from a path that rustup never gave it, with nothing in it writable. A sandbox can therefore show one toolchain's directory read-only, at whatever path it chooses, and no rustup home.
+
+**The rule that keeps rustup off a worker's `PATH` has a reason that can be shown.** With rustup on the `PATH`, the file in the work tree decides which toolchain runs, and rustup goes to the network for one it lacks. Without it, the file decides nothing.
+
+### What changed in the spec
+
+The operator answered eight questions on the same day, with these observations before the first four, each as recommended. D-42 records the answers.
+
+1. WS-7 says which file is read and which of its keys, that a channel is a full version, where the directory lies and what it is named, how a toolchain, a component and a target are found present, what a worker is shown, and which crate looks. WS-7a names the key of the tools directory, and CLI-6 says what `sf sandbox exec` does where a toolchain is missing.
+2. 9.5 says that `Ecosystem` is pure, and 19.1 that `factory-daemon` looks at what the host has installed.
+3. 16.4 is new and holds every key of the operator configuration of version 1. CFG-5 is new and says what the key sets of version 1 are, CFG-6 is new and says what makes the file invalid, and CFG-2 says when a key joins a version without a new number. 16.1, 16.2 and SEC-11 follow.
+4. BUD-3 puts the price table into the operator configuration and says what a row holds, and step 1 of the claim looks the rows up (8.2).
+5. 9.4 and BOOT-6 say that the capture limits and the session limits are keys of the operator configuration alone.
+6. CLI-7 is new and puts `sf init` into M5. 13.5 and 4.4 follow.
+7. P-39 and D-42 are rows of section 23, the roadmap names the configuration types and the lookup in M0, the price table in M1a and `sf init` in M5, `GLOSSARY.md` gains two terms, and the status row and the entry of `16-spec-draft-4-review` count B3 and B4 as addressed.
+
+### Still open
+
+- **Linux.** Everything ran on macOS. That rustup names the directory `1.100.0-x86_64-unknown-linux-gnu` on the server, and that the `components` file has the same form there, was not observed. The operator sees both when the server is provisioned.
+- **A sandbox.** No toolchain was shown to a sandbox. The cold build of M0's exit check is the first build with a toolchain that bubblewrap shows read-only (BOOT-3).
+- **A dated channel.** No `nightly-YYYY-MM-DD` was installed, so the name of its directory is the grammar's and was not seen. WS-7 does not accept one.
+- **Other versions.** rustup 1.29.3 and the toolchain 1.100.0 were run. An older toolchain's `components` file was not read.
+- **A toolchain that rustup did not install,** from the standalone installer or built from source.
+- **A component with a target of its own in its name,** `gcc-x86_64-unknown-linux-gnu` of the renames for one, and a component of the `complete` profile. Only `clippy`, `rustfmt` and `rust-src` were added.

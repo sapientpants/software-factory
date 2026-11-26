@@ -1,0 +1,11 @@
+$ cargo mutants --no-shuffle -j 2   (cargo-mutants 27.1.0, rustc 1.100.0, macOS 27.0.1 on arm64)
+Found 10 mutants to test
+ok       Unmutated baseline in 0s build + 0s test
+ INFO Auto-set test timeout to 20s
+MISSED   src/lib.rs:3:5: replace linux_only -> i32 with 1 in 0s build + 0s test
+MISSED   src/lib.rs:3:5: replace linux_only -> i32 with 0 in 0s build + 0s test
+MISSED   src/lib.rs:3:5: replace linux_only -> i32 with -1 in 0s build + 0s test
+MISSED   src/lib.rs:3:7: replace + with - in linux_only in 0s build + 0s test
+MISSED   src/lib.rs:3:7: replace + with * in linux_only in 0s build + 0s test
+10 mutants tested in 2s: 5 missed, 5 caught
+(exit 2)

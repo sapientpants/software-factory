@@ -61,6 +61,9 @@ A commit the host builds from the workspace (9.4). Gates run on candidates; only
 **Policy**:
 The repository-owned configuration in `.factory/` on the default branch.
 
+**Operator configuration**:
+The operator-owned file on the host that names the factory's credentials, directories, limits and prices, and the repositories it may work on (16.1). It is trusted, which a policy is not. 16.4 holds its keys.
+
 **Path pattern**:
 A glob that names files of a repository by their path. VAL-5b says which lists hold path patterns and how one matches, VAL-5c what a pattern may hold and VAL-5d which spellings of a path are one name. VAL-5e names the rules of the integrity check that use one outside those lists.
 
@@ -69,6 +72,9 @@ The whole path of one file from the repository root, which the host took from a 
 
 **Locked path**:
 The exact path of a file that `author_tests` wrote for a run (11.7). A change to it by the implementer fails the integrity check (VAL-5e).
+
+**Toolchain**:
+The compiler and the build programs of one version that a target repository names for its ecosystem: for Rust, what `rust-toolchain.toml` names. WS-7 says where the host finds one and how it reaches a worker.
 
 **Check tool**:
 A program that a repository's setup commands or checks run and that is no part of its toolchain (WS-7): `cargo-nextest` or `typos`, for example. WS-7a says how one reaches a worker.

@@ -4218,3 +4218,31 @@ The operator answered eight questions on the same day for #91, each as recommend
 - **What a deleted label does to its events,** and what an account that was deleted leaves as the actor of an event, the editor of an entry or the author of a comment. No actor was null in any read here, as in the first run.
 - **An edit of a comment, and who made it.** As the first run left it.
 - **The page limit of the timeline.** 101 came back; a larger number was not asked for.
+
+## P-21, the tool list: what a session without a tool list brings
+
+Read on 2026-11-26 for #92 from the output that the pass of 2026-11-19 kept, on the branch `prototype/claude-code-lockdown` at commit `2d47e6d`. No session was started for it. The record of P-21 above says "23 built-in tools" and names five of them. The review of draft 4 found that no rule lists the tools of a role (`16-spec-draft-4-review`, finding S12), and the list that AG-22 now holds is written against the names below.
+
+**What the `system/init` of Claude Code 2.1.311 named.**
+
+- **With no tool list** (`results/baseline.json`, the control with no lock-down flag): `Task`, `Bash`, `CronCreate`, `CronDelete`, `CronList`, `Edit`, `EnterWorktree`, `ExitWorktree`, `ListAgents`, `Monitor`, `NotebookEdit`, `Read`, `RemoteTrigger`, `ReportFindings`, `ScheduleWakeup`, `SendMessage`, `Skill`, `TaskStop`, `ToolSearch`, `WebFetch`, `WebSearch`, `Workflow`, `Write`, and the tool of the planted MCP server. That is 23 built-in tools.
+- **Under the flags of AG-3a** (`results/ag3a.json`): the same 23, and the tool of the host's MCP server in place of the planted one. The lock-down removes no tool.
+- **With `--tools Read,Glob,Grep --allowedTools Read`** and a result schema (`results/full-ag1.json` and `results/full-ag1-partial.json`): `Glob`, `Grep`, `Read`, `StructuredOutput` and the tool of the host's MCP server.
+
+**What follows.**
+
+- The Agent tool is listed as `Task`. On the command line it is `Agent`: the subagent cases of P-26 passed `--tools Read,Glob,Grep,Agent` on 2.1.323, and their `init` listed `Task` (the record of P-26 below).
+- `Glob` and `Grep` are in neither list of 23, and the two sessions that asked for them by name had them.
+- `StructuredOutput` is in the sessions that were given a result schema and in neither of the others.
+
+### What changed in the spec
+
+1. 10.2 lists the tools of each role, and AG-22 says what no role has (D-46).
+2. The contract test of 19.4 asserts the list.
+3. Probe P-41 holds the first question below, on which the list rests.
+
+### Still open
+
+- **A subagent's tools.** No session of P-21 started a subagent. Those of P-26 did, under the list `Read,Glob,Grep,Agent`, and what tools a subagent had there was not compared with the list (P-41).
+- **Other versions.** The names are those of one version. Those of 2.1.326, which AG-5 names to be tried first, were not read.
+- **What `--allowedTools` adds to `--tools`.** The two sessions with a list ran under the permission mode `dontAsk` and passed `Read` alone as allowed. Each called `Read` and `StructuredOutput` and no other tool.

@@ -52,6 +52,12 @@ The line of model calls that the agent CLI makes for the messages an agent sessi
 **Subagent**:
 A second line of model calls that the main loop starts through the agent CLI's Agent tool, within the same agent session (AG-20). BUD-10 says how it runs and how its calls are counted.
 
+**Tested range**:
+The versions of the agent CLI on which a build of `sf` starts a session: a list of exact versions that the build holds. AG-5 says how a version joins it.
+
+**Contract test**:
+The cases that `sf contract` runs against the installed agent CLI, inside the sandbox, to assert what the driver, the lock-down and the session limits rest on (19.4, CLI-8). The test of the outbound encoder against GitHub has a row of its own in 19.4 and is not meant by this term.
+
 **Workspace**:
 The directory tree in which the implementer works. It lives for one attempt, or until a base update rebuilds it (12.4).
 
@@ -110,4 +116,4 @@ The repository that holds `sf` and its specification, `SPEC.md`. It is also a ta
 The GitHub App that an installed build of `sf` authenticates as (5.7). What the factory writes to a target repository is written under its identity.
 
 **Scratch App**:
-The GitHub App that a development build of `sf` (BOOT-2) and the end-to-end tests (19.4) authenticate as. It is installed on the scratch repository and on no other.
+The GitHub App that a development build of `sf` (BOOT-2) and the tests of 19.4 that write to the scratch repository authenticate as. It is installed on the scratch repository and on no other.

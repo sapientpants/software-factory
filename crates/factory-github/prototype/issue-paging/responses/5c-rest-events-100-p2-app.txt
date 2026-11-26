@@ -1,0 +1,399 @@
+HTTP/2 200 
+date: Thu, 26 Nov 2026 12:37:14 GMT
+link: <https://api.github.com/repositories/1463362063/issues/133/events?per_page=100&page=1>; rel="prev", <https://api.github.com/repositories/1463362063/issues/133/events?per_page=100&page=1>; rel="first"
+x-accepted-github-permissions: issues=read; pull_requests=read
+x-github-api-version-selected: 2026-03-10
+x-ratelimit-remaining: 4997
+x-ratelimit-used: 3
+x-github-request-id: F996:17FC5E:379E744:523A382:6B0827FA
+
+[
+  {
+    "id": 37367439040,
+    "node_id": "RTE_lADOVzkiD88AAAABivrO088AAAAIs0XewA",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/issues/events/37367439040",
+    "actor": {
+      "login": "sapientpants",
+      "id": 305936,
+      "node_id": "MDQ6VXNlcjMwNTkzNg==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/305936?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/sapientpants",
+      "html_url": "https://github.com/sapientpants",
+      "followers_url": "https://api.github.com/users/sapientpants/followers",
+      "following_url": "https://api.github.com/users/sapientpants/following{/other_user}",
+      "gists_url": "https://api.github.com/users/sapientpants/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/sapientpants/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/sapientpants/subscriptions",
+      "organizations_url": "https://api.github.com/users/sapientpants/orgs",
+      "repos_url": "https://api.github.com/users/sapientpants/repos",
+      "events_url": "https://api.github.com/users/sapientpants/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/sapientpants/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "event": "renamed",
+    "commit_id": null,
+    "commit_url": null,
+    "created_at": "2026-11-26T12:35:26Z",
+    "rename": {
+      "from": "P-8 probe: paging, title 97",
+      "to": "P-8 probe: paging, title 98"
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "id": 37367444891,
+    "node_id": "RTE_lADOVzkiD88AAAABivrO088AAAAIs0X1mw",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/issues/events/37367444891",
+    "actor": {
+      "login": "sapientpants",
+      "id": 305936,
+      "node_id": "MDQ6VXNlcjMwNTkzNg==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/305936?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/sapientpants",
+      "html_url": "https://github.com/sapientpants",
+      "followers_url": "https://api.github.com/users/sapientpants/followers",
+      "following_url": "https://api.github.com/users/sapientpants/following{/other_user}",
+      "gists_url": "https://api.github.com/users/sapientpants/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/sapientpants/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/sapientpants/subscriptions",
+      "organizations_url": "https://api.github.com/users/sapientpants/orgs",
+      "repos_url": "https://api.github.com/users/sapientpants/repos",
+      "events_url": "https://api.github.com/users/sapientpants/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/sapientpants/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "event": "renamed",
+    "commit_id": null,
+    "commit_url": null,
+    "created_at": "2026-11-26T12:35:30Z",
+    "rename": {
+      "from": "P-8 probe: paging, title 98",
+      "to": "P-8 probe: paging, title 99"
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "id": 37367450608,
+    "node_id": "RTE_lADOVzkiD88AAAABivrO088AAAAIs0YL8A",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/issues/events/37367450608",
+    "actor": {
+      "login": "sapientpants",
+      "id": 305936,
+      "node_id": "MDQ6VXNlcjMwNTkzNg==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/305936?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/sapientpants",
+      "html_url": "https://github.com/sapientpants",
+      "followers_url": "https://api.github.com/users/sapientpants/followers",
+      "following_url": "https://api.github.com/users/sapientpants/following{/other_user}",
+      "gists_url": "https://api.github.com/users/sapientpants/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/sapientpants/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/sapientpants/subscriptions",
+      "organizations_url": "https://api.github.com/users/sapientpants/orgs",
+      "repos_url": "https://api.github.com/users/sapientpants/repos",
+      "events_url": "https://api.github.com/users/sapientpants/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/sapientpants/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "event": "renamed",
+    "commit_id": null,
+    "commit_url": null,
+    "created_at": "2026-11-26T12:35:34Z",
+    "rename": {
+      "from": "P-8 probe: paging, title 99",
+      "to": "P-8 probe: paging, title 100"
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "id": 37367456297,
+    "node_id": "RTE_lADOVzkiD88AAAABivrO088AAAAIs0YiKQ",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/issues/events/37367456297",
+    "actor": {
+      "login": "sapientpants",
+      "id": 305936,
+      "node_id": "MDQ6VXNlcjMwNTkzNg==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/305936?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/sapientpants",
+      "html_url": "https://github.com/sapientpants",
+      "followers_url": "https://api.github.com/users/sapientpants/followers",
+      "following_url": "https://api.github.com/users/sapientpants/following{/other_user}",
+      "gists_url": "https://api.github.com/users/sapientpants/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/sapientpants/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/sapientpants/subscriptions",
+      "organizations_url": "https://api.github.com/users/sapientpants/orgs",
+      "repos_url": "https://api.github.com/users/sapientpants/repos",
+      "events_url": "https://api.github.com/users/sapientpants/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/sapientpants/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "event": "renamed",
+    "commit_id": null,
+    "commit_url": null,
+    "created_at": "2026-11-26T12:35:38Z",
+    "rename": {
+      "from": "P-8 probe: paging, title 100",
+      "to": "P-8 probe: paging, title 101"
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "id": 37367462029,
+    "node_id": "RTE_lADOVzkiD88AAAABivrO088AAAAIs0Y4jQ",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/issues/events/37367462029",
+    "actor": {
+      "login": "sapientpants",
+      "id": 305936,
+      "node_id": "MDQ6VXNlcjMwNTkzNg==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/305936?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/sapientpants",
+      "html_url": "https://github.com/sapientpants",
+      "followers_url": "https://api.github.com/users/sapientpants/followers",
+      "following_url": "https://api.github.com/users/sapientpants/following{/other_user}",
+      "gists_url": "https://api.github.com/users/sapientpants/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/sapientpants/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/sapientpants/subscriptions",
+      "organizations_url": "https://api.github.com/users/sapientpants/orgs",
+      "repos_url": "https://api.github.com/users/sapientpants/repos",
+      "events_url": "https://api.github.com/users/sapientpants/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/sapientpants/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "event": "renamed",
+    "commit_id": null,
+    "commit_url": null,
+    "created_at": "2026-11-26T12:35:42Z",
+    "rename": {
+      "from": "P-8 probe: paging, title 101",
+      "to": "P-8 probe: paging, title 102"
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "id": 37367467470,
+    "node_id": "RTE_lADOVzkiD88AAAABivrO088AAAAIs0ZNzg",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/issues/events/37367467470",
+    "actor": {
+      "login": "sapientpants",
+      "id": 305936,
+      "node_id": "MDQ6VXNlcjMwNTkzNg==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/305936?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/sapientpants",
+      "html_url": "https://github.com/sapientpants",
+      "followers_url": "https://api.github.com/users/sapientpants/followers",
+      "following_url": "https://api.github.com/users/sapientpants/following{/other_user}",
+      "gists_url": "https://api.github.com/users/sapientpants/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/sapientpants/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/sapientpants/subscriptions",
+      "organizations_url": "https://api.github.com/users/sapientpants/orgs",
+      "repos_url": "https://api.github.com/users/sapientpants/repos",
+      "events_url": "https://api.github.com/users/sapientpants/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/sapientpants/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "event": "renamed",
+    "commit_id": null,
+    "commit_url": null,
+    "created_at": "2026-11-26T12:35:45Z",
+    "rename": {
+      "from": "P-8 probe: paging, title 102",
+      "to": "P-8 probe: paging, title 103"
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "id": 37367473090,
+    "node_id": "RTE_lADOVzkiD88AAAABivrO088AAAAIs0Zjwg",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/issues/events/37367473090",
+    "actor": {
+      "login": "sapientpants",
+      "id": 305936,
+      "node_id": "MDQ6VXNlcjMwNTkzNg==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/305936?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/sapientpants",
+      "html_url": "https://github.com/sapientpants",
+      "followers_url": "https://api.github.com/users/sapientpants/followers",
+      "following_url": "https://api.github.com/users/sapientpants/following{/other_user}",
+      "gists_url": "https://api.github.com/users/sapientpants/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/sapientpants/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/sapientpants/subscriptions",
+      "organizations_url": "https://api.github.com/users/sapientpants/orgs",
+      "repos_url": "https://api.github.com/users/sapientpants/repos",
+      "events_url": "https://api.github.com/users/sapientpants/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/sapientpants/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "event": "renamed",
+    "commit_id": null,
+    "commit_url": null,
+    "created_at": "2026-11-26T12:35:49Z",
+    "rename": {
+      "from": "P-8 probe: paging, title 103",
+      "to": "P-8 probe: paging, title 104"
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "id": 37367478600,
+    "node_id": "RTE_lADOVzkiD88AAAABivrO088AAAAIs0Z5SA",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/issues/events/37367478600",
+    "actor": {
+      "login": "sapientpants",
+      "id": 305936,
+      "node_id": "MDQ6VXNlcjMwNTkzNg==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/305936?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/sapientpants",
+      "html_url": "https://github.com/sapientpants",
+      "followers_url": "https://api.github.com/users/sapientpants/followers",
+      "following_url": "https://api.github.com/users/sapientpants/following{/other_user}",
+      "gists_url": "https://api.github.com/users/sapientpants/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/sapientpants/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/sapientpants/subscriptions",
+      "organizations_url": "https://api.github.com/users/sapientpants/orgs",
+      "repos_url": "https://api.github.com/users/sapientpants/repos",
+      "events_url": "https://api.github.com/users/sapientpants/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/sapientpants/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "event": "renamed",
+    "commit_id": null,
+    "commit_url": null,
+    "created_at": "2026-11-26T12:35:53Z",
+    "rename": {
+      "from": "P-8 probe: paging, title 104",
+      "to": "P-8 probe: paging, title 105"
+    },
+    "performed_via_github_app": null
+  },
+  {
+    "id": 37367484525,
+    "node_id": "UNLE_lADOVzkiD88AAAABivrO088AAAAIs0aQbQ",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/issues/events/37367484525",
+    "actor": {
+      "login": "sapientpants",
+      "id": 305936,
+      "node_id": "MDQ6VXNlcjMwNTkzNg==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/305936?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/sapientpants",
+      "html_url": "https://github.com/sapientpants",
+      "followers_url": "https://api.github.com/users/sapientpants/followers",
+      "following_url": "https://api.github.com/users/sapientpants/following{/other_user}",
+      "gists_url": "https://api.github.com/users/sapientpants/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/sapientpants/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/sapientpants/subscriptions",
+      "organizations_url": "https://api.github.com/users/sapientpants/orgs",
+      "repos_url": "https://api.github.com/users/sapientpants/repos",
+      "events_url": "https://api.github.com/users/sapientpants/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/sapientpants/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "event": "unlabeled",
+    "commit_id": null,
+    "commit_url": null,
+    "created_at": "2026-11-26T12:35:57Z",
+    "label": {
+      "name": "probe:p-8",
+      "color": "ededed"
+    },
+    "intent": null,
+    "performed_via_github_app": null
+  },
+  {
+    "id": 37367487424,
+    "node_id": "LE_lADOVzkiD88AAAABivrO088AAAAIs0abwA",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/issues/events/37367487424",
+    "actor": {
+      "login": "sapientpants",
+      "id": 305936,
+      "node_id": "MDQ6VXNlcjMwNTkzNg==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/305936?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/sapientpants",
+      "html_url": "https://github.com/sapientpants",
+      "followers_url": "https://api.github.com/users/sapientpants/followers",
+      "following_url": "https://api.github.com/users/sapientpants/following{/other_user}",
+      "gists_url": "https://api.github.com/users/sapientpants/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/sapientpants/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/sapientpants/subscriptions",
+      "organizations_url": "https://api.github.com/users/sapientpants/orgs",
+      "repos_url": "https://api.github.com/users/sapientpants/repos",
+      "events_url": "https://api.github.com/users/sapientpants/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/sapientpants/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "event": "labeled",
+    "commit_id": null,
+    "commit_url": null,
+    "created_at": "2026-11-26T12:35:59Z",
+    "label": {
+      "name": "probe:p-8",
+      "color": "ededed"
+    },
+    "intent": null,
+    "performed_via_github_app": null
+  },
+  {
+    "id": 37367490664,
+    "node_id": "RTE_lADOVzkiD88AAAABivrO088AAAAIs0aoaA",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/issues/events/37367490664",
+    "actor": {
+      "login": "sapientpants",
+      "id": 305936,
+      "node_id": "MDQ6VXNlcjMwNTkzNg==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/305936?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/sapientpants",
+      "html_url": "https://github.com/sapientpants",
+      "followers_url": "https://api.github.com/users/sapientpants/followers",
+      "following_url": "https://api.github.com/users/sapientpants/following{/other_user}",
+      "gists_url": "https://api.github.com/users/sapientpants/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/sapientpants/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/sapientpants/subscriptions",
+      "organizations_url": "https://api.github.com/users/sapientpants/orgs",
+      "repos_url": "https://api.github.com/users/sapientpants/repos",
+      "events_url": "https://api.github.com/users/sapientpants/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/sapientpants/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "event": "renamed",
+    "commit_id": null,
+    "commit_url": null,
+    "created_at": "2026-11-26T12:36:01Z",
+    "rename": {
+      "from": "P-8 probe: paging, title 105",
+      "to": "P-8 probe: paging, title 106"
+    },
+    "performed_via_github_app": null
+  }
+]
+

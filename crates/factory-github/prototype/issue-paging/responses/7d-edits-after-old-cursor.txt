@@ -1,0 +1,8 @@
+HTTP/2 200 
+date: Thu, 26 Nov 2026 12:37:22 GMT
+x-ratelimit-remaining: 4962
+x-ratelimit-used: 38
+x-github-request-id: F2A7:3A316:366D9EE:50A12B7:6B082802
+
+{"data":{"rateLimit":{"cost":1,"remaining":4962},"repository":{"issue":{"title":"P-8 probe: paging, title 107","updatedAt":"2026-11-26T12:37:21Z","lastEditedAt":"2026-11-26T12:37:17Z","includesCreatedEdit":true,"author":{"__typename":"User","login":"sapientpants","databaseId":305936},"editor":{"__typename":"User","login":"sapientpants","databaseId":305936},"userContentEdits":{"totalCount":100,"pageInfo":{"hasNextPage":false,"hasPreviousPage":true,"startCursor":null,"endCursor":null},"edges":[]}}}}}
+

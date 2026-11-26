@@ -1,0 +1,8 @@
+HTTP/2 200 
+date: Thu, 26 Nov 2026 12:36:25 GMT
+x-ratelimit-remaining: 4967
+x-ratelimit-used: 33
+x-github-request-id: FBC0:36A71D:376E0A2:51E8F94:6B0827C9
+
+{"data":{"rateLimit":{"cost":1,"remaining":4967},"repository":{"issue":{"title":"P-8 probe: paging, title 106","updatedAt":"2026-11-26T12:36:01Z","lastEditedAt":"2026-11-26T12:35:53Z","includesCreatedEdit":true,"author":{"__typename":"User","login":"sapientpants","databaseId":305936},"editor":{"__typename":"User","login":"sapientpants","databaseId":305936},"timelineItems":{"totalCount":106,"filteredCount":106,"pageCount":1,"updatedAt":"2026-11-26T12:36:01Z","pageInfo":{"hasNextPage":false,"hasPreviousPage":true,"startCursor":"Y3Vyc29yOnYyOpPPAAABohfbC2gBqzM3MzY3NDkwNjY0","endCursor":"Y3Vyc29yOnYyOpPPAAABohfbC2gBqzM3MzY3NDkwNjY0"},"edges":[{"cursor":"Y3Vyc29yOnYyOpPPAAABohfbC2gBqzM3MzY3NDkwNjY0","node":{"__typename":"RenamedTitleEvent","createdAt":"2026-11-26T12:36:01Z","actor":{"__typename":"User","login":"sapientpants","databaseId":305936},"currentTitle":"P-8 probe: paging, title 106"}}]}}}}}
+

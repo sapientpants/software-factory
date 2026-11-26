@@ -1,0 +1,8 @@
+HTTP/2 200 
+date: Thu, 26 Nov 2026 12:36:09 GMT
+x-ratelimit-remaining: 4975
+x-ratelimit-used: 25
+x-github-request-id: E7F3:3A316:3630793:50461C5:6B0827B9
+
+{"data":{"rateLimit":{"cost":1,"remaining":4975},"repository":{"issue":{"title":"P-8 probe: paging, title 106","updatedAt":"2026-11-26T12:36:01Z","lastEditedAt":"2026-11-26T12:35:53Z","includesCreatedEdit":true,"author":{"__typename":"User","login":"sapientpants","databaseId":305936},"editor":{"__typename":"User","login":"sapientpants","databaseId":305936},"userContentEdits":null}}},"errors":[{"type":"EXCESSIVE_PAGINATION","path":["repository","issue","userContentEdits"],"locations":[{"line":2,"column":214}],"message":"Requesting 101 records on the `userContentEdits` connection exceeds the `first` limit of 100 records."}]}
+

@@ -1,0 +1,249 @@
+2a-edits-first100-app userContentEdits: nodes 100, totalCount 100, next false, previous false, cost 1
+    first: Body 105. by sapientpants/User/305936
+    last:  Body 0. by sapientpants/User/305936
+    actors: sapientpants/User/305936 x100
+2a-edits-first100-op userContentEdits: nodes 100, totalCount 100, next false, previous false, cost 1
+    first: Body 105. by sapientpants/User/305936
+    last:  Body 0. by sapientpants/User/305936
+    actors: sapientpants/User/305936 x100
+2b-edits-first100-after-app userContentEdits: nodes 0, totalCount 100, next false, previous true, cost 1
+    first: -
+    last:  -
+    actors: 
+2b-edits-first100-after-op userContentEdits: nodes 0, totalCount 100, next false, previous true, cost 1
+    first: -
+    last:  -
+    actors: 
+2c-edits-last100-app userContentEdits: nodes 100, totalCount 100, next false, previous false, cost 1
+    first: Body 105. by sapientpants/User/305936
+    last:  Body 0. by sapientpants/User/305936
+    actors: sapientpants/User/305936 x100
+2c-edits-last100-op userContentEdits: nodes 100, totalCount 100, next false, previous false, cost 1
+    first: Body 105. by sapientpants/User/305936
+    last:  Body 0. by sapientpants/User/305936
+    actors: sapientpants/User/305936 x100
+2d-edits-last100-before-app userContentEdits: nodes 0, totalCount 100, next true, previous false, cost 1
+    first: -
+    last:  -
+    actors: 
+2d-edits-last100-before-op userContentEdits: nodes 0, totalCount 100, next true, previous false, cost 1
+    first: -
+    last:  -
+    actors: 
+2e-edits-first101-app: ERROR EXCESSIVE_PAGINATION Requesting 101 records on the `userContentEdits` connection exceeds the `first` limit of 100 records.
+2e-edits-first101-op: ERROR EXCESSIVE_PAGINATION Requesting 101 records on the `userContentEdits` connection exceeds the `first` limit of 100 records.
+2f-edits-first50-p1-app userContentEdits: nodes 50, totalCount 100, next true, previous false, cost 1
+    first: Body 105. by sapientpants/User/305936
+    last:  Body 56. by sapientpants/User/305936
+    actors: sapientpants/User/305936 x50
+2f-edits-first50-p1-op userContentEdits: nodes 50, totalCount 100, next true, previous false, cost 1
+    first: Body 105. by sapientpants/User/305936
+    last:  Body 56. by sapientpants/User/305936
+    actors: sapientpants/User/305936 x50
+2f-edits-first50-p2-app userContentEdits: nodes 50, totalCount 100, next false, previous true, cost 1
+    first: Body 55. by sapientpants/User/305936
+    last:  Body 0. by sapientpants/User/305936
+    actors: sapientpants/User/305936 x50
+2f-edits-first50-p2-op userContentEdits: nodes 50, totalCount 100, next false, previous true, cost 1
+    first: Body 55. by sapientpants/User/305936
+    last:  Body 0. by sapientpants/User/305936
+    actors: sapientpants/User/305936 x50
+2f-edits-first50-p3-app userContentEdits: nodes 0, totalCount 100, next false, previous true, cost 1
+    first: -
+    last:  -
+    actors: 
+2f-edits-first50-p3-op userContentEdits: nodes 0, totalCount 100, next false, previous true, cost 1
+    first: -
+    last:  -
+    actors: 
+2g-edits-no-count-app: ERROR MISSING_PAGINATION_BOUNDARIES You must provide a `first` or `last` value to properly paginate the `userContentEdits` connection.
+2g-edits-no-count-op: ERROR MISSING_PAGINATION_BOUNDARIES You must provide a `first` or `last` value to properly paginate the `userContentEdits` connection.
+3a-tl-first100-app timelineItems: nodes 100, totalCount 111, filteredCount 111, pageCount 100, next true, previous false, cost 1
+    first: renamed title 1, by the scratch App by sf-scratch-app/Bot/361295021
+    last:  renamed title 97 by sapientpants/User/305936
+    actors: sapientpants/User/305936 x99, sf-scratch-app/Bot/361295021 x1
+3a-tl-first100-op timelineItems: nodes 100, totalCount 111, filteredCount 111, pageCount 100, next true, previous false, cost 1
+    first: renamed title 1, by the scratch App by sf-scratch-app/Bot/361295021
+    last:  renamed title 97 by sapientpants/User/305936
+    actors: sapientpants/User/305936 x99, sf-scratch-app/Bot/361295021 x1
+3b-tl-first100-after-app timelineItems: nodes 11, totalCount 111, filteredCount 11, pageCount 11, next false, previous false, cost 1
+    first: renamed title 98 by sapientpants/User/305936
+    last:  renamed title 106 by sapientpants/User/305936
+    actors: sapientpants/User/305936 x11
+3b-tl-first100-after-op timelineItems: nodes 11, totalCount 111, filteredCount 11, pageCount 11, next false, previous false, cost 1
+    first: renamed title 98 by sapientpants/User/305936
+    last:  renamed title 106 by sapientpants/User/305936
+    actors: sapientpants/User/305936 x11
+3c-tl-last100-app timelineItems: nodes 100, totalCount 111, filteredCount 111, pageCount 100, next false, previous true, cost 1
+    first: renamed title 10 by sapientpants/User/305936
+    last:  renamed title 106 by sapientpants/User/305936
+    actors: sapientpants/User/305936 x100
+3c-tl-last100-op timelineItems: nodes 100, totalCount 111, filteredCount 111, pageCount 100, next false, previous true, cost 1
+    first: renamed title 10 by sapientpants/User/305936
+    last:  renamed title 106 by sapientpants/User/305936
+    actors: sapientpants/User/305936 x100
+3d-tl-last100-before-app timelineItems: nodes 11, totalCount 111, filteredCount 11, pageCount 11, next false, previous false, cost 1
+    first: renamed title 1, by the scratch App by sf-scratch-app/Bot/361295021
+    last:  renamed title 9 by sapientpants/User/305936
+    actors: sapientpants/User/305936 x10, sf-scratch-app/Bot/361295021 x1
+3d-tl-last100-before-op timelineItems: nodes 11, totalCount 111, filteredCount 11, pageCount 11, next false, previous false, cost 1
+    first: renamed title 1, by the scratch App by sf-scratch-app/Bot/361295021
+    last:  renamed title 9 by sapientpants/User/305936
+    actors: sapientpants/User/305936 x10, sf-scratch-app/Bot/361295021 x1
+3e-tl-last1-labeled-app timelineItems: nodes 1, totalCount 3, filteredCount 3, pageCount 1, next false, previous true, cost 1
+    first: labeled by sapientpants/User/305936
+    last:  labeled by sapientpants/User/305936
+    actors: sapientpants/User/305936 x1
+3e-tl-last1-labeled-op timelineItems: nodes 1, totalCount 3, filteredCount 3, pageCount 1, next false, previous true, cost 1
+    first: labeled by sapientpants/User/305936
+    last:  labeled by sapientpants/User/305936
+    actors: sapientpants/User/305936 x1
+3f-tl-last1-renamed-app timelineItems: nodes 1, totalCount 106, filteredCount 106, pageCount 1, next false, previous true, cost 1
+    first: renamed title 106 by sapientpants/User/305936
+    last:  renamed title 106 by sapientpants/User/305936
+    actors: sapientpants/User/305936 x1
+3f-tl-last1-renamed-op timelineItems: nodes 1, totalCount 106, filteredCount 106, pageCount 1, next false, previous true, cost 1
+    first: renamed title 106 by sapientpants/User/305936
+    last:  renamed title 106 by sapientpants/User/305936
+    actors: sapientpants/User/305936 x1
+3g-tl-last101-app timelineItems: nodes 101, totalCount 111, filteredCount 111, pageCount 101, next false, previous true, cost 1
+    first: renamed title 9 by sapientpants/User/305936
+    last:  renamed title 106 by sapientpants/User/305936
+    actors: sapientpants/User/305936 x101
+3g-tl-last101-op timelineItems: nodes 101, totalCount 111, filteredCount 111, pageCount 101, next false, previous true, cost 1
+    first: renamed title 9 by sapientpants/User/305936
+    last:  renamed title 106 by sapientpants/User/305936
+    actors: sapientpants/User/305936 x101
+3h-tl-last100-all-types-app timelineItems: nodes 100, totalCount 216, filteredCount 216, pageCount 100, next false, previous true, cost 1
+    first: IssueComment 
+    last:  renamed title 106 by sapientpants/User/305936
+    actors: null x49, sapientpants/User/305936 x51
+3h-tl-last100-all-types-op timelineItems: nodes 100, totalCount 216, filteredCount 216, pageCount 100, next false, previous true, cost 1
+    first: IssueComment 
+    last:  renamed title 106 by sapientpants/User/305936
+    actors: null x49, sapientpants/User/305936 x51
+4a-comments-last100-app comments: nodes 100, totalCount 105, next false, previous true, cost 1
+    first: Comment 6. by sapientpants/User/305936
+    last:  Comment 105. by sapientpants/User/305936
+    actors: sapientpants/User/305936 x100
+4a-comments-last100-op comments: nodes 100, totalCount 105, next false, previous true, cost 1
+    first: Comment 6. by sapientpants/User/305936
+    last:  Comment 105. by sapientpants/User/305936
+    actors: sapientpants/User/305936 x100
+4b-comments-last100-before-app comments: nodes 5, totalCount 105, next true, previous false, cost 1
+    first: Comment 1, by the scratch App. by sf-scratch-app/Bot/361295021
+    last:  Comment 5. by sapientpants/User/305936
+    actors: sapientpants/User/305936 x4, sf-scratch-app/Bot/361295021 x1
+4b-comments-last100-before-op comments: nodes 5, totalCount 105, next true, previous false, cost 1
+    first: Comment 1, by the scratch App. by sf-scratch-app/Bot/361295021
+    last:  Comment 5. by sapientpants/User/305936
+    actors: sapientpants/User/305936 x4, sf-scratch-app/Bot/361295021 x1
+4c-comments-first100-app comments: nodes 100, totalCount 105, next true, previous false, cost 1
+    first: Comment 1, by the scratch App. by sf-scratch-app/Bot/361295021
+    last:  Comment 100. by sapientpants/User/305936
+    actors: sapientpants/User/305936 x99, sf-scratch-app/Bot/361295021 x1
+4c-comments-first100-op comments: nodes 100, totalCount 105, next true, previous false, cost 1
+    first: Comment 1, by the scratch App. by sf-scratch-app/Bot/361295021
+    last:  Comment 100. by sapientpants/User/305936
+    actors: sapientpants/User/305936 x99, sf-scratch-app/Bot/361295021 x1
+6a-all-newest-app userContentEdits: nodes 100, totalCount 100, next false, previous false, cost 1
+    first: 2026-11-26T12:35:53Z by sapientpants/User/305936
+    last:  2026-11-26T12:29:06Z by sapientpants/User/305936
+    actors: sapientpants/User/305936 x100
+6a-all-newest-app timelineItems: nodes 100, totalCount 111, filteredCount 111, next false, previous true, cost 1
+    first: renamed  by sapientpants/User/305936
+    last:  renamed  by sapientpants/User/305936
+    actors: sapientpants/User/305936 x100
+6a-all-newest-app comments: nodes 100, totalCount 105, next false, previous true, cost 1
+    first: comment 7192071155 by sapientpants/User/305936
+    last:  comment 7192209793 by sapientpants/User/305936
+    actors: sapientpants/User/305936 x100
+6a-all-newest-op userContentEdits: nodes 100, totalCount 100, next false, previous false, cost 1
+    first: 2026-11-26T12:35:53Z by sapientpants/User/305936
+    last:  2026-11-26T12:29:06Z by sapientpants/User/305936
+    actors: sapientpants/User/305936 x100
+6a-all-newest-op timelineItems: nodes 100, totalCount 111, filteredCount 111, next false, previous true, cost 1
+    first: renamed  by sapientpants/User/305936
+    last:  renamed  by sapientpants/User/305936
+    actors: sapientpants/User/305936 x100
+6a-all-newest-op comments: nodes 100, totalCount 105, next false, previous true, cost 1
+    first: comment 7192071155 by sapientpants/User/305936
+    last:  comment 7192209793 by sapientpants/User/305936
+    actors: sapientpants/User/305936 x100
+7d-edits-after-old-cursor userContentEdits: nodes 0, totalCount 100, next false, previous true, cost 1
+    first: -
+    last:  -
+    actors: 
+7e-tl-before-old-cursor timelineItems: nodes 11, totalCount 113, filteredCount 11, pageCount 11, next false, previous false, cost 1
+    first: renamed title 1, by the scratch App by sf-scratch-app/Bot/361295021
+    last:  renamed title 9 by sapientpants/User/305936
+    actors: sapientpants/User/305936 x10, sf-scratch-app/Bot/361295021 x1
+7f-comments-before-old-cursor comments: nodes 5, totalCount 106, next true, previous false, cost 1
+    first: Comment 1, by the scratch App. by sf-scratch-app/Bot/361295021
+    last:  Comment 5. by sapientpants/User/305936
+    actors: sapientpants/User/305936 x4, sf-scratch-app/Bot/361295021 x1
+7g-edits-first100-fresh userContentEdits: nodes 100, totalCount 100, next false, previous false, cost 1
+    first: Body 107. by sapientpants/User/305936
+    last:  Body 0. by sapientpants/User/305936
+    actors: sapientpants/User/305936 x100
+7h-tl-last100-fresh timelineItems: nodes 100, totalCount 113, filteredCount 113, pageCount 100, next false, previous true, cost 1
+    first: renamed title 12 by sapientpants/User/305936
+    last:  unlabeled by sapientpants/User/305936
+    actors: sapientpants/User/305936 x100
+7i-comments-last100-fresh comments: nodes 100, totalCount 106, next false, previous true, cost 1
+    first: Comment 7. by sapientpants/User/305936
+    last:  Comment 106. by sapientpants/User/305936
+    actors: sapientpants/User/305936 x100
+7j-all-newest-fresh userContentEdits: nodes 100, totalCount 100, next false, previous false, cost 1
+    first: 2026-11-26T12:37:17Z by sapientpants/User/305936
+    last:  2026-11-26T12:29:06Z by sapientpants/User/305936
+    actors: sapientpants/User/305936 x100
+7j-all-newest-fresh timelineItems: nodes 100, totalCount 113, filteredCount 113, next false, previous true, cost 1
+    first: renamed  by sapientpants/User/305936
+    last:  unlabeled by sapientpants/User/305936
+    actors: sapientpants/User/305936 x100
+7j-all-newest-fresh comments: nodes 100, totalCount 106, next false, previous true, cost 1
+    first: comment 7192072606 by sapientpants/User/305936
+    last:  comment 7192240565 by sapientpants/User/305936
+    actors: sapientpants/User/305936 x100
+7l-comments-before-cursor-of-deleted comments: nodes 5, totalCount 105, next true, previous false, cost 1
+    first: Comment 1, by the scratch App. by sf-scratch-app/Bot/361295021
+    last:  Comment 5. by sapientpants/User/305936
+    actors: sapientpants/User/305936 x4, sf-scratch-app/Bot/361295021 x1
+
+REST
+5a-rest-events-default-app: 30 events; link: next=2, last=4
+5a-rest-events-default-op: 30 events; link: next=2, last=4
+5b-rest-events-100-p1-app: 100 events; link: next=2, last=2
+5b-rest-events-100-p1-op: 100 events; link: next=2, last=2
+5c-rest-events-100-p2-app: 11 events; link: prev=1, first=1
+5c-rest-events-100-p2-op: 11 events; link: prev=1, first=1
+5d-rest-events-100-p9-app: 0 events; link: prev=2, last=2, first=1
+5d-rest-events-100-p9-op: 0 events; link: prev=2, last=2, first=1
+
+The App's reads against the operator's
+  2a-edits-first100: the same
+  2b-edits-first100-after: the same
+  2c-edits-last100: the same
+  2d-edits-last100-before: the same
+  2e-edits-first101: the same
+  2f-edits-first50-p1: the same
+  2f-edits-first50-p2: the same
+  2f-edits-first50-p3: the same
+  2g-edits-no-count: the same
+  3a-tl-first100: the same
+  3b-tl-first100-after: the same
+  3c-tl-last100: the same
+  3d-tl-last100-before: the same
+  3e-tl-last1-labeled: the same
+  3f-tl-last1-renamed: the same
+  3g-tl-last101: the same
+  3h-tl-last100-all-types: the same
+  4a-comments-last100: the same
+  4b-comments-last100-before: the same
+  4c-comments-first100: the same
+  5a-rest-events-default: the same
+  5b-rest-events-100-p1: the same
+  5c-rest-events-100-p2: the same
+  5d-rest-events-100-p9: the same
+  6a-all-newest: the same

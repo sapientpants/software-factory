@@ -1,0 +1,12 @@
+HTTP/2 200 
+date: Thu, 26 Nov 2026 12:36:37 GMT
+link: <https://api.github.com/repositories/1463362063/issues/133/events?per_page=100&page=2>; rel="prev", <https://api.github.com/repositories/1463362063/issues/133/events?per_page=100&page=2>; rel="last", <https://api.github.com/repositories/1463362063/issues/133/events?per_page=100&page=1>; rel="first"
+x-github-api-version-selected: 2026-03-10
+x-ratelimit-remaining: 4992
+x-ratelimit-used: 8
+x-github-request-id: F4E6:3306CD:3955B08:54CA120:6B0827D5
+
+[
+
+]
+

@@ -44,6 +44,7 @@ echo "## B. a copy of the toolchain under another path and name"
 rm -rf "$S/moved" && mkdir -p "$S/moved" && cp -cR "$TC" "$S/moved/tc"
 bare "$S/moved/tc" rustc --print sysroot | sed "s|$S|<scratch>|"
 try "$S/moved/tc" cargo build --offline
+try "$S/moved/tc" cargo test --offline
 try "$S/moved/tc" cargo clippy --offline -- -D warnings
 try "$S/moved/tc" cargo fmt --check
 
@@ -59,9 +60,13 @@ echo "## D. through a symbolic link to the toolchain directory"
 ln -sfn "$TC" "$S/link-tc"
 bare "$S/link-tc" rustc --print sysroot | sed "s|$S|<scratch>|"
 try "$S/link-tc" cargo build --offline
+try "$S/link-tc" cargo test --offline
+try "$S/link-tc" cargo clippy --offline -- -D warnings
+try "$S/link-tc" cargo fmt --check
 
 echo "## E. the toolchain installed with the minimal profile: no clippy, no rustfmt"
 try "$MIN" cargo build --offline
+try "$MIN" cargo test --offline
 try "$MIN" cargo clippy --offline
 try "$MIN" cargo fmt --check
 

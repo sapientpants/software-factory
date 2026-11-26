@@ -17,11 +17,17 @@ section of P-39 in `docs/research/probes.md`.
 - `case/` is that crate. Its `rust-toolchain.toml` names another version than
   the toolchain that builds it.
 
-Both scripts ran once, in this order, on one scratch directory:
+Both scripts ran in this order on one scratch directory, `install.sh` once, at
+06:53 UTC:
 
 ```sh
 ./install.sh ~/.cargo/bin/rustup <scratch>
 ./use.sh <scratch>
 ```
+
+`use.sh` ran a second time on the same directory at 07:07 UTC, after a review
+of the record asked for every command in every case: the first run had left
+`cargo test` out of two cases and had only built through the link. The kept
+output is that of the second run.
 
 Nothing ran on Linux, and nothing ran in a sandbox.

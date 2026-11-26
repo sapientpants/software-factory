@@ -11,6 +11,7 @@ error: no such command: `+1.97.1`
 ## B. a copy of the toolchain under another path and name
 <scratch>/moved/tc
 exit=0 :: cargo build --offline
+exit=0 :: cargo test --offline
 exit=0 :: cargo clippy --offline -- -D warnings
 exit=0 :: cargo fmt --check
 ## C. the copy with no write permission on any entry (chmod -R a-w)
@@ -21,8 +22,12 @@ exit=0 :: cargo fmt --check
 ## D. through a symbolic link to the toolchain directory
 <scratch>/rustup/toolchains/1.100.0-aarch64-apple-darwin
 exit=0 :: cargo build --offline
+exit=0 :: cargo test --offline
+exit=0 :: cargo clippy --offline -- -D warnings
+exit=0 :: cargo fmt --check
 ## E. the toolchain installed with the minimal profile: no clippy, no rustfmt
 exit=0 :: cargo build --offline
+exit=0 :: cargo test --offline
 exit=101 :: cargo clippy --offline
 error: no such command: `clippy`
 exit=101 :: cargo fmt --check

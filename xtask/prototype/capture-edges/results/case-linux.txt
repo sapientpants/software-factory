@@ -72,7 +72,43 @@ the scratch directory does not take caseprobe for CaseProbe
     ./AGENTS.md: the file named in upper case
     ./AGENTſ.md: the file named in lower case
 
+### A7 a file a.rs in each of the directories src and SRC
+  040000 tree cc8714e306ec3253bb2a0ac9c614fec69b3edd36	SRC
+  100644 blob aae155685cde470f3d4a86e9068397fe46842490	SRC/a.rs
+  040000 tree 28a4463550075704158dfa0641f5255ab95b8608	src
+  100644 blob 698cf2ef1f7eeaaeebcbbf06feb043b56a8a2218	src/a.rs
+  fsck --strict: exit=0
+  index-pack: pack	e2deb4f33ad9b874e9c55adfbdbc33659c8a3daa
+  index-pack --strict: exit=0
+  checkout-index -a: exit=0
+  the export holds:
+    ./SRC/a.rs: the file named in upper case
+    ./src/a.rs: the file named in lower case
+
 ## B. A clone of a branch that holds A1, and its status
   clone: exit=0
   holds: README.md
   holds: readme.md
+
+## C. The entries of a repository layout in two directories whose names have one fold
+
+### C1 fix/HEAD, and FIX/config, FIX/objects, FIX/refs
+  040000 tree 5fa692db56954f48b4ac550743efe9216ddc03b2	FIX
+  100644 blob d850b699eb1ad520c44c774bbb9c6b0edcb4ad39	FIX/config
+  100755 blob e69de29bb2d1d6434b8b29ae775ad8c2e48c5391	FIX/objects
+  100755 blob e69de29bb2d1d6434b8b29ae775ad8c2e48c5391	FIX/refs
+  040000 tree 12de69b03d6b810ec6cce8f1e387b4cf76a18974	fix
+  100644 blob b870d82622c1a9ca6bcaf5df639680424a1904b0	fix/HEAD
+  fsck --strict: exit=0
+  index-pack: pack	2542edf4a585b7503639089c4f61659b3f0b7093
+  index-pack --strict: exit=0
+  checkout-index -a: exit=0
+  the export holds:
+    ./FIX/config: [core]
+    ./FIX/objects: 
+    ./FIX/refs: 
+    ./fix/HEAD: ref: refs/heads/main
+  git st in fix/: git: 'st' is not a git command. See 'git --help'.
+  git rev-parse --git-dir in fix/: fatal: not a git repository (or any of the parent directories): .git
+  git st in FIX/: git: 'st' is not a git command. See 'git --help'.
+  git rev-parse --git-dir in FIX/: fatal: not a git repository (or any of the parent directories): .git

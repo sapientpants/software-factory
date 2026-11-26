@@ -72,6 +72,7 @@ check "A3 a symbolic link Docs and a directory docs" "$(tree 120000 blob Docs "$
 check "A4 strasse.txt in two spellings, full case folding" "$(tree 100644 blob STRASSE.txt "$UPPER" 100644 blob "$ESZETT" "$LOWER")"
 check "A5 e-acute as one code point and as two" "$(tree 100644 blob "$NFC" "$UPPER" 100644 blob "$NFD" "$LOWER")"
 check "A6 AGENTS.md and the same with a long s" "$(tree 100644 blob AGENTS.md "$UPPER" 100644 blob "$LONG_S" "$LOWER")"
+check "A7 a file a.rs in each of the directories src and SRC" "$(tree 040000 tree SRC "$(tree 100644 blob a.rs "$UPPER")" 040000 tree src "$SUB_A")"
 
 echo
 echo "## B. A clone of a branch that holds A1, and its status"
@@ -80,3 +81,20 @@ g $H update-ref refs/heads/main "$(commit "$T" collide)"
 g clone -q "$W/host.git" "$W/clone" 2>&1 | sed "s|$W|<w>|g; s/^/  /"
 echo "  clone: exit=${PIPESTATUS[0]}"
 (cd "$W/clone" && g status --porcelain | sed 's/^/  status: /'; ls | sed 's/^/  holds: /')
+
+echo
+echo "## C. The entries of a repository layout in two directories whose names have one fold"
+# fix/HEAD in one directory; FIX/objects, FIX/refs (empty files, mode 100755)
+# and FIX/config in the other. The config names an alias that prints a line.
+HEADB=$(blob 'ref: refs/heads/main')
+EMPTYB=$(printf '' | g $H hash-object -w --stdin)
+CFG=$(printf '[core]\n\trepositoryformatversion = 0\n\tbare = true\n[alias]\n\tst = !echo the alias of the config ran\n' | g $H hash-object -w --stdin)
+T=$(tree 040000 tree FIX "$(tree 100644 blob config "$CFG" 100755 blob objects "$EMPTYB" 100755 blob refs "$EMPTYB")" 040000 tree fix "$(tree 100644 blob HEAD "$HEADB")")
+check "C1 fix/HEAD, and FIX/config, FIX/objects, FIX/refs" "$T"
+for d in fix FIX; do
+  if [ -d "$W/export/$d" ]; then
+    (cd "$W/export/$d" && g st 2>&1 | head -1 | sed "s|$W|<w>|g; s|^|  git st in $d/: |")
+    (cd "$W/export/$d" && g rev-parse --git-dir 2>&1 | head -1 | sed "s|$W|<w>|g; s|^|  git rev-parse --git-dir in $d/: |")
+  fi
+done
+

@@ -11,10 +11,11 @@ directory of its own in it, which it removes first. Every git process gets a
 cleared environment, a home in the scratch directory, no system configuration
 and a global configuration that the script names.
 
-- `bare.sh` makes thirteen directories inside the work tree of a repository,
-  each with some of the files of a git directory under a name other than
-  `.git`, and starts three git commands in each: `rev-parse --git-dir`, an
-  alias and `status`. The `config` of each names a canary script as an alias
+- `bare.sh` makes fourteen directories inside the work tree of a repository,
+  A1 to A12, A14 and A15, each with some of the files of a git directory under
+  a name other than `.git`, and starts three git commands in each:
+  `rev-parse --git-dir`, an alias and `status`. A13 is a repository of its own
+  with those files at its root, and a copy of it without its `.git`. The `config` of each names a canary script as an alias
   and as the fsmonitor, and the output says for each command whether the
   canary ran. The script then commits and clones the directories, and repeats
   the commands with `safe.bareRepository = explicit` in the global
@@ -28,11 +29,13 @@ and a global configuration that the script names.
 - `export.sh` runs the two export commands of SPEC 9.4 into a new directory,
   writes to that directory as a verify command could, and runs the two
   commands again on it, without and with `-f`.
-- `case.sh` builds six trees with `git mktree`, each with two names of one
-  directory that the fold of SPEC VAL-5d takes for one, so that no file system
-  has to hold both. For each it runs `fsck --strict`, `index-pack --strict` on
-  a pack of it and the export commands, and lists what the export holds. It
-  then clones a branch that holds the first tree.
+- `case.sh` builds seven trees with `git mktree`, each with two paths that the
+  fold of SPEC VAL-5d takes for one, so that no file system has to hold both.
+  For each it runs `fsck --strict`, `index-pack --strict` on a pack of it and
+  the export commands, and lists what the export holds. It then clones a
+  branch that holds the first tree. Its last part exports a tree that holds
+  the entries of a repository layout in two directories, `fix` and `FIX`, and
+  starts git in what the export made of them.
 
 On the Mac, with the scratch directory on the Mac's own volume:
 
@@ -50,11 +53,17 @@ docker run --rm -v "$PWD":/probe:ro debian:13 bash -c '
   su p -c "mkdir /tmp/s && cd /tmp && /probe/<script>.sh /tmp/s 2>&1"'
 ```
 
-The kept output is that of the last run of each script. Earlier runs the same
-day had `bare.sh` without its case A13 and with two cases of its parts D and E
-printed in another form, `export.sh` with a `stat` call that GNU `stat` reads
-otherwise, and `case.sh` with a notice of `fsck` that differs between the two
-versions of git and is now left out. No outcome differed between those runs
-and the kept ones.
+The kept output is that of the last run of each script: `renames.sh` and
+`export.sh` at 08:46 UTC on the Mac and 08:47 in the container, `bare.sh` and
+`case.sh` at 09:22 and 09:23. Earlier runs the same day are not kept. In them
+`export.sh` had a `stat` call that GNU `stat` reads otherwise, and `case.sh`
+printed a notice of `fsck` that differs between the two versions of git and
+is now left out. A review of the record then found that it said more than
+`bare.sh` had run, and the script was changed for it: the cases A13 to A15
+are new, as are A7 and part C of `case.sh`; parts B, C and D of `bare.sh` now
+run on every directory that git took for a repository, where they had run on
+some; and part B prints the exit status of `git add` and of `git commit`,
+where it had printed that of a `sed` behind them, and lists every entry of the
+commit. In the cases that both runs hold, no outcome differed.
 
 Nothing ran in the factory's sandbox, and nothing ran on the server.

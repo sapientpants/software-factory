@@ -2,6 +2,7 @@
 # Probe P-40, part 1: which directories of a checkout git takes for a bare
 # repository when it is started inside them, what it then runs from their
 # `config`, and what `safe.bareRepository = explicit` changes.
+# The cases are numbered A1 to A15; A13 is a repository of its own.
 # Run as: bare.sh <scratch dir>. Every git process gets a cleared environment,
 # a home of its own, no system configuration and the file <scratch>/bare/global
 # as its global configuration.
@@ -79,6 +80,9 @@ if [ -e "$S/caseprobe" ]; then echo "it takes caseprobe for CaseProbe"; else ech
 
 g init -q -b main "$W/outer"
 O=$W/outer
+# The directories that git took for a repository on at least one system; the
+# later parts run on each of them.
+TAKEN="a1 a3 a4 a6 a7 a8 a9 a12/sub/deep a14 a15"
 echo base >"$O/README.md"
 
 echo
@@ -145,22 +149,35 @@ echo "   started in root/sub:"
 run "$W/root/sub" rev-parse --git-dir
 echo "   the same tree without its .git, as an export holds it:"
 cp -R "$W/root" "$W/root-export" && rm -rf "$W/root-export/.git"
-run "$W/root-export" rev-parse --git-dir
+three "$W/root-export"
+echo "   started in sub/ of that copy:"
+run "$W/root-export/sub" st
+
+echo "A14 the layout of A1, its config a symbolic link to ../a14cfg/config"
+mk a14/objects; mk a14/refs; mk a14cfg; echo 'ref: refs/heads/main' >"$O/a14/HEAD"; : >"$O/a14/objects/keep"; : >"$O/a14/refs/keep"
+hostile_config "$O/a14cfg/config"; ln -s ../a14cfg/config "$O/a14/config"
+three "$O/a14"
+
+echo "A15 the layout of A1, its config with [include] path = ../a15cfg/extra, which names the alias and the fsmonitor"
+mk a15/objects; mk a15/refs; mk a15cfg; echo 'ref: refs/heads/main' >"$O/a15/HEAD"; : >"$O/a15/objects/keep"; : >"$O/a15/refs/keep"
+printf '[core]\n\trepositoryformatversion = 0\n\tbare = false\n\tworktree = ..\n[include]\n\tpath = ../a15cfg/extra\n' >"$O/a15/config"
+printf '[core]\n\tfsmonitor = %s fsmonitor\n[alias]\n\tst = !%s alias\n' "$W/canary.sh" "$W/canary.sh" >"$O/a15cfg/extra"
+three "$O/a15"
 
 echo
 echo "## B. The layouts committed and cloned"
-(cd "$O" && g add -A 2>&1 | sed "s|$W|<w>|g"; echo "git add -A: exit=$?")
-(cd "$O" && g commit -q -m base; echo "git commit: exit=$?")
-(cd "$O" && g ls-tree -r --name-only HEAD | grep -E '^a(1|3|4|6|7)(common)?/' | tr '\n' ' '; echo)
-(cd "$O" && g ls-tree -r HEAD a3 a4 | sed 's/^/  /')
+(cd "$O" && g add -A >"$W/out.txt" 2>&1; echo "git add -A: exit=$?"; sed "s|$W|<w>|g" "$W/out.txt")
+(cd "$O" && g commit -q -m base >"$W/out.txt" 2>&1; echo "git commit: exit=$?"; sed "s|$W|<w>|g" "$W/out.txt")
+echo "the entries of the commit, by mode and path, without the content of each config:"
+(cd "$O" && g ls-tree -r HEAD | awk '{print "  " $1 " " $4}')
 g clone -q "file://$O" "$W/clone" 2>&1 | sed "s|$W|<w>|g"
 echo "in the clone:"
-for v in a1 a3 a4 a6 a7; do echo "$v"; three "$W/clone/$v"; done
+for v in $TAKEN; do echo "$v"; three "$W/clone/$v"; done
 
 echo
 echo "## C. safe.bareRepository = explicit in the global configuration"
 printf '[safe]\n\tbareRepository = explicit\n' >"$W/global"
-for v in a1 a3 a4 a6 a7 a9 a12/sub/deep; do echo "$v"; three "$O/$v"; done
+for v in $TAKEN; do echo "$v"; three "$O/$v"; done
 echo "a1, whose own config also says [safe] bareRepository = all"
 printf '[safe]\n\tbareRepository = all\n' >>"$O/a1/config"
 three "$O/a1"
@@ -169,7 +186,7 @@ echo
 echo "## D. The setting in other places"
 : >"$W/global"
 echo "D1 on the command line, -c safe.bareRepository=explicit"
-run "$O/a1" -c safe.bareRepository=explicit rev-parse --git-dir
+for v in $TAKEN; do run "$O/$v" -c safe.bareRepository=explicit rev-parse --git-dir; done
 echo "D2 in the configuration of outer/ alone (outer/.git/config)"
 (cd "$O" && g config safe.bareRepository explicit)
 run "$O/a1" st
@@ -178,8 +195,7 @@ run "$O/a3" st
 echo "D3 in the system configuration, the global one empty"
 printf '[safe]\n\tbareRepository = explicit\n' >"$W/system"
 SYS=$W/system
-run "$O/a3" rev-parse --git-dir
-run "$O/a3" st
+for v in $TAKEN; do echo "$v"; run "$O/$v" rev-parse --git-dir; run "$O/$v" st; done
 SYS=
 
 echo

@@ -4246,3 +4246,208 @@ Read on 2026-11-26 for #92 from the output that the pass of 2026-11-19 kept, on 
 - **A subagent's tools.** No session of P-21 started a subagent. Those of P-26 did, under the list `Read,Glob,Grep,Agent`, and what tools a subagent had there was not compared with the list (P-41).
 - **Other versions.** The names are those of one version. Those of 2.1.326, which AG-5 names to be tried first, were not read.
 - **What `--allowedTools` adds to `--tools`.** The two sessions with a list ran under the permission mode `dontAsk` and passed `Read` alone as allowed. Each called `Read` and `StructuredOutput` and no other tool.
+
+## P-43: which file names the tools of the checks read unasked
+
+Answered 2026-11-26 for #94, by throwaway scripts that a session ran on the operator's Mac. The review of draft 4 (`16-spec-draft-4-review`, finding S3) found that the lists of SPEC 11.3 and BOOT-4 protect one file name for each tool of the checks, the toolchain and mise among them, and named seven more that the tools read, from its reviewer's knowledge of the tools. Nothing had run them. The scripts and the output of each are on the branch `prototype/second-names-and-hidden-diffs`, at commit [`e5803f2`](https://github.com/sapientpants/software-factory/tree/e5803f2d67302ffeafd257e1a308d77df3146cc9/xtask/prototype/flags-and-listing/p-43). It is throwaway code.
+
+**Answer.** All seven names are read. `.clippy.toml`, `rust-toolchain`, `.mise.toml` and `mise.local.toml` win over the protected name beside them. `.tool-versions` and `.config/mise.toml` are read at a lower precedence than `mise.toml`, so they add what it does not name, and `.config/nextest.toml` is the one file that nextest reads. The tools read more names than the review listed: rustfmt two, of which neither was protected; `cargo deny` a second name for its configuration and an exceptions file that it merges into the policy under three names; typos five names and every `.ignore`; mise nineteen names in a project directory, eight of which outrank `mise.toml`, and a file `.miserc.toml` that needs no trust and can put another file in the place of `mise.toml`. An argument or a variable that names the configuration leaves the other files without effect for rustfmt, nextest, `cargo mutants` and rustup, and for the configuration files of typos, whose ignore files still apply. It does not for clippy, nor for the exceptions file of `cargo deny`. `mise exec` and `mise run` trusted a directory of untrusted configuration without asking.
+
+### Method
+
+Each tool ran in a tree of its own, `outer/repo/member`: `repo` is the root of a git repository and of a cargo workspace, `member` a crate of it, and `outer` a directory above the git root. Each candidate file held a setting whose effect shows in the output or the exit code. A second channel was a library, loaded with `DYLD_INSERT_LIBRARIES`, that logged every `open`, `stat` and `access`: it shows the names that a tool looks for where none exists. `HOME`, `CARGO_HOME` and, for rustup, mise and `cargo llvm-cov`, `RUSTUP_HOME` pointed into the scratch directory. Nothing was installed or changed outside it.
+
+| | |
+|---|---|
+| The Mac | macOS 27.0.1, arm64, on APFS that is not case-sensitive. Nothing ran on Linux |
+| cargo, rustc, rustdoc | 1.100.0 |
+| clippy, rustfmt | 0.1.100, 1.11.0-stable |
+| rustup | 1.29.3, with a rustup home of its own and two linked toolchains to tell apart |
+| mise | 2026.11.14 |
+| `cargo nextest` | 0.9.152, the released binary |
+| `cargo deny` | 0.22.1, the released binary, and 0.18.5, the Mac's own |
+| typos | 1.52.2, the released binary |
+| `cargo mutants` | 27.1.0, built with `cargo install --locked` |
+| `cargo llvm-cov` | 0.9.2, the released binary |
+
+### What each tool read
+
+"Upward" means the directory named and every directory above it, past the git root, up to `/`.
+
+| Tool | Read unasked | Which wins | What the tool said |
+|---|---|---|---|
+| rustfmt, through `cargo fmt --all --check` | `rustfmt.toml` and `.rustfmt.toml`, upward from the directory of each source file; then in the home directory and in `~/Library/Application Support/rustfmt/` | The nearest directory; the files are not merged. In one directory `.rustfmt.toml` | Nothing |
+| clippy | `clippy.toml` and `.clippy.toml`, upward from the directory of each package's manifest | The first directory that holds either; no merge. In one directory `.clippy.toml` | `warning: using config file …/.clippy.toml, …/clippy.toml will be ignored`. Under `-D warnings` the run still exited with 0 |
+| cargo | `.cargo/config.toml` and `.cargo/config`, upward from the working directory, then in `CARGO_HOME`; a file that a configuration names in `include` | All are merged, the nearest key wins. In one directory `config` | A warning that `config` is deprecated, and one that both exist |
+| rustup | `rust-toolchain` and `rust-toolchain.toml`, upward from the working directory | The nearest directory. In one directory `rust-toolchain` | `warn: both …/rust-toolchain and …/rust-toolchain.toml exist; using contents of …/rust-toolchain` |
+| mise | Nineteen names in a directory, below; the same upward, then `~/.config/mise/` | Below | Nothing for a file that holds `[tools]` alone |
+| `cargo nextest` | `.config/nextest.toml` at the root of the workspace, and no other file of the repository | | |
+| `cargo deny` | `deny.toml`, `.deny.toml` and `.cargo/deny.toml`, upward from the working directory or from the directory of `--manifest-path`; 0.22.1 also `.config/deny.toml`. And an exceptions file, searched by itself: `deny.exceptions.toml`, `.deny.exceptions.toml`, `.cargo/deny.exceptions.toml`, and in 0.22.1 `.config/deny.exceptions.toml` | Of the configuration the first found, in the order written; no merge. The exceptions file is merged into whichever policy holds | `[INFO] using config from <path>`, at the log level `info` |
+| typos | `typos.toml`, `_typos.toml`, `.typos.toml`, `Cargo.toml` with a table `workspace.metadata.typos` or `package.metadata.typos`, and `pyproject.toml`, in the working directory and upward where it holds none. Every `.ignore` of the tree and above it, `.gitignore`, `.git/info/exclude` and git's global ignore file | The first of the five that is present, alone | Nothing |
+| `cargo mutants` | `.cargo/mutants.toml` at the root of the workspace, and no other | | |
+| `cargo llvm-cov`, `cargo doc` | No file of their own: cargo's | | |
+
+**What a second file did.**
+
+- An empty `.clippy.toml` beside a `clippy.toml` with a `disallowed-methods` rule switched the rule off: the warning above, and exit code 0. An empty `clippy.toml` or `.clippy.toml` in the directory of a member did the same for that member, with no warning.
+- A `.config/nextest.toml` with a `default-filter` left the failing test out: exit code 0 where the run without it gave 100. The file switched on a setup script, which ran, and a wrapper script `/usr/bin/true`, under which both tests passed.
+- A `deny.exceptions.toml` with one exception turned a licence that `deny.toml` rejects into exit code 0, under each of its names.
+- A `.typos.toml` with `extend-exclude = ["*"]`, or a `.ignore` that names a file, left the misspelling unreported.
+- A `.cargo/mutants.toml` with `exclude_globs = ["**/*.rs"]` gave no mutant and exit code 0, where the run without it reported four missed and exited with 2.
+- A `rust-toolchain` with a key `path` that names a directory by an absolute path ran the two scripts in that directory's `bin/` as `rustc` and `cargo`. A relative path was refused.
+- A `.rustfmt.toml` with `disable_all_formatting = true` gave exit code 0 on source that is not formatted.
+
+### The names of mise
+
+In one directory, from the lowest precedence to the highest, found by removing the winner again and again:
+
+`.tool-versions`; `.config/mise/conf.d/*.toml`; `.config/mise/config.toml`; `.config/mise/mise.toml`; `.config/mise.toml`; `.mise/conf.d/*.toml`; `.mise/config.toml`; `mise/conf.d/*.toml`; `mise/conf.d/<directory>/mise.toml`; `mise/config.toml`; `mise.toml`; `.mise.toml`; `.config/mise/config.local.toml`; `.config/mise/mise.local.toml`; `.config/mise.local.toml`; `.mise/config.local.toml`; `mise/config.local.toml`; `mise.local.toml`; `.mise.local.toml`.
+
+- With an environment selected, by `MISE_ENV` or by `env` in a `.miserc.toml`, `mise.<environment>.toml` and `.mise.<environment>.local.toml` are read too.
+- **`.miserc.toml`**, `.miserc.local.toml` and `.config/miserc.toml` are read in the working directory and upward, with no trust asked. `override_config_filenames = ["evil.toml"]` there made mise read that file in the place of `mise.toml`; `ignored_config_paths` and `ceiling_paths` each removed `mise.toml`; `env = ["ci"]` loaded `mise.ci.toml`. Each key lost to its own variable in the environment.
+- **Trust.** A file that holds `[tools]` with plain versions needs none. One with `[env]`, `[hooks]`, `[settings]` or a template that runs a command is refused by `mise env` and `mise ls`: `mise ERROR Config files in <file> are not trusted.` A shim refused it too.
+- **`mise exec` and `mise run` trusted the directory by themselves.** With no terminal and an environment of `env -i`, `mise exec -- <command>` in a directory whose only configuration was an untrusted `.mise.toml` with `[env]` added the directory to the trust store, applied the `[env]`, ran a command from a template, and put a directory of the tree on the `PATH` ahead of the real cargo. `mise env` loaded the file afterwards. `MISE_PARANOID=1` stopped it. Why mise does this was not read from its source.
+- Trust is held for a directory and by its path. After `mise trust`, a changed file and a new file beside it are trusted.
+- mise sets `RUSTUP_TOOLCHAIN`. Under `mise exec` and under a shim, `rust-toolchain`, `rust-toolchain.toml` and the `path` toolchain above therefore did nothing.
+
+### An argument or a variable that names the configuration
+
+| Tool | Named by | The other files then |
+|---|---|---|
+| rustfmt | `-- --config-path <file>` | Without effect |
+| clippy | `CLIPPY_CONF_DIR=<directory>` | A file in the directory of a member was without effect. A `.clippy.toml` inside the named directory still won over its `clippy.toml`. A `[env]` entry of `.cargo/config.toml` with `force = true` replaced the variable |
+| rustup | `RUSTUP_TOOLCHAIN`, or `cargo +<toolchain>` | Without effect, the `path` toolchain included |
+| `cargo nextest` | `--config-file <file>` | Without effect |
+| `cargo deny` | `--config <file>`, before `check` in 0.22.1 and after it in 0.18.5 | The other configuration files were without effect. The exceptions file was still merged, also with a `--config` that names a file outside the tree |
+| typos | `--isolated --config <file>` | The other configuration files were without effect. The ignore files still applied, until `--no-ignore` |
+| `cargo mutants` | `--config <file>`, or `--no-config` | Without effect |
+| mise | `MISE_OVERRIDE_CONFIG_FILENAMES=mise.toml` | `.mise.toml`, `mise.local.toml` and `.mise.local.toml` were without effect. A `.miserc.toml` was still read. The names of lower precedence were not tried |
+| cargo | Nothing leaves a `.cargo/config.toml` of the tree without effect as a whole | |
+
+### Other inputs that changed a check
+
+Each turned a failing check into exit code 0, and none is a configuration file of the tool: a `[lints]` table in a `Cargo.toml`; `rustflags`, `rustdocflags`, a `runner` or an alias in `.cargo/config.toml`; a `build.rs` in the root of a package, which cargo runs without a key in the manifest; `#![allow(…)]`, `#[rustfmt::skip]` and `#[mutants::skip]` in the source; and, for `cargo llvm-cov`, an uncovered function in a directory named `tests`, `examples` or `benches` below `src`, which the report then left out.
+
+### Findings
+
+**A name that no pattern matched.** The patterns of 11.3 and BOOT-4 as they stood, `clippy.toml`, `deny.toml`, `rust-toolchain.toml`, `mise.toml`, `.cargo/**`, `Cargo.toml` and `.gitignore`, match at any depth, so `.config/deny.toml`, `.config/mise.toml`, `.cargo/deny.exceptions.toml` and `.cargo/mutants.toml` were covered. Not covered: `rustfmt.toml` and `.rustfmt.toml`; `.clippy.toml`; `rust-toolchain`; `.config/nextest.toml`; `.deny.toml`, `deny.exceptions.toml` and `.deny.exceptions.toml`; `typos.toml`, `_typos.toml`, `.typos.toml`, `pyproject.toml` and `.ignore`; and every name of mise but those that end in `mise.toml`, with `.miserc.toml`.
+
+**An argument does not close it.** For clippy, which carries the `disallowed-methods` of SPEC 19.3, no argument leaves a `.clippy.toml` beside the named file without effect. For `cargo deny` no argument stops the exceptions file.
+
+**The letter case of a name.** `Clippy.toml`, `Deny.TOML`, `Mise.toml`, `rust-toolchain.TOML`, `rustfmt.TOML` and `.config/Nextest.TOML` were each read, on this file system. The fold of VAL-5d matches each.
+
+### What changed in the spec
+
+1. The built-in list of 11.3 gains `.clippy.toml`, `rust-toolchain`, `.deny.toml`, `deny.exceptions.toml`, `.deny.exceptions.toml`, `rustfmt.toml`, `.rustfmt.toml` and `nextest.toml`, and VAL-5j says which rule holds them there (D-49).
+2. BOOT-4 gains every dot file and dot directory at the root of the factory repository, and the names of mise and typos that no dot covers.
+3. The structural test fails on a file under a second name, on a `.ignore`, and on a link where a tool looks for a directory (DEV-2b). No command passes its configuration as an argument.
+4. 23.3 records that nothing notices a later version of a tool that reads another name, and what `mise exec` trusts.
+
+### Still open
+
+- **Linux, and a file system that is case-sensitive.** rustfmt's configuration directory on Linux among it.
+- **mise.** Why `mise exec` and `mise run` trust without asking; a prompt with a person at the terminal; the shell activation; `/etc/mise`; `mise.lock`; the task directories, which the trace shows mise looking for; and whether `MISE_OVERRIDE_CONFIG_FILENAMES` leaves the names of lower precedence without effect.
+- **`cargo deny`.** Only the licence check was the canary. Why a whole `cargo deny check` exited with 1 on 0.18.5 was not looked into.
+- **Other versions.** `cargo deny` gained two names between 0.18.5 and 0.22.1. The versions that `mise.toml` will pin were not all these.
+- **The unused-dependency check and the check of Markdown links** of DEV-2, whose programs are not chosen.
+- **A first name in a second place.** An empty `clippy.toml` in the directory of a member switches the root's rules off for it. The pattern `clippy.toml` flags it at any depth, and the structural test does not look for it.
+
+## P-44: what GitHub's page of a pull request shows no content of
+
+Answered 2026-11-26 for #94, in part, by four pull requests on `sapientpants/sf-scratch` and a branch of size experiments, pushed with the operator's token and read without a login. The review of draft 4 (`16-spec-draft-4-review`, finding S10) found that the rules of SPEC 11.3 follow git attributes, and that GitHub hides changes without one; what it hides was the reviewer's knowledge. The scripts, the manifests of the planted files and the parse of each page are on the branch `prototype/second-names-and-hidden-diffs`, at commit [`e5803f2`](https://github.com/sapientpants/software-factory/tree/e5803f2d67302ffeafd257e1a308d77df3146cc9/xtask/prototype/flags-and-listing/p-44). The pages themselves are not kept.
+
+**Answer.** With no attribute set, the page showed no content for a binary file, whether new, changed, removed, or text again. It collapsed behind a button, "Load diff", every file that GitHub's own detection takes for generated: `Cargo.lock` at any depth, and any file whose path holds such a name, Rust source included. No header collapsed a `.rs` file. It collapsed a file by its size: from 400 lines of diff where the diff held eight files or more, from 16,000 bytes where it held 25, and every file after 5,700 to 6,000 lines or 200,000 to 220,000 bytes of rendered diff. It collapsed a removed text file. All of this is the page as someone who is not logged in gets it. The operator's own view was not observed, and neither was which `.gitattributes` the page obeys.
+
+### Method
+
+**The branches.** `probe/p-44-base`, at `437abfd`, is `main` of the scratch repository with one commit that holds the files that a case changes, removes or renames. `main` held no `.gitattributes`. Four branches from it, each with a pull request into `probe/p-44-base`, none merged:
+
+| Pull request | Head | Holds |
+|---|---|---|
+| [sf-scratch#134](https://github.com/sapientpants/sf-scratch/pull/134) | `probe/p-44-kinds`, `eda6596` | Binary files, and the other kinds of change: a removal, a rename, a mode, a link |
+| [sf-scratch#135](https://github.com/sapientpants/sf-scratch/pull/135) | `probe/p-44-names`, `87f491a` | Names that linguist takes for generated or vendored, each with a control of the same content under another name |
+| [sf-scratch#136](https://github.com/sapientpants/sf-scratch/pull/136) | `probe/p-44-content`, `b9e8966` | Content that linguist takes for generated, each with a control |
+| [sf-scratch#137](https://github.com/sapientpants/sf-scratch/pull/137) | `probe/p-44-size-1`, `494054e` | Nine new files of 100 to 20,000 lines of 40 characters |
+
+A fifth branch, `probe/p-44-bisect`, is a chain of 105 commits, each of which puts one size experiment in the place of the last. Those were read through the compare view of the commit against the base, to open no pull request for each. The branch of #137 gave the same result for each file in both views.
+
+**The page.** `curl` without a login fetched `/pull/<n>/files` and every fragment that the page names for later files. The page that came back is the classic view. A file counts as shown where the HTML holds the rows of its diff, as collapsed where a button "Load diff" stands in their place, and as without content where it holds neither. The fragment behind the button was fetched for the removed file and for the `Cargo.lock` at the root: the rows came back.
+
+**The API.** `GET /repos/{o}/{r}/pulls/{n}/files` for each pull request, read for the entries without a `patch`.
+
+**The rules of linguist** were read from `lib/linguist/generated.rb` of `github-linguist/linguist` at commit `f6e9adf`, to choose the cases. What the page did is observed; why is that source's.
+
+### What the page showed
+
+| Change | The page | Its words | `patch` in the API |
+|---|---|---|---|
+| A binary file: new, changed or removed | No content | "Binary file not shown." | No |
+| A file that was text and is binary, or was binary and is text | No content | "Binary file not shown." | No |
+| Text in UTF-16 with a byte order mark; a file with a NUL in its first line; a PostScript file that is text | No content | "Binary file not shown." | No |
+| A file with its first NUL after byte 12,300 | Shown as text | | Yes |
+| A new PNG | A frame for GitHub's image viewer in the place of a diff. No browser loaded it, so what it renders was not seen | | No |
+| A new SVG | The same frame; its source as a diff behind a switch | | Yes |
+| A new empty file; a change of mode alone | No content. The header shows the two modes | "Empty file." | No |
+| A removed text file of 30 lines | Collapsed | "This file was deleted." | Yes |
+| A rename with no change | No content | "File renamed without changes." | No |
+| A rename with an edit | The edit | | Yes |
+| A symbolic link, new or pointed elsewhere | Its target, as a diff of text | | Yes |
+| A change of white space alone, of the last line feed, or of line endings | Shown | | Yes |
+
+**Generated, by the name.** Collapsed, with "Some generated files are not rendered by default.":
+
+- `Cargo.lock`, new at the root, new in a directory and changed in a directory; `Cargo.toml.orig`; `.sqlx/query-<64 hexadecimal digits>.json`.
+- 21 other lockfiles, `package-lock.json`, `pnpm-lock.yaml`, `poetry.lock`, `uv.lock`, `composer.lock`, `deno.lock`, `flake.lock` and `mise.lock` among them, and 19 other names and directories, `node_modules/`, `__generated__/`, `.idea/`, `Pods/`, `htmlcov/`, `gradlew` and `*.js.map` among them.
+- **Rust source under such a path.** Each of twenty files of ordinary Rust was collapsed: `Cargo.lock.rs`, `Cargo.lock/evil.rs`, `myCargo.locked.rs`, `Cargo.toml.orig.rs`, `uv.lock.rs`, `package-lock.json.rs`, `fake_node_modules/evil.rs`, `__generated__/evil.rs`, `.idea/evil.rs` and `vendor/a.io/evil.rs` among them. The controls beside them were shown.
+- Not collapsed: `yarn.lock`, `go.sum`, `Gemfile.lock`, `*.min.js` with short lines, `vendor/lib/thing.rs`, `dist/bundle.js`, a `.snap` file under `snapshots/` or `__snapshots__/`.
+- The line that gives the reason stood under the button only for the files of the first response. A file that the page loaded later had the button alone, as `curl` fetched it.
+
+**Generated, by the content.** No header collapsed a `.rs` file. Eight were tried: `@generated`, the header that cargo writes, `Code generated … DO NOT EDIT`, and those of prost, bindgen, protobuf and thrift. A `.toml` file with cargo's header was shown too. A line that an author can write collapsed a file of these kinds: `.js`, `.css`, `.go`, `.c`, `.h`, `.py`, `.ts`, `.html`, `.yml`, `.xml`, `.proto`, `.rb`, `.java` and `.dart`, by a comment in the first lines, a source-map comment in the last, or one very long line. Three rules of the source that was read collapsed nothing: `apm.lock.yaml`, the `<auto-generated>` of C# and the header of gRPC for Python.
+
+**The API and the page disagree** on every file that was collapsed as generated and on the removed text file: the API returns a `patch` for it. They agree on the files without content.
+
+### Size
+
+A size is that of one file's diff as the page counts it: its added lines and the header of its hunk, and the bytes of that text, each line with the `+` before it and its line end. A new file of 100 lines of 40 characters is so 101 lines and 4,217 bytes. Only the row of nine files is a page of a pull request. The others are compare views.
+
+| Files in the diff | Shown | Collapsed, with "Large diffs are not rendered by default." |
+|---|---|---|
+| 1 | 2,999 lines; 1,003 lines of 100 characters | 3,000 lines; 1,004 lines of 100 characters |
+| 2 | 1,499 lines; 100 lines of 520 characters | 1,500 lines; 100 lines of 600 characters |
+| 4 | 749 lines; 100 lines of 260 characters | 750 lines; 100 lines of 300 characters |
+| 9, in #137 | 300 lines | 400 lines |
+| 25 | 399 lines; 100 lines of 157 characters | 400 lines; 100 lines of 158 characters |
+
+- The lines fit one rule: a file is collapsed from 3,000 lines divided by the number of files, and from 400 lines where that is less, which is from eight files on. With seven files a file of 400 lines was shown, and with eight it was collapsed. The rule is read off these brackets and is in no documentation that was read.
+- The bytes fall with the number of files too and fit no such rule. In a diff of eight files a file of 100 lines of 200 characters, about 20,000 bytes, was shown, and one of 100 lines of 300 characters collapsed. The lowest limit found was in the diff of 25 files: 100 lines of 157 characters, 15,917 bytes, were shown, and 100 lines of 158, 16,017 bytes, collapsed.
+- **A cap for the whole diff, in lines.** Of 40 new files of 300 lines of 10 characters, the first 19 were shown and the other 21 collapsed with the same button. 19 files are 5,700 added lines and 68,723 bytes, and 20 would be 6,000 lines. The cap lies between the two.
+- **A second cap, in bytes.** Of 80 new files of 100 lines of 40 characters, the first 51 were shown: 5,100 added lines, which is under the cap in lines, and 215,067 bytes. Of 30 files of 300 lines of 40 characters behind one collapsed file of 400 lines, the first 16 were shown, 201,872 bytes, and a seventeenth would have made 214,489. The two figures agree only if the collapsed file counts towards the cap, which was not tried. The cap in bytes lies between 200,000 and 220,000.
+- A file of 100 lines late in such a diff is collapsed with the rest.
+- The API returned a `patch` for a file of 2,000 lines and none for one of 3,000, in a pull request of 32,300 lines.
+
+### Findings
+
+**GitHub's binary is not git's.** The page took a PostScript file that is text and holds no NUL for binary, and a file whose first NUL comes after 12,300 bytes for text.
+
+**A path can collapse a source file.** The rules for generated names match a part of a path. A worker that names a directory `__generated__`, or a file `Cargo.lock.rs`, has its source collapsed behind the button, and the page says "generated".
+
+**A size that hides nothing alone hides in company.** The limit for one file falls with the number of files, and after the cap for the whole diff a small file is collapsed as well.
+
+**The page marks each collapsed file.** The content is one click away, and the entry of the file with its line count stays in the list.
+
+### What changed in the spec
+
+1. The binary rule of 11.3 flags a changed path whose blob is binary at the base or in the candidate (VAL-5i, D-49).
+2. Item 5 of 11.6 names three groups that the host can compute, an attribute, a binary file and a large diff, and no longer promises what the page hides (VAL-14c). The four numbers of the large group are the lowest limits of this probe: 400 lines and 16,000 bytes for a file, 5,700 lines and 200,000 bytes for a diff.
+3. The host holds no copy of GitHub's rules for generated files, and 23.3 says what that leaves.
+4. The threat table of 13.1 names the two groups that are flags, binary files and diffs that an attribute hides, in the place of "hidden diffs".
+
+### Still open
+
+- **The operator's view.** Every page was fetched without a login and is the classic view. What someone who is logged in sees, and whether GitHub's newer view of the changed files has the same limits, was not observed: no browser was at hand. The operator sees it by opening [sf-scratch#137](https://github.com/sapientpants/sf-scratch/pull/137), where the files of 400 lines and more should carry "Load diff".
+- **Attributes.** No case set one, so nothing compares `linguist-generated`, `-diff`, `binary` and `linguist-vendored` with the above, and which `.gitattributes` the page obeys, that of the base or that of the head, is not known.
+- **The limits of a whole pull request:** the number of files, the total of lines, and what the page says beyond them.
+- **Size.** Very long lines, a changed file with a large diff, a large file with few changed lines, and the size limits on the page of a pull request with other numbers of files than nine.
+- **The warning for text that sets the direction of writing.** The page holds its words as a template in every file; whether it shows them is decided by a script.
+- **Other extensions** that the page takes for binary, as it took `.ps`.
+- The four pull requests and the branches `probe/p-44-*` are left on the scratch repository.

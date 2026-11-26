@@ -1,19 +1,21 @@
-## versions
+## versions, 2026-11-26T03:56:47Z
 cargo-deny 0.22.1
+cargo-deny 0.18.5
 git version 2.56.1
 ProductName:		macOS ProductVersion:		27.0.1 BuildVersion:		26A434 
+curl under sandbox-exec: curl: (6) Could not resolve host: static.crates.io
 
 ## 1. the dependencies, fetched with a network
 
 $ cargo fetch --locked
  Downloading crates ...
-  Downloaded quote v1.0.47
-  Downloaded zmij v1.0.23
   Downloaded itoa v1.0.19
+  Downloaded quote v1.0.47
   Downloaded unicode-ident v1.0.27
+  Downloaded zmij v1.0.23
+  Downloaded serde_derive v1.0.229
   Downloaded proc-macro2 v1.0.107
   Downloaded serde_core v1.0.229
-  Downloaded serde_derive v1.0.229
   Downloaded serde v1.0.229
   Downloaded memchr v2.8.3
   Downloaded serde_json v1.0.154
@@ -35,13 +37,13 @@ For more information, try '--help'.
 ## 3. no database, no network
 
 $ nonet cargo-deny --offline check
-2026-11-26 03:44:16 [ERROR] failed to get 'FETCH_HEAD' metadata: failed to get HEAD timestamp: ["-C", "<scratch>/cargo-home/advisory-dbs/advisory-db-3157b0e258782691", "show", "-s", "--format=%cI", "HEAD"]
+2026-11-26 03:56:51 [ERROR] failed to get 'FETCH_HEAD' metadata: failed to get HEAD timestamp: ["-C", "<scratch>/cargo-home/advisory-dbs/advisory-db-3157b0e258782691", "show", "-s", "--format=%cI", "HEAD"]
 fatal: cannot change to '<scratch>/cargo-home/advisory-dbs/advisory-db-3157b0e258782691': No such file or directory
 
 (exit 1)
 
 $ nonet cargo-deny check
-2026-11-26 03:44:16 [ERROR] failed to fetch advisory database https://github.com/RustSec/advisory-db with cli: failed to clone: ["clone", "--depth=1", "--branch", "main", "https://github.com/RustSec/advisory-db", "<scratch>/cargo-home/advisory-dbs/advisory-db-3157b0e258782691"]
+2026-11-26 03:56:51 [ERROR] failed to fetch advisory database https://github.com/RustSec/advisory-db with cli: failed to clone: ["clone", "--depth=1", "--branch", "main", "https://github.com/RustSec/advisory-db", "<scratch>/cargo-home/advisory-dbs/advisory-db-3157b0e258782691"]
 Cloning into '<scratch>/cargo-home/advisory-dbs/advisory-db-3157b0e258782691'...
 fatal: unable to access 'https://github.com/RustSec/advisory-db/': Could not resolve host: github.com
 
@@ -56,6 +58,7 @@ bans ok, licenses ok, sources ok
 $ cargo-deny fetch db
 (exit 0)
 advisory-dbs: advisory-db-3157b0e258782691 db.lock  advisory-dbs/advisory-db-3157b0e258782691/.git: config description HEAD hooks index info logs objects packed-refs refs shallow 
+db.lock: 0 bytes; advisory-dbs: 7.7M
 
 ## 5. the database present, no network
 
@@ -67,17 +70,48 @@ $ nonet cargo-deny --frozen check advisories
 advisories ok
 (exit 0)
 
+$ nonet cargo-deny -L info --offline check advisories
+2026-11-26 03:56:54 [INFO] using config from <scratch>/w/deny.toml
+2026-11-26 03:56:54 [INFO] No advisory database configured, falling back to default 'https://github.com/RustSec/advisory-db'
+2026-11-26 03:56:54 [INFO] fetching crates for <scratch>/w/Cargo.toml
+2026-11-26 03:56:54 [INFO] fetched crates in 66.635541ms
+2026-11-26 03:56:54 [INFO] gathering crates for <scratch>/w/Cargo.toml
+2026-11-26 03:56:54 [INFO] gathered 17 crates in 141ms
+2026-11-26 03:56:54 [INFO] loading index metadata for crates...
+2026-11-26 03:56:54 [INFO] cached index metadata loaded in 43ms
+2026-11-26 03:56:54 [INFO] checking advisories...
+2026-11-26 03:56:54 [INFO] advisories checked in 1ms
+ advisories ok: 0 errors, 0 warnings, 0 notes
+(exit 0)
+
 $ nonet cargo-deny check advisories
-2026-11-26 03:44:18 [ERROR] failed to fetch advisory database https://github.com/RustSec/advisory-db with cli: failed to fetch latest changes: ["-C", "<scratch>/cargo-home/advisory-dbs/advisory-db-3157b0e258782691", "fetch", "--depth=1", "-u", "origin", "+main:main"]
+2026-11-26 03:56:54 [ERROR] failed to fetch advisory database https://github.com/RustSec/advisory-db with cli: failed to fetch latest changes: ["-C", "<scratch>/cargo-home/advisory-dbs/advisory-db-3157b0e258782691", "fetch", "--depth=1", "-u", "origin", "+main:main"]
 fatal: unable to access 'https://github.com/RustSec/advisory-db/': Could not resolve host: github.com
 
 (exit 1)
 FETCH_HEAD after the fetch that failed: 0 bytes
 
 ## 6. a root directory that cannot be written
+-- nothing below the root writable, db.lock in it
 
 $ nonet cargo-deny --offline check advisories
-2026-11-26 03:44:19 [ERROR] failed to acquire advisory database lock: file lock error: failed to obtain lock file '<scratch>/cargo-home/advisory-dbs/db.lock': attempted to take an exclusive lock on a read-only path
+2026-11-26 03:56:54 [ERROR] failed to acquire advisory database lock: file lock error: failed to obtain lock file '<scratch>/cargo-home/advisory-dbs/db.lock': attempted to take an exclusive lock on a read-only path
+(exit 1)
+-- the root without write permission and without db.lock
+
+$ nonet cargo-deny --offline check advisories
+2026-11-26 03:56:54 [ERROR] failed to acquire advisory database lock: file lock error: failed to obtain lock file '<scratch>/cargo-home/advisory-dbs/db.lock': attempted to take an exclusive lock on a read-only path
+(exit 1)
+-- the root without write permission, a writable db.lock in it
+
+$ nonet cargo-deny --offline check advisories
+advisories ok
+(exit 0)
+-- the root a disk image attached read-only, db.lock in it
+touch: <scratch>/cargo-home/advisory-dbs/probe: Read-only file system
+
+$ nonet cargo-deny --offline check advisories
+2026-11-26 03:56:57 [ERROR] failed to acquire advisory database lock: file lock error: failed to obtain lock file '<scratch>/cargo-home/advisory-dbs/db.lock': attempted to take an exclusive lock on a read-only path
 (exit 1)
 
 ## 7. a writable root without db.lock, the database read-only
@@ -101,7 +135,7 @@ advisories ok
 -- 91 days old
 
 $ nonet cargo-deny --offline check advisories
-2026-11-26 03:44:20 [ERROR] repository is stale (last update: 2026-08-27T02:44:00Z)
+2026-11-26 03:56:59 [ERROR] repository is stale (last update: 2026-08-27T02:56:00Z)
 (exit 1)
 -- limit P7D, 6 days old
 
@@ -111,7 +145,7 @@ advisories ok
 -- limit P7D, 8 days old
 
 $ nonet cargo-deny --offline check advisories
-2026-11-26 03:44:21 [ERROR] repository is stale (last update: 2026-11-18T03:44:00Z)
+2026-11-26 03:56:59 [ERROR] repository is stale (last update: 2026-11-18T03:56:00Z)
 (exit 1)
 -- then a fetch that fails, and the check again
 (fetch exit 1)
@@ -119,6 +153,12 @@ $ nonet cargo-deny --offline check advisories
 $ nonet cargo-deny --offline check advisories
 advisories ok
 (exit 0)
+-- 8 days old again, a fetch that fails, the time of FETCH_HEAD put back, and the check
+(fetch exit 1)
+
+$ nonet cargo-deny --offline check advisories
+2026-11-26 03:57:00 [ERROR] repository is stale (last update: 2026-11-18T03:57:00Z)
+(exit 1)
 -- no FETCH_HEAD, HEAD 8 days old, the commit of HEAD: 2026-11-25T12:10:30+01:00
 
 $ nonet cargo-deny --offline check advisories
@@ -138,7 +178,7 @@ error: failed to find variable
 4 │ db-path = "$SF_P38/elsewhere"
   │            ━━━━━━━
 
-2026-11-26 03:44:22 [ERROR] failed to validate configuration file <scratch>/w/deny.toml
+2026-11-26 03:57:01 [ERROR] failed to validate configuration file <scratch>/w/deny.toml
 (exit 1)
 
 ## 10. a clone made by git under the directory name
@@ -146,3 +186,28 @@ error: failed to find variable
 $ nonet cargo-deny --offline check advisories
 advisories ok
 (exit 0)
+
+## 11. git's clone on a read-only disk image, attached in the default place below a writable root without db.lock
+touch: <scratch>/cargo-home/advisory-dbs/advisory-db-3157b0e258782691/probe: Read-only file system
+
+$ nonet cargo-deny --locked --offline check
+advisories ok, bans ok, licenses ok, sources ok
+(exit 0)
+advisory-db-3157b0e258782691 db.lock 
+
+## 12. the older version on the same arrangement, and without the database
+
+$ nonet cargo-deny-old --locked --offline check
+2026-11-26 03:57:05 [ERROR] failed to load advisory database: parse error: error parsing <scratch>/cargo-home/advisory-dbs/advisory-db-3157b0e258782691/crates/libcrux-poly1305/RUSTSEC-2026-0073.md: parse error: TOML parse error at line 5, column 8
+  |
+5 | cvss = "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N"
+  |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+unsupported CVSS version: 4.0
+
+(exit 1)
+
+$ nonet cargo-deny-old --locked --offline check advisories
+2026-11-26 03:57:05 [ERROR] failed to open advisory database: "<scratch>/cargo-home/advisory-dbs/advisory-db-3157b0e258782691" does not appear to be a git repository: Could not retrieve metadata of "<scratch>/cargo-home/advisory-dbs/advisory-db-3157b0e258782691": No such file or directory (os error 2)
+(exit 1)
+
+## done, 2026-11-26T03:57:06Z

@@ -1,0 +1,6 @@
+$ gh api repos/sapientpants/software-factory/rulesets/27671324   (2026-11-26T03:57:20Z)
+{"bypass_actors":[],"conditions":{"ref_name":{"exclude":[],"include":["~DEFAULT_BRANCH"]}},"created_at":"2026-11-19T20:58:08.861+01:00","current_user_can_bypass":"never","enforcement":"active","id":27671324,"name":"main","rules":[{"parameters":{"allowed_merge_methods":["merge","squash","rebase"],"dismiss_stale_reviews_on_push":false,"require_code_owner_review":false,"require_extra_approval_for_unattributed_changes":true,"require_last_push_approval":false,"required_approving_review_count":0,"required_review_thread_resolution":false,"required_reviewers":[]},"type":"pull_request"},{"type":"non_fast_forward"},{"type":"deletion"}],"target":"branch","updated_at":"2026-11-19T20:58:08.895+01:00"}
+
+$ gh api repos/sapientpants/sf-scratch/pulls/{131,132}
+{"base":"probe/p-38-base","created_at":"2026-11-26T03:33:29Z","head":"probe/p-38-a","merged":true,"merged_at":"2026-11-26T03:33:45Z","number":131,"state":"closed"}
+{"base":"probe/p-38-base","created_at":"2026-11-26T03:33:58Z","head":"probe/p-38-b","merged":true,"merged_at":"2026-11-26T03:34:18Z","number":132,"state":"closed"}

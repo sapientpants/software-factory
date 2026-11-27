@@ -4738,6 +4738,89 @@ Without the sandbox tests, `cargo mutants` 27.1.0 missed each of the three viabl
 
 ### Still open
 
-- **The rest of P-37:** the first process and the signals (#133), the filter (#132), the proxy (#134, #135), and the agent CLI with `TMPDIR` at `/tmp` (#138).
+- **The rest of P-37:** the first process and the signals (#133), the filter (#132, answered below), the proxy (#134, #135), and the agent CLI with `TMPDIR` at `/tmp` (#138).
 - **A program that needs `/dev/shm`** fails in a worker now. None of the factory's checks was seen to.
 - **The host's paths in `/proc/1/cmdline`.** With `--as-pid-1` the first process takes PID 1, and the `bwrap` that holds the arguments is outside the namespace (SEC-10a). Whether a worker then sees them anywhere else was not looked at.
+
+## P-37, in part: the seccomp filter
+
+Answered 2026-11-27 for #132 by the tests of the filter that 19.4 asks for. The backend of `factory-sandbox` ran under the filter of SEC-6e as this pull request builds it. This is the first time a program ran under the filter. Whether a cold build or a session of the agent CLI makes a call that the filter refuses is not answered here. It stays with the exit check of M0 and #138.
+
+**Answer.**
+
+- **bubblewrap takes one program for each error code.** The backend passed three programs with `--add-seccomp-fd` on arm64 and four on x86-64: one each for `EPERM`, `ENOSYS` and `EAFNOSUPPORT`, and the program of the x32 ABI that the backend writes itself. bubblewrap 0.12.0 in the development VM took them, and so did 0.9.0 on the hosted runners of both architectures. The worker held no descriptor of them.
+- **Each row does what it says.** A test program shown read-only in the instance made one call of each row, and each got the code of its row. Of the 56 calls on arm64 and 59 on x86-64, every call that the table refuses got its code, and the calls that it allows went through.
+- **The x32 row on x86-64.** `getpid` of the x32 ABI, number `39 | 0x40000000`, got `ENOSYS` on the runner `check (x86-64)`. Whether that runner's kernel has the x32 ABI at all was not looked at. The call would get `ENOSYS` from a kernel without it too, so this observation does not separate the filter from the kernel for that row. What separates them is the program itself, which the unit tests run (below).
+- **A call of another architecture ends the process.** On x86-64, `getpid` of the i386 ABI through `int 0x80` killed the test program before it printed anything, and the shell saw status 159, which is 128 + SIGSYS. On arm64 no such call can be made. A process of 64 bits cannot make a call of 32, and the processors of the VM (Apple silicon) and of the runner have no 32-bit mode.
+- **No row differed,** so the table of SEC-6e did not change.
+- **The 14 earlier sandbox tests passed under the filter,** among them the shell scripts, `unshare`, a nested `bwrap`, `mount`, `sudo` and `su`.
+
+### Method
+
+The test binary `crates/factory-sandbox/tests/sandbox.rs`, with `SF_SANDBOX_TESTS=process`, which is the sandbox step of `cargo xtask check` (DEV-2a). Run as `<binary> __call rows`, the binary makes each call through `syscall(2)` and prints its label and `ok` or the name of the error. Its arguments are null pointers, a path that does not exist, a descriptor that is not open, or flags that the kernel refuses, so that a call which the filter let through by mistake does no harm. A `clone` with a flag of a namespace also carries `CLONE_THREAD` without `CLONE_SIGHAND`, which the kernel refuses with `EINVAL` before it creates anything. Each test shows the binary at `/probe` in an instance, runs it through the supervisor shim and destroys the instance.
+
+| | |
+|---|---|
+| Where | The development VM `sf-dev` of DEV-3, as in the part of P-37 above: Debian 13, kernel `6.12.115+deb13.1-cloud-arm64`, aarch64, bubblewrap 0.12.0 |
+| When | 2026-11-27, by the session, in `cargo xtask check` and on its own |
+| The hosted runners | Run [46075133601](https://github.com/sapientpants/software-factory/actions/runs/46075133601) of the CI workflow on this pull request, at its first commit, `375869d`: both jobs, with the `bubblewrap` `0.9.0-1ubuntu0.3` that apt installed and inside the network namespace of DEV-6. In each, the sandbox step ran its 17 tests and each passed. The mutation step tested 45 mutants: 34 caught and 11 unviable |
+
+### What each call got
+
+The calls of each row, and what the same call got inside the sandbox without the filter. That second column was observed in the VM alone, with the tests before the backend passed the filter.
+
+| Call | Under the filter | Without it, in the VM |
+|---|---|---|
+| `unshare(0)` | `EPERM` | ok |
+| `setns(-1, 0)` | `EPERM` | `EBADF` |
+| `clone` with each of the seven namespace flags | `EPERM` | `EINVAL` |
+| `clone` with `CLONE_THREAD` alone | `EINVAL` | `EINVAL` |
+| `clone3(NULL, 0)` | `ENOSYS` | `EINVAL` |
+| `mount`, `umount2`, `chroot`, of a path that does not exist | `EPERM` | `ENOENT` |
+| `pivot_root` | `EPERM` | `EPERM` |
+| `open_tree`, `fsconfig`, `mount_setattr` | `ENOSYS` | `ENOENT`, `EINVAL`, `EINVAL` |
+| `move_mount`, `fsopen`, `fsmount`, `fspick` | `ENOSYS` | `EPERM` |
+| `add_key`, `keyctl`, `request_key` | `EPERM` | `EFAULT`, `EOPNOTSUPP`, `EFAULT` |
+| `syslog(SIZE_BUFFER)`, `acct(NULL)` | `EPERM` | `EPERM` |
+| `quotactl` | `EPERM` | `ENODEV` |
+| `move_pages`, `mbind`, `get_mempolicy`, `set_mempolicy` | `EPERM` | ok |
+| `migrate_pages` | `EPERM` | `EINVAL` |
+| `perf_event_open(NULL)` | `EPERM` | `EFAULT` |
+| `ptrace(PEEKDATA)` of no process | `EPERM` | `ESRCH` |
+| `personality(0xffffffff)`, the query | `EPERM` | ok |
+| `personality(PER_LINUX)` | ok | ok |
+| `process_vm_readv`, `process_vm_writev` of itself | `EPERM` | ok |
+| `bpf` | `EPERM` | `EINVAL` |
+| `userfaultfd(UFFD_USER_MODE_ONLY)` | `EPERM` | ok |
+| `io_uring_setup`, `io_uring_enter`, `io_uring_register` | `ENOSYS` | `EFAULT`, `EBADF`, `EBADF` |
+| `ioctl(0, TIOCSTI)`, also with the high 32 bits of the request set, and `ioctl(0, TIOCLINUX)` | `EPERM` | `ENOTTY` |
+| `ioctl(0, TCGETS)` | `ENOTTY` | `ENOTTY` |
+| `socket(AF_ALG)` | `EAFNOSUPPORT` | ok |
+| `socket(AF_PACKET)` | `EAFNOSUPPORT` | `EPERM` |
+| `socket` of `AF_UNIX`, also with high bits set, `AF_INET`, `AF_INET6`, `AF_NETLINK` | ok | ok |
+| x86-64: `uselib`, `modify_ldt` | `EPERM` | not run |
+| x86-64: `getpid` of the x32 ABI | `ENOSYS` | not run |
+| x86-64: `getpid` through `int 0x80` | the process killed, status 159 | not run |
+
+The kernel itself refused `pivot_root`, `syslog` and `acct` with the code of their row, so for those three rows the test shows the kernel's refusal as much as the filter's. For every other row, the filter alone gave the code that the test saw.
+
+### Beside the kernel
+
+The unit tests of `factory-sandbox::seccomp` run the compiled programs in an evaluator of classic BPF, which takes the action of highest precedence as the kernel does. On both architectures, every row with arguments that meet its condition gets its code. With arguments that do not, and for `getpid`, `read`, `prctl` and `seccomp`, it is allowed. A call under the architecture `AUDIT_ARCH_I386`, `AUDIT_ARCH_ARM` or the other 64-bit one is killed by every program, and a call of the x32 ABI is refused on x86-64 alone. A test compares the call numbers of the table with those of `libc` for the architecture it runs on, and so checks both architectures across the two jobs.
+
+### Found on the way
+
+- **A worker inherits the descriptors that the process starting the daemon left open.** Under `cargo mutants`, the probe in the sandbox saw descriptors 3, 4, 5, 10 and 12 besides stdio, where the same test under `cargo nextest` alone saw none. Neither the supervisor shim nor `bwrap` closes a descriptor that is not marked close-on-exec, so such a descriptor reaches the command. None of them was the filter's. The test now looks for the filter's file by name.
+- **The mutation step and flags.** `cargo mutants` turned the `|` of flags whose bits do not overlap into `^`, which changes nothing, and it does mutate constant items. The flags of the memfd and its seals are therefore unions of constants, which the unit test checks on the file itself: sealed and closed on exec.
+
+### What changed in the spec
+
+1. SEC-6e: how the programs reach `bwrap`, and what was observed, in place of what nobody observed.
+2. SEC-6b: the filter's refusal of the calls of a namespace was observed.
+3. The row of this probe in 23.2.
+
+### Still open
+
+- **A cold build and an agent session under the filter**, with the exit check of M0 (22) and #138.
+- **The descriptors that a worker inherits** from the process that starts the daemon (above).
+- **The x32 ABI on the runner's kernel.** Whether the kernel has the ABI, so that the filter and not the kernel gave the `ENOSYS`, was not looked at.

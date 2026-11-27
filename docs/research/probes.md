@@ -4680,3 +4680,64 @@ Read on 2026-11-26 through a fetch tool, which returned the pages as text; the q
 - **A push under a ruleset that excludes the work branches.** The third script sent a create, a force-update through the REST API and a delete.
 - **The 403 of a repository without rulesets,** which 4.1 names for this read. The scratch repository is public.
 - **Required checks that something reports.** The context of the rule was one that nothing reports, so a push under the rule that could pass was not seen.
+
+## P-37, in part: the bubblewrap backend runs a command
+
+Answered 2026-11-27 for #131, by the sandbox tests of 19.4 that need neither the first process of SEC-10a, the filter of SEC-6e nor the proxy of SEC-10b, run against the backend of `factory-sandbox` as this pull request builds it. It is the first time that the backend, and not a stand-in of `bwrap` arguments, ran on a kernel. The rest of P-37 is the work of #132, #133, #134, #135 and #138.
+
+**Answer.**
+
+- **The namespaces and the mounts run a command.** The supervisor shim started `bwrap` with the arguments of the backend, and `bwrap` the command, in the development VM, as the factory's tests start it. The command saw the variables of its spec and of the instance and nothing of the test's environment, the work directory it was given, and PID 2: PID 1 of the namespace is bubblewrap's own, since the backend does not yet pass `--as-pid-1` (SEC-10a).
+- **Fourteen tests passed,** of which nine are the cases of the row "Sandbox" of 19.4 that need none of the three, and five are of the backend's own kill, reap and refusals. Each case is below.
+- **The root and `/dev` that bubblewrap creates were writable.** `--remount-ro /` and `--remount-ro /dev` after the mounts made both read-only, and `/dev/null` and `/dev/urandom`, which are mounts of their own, stayed writable and readable. That is SEC-6f.
+- **The `/tmp` of SEC-6c met its condition.** `/tmp` showed mode 0700 and the worker's uid, and the root above it mode 0755 and the worker's uid.
+- **A worker sees the host's path of each of its mounts.** `/proc/1/cmdline` of the sandbox is the command line of the `bwrap` inside it, which holds them.
+
+### Method
+
+The test binary `crates/factory-sandbox/tests/sandbox.rs` of this pull request, with `SF_SANDBOX_TESTS=process`, which is the sandbox step of `cargo xtask check` (DEV-2a). Each test creates an instance from a policy that shows a read-write directory as `/work` and a read-only one as `/ro`, runs one `/bin/sh -c` script in it through the supervisor shim, which the test binary itself plays (AG-16), reads its output and destroys the instance. The scripts are in the file. The arguments of `bwrap` are those of `bubblewrap::arguments`, whose unit test holds them in order: `--unshare-user --unshare-pid --unshare-ipc --unshare-net --unshare-uts --unshare-cgroup-try --disable-userns --die-with-parent --new-session --proc /proc --dev /dev`, the baseline of SEC-6f, `--bind <tmp> /tmp`, the mounts of the policy, `--remount-ro / --remount-ro /dev`, `--chdir`, and the command.
+
+| | |
+|---|---|
+| Where | The development VM `sf-dev` of DEV-3, on the operator's Mac: Debian GNU/Linux 13 (trixie), kernel `6.12.115+deb13.1-cloud-arm64`, aarch64, `kernel.unprivileged_userns_clone` 1. bubblewrap 0.12.0, not setuid. The account that Lima creates, uid 502, with `sudo` without a password; `/usr/bin/sudo`, `/usr/bin/su` and `/usr/bin/mount` are setuid root |
+| When | 2026-11-27, by the session, in `cargo xtask check` and on its own |
+| The hosted runners | Not yet observed when this record was written. The CI run of this pull request, with the bubblewrap 0.9.0 of DEV-6 in the network namespace of DEV-6, is that observation |
+
+The case of `/dev` was seen first by hand in the VM, with the backend's arguments less the two remounts: `touch /dev/x` and `touch /dev/shm/x` succeeded, and `mount` showed `/dev` as a `tmpfs` with `rw` and `uid=502`. With `--remount-ro /dev` both failed with `Read-only file system`.
+
+### What each test observed
+
+| Test | Observed |
+|---|---|
+| A command runs through the shim | The shim leads a group of its own, and the group it reported is that of `bwrap`, whose `/proc/<pid>/cmdline` names the program the backend was given. The command printed PID 2, the work directory, and of its environment `PATH`, `SF_SANDBOX=process`, the one variable of the spec and `TMPDIR=/tmp`, after the spec had given `TMPDIR` and `SF_SANDBOX` values of its own |
+| The host home and a credential file | A file of mode 0600 beside the work directory on the host, the test's `$HOME`, `/root`, `/home`, `/etc/shadow`, `/run`, `/var`, `/srv`, `/opt` and `/mnt`: none exists in the sandbox |
+| A host process | A `sleep` that the test started on the host, with a marker in its arguments and in its environment. No `cmdline` or `environ` under the sandbox's `/proc` held the marker; `/proc/<pid>` of the host process did not exist; `kill -0` and `kill -KILL` of its pid failed, and it lived on. The sandbox's `/proc` listed at most four processes |
+| Writes | `touch` and `mkdir` failed in `/`, `/usr`, `/usr/bin`, `/bin`, `/etc`, `/proc`, `/sys`, `/dev`, `/dev/shm`, `/dev/pts`, `/home`, the read-only mount, and the host's paths of the scratch directory and of the directory above `tmp`, which the sandbox does not show; an append to a file of the read-only mount failed. A write to `/dev/null`, `/work` and `/tmp` succeeded, and the host saw nothing but the last two |
+| A setuid binary and a mount | `CapPrm`, `CapEff` and `CapAmb` were 0 and `NoNewPrivs` 1. `mount -t tmpfs`, `mount --bind` and `mount -o remount,rw /` failed. The setuid binaries were there; `sudo -n id -u` and `su -c 'id -u' root` printed no `0`, and `id -u` printed the worker's uid |
+| A user namespace | `unshare --user true`, `unshare --user --map-root-user true` and a nested `bwrap --unshare-user` each failed, with `/usr/bin/unshare` and `/usr/bin/bwrap` present |
+| `/etc/claude-code` | It did not exist, and every name of the sandbox's `/etc` was one of the baseline. A policy that asked for a mount at `/etc/claude-code` was refused before the temporary directory was made |
+| `/tmp` | `TMPDIR` held `/tmp`; `stat` gave `700` and the worker's uid for `/tmp` and `755` and the worker's uid for `/`. A file written to `/tmp` lay in the stage execution's directory on the host, and `destroy` removed the directory |
+| The network | `/proc/net/dev` listed `lo` alone, and a connection from bash's `/dev/tcp` to a listener of the test on the host's `127.0.0.1` failed; the listener accepted nothing |
+| `kill_all` | A script with two `sleep`s in the background: on the host the tree below `bwrap` was five processes, `bwrap` twice, the shell and the two `sleep`s. After `kill_all` each had ended, and the shim exited with 137 |
+| `reap` | The same, with the instance dropped unended and a second backend given its record: every process ended and the temporary directory was removed |
+| The refusals | A backend whose `bwrap` does not exist, and a temporary directory that exists already, each created no instance |
+| A directory its owner cannot write | A worker made a tree under `/tmp` and took every permission off it; `destroy` removed it |
+
+### The mutation step
+
+Without the sandbox tests, `cargo mutants` 27.1.0 missed each of the three viable mutants of the function that kills an instance's processes, in a trial in the VM on that function alone. `--cargo-test-arg=--run-ignored=all` reached nextest, which then ran the sandbox tests, but it would run the ignored test of `factory-cli` that waits to be killed as well, so the step sets `SF_SANDBOX_TESTS` instead (DEV-2a). With the variable, the first run of `cargo xtask check` on this change tested 133 mutants: 103 caught, 25 unviable, 4 missed and 1 timed out, and no mutant of that function among the five. The five were a filter of variables that their order already made redundant, a walk of the process tree whose counter, once mutated, never ends, the removal of a directory that is already gone, and the function of `xtask` that read `SF_SANDBOX`. The change removed the first, made the walk a worklist with no counter, and tested the other two. A second run failed in its unmutated baseline: the test of a host process had given `grep` the marker as an argument, and the `cat` of every `cmdline` in the sandbox read it there when `grep` started first. The marker now reaches the sandbox in a file.
+
+### What changed in the spec
+
+1. The new item SEC-6f: the OS baseline, the further namespaces, the read-only root and `/dev`, the paths that no sandbox policy can show, and that the backend reports no `egress_filtering` until the proxy exists.
+2. The new item SEC-6g: how an instance knows and kills its processes, and that a worker sees the host's paths of its mounts.
+3. DEV-2a: how the sandbox tests at level `process` are kept out of the plain test run, and what the mutation step does with them; DEV-11: the third outcome is built; DEV-1: the step joined the command.
+4. 19.2: `nix` in `factory-sandbox`.
+5. The row of this probe in 23.2.
+
+### Still open
+
+- **The hosted runners,** with bubblewrap 0.9.0: the CI run of this pull request.
+- **The rest of P-37:** the first process and the signals (#133), the filter (#132), the proxy (#134, #135), and the agent CLI with `TMPDIR` at `/tmp` (#138).
+- **A program that needs `/dev/shm`** fails in a worker now. None of the factory's checks was seen to.
+- **The host's paths in `/proc/1/cmdline`.** With `--as-pid-1` the first process takes PID 1, and the `bwrap` that holds the arguments is outside the namespace (SEC-10a). Whether a worker then sees them anywhere else was not looked at.

@@ -45,6 +45,27 @@ fn steps() -> Vec<Step> {
         // The tests and the doc tests, each word for word a verify command of
         // 11.2 (BOOT-6). nextest runs no doc test.
         Step::new("cargo", &["nextest", "run", "--workspace", "--locked"]).also_outside_the_vm(),
+        // The sandbox tests of 19.4 at level `process`, a step of their own.
+        // They are ignored unless the variable says the level, so the run
+        // above runs none of them (DEV-2a). A check that creates a sandbox
+        // does not run in a worker's (SEC-6b), so there the step is not run
+        // (DEV-11).
+        Step::new(
+            "cargo",
+            &[
+                "nextest",
+                "run",
+                "--locked",
+                "--package",
+                "factory-sandbox",
+                "--test",
+                "sandbox",
+            ],
+        )
+        .with_variable(SANDBOX_TESTS.0, SANDBOX_TESTS.1)
+        .not_run_in_a_worker(
+            "a sandbox test creates a sandbox, which a worker's sandbox does not allow (SEC-6b)",
+        ),
         Step::new("cargo", &["test", "--doc", "--workspace", "--locked"]).also_outside_the_vm(),
         // Warnings denied, the lint of broken intra-doc links among them (DEV-2).
         Step::new("cargo", &["doc", "--workspace", "--no-deps", "--locked"])
@@ -57,6 +78,10 @@ fn steps() -> Vec<Step> {
         Step::new("cargo", &["llvm-cov", "nextest", "--workspace", "--locked"]),
     ]
 }
+
+/// The variable that makes the sandbox tests of level `process` ordinary
+/// tests, with its value. Without it nextest sees them as ignored.
+pub const SANDBOX_TESTS: (&str, &str) = ("SF_SANDBOX_TESTS", "process");
 
 /// The steps that run on macOS outside the development VM, after the whole set
 /// has run in it: clippy and the tests a second time, for the macOS build
@@ -75,15 +100,19 @@ pub fn main() -> ExitCode {
         return ExitCode::FAILURE;
     }
     let outcome = if cfg!(target_os = "macos") {
+        // Every step has its run in the VM, so none is not run (DEV-3).
         let vm = Vm::new("limactl", vm::NAME);
         in_the_vm(&root, &vm, std::env::var_os("SF_BASE_SHA"))
-            .and_then(|()| at_the_pins(&macos_steps()))
+            .and_then(|()| at_the_pins(&macos_steps(), false))
     } else {
-        at_the_pins(&steps())
+        at_the_pins(
+            &steps(),
+            is_a_worker(std::env::var_os("SF_SANDBOX").as_deref()),
+        )
     };
     match outcome {
-        Ok(()) => {
-            eprintln!("xtask check: passed");
+        Ok(not_run) => {
+            eprintln!("xtask check: {}", passed(&not_run));
             ExitCode::SUCCESS
         }
         Err(failure) => {
@@ -93,13 +122,31 @@ pub fn main() -> ExitCode {
     }
 }
 
+/// Whether `sf_sandbox`, the value of `SF_SANDBOX`, names the level of a
+/// worker's sandbox: the command knows a worker's sandbox by that variable
+/// alone (AG-11a, DEV-11).
+pub fn is_a_worker(sf_sandbox: Option<&std::ffi::OsStr>) -> bool {
+    sf_sandbox.is_some_and(|level| level == "process" || level == "hardened")
+}
+
+/// The last line of a check that passed: it names every step that was not
+/// run once more (DEV-11).
+fn passed(not_run: &[String]) -> String {
+    if not_run.is_empty() {
+        "passed".to_owned()
+    } else {
+        format!("passed; not run: {}", not_run.join(", "))
+    }
+}
+
 /// Runs the steps once each check tool among them reports the version that
-/// `mise.toml` pins (DEV-2).
-fn at_the_pins(steps: &[Step]) -> Result<(), String> {
+/// `mise.toml` pins (DEV-2). In a worker's sandbox the steps that do not run
+/// there are not run. It returns the steps that were not run.
+fn at_the_pins(steps: &[Step], worker: bool) -> Result<Vec<String>, String> {
     let text = std::fs::read_to_string("mise.toml")
         .map_err(|error| format!("cannot read mise.toml: {error}"))?;
     check_versions(steps, &pins(&text))?;
-    run(steps)
+    run(steps, worker)
 }
 
 /// On macOS, the whole set in the development VM (DEV-3): the VM is created
@@ -185,6 +232,9 @@ pub struct Step {
     /// The cargo subcommand whose version the step is checked for, where it
     /// is not the first argument: a task of `xtask` that runs a check tool.
     tool: Option<String>,
+    /// Why the step is not run in a worker's sandbox, where it is not
+    /// (DEV-7, DEV-11).
+    not_in_a_worker: Option<&'static str>,
 }
 
 impl Step {
@@ -199,6 +249,7 @@ impl Step {
             outside_the_vm: false,
             on_failure: None,
             tool: None,
+            not_in_a_worker: None,
         }
     }
 
@@ -219,6 +270,13 @@ impl Step {
     /// version check (DEV-2).
     fn running(mut self, subcommand: &str) -> Self {
         self.tool = Some(subcommand.to_owned());
+        self
+    }
+
+    /// Marks the step as one that is not run in a worker's sandbox, for
+    /// `reason` (DEV-11).
+    fn not_run_in_a_worker(mut self, reason: &'static str) -> Self {
+        self.not_in_a_worker = Some(reason);
         self
     }
 
@@ -245,9 +303,18 @@ impl fmt::Display for Step {
 }
 
 /// Runs the steps in order and stops at the first that fails. The error names
-/// that step and says how it failed.
-pub fn run(steps: &[Step]) -> Result<(), String> {
+/// that step and says how it failed. Where `worker` is set, a step that does
+/// not run in a worker's sandbox is not run: the command names it and the
+/// reason, and goes on. It returns the steps that were not run, which a
+/// failure names too.
+pub fn run(steps: &[Step], worker: bool) -> Result<Vec<String>, String> {
+    let mut not_run = Vec::new();
     for step in steps {
+        if let (true, Some(reason)) = (worker, step.not_in_a_worker) {
+            eprintln!("xtask check: not run, in a worker's sandbox: `{step}`: {reason}");
+            not_run.push(format!("`{step}`"));
+            continue;
+        }
         eprintln!("xtask check: {step}");
         let status = Command::new(&step.program)
             .args(&step.arguments)
@@ -256,13 +323,18 @@ pub fn run(steps: &[Step]) -> Result<(), String> {
             .map_err(|error| format!("`{step}` could not be started: {error}"))?;
         if !status.success() {
             let failure = format!("`{step}` {}", vm::ended(status));
-            return Err(match step.on_failure {
+            let failure = match step.on_failure {
                 Some(advice) => format!("{failure}; {advice}"),
                 None => failure,
+            };
+            return Err(if not_run.is_empty() {
+                failure
+            } else {
+                format!("{failure}; not run: {}", not_run.join(", "))
             });
         }
     }
-    Ok(())
+    Ok(not_run)
 }
 
 #[cfg(test)]
@@ -299,7 +371,7 @@ mod tests {
         let scratch = Scratch::new("pass");
         let (first, second) = (scratch.0.join("first"), scratch.0.join("second"));
 
-        let outcome = run(&[leaves(&first), leaves(&second)]);
+        let outcome = run(&[leaves(&first), leaves(&second)], false);
 
         assert!(outcome.is_ok(), "{outcome:?}");
         assert!(first.exists() && second.exists());
@@ -310,11 +382,14 @@ mod tests {
         let scratch = Scratch::new("fail");
         let (before, after) = (scratch.0.join("before"), scratch.0.join("after"));
 
-        let outcome = run(&[
-            leaves(&before),
-            Step::new("sh", &["-c", "exit 3"]),
-            leaves(&after),
-        ]);
+        let outcome = run(
+            &[
+                leaves(&before),
+                Step::new("sh", &["-c", "exit 3"]),
+                leaves(&after),
+            ],
+            false,
+        );
 
         let failure = outcome.expect_err("the check fails").to_string();
         assert!(failure.contains("sh -c exit 3"), "{failure}");
@@ -401,7 +476,7 @@ mod tests {
             ..deny
         };
 
-        let failure = run(&[failing]).expect_err("the check fails");
+        let failure = run(&[failing], false).expect_err("the check fails");
 
         assert!(failure.contains("exit code 1"), "{failure}");
         assert!(failure.contains("`cargo xtask fetch`"), "{failure}");
@@ -421,7 +496,7 @@ mod tests {
         )
         .with_variable("XTASK_CHECK_VALUE", "-D warnings");
 
-        let outcome = run(&[step]);
+        let outcome = run(&[step], false);
 
         assert!(outcome.is_ok(), "{outcome:?}");
         let value = std::fs::read_to_string(&trace).expect("the step left its trace");
@@ -554,8 +629,105 @@ mod tests {
     }
 
     #[test]
+    fn in_a_workers_sandbox_a_step_that_does_not_run_there_is_named_and_the_rest_run() {
+        let scratch = Scratch::new("worker");
+        let (before, skipped, after) = (
+            scratch.0.join("before"),
+            scratch.0.join("skipped"),
+            scratch.0.join("after"),
+        );
+        let steps = [
+            leaves(&before),
+            leaves(&skipped).not_run_in_a_worker("it makes a sandbox"),
+            leaves(&after),
+        ];
+
+        let not_run = run(&steps, true).expect("the check passes");
+
+        assert_eq!(not_run, [format!("`touch {}`", skipped.display())]);
+        assert!(before.exists() && after.exists());
+        assert!(!skipped.exists(), "the step ran in a worker");
+        assert_eq!(
+            passed(&not_run),
+            format!("passed; not run: `touch {}`", skipped.display())
+        );
+    }
+
+    #[test]
+    fn outside_a_workers_sandbox_every_step_runs() {
+        let scratch = Scratch::new("not-worker");
+        let marked = scratch.0.join("marked");
+
+        let not_run = run(&[leaves(&marked).not_run_in_a_worker("a reason")], false)
+            .expect("the check passes");
+
+        assert!(not_run.is_empty(), "{not_run:?}");
+        assert!(marked.exists());
+        assert_eq!(passed(&not_run), "passed");
+    }
+
+    #[test]
+    fn a_failure_after_a_step_that_was_not_run_names_it_too() {
+        let scratch = Scratch::new("worker-fails");
+        let skipped = scratch.0.join("skipped");
+        let steps = [
+            leaves(&skipped).not_run_in_a_worker("a reason"),
+            Step::new("sh", &["-c", "exit 4"]),
+        ];
+
+        let failure = run(&steps, true).expect_err("the check fails");
+
+        assert!(failure.contains("exit code 4"), "{failure}");
+        assert!(
+            failure.ends_with(&format!("; not run: `touch {}`", skipped.display())),
+            "{failure}"
+        );
+    }
+
+    #[test]
+    fn a_worker_is_known_by_sf_sandbox_alone() {
+        use std::ffi::OsStr;
+
+        assert!(is_a_worker(Some(OsStr::new("process"))));
+        assert!(is_a_worker(Some(OsStr::new("hardened"))));
+        for other in ["none", "", "Process", "yes"] {
+            assert!(!is_a_worker(Some(OsStr::new(other))), "{other}");
+        }
+        assert!(!is_a_worker(None));
+    }
+
+    #[test]
+    fn the_sandbox_tests_are_a_step_of_their_own_that_no_worker_runs() {
+        let set = steps();
+        let sandbox: Vec<&Step> = set
+            .iter()
+            .filter(|step| step.not_in_a_worker.is_some())
+            .collect();
+        let on_the_mac: Vec<String> = macos_steps().iter().map(ToString::to_string).collect();
+
+        let [sandbox] = sandbox[..] else {
+            panic!("one step is not run in a worker: {sandbox:?}");
+        };
+        let sandbox = sandbox.to_string();
+        assert_eq!(
+            sandbox,
+            "SF_SANDBOX_TESTS='process' cargo nextest run --locked --package factory-sandbox \
+             --test sandbox"
+        );
+        assert!(!on_the_mac.contains(&sandbox), "{on_the_mac:?}");
+        // The plain test run sets no variable, so it runs none of the
+        // sandbox tests (DEV-2a).
+        let plain = set
+            .iter()
+            .map(ToString::to_string)
+            .find(|step| step.contains("cargo nextest run --workspace"))
+            .expect("the plain test run");
+        assert_eq!(plain, "cargo nextest run --workspace --locked");
+    }
+
+    #[test]
     fn a_step_that_cannot_be_started_fails_the_check_by_name() {
-        let outcome = run(&[Step::new("xtask-no-such-program", &["--flag"])]);
+        let outcome = run(&[Step::new("xtask-no-such-program", &["--flag"])], false);
 
         let failure = outcome.expect_err("the check fails").to_string();
         assert!(

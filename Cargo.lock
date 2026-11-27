@@ -256,6 +256,13 @@ dependencies = [
 [[package]]
 name = "factory-sandbox"
 version = "0.1.0"
+dependencies = [
+ "factory-core",
+ "factory-proc",
+ "nix",
+ "thiserror",
+ "tokio",
+]
 
 [[package]]
 name = "factory-store"

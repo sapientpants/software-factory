@@ -7,7 +7,12 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, ExitCode, Stdio};
 use std::sync::atomic::{AtomicUsize, Ordering};
 
-use crate::vm;
+use crate::{check, vm};
+
+/// The files whose code the sandbox tests of 19.4 test, and the plain test
+/// run does not: in a worker's sandbox, where those tests do not run (DEV-11),
+/// the step does not mutate them.
+pub const SANDBOX_CODE: &[&str] = &["crates/factory-sandbox/src/bubblewrap.rs"];
 
 /// The variable through which the development VM is given the diff that the
 /// Mac wrote: the copy of the work tree in the VM holds no `.git` (DEV-3).
@@ -45,7 +50,8 @@ fn run(root: &Path) -> Result<(), String> {
             file
         }
     };
-    mutate("cargo", &file, &target)
+    let worker = check::is_a_worker(std::env::var_os("SF_SANDBOX").as_deref());
+    mutate("cargo", &file, &target, worker)
 }
 
 /// The diff from the base to the work tree at `root`, each found as DEV-2a
@@ -139,14 +145,20 @@ fn diff(root: &Path, base: &str) -> Result<Vec<u8>, String> {
 /// says that it had nothing to mutate. `mutants.out` is written below
 /// `target`, the build output, and not in the work tree. The mutated copies
 /// are built without `CARGO_TARGET_DIR`, each in a build output of its own.
-pub fn mutate(cargo: &str, file: &Path, target: &Path) -> Result<(), String> {
+///
+/// The tests of each mutant include the sandbox tests of 19.4, which nextest
+/// sees as ignored unless [`check::SANDBOX_TESTS`] is set: without them every
+/// mutant of the sandbox's code survives.
+/// In a worker's sandbox (`worker`) they cannot run, and the files of
+/// [`SANDBOX_CODE`] are left out of the mutation, which the step says.
+pub fn mutate(cargo: &str, file: &Path, target: &Path, worker: bool) -> Result<(), String> {
     let diff = std::fs::read(file)
         .map_err(|error| format!("cannot read the diff {}: {error}", file.display()))?;
     if diff.is_empty() {
         eprintln!("xtask mutants: the diff is empty, so there is nothing to mutate");
         return Ok(());
     }
-    let step = [
+    let mut step: Vec<String> = [
         "mutants",
         "--in-diff",
         &file.to_string_lossy(),
@@ -155,14 +167,28 @@ pub fn mutate(cargo: &str, file: &Path, target: &Path) -> Result<(), String> {
         "--output",
         &target.to_string_lossy(),
     ]
-    .map(str::to_owned);
+    .map(str::to_owned)
+    .into();
+    if worker {
+        eprintln!(
+            "xtask mutants: in a worker's sandbox the sandbox tests do not run, \
+             so {} is not mutated (DEV-11)",
+            SANDBOX_CODE.join(", ")
+        );
+        step.extend(SANDBOX_CODE.iter().map(|path| format!("--exclude={path}")));
+    }
     eprintln!("xtask mutants: {cargo} {}", step.join(" "));
     // The copies that `cargo mutants` builds share no build output with the
     // check: with the check's `CARGO_TARGET_DIR` a mutated build would take
     // the place of the check's own (DEV-2a).
-    let status = Command::new(cargo)
-        .args(&step)
-        .env_remove("CARGO_TARGET_DIR")
+    let mut command = Command::new(cargo);
+    command.args(&step).env_remove("CARGO_TARGET_DIR");
+    if worker {
+        command.env_remove(check::SANDBOX_TESTS.0);
+    } else {
+        command.env(check::SANDBOX_TESTS.0, check::SANDBOX_TESTS.1);
+    }
+    let status = command
         .status()
         .map_err(|error| format!("`{cargo} mutants` could not be started: {error}"))?;
     if status.success() {
@@ -269,7 +295,7 @@ mod tests {
             std::fs::write(
                 &cargo,
                 format!(
-                    "#!/bin/sh\necho \"$*\" >> '{runs}'\nexit {exit}\n",
+                    "#!/bin/sh\necho \"$* with SF_SANDBOX_TESTS=$SF_SANDBOX_TESTS\" >> '{runs}'\nexit {exit}\n",
                     runs = self.0.join("runs").display()
                 ),
             )
@@ -434,7 +460,7 @@ mod tests {
         let file = scratch.0.join("mutants.diff");
         std::fs::write(&file, "").expect("write the diff");
 
-        let outcome = mutate(&cargo, &file, &scratch.0.join("target"));
+        let outcome = mutate(&cargo, &file, &scratch.0.join("target"), false);
 
         assert!(outcome.is_ok(), "{outcome:?}");
         assert_eq!(scratch.runs(), None, "cargo ran");
@@ -448,20 +474,54 @@ mod tests {
         std::fs::write(&file, "diff --git a/x b/x\n").expect("write the diff");
         let target = scratch.0.join("target");
 
-        let outcome = mutate(&cargo, &file, &target);
+        let outcome = mutate(&cargo, &file, &target, false);
 
         assert!(outcome.is_ok(), "{outcome:?}");
         assert_eq!(
             scratch.runs().as_deref(),
             Some(
                 format!(
-                    "mutants --in-diff {} --test-tool=nextest --cargo-arg=--locked --output {}\n",
+                    "mutants --in-diff {} --test-tool=nextest --cargo-arg=--locked --output {} \
+                     with SF_SANDBOX_TESTS=process\n",
                     file.display(),
                     target.display()
                 )
                 .as_str()
             )
         );
+    }
+
+    #[test]
+    fn in_a_workers_sandbox_the_sandboxs_code_is_not_mutated() {
+        let scratch = Scratch::new("worker");
+        let cargo = scratch.cargo(0);
+        let file = scratch.0.join("mutants.diff");
+        std::fs::write(&file, "diff --git a/x b/x\n").expect("write the diff");
+        let target = scratch.0.join("target");
+
+        let outcome = mutate(&cargo, &file, &target, true);
+
+        assert!(outcome.is_ok(), "{outcome:?}");
+        assert_eq!(
+            scratch.runs().as_deref(),
+            Some(
+                format!(
+                    "mutants --in-diff {} --test-tool=nextest --cargo-arg=--locked --output {} \
+                     --exclude=crates/factory-sandbox/src/bubblewrap.rs with SF_SANDBOX_TESTS=\n",
+                    file.display(),
+                    target.display()
+                )
+                .as_str()
+            )
+        );
+    }
+
+    #[test]
+    fn the_sandboxs_code_is_a_file_of_the_tree() {
+        let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("..");
+        for path in SANDBOX_CODE {
+            assert!(root.join(path).is_file(), "{path}");
+        }
     }
 
     #[test]
@@ -472,7 +532,8 @@ mod tests {
         let file = scratch.0.join("mutants.diff");
         std::fs::write(&file, "diff --git a/x b/x\n").expect("write the diff");
 
-        let failure = mutate(&cargo, &file, &scratch.0.join("target")).expect_err("it fails");
+        let failure =
+            mutate(&cargo, &file, &scratch.0.join("target"), false).expect_err("it fails");
 
         assert!(failure.contains("mutants"), "{failure}");
         assert!(failure.contains("exit code 2"), "{failure}");

@@ -7,5 +7,27 @@ rust-version.workspace = true
 publish.workspace = true
 license.workspace = true
 
+[dependencies]
+factory-core = { path = "../factory-core" }
+factory-proc = { path = "../factory-proc" }
+thiserror.workspace = true
+
+# The bubblewrap backend is compiled for Linux alone (SPEC 4.4).
+[target.'cfg(target_os = "linux")'.dependencies]
+nix.workspace = true
+tokio = { workspace = true, features = ["time"] }
+
+[target.'cfg(target_os = "linux")'.dev-dependencies]
+tokio = { workspace = true, features = ["io-std", "net", "rt-multi-thread", "time"] }
+
 [lints]
 workspace = true
+
+# The sandbox tests of SPEC 19.4, at level `process`. A harness of its own:
+# the binary is also the supervisor shim that its tests start, and its tests
+# are ignored unless `SF_SANDBOX_TESTS` holds `process`, so that `cargo
+# nextest run` runs none of them and the sandbox step of `cargo xtask check`
+# runs them (DEV-2a).
+[[test]]
+name = "sandbox"
+harness = false

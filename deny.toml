@@ -12,5 +12,6 @@ maximum-db-staleness = "P7D"
 [licenses]
 # The licences that the crates of the dependency graph carry today. A crate
 # under another one fails the check, and the change that brings it in adds it
-# here.
-allow = ["MIT", "Apache-2.0"]
+# here. `Unicode-3.0` came with the ICU4X crates of the fold (VAL-5d), whose
+# tables are Unicode's data.
+allow = ["MIT", "Apache-2.0", "Unicode-3.0"]

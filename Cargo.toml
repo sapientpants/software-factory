@@ -16,6 +16,12 @@ license = "MIT OR Apache-2.0"
 serde_json = "1"
 # Exact pin, default features off (SPEC 19.2).
 pulldown-cmark = { version = "=0.13.6", default-features = false }
+# Exact pins, for the fold of VAL-5d (SPEC 19.2).
+icu_casemap = "=2.4.0"
+icu_normalizer = { version = "=2.4.0", default-features = false, features = ["compiled_data"] }
+# The testing row gives no version (SPEC 19.2). Without the default features,
+# which fork and time out tests and read regular expressions.
+proptest = { version = "1", default-features = false, features = ["std"] }
 
 # SPEC 19.3. The disallowed methods are listed in clippy.toml.
 [workspace.lints.clippy]

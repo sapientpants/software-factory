@@ -12,6 +12,11 @@ use crate::vm::{self, Vm};
 fn steps() -> Vec<Step> {
     vec![
         Step::new("cargo", &["fmt", "--all", "--check"]),
+        // Over code and documents, with `typos.toml`, which it finds by
+        // itself; no argument names it (DEV-2b).
+        Step::new("typos", &[]),
+        // The check of local Markdown links (DEV-2, 19.2).
+        Step::new("cargo", &["xtask", "links"]),
         // DEV-2a. The advisories read the database that `cargo xtask fetch`
         // fetched, and fail where it is missing or too old.
         Step::new("cargo", &["deny", "--locked", "--offline", "check"]).on_failure(
@@ -325,6 +330,21 @@ mod tests {
         assert!(
             !steps.contains(&"cargo test --workspace --locked".to_owned()),
             "`cargo test` no longer stands in for the test runs (DEV-1)"
+        );
+    }
+
+    #[test]
+    fn the_set_checks_the_spelling_and_the_local_markdown_links_in_the_vm_alone() {
+        let steps: Vec<String> = steps().iter().map(ToString::to_string).collect();
+        let on_the_mac: Vec<String> = macos_steps().iter().map(ToString::to_string).collect();
+
+        // typos reads typos.toml, its one file, without being told (DEV-2b).
+        assert!(steps.contains(&"typos".to_owned()), "{steps:?}");
+        assert!(steps.contains(&"cargo xtask links".to_owned()), "{steps:?}");
+        assert!(
+            !on_the_mac
+                .iter()
+                .any(|step| step == "typos" || step == "cargo xtask links")
         );
     }
 

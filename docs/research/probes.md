@@ -3337,9 +3337,9 @@ No rule's outcome changed. SEC-1 and SEC-2 stand as they were.
 
 ### Still open
 
-- **Whether onboarding refuses a repository whose rules restrict the creation of `factory/**`.** The App can read the rules of a branch name, and nothing asks it to. It is a new rule and the operator's to decide.
-- **A ruleset on `factory/**` and the push of publish.** Only the create of the ref was sent under each ruleset. A push to a work branch under a rule that restricts updates, requires a pull request or requires signed commits was not tried.
-- **An organisation's ruleset, a ruleset in evaluate mode and a classic branch protection.** Each ruleset here was the repository's own and active.
+- **Whether onboarding refuses a repository whose rules restrict the creation of `factory/**`.** The App can read the rules of a branch name, and nothing asks it to. It is a new rule and the operator's to decide. Decided on 2026-11-27 for #98, as D-51: see "P-45" below.
+- **A ruleset on `factory/**` and the push of publish.** Only the create of the ref was sent under each ruleset. A push to a work branch under a rule that restricts updates, requires a pull request or requires signed commits was not tried. Observed on 2026-11-26 for #98: see "P-45" below.
+- **An organisation's ruleset, a ruleset in evaluate mode and a classic branch protection.** Each ruleset here was the repository's own and active. A classic branch protection was observed on 2026-11-26 for #98, and GitHub refused the scratch repository a ruleset in evaluate mode: see "P-45" below.
 - **The documented 409.** No request produced it. An empty repository was not tried, since the scratch repository is not one.
 - **Which commits GitHub compares when it refuses a workflow.** The reading under "Findings" fits the cases and was not tested against another: a workflow that is at the head of a tag only, one that is on the default branch only, or one whose content is at the head of a branch under another path.
 - **A workflow changed or removed through the REST API.** The two requests that were refused each add a workflow. The contents endpoint was not asked to change or to delete one.
@@ -4451,3 +4451,232 @@ A size is that of one file's diff as the page counts it: its added lines and the
 - **The warning for text that sets the direction of writing.** The page holds its words as a template in every file; whether it shows them is decided by a script.
 - **Other extensions** that the page takes for binary, as it took `.ps`.
 - The four pull requests and the branches `probe/p-44-*` are left on the scratch repository.
+
+## P-45: what a rule on `factory/**` does to the factory's writes to a work branch, and what the App reads of it
+
+Answered 2026-11-26 for #98, on `sapientpants/sf-scratch`, between 21:46 and 22:00 UTC, with one more script on 2026-11-27 at 05:33 UTC, after a review of this record. The record of P-1 under the scratch App's token, above, left open what a ruleset on `factory/**` does to anything but the create of the ref, and whether a classic branch protection behaves as a ruleset does. Every request and every push below is the scratch App's unless it says otherwise: an installation token of App 5926866 (`17-scratch-app`), which holds the seven permissions of 5.7 and is on no bypass list, sent with `curl` 8.7.1 and, for a push, with git 2.56.1 over HTTPS, on macOS 27.0.1. The operator's OAuth token, as `gh` 2.105.0 holds it, created and deleted each ruleset and each classic rule and made the reads that are named as the operator's. D-51 is the decision that rests on this record, and GH-22 the rule.
+
+**Answer.**
+
+- **Every rule that a ruleset was given stopped a write.** Eight rule types, one at a time, in a ruleset for `factory/**` with no bypass actor. Each stopped at least one of the five writes that the factory makes to a work branch, and none stopped all five. The table is under "Under a ruleset".
+- **Three rules refused the create of the ref,** each with `422 Reference update failed` and no rule named: `creation`; `required_linear_history`, at the head of `main`, which has merge commits behind it; and `required_status_checks`, unless the rule sets `do_not_enforce_on_create`.
+- **Every other refusal named its rule:** a push in the lines that git prints from the remote, and an update or a delete through the REST API in the `message` of its 422.
+- **The App read every active rule beforehand.** `GET /repos/{o}/{r}/rules/branches/{branch}` listed each rule for a branch name that no ref had, with the ruleset it comes from.
+- **A classic branch protection rule was in no read that the App may make for such a name.** It did not stop the create. As created, with nothing chosen, it stopped a force-update and the delete, and with required reviews or a lock it stopped every push.
+- **A ruleset that excludes `refs/heads/factory/**` left the work branches alone.** The rules read listed nothing for a name under `factory/`, and the App's create, force-update and delete went through.
+- **The operator's token read the same list of rules as the App's,** also where the operator's role may bypass the ruleset.
+
+### Method
+
+Three scripts. `p45.sh` runs one variant for each rule. A variant makes two work branches while no rule exists, and a short variant the first alone: `e`, created through `POST /git/refs` at the head of `main`, as the claim leaves a work branch (8.2), and `f`, created by a push of one commit, as a branch that holds a pushed candidate. The operator's token then creates the rule, and after three seconds the App makes its reads and sends each write once:
+
+| Write | What it stands for | How it was sent |
+|---|---|---|
+| The create of a ref | The claim, 8.2 step 3 | `POST /git/refs`, a third name under `factory/`, at the head of `main` |
+| The push of a candidate | Publish (9.4), the first push and a later one | `git push` to `e` of a child of its head, which is the commit that `f` was created with and so is in the repository already, and to `f` of a child of its head, which is new |
+| The push of a merge commit | A base update (12.4) | `git push` to `f` of a commit with two parents, the head of `f` and a commit beside it |
+| A force-update | A reset (7.6), and the ref that a cancelled run left (8.2) | `git push --force-with-lease=<ref>:<its head>` to `f` of a child of `main`'s head, and `PATCH /git/refs/heads/<e>` with `force: true` to the parent of `main`'s head |
+| The delete of the ref | The branch of a merged run (12.3, 18.2) | `DELETE /git/refs/heads/<e>` |
+
+The operator's token then deleted the rule, and the App deleted the refs that were left. A first variant, `control`, ran the same writes with no rule: every one was accepted. Six variants are short, with the reads and the create alone, and GitHub refused three of those their rule. Every commit is new for its variant, made with `git commit-tree` in a work repository that read no configuration of the Mac, unsigned, with one file under `probe/p-45/`. The head of `main` is `17d8464cd28fd71ba3cb0333f13f34d622816867`. It is not signed, and neither is its parent.
+
+Each ruleset has `target: branch`, `enforcement: active`, the condition `include: ["refs/heads/factory/**"]` and no bypass actor, unless its row says otherwise. Each classic rule has the pattern `factory/*` and was created with the GraphQL mutation `createBranchProtectionRule`, since the REST API protects only a branch that exists.
+
+`p45b.sh` followed, for two things that the first script left unsaid: where the rule for a linear history refuses a create, and what the App reads of a classic rule through a ref. `p45c.sh` ran the next morning, after a review of this record, for two things that nothing had tried: a ruleset that excludes the work branches, and the operator's own read of the rules.
+
+REST requests went out under `X-GitHub-Api-Version: 2026-03-10`, the version GH-17 pins. Mutating requests and pushes were sent one at a time with a second between them. Beside the requests for their tokens, the three scripts made 431 REST and GraphQL requests, 73 of them the operator's, and 67 pushes, all of them the App's. Each script signed a JSON Web Token with the App's private key, through `openssl` 4.1.0, asked for one installation token restricted to the scratch repository and revoked it at its end, as the scripts of #82 did; all four runs printed `token revoked: 204`. The versions of the tools are those of the Mac on the day and are in no kept response.
+
+The scripts, every response and what the scripts printed are on the branch `prototype/work-branch-rules`, at commit [`42a5694`](https://github.com/sapientpants/software-factory/tree/42a5694b1c5b6b525a4ee5644cb1c931a0880b3b/crates/factory-github/prototype/work-branch-rules). They are throwaway code. A note there says which requests the operator's token made.
+
+The scripts deleted what they made on the scratch repository: every ruleset, every classic rule and every ref under `factory/`. It has no ruleset and no classic rule again. The commits of a refused push are on no branch.
+
+### Under a ruleset
+
+| Rule | The create of a ref | The push of a candidate, first and later | The push of a merge commit | The push with a lease | `PATCH` with `force` | The delete |
+|---|---|---|---|---|---|---|
+| None (`control`) | 201 | Accepted | Accepted | Accepted | 200 | 204 |
+| `creation` | 422 | Accepted | Accepted | Accepted | 200 | 204 |
+| `update` | 201 | Refused | Refused | Refused | 422 | 204 |
+| `deletion` | 201 | Accepted | Accepted | Accepted | 200 | 422 |
+| `non_fast_forward` | 201 | Accepted | Accepted | Refused | 422 | 204 |
+| `required_linear_history` | 422 | Accepted | Refused | Accepted | 200 | 204 |
+| `required_signatures` | 201 | Refused | Refused | Refused | 200 | 204 |
+| `pull_request`, with no approval required | 201 | Refused | Refused | Refused | 422 | 204 |
+| `required_status_checks`, one context that nothing reports | 422 | Refused | Refused | Refused | 422 | 204 |
+| The same with `do_not_enforce_on_create: true` | 201 | Refused | Refused | Refused | 422 | 204 |
+
+**The create.** Each 422 has the body that P-1 saw under `creation`, with no `errors` array and no rule named:
+
+```json
+{"message":"Reference update failed","documentation_url":"https://docs.github.com/rest/git/refs#create-a-reference","status":"422"}
+```
+
+After each of them the read of the ref returned 404, and after each 201 it returned 200.
+
+**A linear history.** `main` has 14 merge commits behind its head. Under the rule, `p45b.sh` sent two creates: one at the head of `main`, which got the 422 again, and one at `569d9ee402c685bae891c1063756277bbc84d21a`, the first parent of the oldest merge commit, which has no merge commit behind it and got a 201. So the create was refused at a commit with merge commits behind it, twice, and accepted at a commit with none, once. The pushes went otherwise: a push that adds no merge commit was accepted three times onto a ref with those 14 behind it, and the one push that adds a merge commit was refused. One reading fits all of it: the rule holds a create to the whole history of its commit, and a push to the commits that it adds. That is a reading, and no create was sent at a third commit to test it.
+
+**Signed commits.** The create at the unsigned head of `main` was accepted, and so was the `PATCH` that moved `e` back to the parent of that head, which is unsigned too. Every push was refused, and each names the commits that it holds against the push: one for a push of one commit, and two for the merge commit, whose second parent the push brought with it. The first push was refused although its commit was in the repository already, at the head of `f`, where a push had put it before the rule existed. So of three updates that brought in no commit that the repository lacked, the two to a commit of `main` were accepted and the one to a commit that only a work branch held was refused. Nothing was sent to tell a commit of the default branch from another commit that a branch outside the rule holds.
+
+**What a refused push says.** git exits with 1, and the remote's lines name the ref and the rule. Under `update`:
+
+```text
+remote: error: GH013: Repository rule violations found for refs/heads/factory/issue-7520.
+remote: Review all repository rules at https://github.com/sapientpants/sf-scratch/rules?ref=refs%2Fheads%2Ffactory%2Fissue-7520
+remote:
+remote: - Cannot update this protected ref.
+remote:
+error: failed to push some refs to 'https://github.com/sapientpants/sf-scratch.git'
+To https://github.com/sapientpants/sf-scratch.git
+!	95f0801c0bebe4e6c1507f567f95ae7a47385121:refs/heads/factory/issue-7520	[remote rejected] (push declined due to repository rule violations)
+Done
+```
+
+That is git's whole output under `--porcelain`, less the spaces that end a `remote:` line. The line of the rule, in the place of the fourth:
+
+| Rule | The line |
+|---|---|
+| `update` | `Cannot update this protected ref.` |
+| `non_fast_forward` | `Cannot force-push to this branch` |
+| `required_linear_history` | `This branch must not contain merge commits.`, then `Found 1 violation:` and the commit |
+| `required_signatures` | `Commits must have verified signatures.`, then `Found 1 violation:` or `Found 2 violations:` and the commits |
+| `pull_request` | `Changes must be made through a pull request.` |
+| `required_status_checks` | `Required status check "probe/p-45" is expected.` |
+
+**What a refused update or delete says.** A 422 whose `message` begins `Repository rule violations found`, with the line of the rule after a blank line: `Cannot update this protected ref.`, `Cannot force-push to this branch`, `Changes must be made through a pull request.`, `Required status check "probe/p-45" is expected.`, and for the delete `Cannot delete this branch`.
+
+**Rules that GitHub did not create.** The operator's token got a 422 for each:
+
+| Asked for | `errors` of the 422 |
+|---|---|
+| `required_deployments`, naming an environment that the repository does not have | `Invalid rule 'required_deployments': Invalid parameter required_deployment_environments: Invalid deployment environments` |
+| `commit_message_pattern` | `Invalid rule 'commit_message_pattern': ` and nothing after the colon |
+| `branch_name_pattern` | `Invalid rule 'branch_name_pattern': ` and nothing after the colon |
+| A ruleset with `enforcement: evaluate` | `Enforcement evaluate option is not supported on this plan. Please upgrade to Enterprise to enable it.` |
+
+### What the App read of a ruleset
+
+`GET /repos/{o}/{r}/rules/branches/factory/issue-<n>` answered 200 in every variant that had a rule to read, and in the control, under `metadata=read` by its `X-Accepted-GitHub-Permissions` header. With an active ruleset it returned one entry for the rule, for the ref that existed and, sent with `per_page=100`, for the name that no ref had:
+
+```json
+[{"type":"creation","ruleset_source_type":"Repository","ruleset_source":"sapientpants/sf-scratch","ruleset_id":28195358}]
+```
+
+An entry has no `parameters` key where the rule has none, as above, and carries them where it has. For `pull_request` they held three keys that the request had not sent: `required_reviewers`, `require_extra_approval_for_unattributed_changes` and `allowed_merge_methods`. For `required_status_checks` they held `do_not_enforce_on_create`, as `false` where the request had left it out. The read of `main` returned an empty list in each of these variants.
+
+| How the ruleset is attached | The read of a name under `factory/` | The create by the App |
+|---|---|---|
+| `include: ["~ALL"]`, rule `creation` | The `creation` entry; the read of `main` lists it too | 422 |
+| `factory/**`, rule `creation`, with the repository-admin role as a bypass actor (`bypass_mode: always`) | The `creation` entry | 422 |
+| `factory/**`, rule `creation`, `enforcement: disabled` | An empty list | 201 |
+
+The App read each ruleset itself too (`GET /rulesets/{id}`): its name, its conditions, its rules and its `enforcement`, no `bypass_actors` key, and `current_user_can_bypass: "never"`, also on the ruleset that names the admin role and on the one for every branch. The App's list of rulesets held the disabled one, with `enforcement: disabled`.
+
+### A classic branch protection rule
+
+Three rules, one at a time, each with the pattern `factory/*`:
+
+| Classic rule | The create of a ref | The push of a candidate | The push of a merge commit | The push with a lease | `PATCH` with `force` | The delete |
+|---|---|---|---|---|---|---|
+| As created, with nothing chosen | 201 | Accepted | Accepted | Refused | 422 | 422 |
+| `requiresApprovingReviews`, one approval | 201 | Refused | Refused | Refused | 422 | 422 |
+| `lockBranch` | 201 | Refused | Refused | Refused | 422 | 422 |
+
+A rule as created has `allowsForcePushes` and `allowsDeletions` at false, by the operator's read of it. A refused push reads otherwise than under a ruleset:
+
+```text
+remote: error: GH006: Protected branch update failed for refs/heads/factory/issue-7710.
+remote:
+remote: - Changes must be made through a pull request.
+error: failed to push some refs to 'https://github.com/sapientpants/sf-scratch.git'
+To https://github.com/sapientpants/sf-scratch.git
+!	c6db219ea88aecd7ab783b06f3445a51e28f21f7:refs/heads/factory/issue-7710	[remote rejected] (protected branch hook declined)
+Done
+```
+
+The other lines were `Cannot force-push to this branch` and `Cannot change this locked branch`, two of them where two held. A refused `PATCH` or `DELETE` is a 422 whose `message` is those lines joined by a space, `Cannot delete this branch` for the delete, with no `Repository rule violations found` before them.
+
+A fourth rule, with `restrictsPushes` and `blocksCreations`, was not created: the mutation answered `Only organization repositories can have users and team restrictions`. So no classic rule that restricts creations was tried.
+
+**What the App read of a classic rule.**
+
+| Read, with the App's token | Answer |
+|---|---|
+| `GET /rules/branches/…`, for the ref that exists and for a name that no ref has | 200 and an empty list, under each of the three rules |
+| GraphQL `repository.branchProtectionRules` | `FORBIDDEN`, `Resource not accessible by integration`. The operator's token read the rule with every field |
+| GraphQL `ref.branchProtectionRule`, of the ref that exists | The same error, and null |
+| `GET /branches/{branch}/protection` | 403, `Resource not accessible by integration`; the endpoint accepts `administration=read` |
+| GraphQL `ref.refUpdateRule`, of the ref that exists | The rule: its pattern `factory/*`, `allowsDeletions` and `allowsForcePushes` false, `blocksCreations` false, `requiredApprovingReviewCount` 1 and `viewerCanPush` true, though each push of the App's under a rule of this kind had been refused in the first script. The operator's token read 0 for the count and the same for the rest |
+| The same for a name that no ref has | `ref` is null |
+| `GET /branches/{branch}`, of the branch that exists | `protected: true` and `protection.enabled: true` |
+| The same for a name that no branch has | 404, `Branch not found` |
+| `GET /branches?protected=true` | The branches that exist and match the pattern |
+
+Under a ruleset, with `update` and `non_fast_forward`, the same ref had a null `refUpdateRule`, and `GET /branches/{branch}` returned `protected: true` with `protection.enabled: false`.
+
+### A ruleset that excludes the work branches, and the operator's read
+
+`p45c.sh`, on 2026-11-27 from 05:33:50 to 05:34:32 UTC. Each ruleset holds `creation`, `non_fast_forward` and `deletion`.
+
+**The exclusion.** A ruleset with `include: ["~ALL"]`, `exclude: ["refs/heads/factory/**"]` and no bypass actor:
+
+| The App's request | Answer |
+|---|---|
+| The rules read of `factory/issue-7900` | 200 and an empty list |
+| The rules read of `probe/p-45-c-outside`, and of `main` | The three entries |
+| The create of `factory/issue-7900` at the head of `main` | 201 |
+| The create of `probe/p-45-c-outside` | 422, `Reference update failed` |
+| `PATCH` of `factory/issue-7900` with `force`, to the parent of `main`'s head | 200 |
+| The delete of `factory/issue-7900` | 204 |
+
+No push was sent under this ruleset.
+
+**The operator's read.** A ruleset for `factory/**` with no bypass actor, and then one with the repository-admin role as a bypass actor (`bypass_mode: always`). Under each, `GET /rules/branches/factory/issue-7910?per_page=100` was sent with the App's token and with the operator's. The two bodies were the same, compared as JSON with sorted keys, and held the three entries. Of the second ruleset the operator's token read `current_user_can_bypass: "always"`, with the bypass actor in `bypass_actors`; of the first, `never` and an empty list.
+
+### Findings
+
+**No rule that was tried leaves the factory's writes alone.** Each of the eight stops one of the five. The two that look harmless stop a write of M1: `non_fast_forward` the force-update of a ref that a cancelled run left, which the claim of 8.2 makes, and `deletion` the delete of a merged run's branch. So a rule about which types count would have to hold every type that was tried, and GH-22 counts every entry of the read.
+
+**The 422 of the create now has five causes that share one message.** `Reference update failed` is what the App gets for a branch named `factory` in the way, for an object that is no commit, and under three rules. The rule of 8.2 step 3 holds as written, since it reads the ref and goes by the read. What the message cannot do is tell the operator why, and the rules read can.
+
+**The push of publish is refused with the rule named.** Under `update`, `pull_request`, `required_signatures` and `required_status_checks` the first push of a run fails, after the claim went through and a session ran. git's output names the ref and the rule, so a run that meets a ruleset added after its claim can report the cause.
+
+**The rules read is enough for a ruleset.** It needs the permission that every App has, it answers for a name before the branch exists, it resolves the condition of the ruleset itself, so the factory matches no pattern, and it leaves out a ruleset that is not in force. It lists a rule that another actor may bypass, which is right for the factory: its App is on no bypass list (GH-11).
+
+**A rule that requires a linear history reached back into the default branch at the create.** It refused a new ref at the head of `main`, with merge commits behind it, and accepted one at a commit with none. The factory merges by squash (5.6). If the reading above holds, a human who once merged with a merge commit has made every later `base_sha` unfit for such a rule; that is an inference from three creates.
+
+**A classic rule cannot be seen before the branch exists.** The reads that list classic rules need the Administration permission, which the App must not hold (GH-11). What the App may read, `refUpdateRule` and `protected`, is of a branch that exists. For a claim that is after step 3 of 8.2, when the ref is made and the run row written.
+
+**A classic rule did not stop a claim.** None of the three refused the create. One with nothing chosen lets a whole run of M1a through and stops the force-update and the delete. One with required reviews or a lock stops the first push. Each refusal names its cause.
+
+**The remedy works, and the read can be made by hand.** A ruleset that excludes `refs/heads/factory/**` is out of the read for a work branch and out of the way of the three writes that were sent. The operator's token got the list that the App's got, so the read of onboarding needs no App where the steps are done by hand (20.1), and a bypass of the operator's takes nothing from the list.
+
+**`current_user_can_bypass` was `never` on two more rulesets,** one that names a bypass actor other than the App and one that contributes to the rules of `main`. That is the field of probe P-14, which stays open: no ruleset named the App itself, so the App's token saw no other value. The operator's token read `always` where its role may bypass.
+
+### Against the documentation
+
+Read on 2026-11-26 through a fetch tool, which returned the pages as text; the quotations are as it gave them.
+
+- The REST reference, "Get rules for a branch": "Returns all active rules that apply to the specified branch." "The branch does not need to exist; rules that would apply to a branch with that name will be returned." "Rules in rulesets with "evaluate" or "disabled" enforcement statuses are not returned." All three agree with what was seen, the second and the disabled half of the third by observation. The page also says that all active rules are returned "regardless of the level at which they are configured", and gives a repository and an organisation as the levels, which was not observed: the scratch repository belongs to a personal account. It gives the call `per_page` and `page`, with 30 entries as the default and 100 as the most. No response here held more than three entries, and none reached a second page. Which permission the call needs was not on the part of the page that was read; the response header named `metadata=read`.
+- The same reference, on creating a ruleset: "evaluate is only available with GitHub Enterprise", which is what the 422 said.
+- "About rulesets": "Rulesets and branch protection rules can both protect branches in a repository." and "Anyone with read access to a repository can view its active rulesets." The second agrees with what was seen: the App read every ruleset. The first was not put to a test, since no variant held a classic rule and a ruleset together.
+- The reference lists 25 rule types. Eight were tried, three more were refused at creation, and `merge_queue`, `code_scanning`, `code_quality`, `code_coverage`, `copilot_code_review`, `license_compliance_scanning`, `workflows`, `tag_name_pattern`, the two patterns for an email address and the four rules of a push ruleset were not asked for.
+
+### What changed in the spec
+
+1. The new item GH-22, in 5.6: a repository is fit for the factory only where GitHub lists no rule for the name of a work branch, with the table of what each rule stopped, the read, when it is made, what a claim does and what holds for a classic rule.
+2. 8.2: no issue is claimed where the read lists a rule for its work branch, step 1 begins with the read, and step 3 names the two further rules behind `Reference update failed` and cites GH-22 for the second read that follows a create refused while the ref is absent. The Deterministic row of 8.6 names a push that GitHub rejects, and so does the row of ORCH-11 that restates it.
+3. 20.1 step 2: a rule on the name of a work branch is a blocking item of the readiness report, and that classic rules are not read is an advisory one. Done by hand, the read is made with the operator's own token. 20.3 says that its ruleset reaches no work branch.
+4. 19.4 has the cases, the M1a row of 22 names the read, 23.3 names what is left to a refused write, and `GLOSSARY.md` gains "work branch".
+5. The row of D-51 in 23.1, the row of this probe in 23.2, and the rows of P-1 and P-14.
+
+### Still open
+
+- **A ruleset of an organisation.** The documentation has the rules read return its rules. The scratch repository's account cannot have one.
+- **The rule types that were not tried,** and the three that GitHub refused to create. GH-22 counts every entry of the read, so none has to be known, but what each stops was not seen.
+- **A create of a ref that exists, under a rule other than `creation`.** Each create here was of a new name. P-1 saw `Reference update failed` for an existing ref under `creation`.
+- **A classic rule that restricts creations,** which GitHub offers to the repositories of an organisation.
+- **A classic rule and a ruleset on one branch,** and two rulesets with the same rule.
+- **A page of the rules read beyond the first.** No response held more than three entries.
+- **A push under a ruleset that excludes the work branches.** The third script sent a create, a force-update through the REST API and a delete.
+- **The 403 of a repository without rulesets,** which 4.1 names for this read. The scratch repository is public.
+- **Required checks that something reports.** The context of the rule was one that nothing reports, so a push under the rule that could pass was not seen.

@@ -7,5 +7,9 @@ rust-version.workspace = true
 publish.workspace = true
 license.workspace = true
 
+[dependencies]
+factory-core = { path = "../factory-core" }
+thiserror.workspace = true
+
 [lints]
 workspace = true

@@ -46,7 +46,7 @@ Read in `SPEC.md`:
 - A term is defined once, in `GLOSSARY.md` (D-21). The rules of this section apply to that file too.
 - A decision is recorded in 23.1, the repository's only decision record; it keeps no `docs/adr/` through M1 (D-21). A platform fact the design depends on but nobody verified is a probe in 23.2; its answer goes in `docs/research/probes.md` and the spec changes in the same commit.
 - `*(tunable)*` marks a number with no empirical basis. Keep the mark until the number is measured.
-- After an edit, every id and section number cited in `SPEC.md`, `GLOSSARY.md` and this file resolves, and the status row matches the draft's real review state.
+- After an edit, every id and section number cited in `SPEC.md`, `GLOSSARY.md` and this file resolves, and the status row matches the draft's real review state. `cargo xtask check` checks the citations in the forms that DEV-2c names.
 
 ## Planning map
 

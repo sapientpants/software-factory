@@ -23,9 +23,9 @@ pub fn main() -> ExitCode {
 /// Every local link of a Markdown file below `root` whose path does not exist,
 /// each as `file:line: destination` and a reason.
 pub fn broken(root: &Path) -> Vec<String> {
-    let mut files = Vec::new();
-    markdown_files(root, root, &mut files);
-    files.sort();
+    let files = crate::tree::files(root)
+        .into_iter()
+        .filter(|file| file.extension().is_some_and(|extension| extension == "md"));
     let mut broken = Vec::new();
     for file in files {
         let Ok(text) = std::fs::read_to_string(root.join(&file)) else {
@@ -122,33 +122,6 @@ fn resolve(directory: &Path, destination: &str) -> Option<PathBuf> {
     Some(target.iter().collect())
 }
 
-/// The Markdown files below `directory`, as paths relative to `root`. The walk
-/// follows no symbolic link and leaves out `.git` and `target` at the root, as
-/// the walk of the structural test does (DEV-2b).
-fn markdown_files(root: &Path, directory: &Path, files: &mut Vec<PathBuf>) {
-    let Ok(entries) = std::fs::read_dir(directory) else {
-        return;
-    };
-    for entry in entries.flatten() {
-        let path = entry.path();
-        let Ok(kind) = entry.file_type() else {
-            continue;
-        };
-        if kind.is_dir() {
-            let name = entry.file_name();
-            let outside = directory == root && (name == ".git" || name == "target");
-            if !outside {
-                markdown_files(root, &path, files);
-            }
-        } else if kind.is_file()
-            && path.extension().is_some_and(|extension| extension == "md")
-            && let Ok(relative) = path.strip_prefix(root)
-        {
-            files.push(relative.to_path_buf());
-        }
-    }
-}
-
 /// The destination of each link and image of `text`, with the byte offset at
 /// which its element starts.
 fn destinations(text: &str) -> Vec<(usize, String)> {
@@ -165,40 +138,12 @@ fn destinations(text: &str) -> Vec<(usize, String)> {
 
 #[cfg(test)]
 mod tests {
-    use std::path::PathBuf;
-
     use super::*;
-
-    /// A fresh tree for one test, removed when the value is dropped.
-    struct Tree(PathBuf);
-
-    impl Tree {
-        fn new(test: &str) -> Self {
-            let path =
-                std::env::temp_dir().join(format!("xtask-links-{}-{test}", std::process::id()));
-            let _ = std::fs::remove_dir_all(&path);
-            std::fs::create_dir_all(&path).expect("create the tree");
-            Self(path)
-        }
-
-        /// Writes `text` to `file`, a path relative to the tree.
-        fn with(self, file: &str, text: &str) -> Self {
-            let path = self.0.join(file);
-            std::fs::create_dir_all(path.parent().expect("a parent")).expect("create a directory");
-            std::fs::write(path, text).expect("write a file");
-            self
-        }
-    }
-
-    impl Drop for Tree {
-        fn drop(&mut self) {
-            let _ = std::fs::remove_dir_all(&self.0);
-        }
-    }
+    use crate::tree::Tree;
 
     #[test]
     fn a_link_to_a_missing_file_is_broken_and_one_to_a_file_that_exists_is_not() {
-        let tree = Tree::new("missing").with("SPEC.md", "# Spec\n").with(
+        let tree = Tree::new("links-missing").with("SPEC.md", "# Spec\n").with(
             "README.md",
             "See [the spec](SPEC.md).\n\nAnd [gone](GONE.md).\n",
         );
@@ -211,7 +156,7 @@ mod tests {
 
     #[test]
     fn a_link_is_read_from_the_directory_of_its_file_and_a_leading_slash_from_the_root() {
-        let tree = Tree::new("relative")
+        let tree = Tree::new("links-relative")
             .with("GLOSSARY.md", "# Terms\n")
             .with("docs/research/01-a.md", "# A\n")
             .with(
@@ -232,7 +177,7 @@ mod tests {
 
     #[test]
     fn a_link_with_a_scheme_and_one_to_a_heading_of_its_own_file_are_no_local_links() {
-        let tree = Tree::new("remote").with(
+        let tree = Tree::new("links-remote").with(
             "README.md",
             "[web](https://example.com/GONE.md) [mail](mailto:someone@example.com) \
              [net](//example.com/GONE.md) [here](#a-heading) <https://example.com/x.md>\n",
@@ -245,7 +190,7 @@ mod tests {
 
     #[test]
     fn the_path_of_a_link_is_read_without_its_fragment_and_query_and_percent_decoded() {
-        let tree = Tree::new("forms")
+        let tree = Tree::new("links-forms")
             .with("docs/my file.md", "# Mine\n")
             .with("docs/img.png", "")
             .with(
@@ -268,7 +213,7 @@ mod tests {
 
     #[test]
     fn the_files_of_git_and_of_the_build_output_at_the_root_are_not_read() {
-        let tree = Tree::new("walk")
+        let tree = Tree::new("links-walk")
             .with(".git/notes.md", "[gone](GONE.md)\n")
             .with("target/doc/notes.md", "[gone](GONE.md)\n")
             .with(".github/notes.md", "[gone](GONE.md)\n")
@@ -286,7 +231,7 @@ mod tests {
 
     #[test]
     fn a_link_that_leaves_the_repository_is_broken() {
-        let tree = Tree::new("leaves").with("docs/a.md", "[out](../../outside.md)\n");
+        let tree = Tree::new("links-leaves").with("docs/a.md", "[out](../../outside.md)\n");
 
         let broken = broken(&tree.0);
 
@@ -298,7 +243,7 @@ mod tests {
 
     #[test]
     fn a_link_in_code_or_in_a_comment_is_no_link() {
-        let tree = Tree::new("code").with(
+        let tree = Tree::new("links-code").with(
             "README.md",
             "A span `[s](GONE.md)`.\n\
              \n\

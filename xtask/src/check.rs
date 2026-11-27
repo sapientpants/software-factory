@@ -17,6 +17,8 @@ fn steps() -> Vec<Step> {
         Step::new("typos", &[]),
         // The check of local Markdown links (DEV-2, 19.2).
         Step::new("cargo", &["xtask", "links"]),
+        // The cross-reference check of ids and section numbers (DEV-2c).
+        Step::new("cargo", &["xtask", "references"]),
         // DEV-2a. The advisories read the database that `cargo xtask fetch`
         // fetched, and fail where it is missing or too old.
         Step::new("cargo", &["deny", "--locked", "--offline", "check"]).on_failure(
@@ -346,6 +348,18 @@ mod tests {
                 .iter()
                 .any(|step| step == "typos" || step == "cargo xtask links")
         );
+    }
+
+    #[test]
+    fn the_set_checks_the_cross_references_in_the_vm_alone() {
+        let steps: Vec<String> = steps().iter().map(ToString::to_string).collect();
+        let on_the_mac: Vec<String> = macos_steps().iter().map(ToString::to_string).collect();
+
+        assert!(
+            steps.contains(&"cargo xtask references".to_owned()),
+            "{steps:?}"
+        );
+        assert!(!on_the_mac.contains(&"cargo xtask references".to_owned()));
     }
 
     #[test]

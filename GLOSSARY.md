@@ -61,6 +61,9 @@ The cases that `sf contract` runs against the installed agent CLI, inside the sa
 **Workspace**:
 The directory tree in which the implementer works. It lives for one attempt, or until a base update rebuilds it (12.4).
 
+**Work branch**:
+The branch `factory/issue-<n>`, one for each issue, which the factory creates at the claim and alone writes to (5.6). GH-22 says which rules of GitHub its name has to be free of.
+
 **Candidate**:
 A commit the host builds from the workspace (9.4). Gates run on candidates; only candidates are pushed.
 

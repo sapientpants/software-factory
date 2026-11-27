@@ -12,8 +12,10 @@
 //! `verify`, `publish`, `ci`, `review`, `ready`, `human_review`, `merge` and
 //! `done` of 7.3, with the round caps of 7.3, the approval of PR-2 and the
 //! cancel and merge rows of 7.7. [`Stage`] names every stage of 7.3 and 7.4,
-//! and the engine enters only those it drives. Every write of a stage is
-//! awaited before the run leaves the stage (ORCH-7), and a result is applied
+//! and the engine enters only those it drives. The writes of `claim`,
+//! `publish`, `ready` and `merge` are awaited before the run leaves the stage
+//! (ORCH-7). Those of `done`, of a cancel, of an escalation and the label of a
+//! human round are not yet: their results are dropped. A result is applied
 //! once (ORCH-3): a result whose effect id the run no longer awaits, or an end
 //! of an activity that is not the run's live one, leaves the state as it is.
 
@@ -73,7 +75,7 @@ pub struct EffectId {
 pub struct ActivityId {
     /// The run of the stage execution.
     pub run: RunId,
-    /// The run's sequence number of the request.
+    /// The run's sequence number of the start.
     pub seq: u64,
 }
 

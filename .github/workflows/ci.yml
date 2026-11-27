@@ -54,6 +54,11 @@ jobs:
           MISE_VERSION=v2026.11.14 MISE_QUIET=1 sh "$RUNNER_TEMP/mise-install.sh"
       - name: Install the toolchain and the check tools
         run: ~/.local/bin/mise install --yes
+      # On the runner mise installs the toolchain without rustfmt. rustup,
+      # run without mise, installs the toolchain that rust-toolchain.toml
+      # names with the components that the file lists.
+      - name: Install the toolchain's components
+        run: rustup toolchain install
 
       # Everything the check reads from the network, while the job still has
       # it (DEV-14). A fetch that fails fails the job.

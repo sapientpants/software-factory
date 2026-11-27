@@ -177,7 +177,9 @@ impl Upstream {
     }
 
     /// Commits `files` (path, bytes) on `branch` of the seed and pushes the
-    /// branch to the upstream, and returns the commit. A branch that the seed
+    /// branch to the upstream, and returns the commit. A file whose name ends
+    /// in `.sh` is executable, and an ignore rule
+    /// keeps no file out. A branch that the seed
     /// does not hold starts from `main`.
     pub async fn commit(&self, branch: &str, files: &[(&str, &[u8])]) -> String {
         let heads = self.seed.join(".git/refs/heads");
@@ -208,12 +210,18 @@ impl Upstream {
                 fs::create_dir_all(parent).unwrap_or_else(|error| panic!("{error}"));
             }
             fs::write(&file, bytes).unwrap_or_else(|error| panic!("{error}"));
+            if path.ends_with(".sh") {
+                use std::os::unix::fs::PermissionsExt as _;
+                fs::set_permissions(&file, fs::Permissions::from_mode(0o755))
+                    .unwrap_or_else(|error| panic!("{error}"));
+            }
         }
         self.seed(&[
             "-c".as_ref(),
             "core.autocrlf=false".as_ref(),
             "add".as_ref(),
             "-A".as_ref(),
+            "--force".as_ref(),
         ])
         .await;
         self.seed(&[

@@ -3,6 +3,7 @@
 mod check;
 mod hook_skip;
 mod pre_tool_use;
+mod vm;
 
 use std::process::ExitCode;
 

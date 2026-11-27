@@ -33,7 +33,13 @@ fn steps() -> Vec<Step> {
             ],
         )
         .also_outside_the_vm(),
-        Step::new("cargo", &["test", "--workspace", "--locked"]).also_outside_the_vm(),
+        // The tests and the doc tests, each word for word a verify command of
+        // 11.2 (BOOT-6). nextest runs no doc test.
+        Step::new("cargo", &["nextest", "run", "--workspace", "--locked"]).also_outside_the_vm(),
+        Step::new("cargo", &["test", "--doc", "--workspace", "--locked"]).also_outside_the_vm(),
+        // Warnings denied, the lint of broken intra-doc links among them (DEV-2).
+        Step::new("cargo", &["doc", "--workspace", "--no-deps", "--locked"])
+            .with_variable("RUSTDOCFLAGS", "-D warnings"),
     ]
 }
 
@@ -54,9 +60,9 @@ pub fn main() -> ExitCode {
         return ExitCode::FAILURE;
     }
     let outcome = if cfg!(target_os = "macos") {
-        in_the_vm(&root).and_then(|()| run(&macos_steps()))
+        in_the_vm(&root).and_then(|()| at_the_pins(&macos_steps()))
     } else {
-        run(&steps())
+        at_the_pins(&steps())
     };
     match outcome {
         Ok(()) => {
@@ -70,6 +76,15 @@ pub fn main() -> ExitCode {
     }
 }
 
+/// Runs the steps once each check tool among them reports the version that
+/// `mise.toml` pins (DEV-2).
+fn at_the_pins(steps: &[Step]) -> Result<(), String> {
+    let text = std::fs::read_to_string("mise.toml")
+        .map_err(|error| format!("cannot read mise.toml: {error}"))?;
+    check_versions(steps, &pins(&text))?;
+    run(steps)
+}
+
 /// On macOS, the whole set in the development VM (DEV-3): the VM is created
 /// and started where it has to be, and shown the work tree at `root`.
 fn in_the_vm(root: &Path) -> Result<(), String> {
@@ -81,11 +96,65 @@ fn in_the_vm(root: &Path) -> Result<(), String> {
     vm.check(&root)
 }
 
+/// The tools that `mise.toml` pins, each with its version: the lines
+/// `name = "version"` of its table `[tools]`, a quoted name unquoted.
+fn pins(text: &str) -> Vec<(String, String)> {
+    let mut in_tools = false;
+    let mut pins = Vec::new();
+    for line in text.lines().map(str::trim) {
+        if line.starts_with('[') {
+            in_tools = line == "[tools]";
+        } else if let (true, false, Some((name, version))) =
+            (in_tools, line.starts_with('#'), line.split_once('='))
+        {
+            let unquote = |word: &str| word.trim().trim_matches('"').to_owned();
+            pins.push((unquote(name), unquote(version)));
+        }
+    }
+    pins
+}
+
+/// Fails by name where a step runs a cargo subcommand that `pins` holds, as
+/// `cargo-<subcommand>`, and that subcommand reports another version (DEV-2).
+/// A pin decides nothing by itself: cargo looks for a subcommand in
+/// `$CARGO_HOME/bin` before `PATH`, `mise exec` or not.
+pub fn check_versions(steps: &[Step], pins: &[(String, String)]) -> Result<(), String> {
+    for step in steps {
+        let Some(subcommand) = step.arguments.first() else {
+            continue;
+        };
+        let tool = format!("cargo-{subcommand}");
+        let Some((_, pinned)) = pins
+            .iter()
+            .find(|(name, _)| *name == tool || name.ends_with(&format!("/{tool}")))
+        else {
+            continue;
+        };
+        let query = format!("{} {subcommand} --version", step.program);
+        let output = Command::new(&step.program)
+            .args([subcommand, "--version"])
+            .output()
+            .map_err(|error| format!("`{query}` could not be started: {error}"))?;
+        let reported = String::from_utf8_lossy(&output.stdout);
+        let first = reported.lines().next().unwrap_or_default().trim();
+        if !output.status.success() || !first.split_whitespace().any(|word| word == pinned) {
+            return Err(format!(
+                "`{query}` reports `{first}`, and mise.toml pins {tool} {pinned}; \
+                 run `mise install`, and remove any other {tool} that cargo finds first, \
+                 in `$CARGO_HOME/bin` (DEV-2)"
+            ));
+        }
+    }
+    Ok(())
+}
+
 /// One check: a program and its arguments, run from the repository's root.
 #[derive(Debug)]
 pub struct Step {
     program: String,
     arguments: Vec<String>,
+    /// Variables set for the program, beside those that it inherits.
+    variables: Vec<(String, String)>,
     /// Whether macOS runs the step outside the VM too, for its own build.
     outside_the_vm: bool,
     /// What the failure of the step adds to its message.
@@ -100,9 +169,16 @@ impl Step {
                 .iter()
                 .map(|&argument| argument.to_owned())
                 .collect(),
+            variables: Vec::new(),
             outside_the_vm: false,
             on_failure: None,
         }
+    }
+
+    /// Sets the variable `name` to `value` for the program.
+    fn with_variable(mut self, name: &str, value: &str) -> Self {
+        self.variables.push((name.to_owned(), value.to_owned()));
+        self
     }
 
     /// Gives the failure of the step a sentence of its own, after the exit
@@ -120,7 +196,12 @@ impl Step {
 }
 
 impl fmt::Display for Step {
+    /// The step for its messages: its variables first, each value in single
+    /// quotes, then the program and its arguments.
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        for (name, value) in &self.variables {
+            write!(formatter, "{name}='{value}' ")?;
+        }
         write!(formatter, "{}", self.program)?;
         for argument in &self.arguments {
             write!(formatter, " {argument}")?;
@@ -136,6 +217,7 @@ pub fn run(steps: &[Step]) -> Result<(), String> {
         eprintln!("xtask check: {step}");
         let status = Command::new(&step.program)
             .args(&step.arguments)
+            .envs(step.variables.iter().map(|(name, value)| (name, value)))
             .status()
             .map_err(|error| format!("`{step}` could not be started: {error}"))?;
         if !status.success() {
@@ -215,7 +297,8 @@ mod tests {
             steps,
             [
                 "cargo clippy --workspace --all-targets --locked -- -D warnings",
-                "cargo test --workspace --locked",
+                "cargo nextest run --workspace --locked",
+                "cargo test --doc --workspace --locked",
             ]
         );
     }
@@ -226,6 +309,23 @@ mod tests {
 
         assert!(steps.contains(&"cargo deny --locked --offline check".to_owned()));
         assert!(steps.contains(&"cargo shear --locked --offline".to_owned()));
+    }
+
+    #[test]
+    fn the_set_runs_the_tests_with_nextest_the_doc_tests_and_rustdoc() {
+        let steps: Vec<String> = steps().iter().map(ToString::to_string).collect();
+
+        // Word for word the nextest and doc-test verify commands of 11.2
+        // (BOOT-6).
+        assert!(steps.contains(&"cargo nextest run --workspace --locked".to_owned()));
+        assert!(steps.contains(&"cargo test --doc --workspace --locked".to_owned()));
+        assert!(steps.contains(
+            &"RUSTDOCFLAGS='-D warnings' cargo doc --workspace --no-deps --locked".to_owned()
+        ));
+        assert!(
+            !steps.contains(&"cargo test --workspace --locked".to_owned()),
+            "`cargo test` no longer stands in for the test runs (DEV-1)"
+        );
     }
 
     #[test]
@@ -244,6 +344,95 @@ mod tests {
 
         assert!(failure.contains("exit code 1"), "{failure}");
         assert!(failure.contains("`cargo xtask fetch`"), "{failure}");
+    }
+
+    #[test]
+    fn a_step_runs_its_program_with_its_variables() {
+        let scratch = Scratch::new("variables");
+        let trace = scratch.0.join("trace");
+        let step = Step::new(
+            "sh",
+            &[
+                "-c",
+                r#"printf %s "$XTASK_CHECK_VALUE" > "$0""#,
+                &trace.to_string_lossy(),
+            ],
+        )
+        .with_variable("XTASK_CHECK_VALUE", "-D warnings");
+
+        let outcome = run(&[step]);
+
+        assert!(outcome.is_ok(), "{outcome:?}");
+        let value = std::fs::read_to_string(&trace).expect("the step left its trace");
+        assert_eq!(value, "-D warnings");
+    }
+
+    #[test]
+    fn the_pins_are_the_tools_of_mise_toml_each_at_its_version() {
+        let text = "[tools]\nrust = \"1.100.0\"\n# A comment.\ncargo-nextest = \"0.9.152\"\n\
+                    \"github:Boshen/cargo-shear\" = \"1.14.1\"\n\n[env]\nFOO = \"bar\"\n";
+
+        assert_eq!(
+            pins(text),
+            [
+                ("rust".to_owned(), "1.100.0".to_owned()),
+                ("cargo-nextest".to_owned(), "0.9.152".to_owned()),
+                ("github:Boshen/cargo-shear".to_owned(), "1.14.1".to_owned()),
+            ]
+        );
+    }
+
+    /// A stand-in `cargo` in `scratch` that prints `version` for any
+    /// subcommand's `--version`, and records each run in `runs`.
+    fn cargo_that_reports(scratch: &Scratch, version: &str) -> String {
+        use std::os::unix::fs::PermissionsExt;
+
+        let cargo = scratch.0.join("cargo");
+        std::fs::write(
+            &cargo,
+            format!(
+                "#!/bin/sh\necho \"$*\" >> '{runs}'\necho \"cargo-$1 {version} (abc 2026-11-13)\"\necho 'release: x'\n",
+                runs = scratch.0.join("runs").display(),
+            ),
+        )
+        .expect("write the stand-in cargo");
+        std::fs::set_permissions(&cargo, std::fs::Permissions::from_mode(0o755))
+            .expect("make the stand-in cargo executable");
+        cargo.to_string_lossy().into_owned()
+    }
+
+    #[test]
+    fn a_check_tool_at_another_version_than_its_pin_fails_the_check_by_name() {
+        let scratch = Scratch::new("version-other");
+        let cargo = cargo_that_reports(&scratch, "0.9.150");
+        let pins = [("cargo-nextest".to_owned(), "0.9.152".to_owned())];
+
+        let outcome = check_versions(&[Step::new(&cargo, &["nextest", "run"])], &pins);
+
+        let failure = outcome.expect_err("the check fails");
+        assert!(failure.contains("nextest"), "{failure}");
+        assert!(failure.contains("0.9.150"), "{failure}");
+        assert!(failure.contains("0.9.152"), "{failure}");
+    }
+
+    #[test]
+    fn check_tools_at_their_pins_pass_and_unpinned_subcommands_are_not_asked() {
+        let scratch = Scratch::new("version-pinned");
+        let cargo = cargo_that_reports(&scratch, "1.14.1");
+        let pins = [
+            ("rust".to_owned(), "1.100.0".to_owned()),
+            ("github:Boshen/cargo-shear".to_owned(), "1.14.1".to_owned()),
+        ];
+        let steps = [
+            Step::new(&cargo, &["fmt", "--all", "--check"]),
+            Step::new(&cargo, &["shear", "--locked", "--offline"]),
+        ];
+
+        let outcome = check_versions(&steps, &pins);
+
+        assert!(outcome.is_ok(), "{outcome:?}");
+        let runs = std::fs::read_to_string(scratch.0.join("runs")).expect("cargo ran");
+        assert_eq!(runs, "shear --version\n");
     }
 
     #[test]

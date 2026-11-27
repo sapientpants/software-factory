@@ -26,6 +26,15 @@ toml = { version = "1", default-features = false, features = ["parse", "serde", 
 schemars = "1"
 # The errors row (SPEC 19.2).
 thiserror = "2"
+# The rows of the async runtime and of processes (SPEC 19.2), the two pre-1.0
+# crates pinned exactly. `process-wrap` brings `nix` in already; it signals
+# the groups of the stop sequence and the shim's pipes.
+tokio = "1"
+tokio-util = "=0.7.20"
+process-wrap = { version = "10", default-features = false, features = ["tokio1", "process-group", "kill-on-drop"] }
+nix = { version = "=0.31.4", default-features = false, features = ["fs", "process", "signal"] }
+# The CLI row (SPEC 19.2).
+clap = { version = "4", features = ["derive"] }
 # The testing row gives no version (SPEC 19.2). Without the default features,
 # which fork and time out tests and read regular expressions.
 proptest = { version = "1", default-features = false, features = ["std"] }

@@ -7,6 +7,14 @@ rust-version.workspace = true
 publish.workspace = true
 license.workspace = true
 
+[dependencies]
+clap.workspace = true
+factory-daemon = { path = "../factory-daemon" }
+
+[dev-dependencies]
+nix.workspace = true
+tokio = { workspace = true, features = ["macros", "rt-multi-thread", "time"] }
+
 [lints]
 workspace = true
 

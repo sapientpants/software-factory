@@ -7,5 +7,20 @@ rust-version.workspace = true
 publish.workspace = true
 license.workspace = true
 
+[dependencies]
+nix.workspace = true
+process-wrap.workspace = true
+thiserror.workspace = true
+tokio = { workspace = true, features = ["io-util", "macros", "process", "net", "rt", "time"] }
+tokio-util = { workspace = true, features = ["codec"] }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["fs", "rt-multi-thread"] }
+
 [lints]
 workspace = true
+
+# A harness of its own: the binary is also the shim that its tests start.
+[[test]]
+name = "supervise"
+harness = false

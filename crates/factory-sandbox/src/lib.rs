@@ -17,6 +17,7 @@ use factory_core::engine::RunId;
 
 #[cfg(target_os = "linux")]
 pub mod bubblewrap;
+pub mod seccomp;
 
 /// A future that a trait method of this crate returns: the traits are used
 /// as objects, which a method declared `async` cannot be.
@@ -301,6 +302,9 @@ pub enum Error {
         /// Why it failed.
         source: std::io::Error,
     },
+    /// The seccomp filter of SEC-6e could not be compiled.
+    #[error("cannot compile the seccomp filter: {0}")]
+    Filter(String),
     /// A process of the instance outlived the kill.
     #[error("processes of the sandbox outlived the kill: {0:?}")]
     Survivors(Vec<i32>),

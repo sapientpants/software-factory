@@ -358,3 +358,108 @@ fn a_file_that_a_tool_reads_beside_its_own_is_known_by_its_path() {
         assert_eq!(tool_that_reads(Path::new(path)), None, "{path}");
     }
 }
+
+/// The files of the `rust` implementation of `Ecosystem`, the one place in
+/// the `factory-*` crates that may name a Cargo file or a cargo command
+/// (SPEC 9.5).
+const RUST_ECOSYSTEM: &[&str] = &[
+    "crates/factory-core/src/ecosystem/rust.rs",
+    "crates/factory-core/tests/ecosystem_rust.rs",
+];
+
+/// The names that are specific to Cargo and rustup, as SPEC 9.5 lists them.
+/// Each is found without regard to letter case, where no letter, digit or
+/// underscore stands on either side of it. The word `cargo` covers
+/// `Cargo.toml`, `Cargo.lock`, `.cargo/`, a cargo command such as
+/// `cargo build` and a subcommand's program such as `cargo-deny`; an
+/// environment variable such as `CARGO_MANIFEST_DIR` has an underscore beside
+/// it and is not found.
+const CARGO_NAMES: &[&str] = &["cargo", "rust-toolchain", "build.rs"];
+
+/// The first name of [`CARGO_NAMES`] that `text` holds, if any.
+fn cargo_name_in(text: &str) -> Option<&'static str> {
+    let text = text.to_ascii_lowercase();
+    let word =
+        |byte: Option<&u8>| byte.is_some_and(|byte| byte.is_ascii_alphanumeric() || *byte == b'_');
+    CARGO_NAMES.iter().copied().find(|name| {
+        text.match_indices(name).any(|(start, _)| {
+            let bytes = text.as_bytes();
+            let before = start.checked_sub(1).and_then(|index| bytes.get(index));
+            !word(before) && !word(bytes.get(start + name.len()))
+        })
+    })
+}
+
+#[test]
+fn only_the_rust_ecosystem_names_a_cargo_file_or_a_cargo_command() {
+    let found: Vec<String> = tree()
+        .iter()
+        .filter(|path| {
+            path.starts_with("crates")
+                && path.extension().is_some_and(|extension| extension == "rs")
+        })
+        .filter(|path| {
+            !RUST_ECOSYSTEM
+                .iter()
+                .any(|allowed| path.as_path() == Path::new(allowed))
+        })
+        .filter_map(|path| {
+            let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("..");
+            let text = std::fs::read_to_string(root.join(path)).expect("read a source file");
+            text.lines().enumerate().find_map(|(number, line)| {
+                cargo_name_in(line)
+                    .map(|name| format!("{}:{} ({name})", path.display(), number + 1))
+            })
+        })
+        .collect();
+    assert!(
+        found.is_empty(),
+        "files outside the rust implementation of Ecosystem that name a Cargo file or a cargo command (SPEC 9.5): {found:?}"
+    );
+}
+
+#[test]
+fn the_rust_ecosystem_lies_where_the_search_leaves_it_out() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("..");
+    for file in RUST_ECOSYSTEM {
+        assert!(root.join(file).is_file(), "{file} is no file");
+    }
+}
+
+#[test]
+fn a_cargo_name_is_found_as_a_word_in_any_letter_case() {
+    for (text, name) in [
+        ("Cargo.toml", "cargo"),
+        ("read Cargo.lock", "cargo"),
+        ("`.cargo/config.toml`", "cargo"),
+        ("Command::new(\"cargo\")", "cargo"),
+        ("cargo build --locked", "cargo"),
+        ("bin/cargo", "cargo"),
+        ("cargo-nextest", "cargo"),
+        ("CARGO", "cargo"),
+        ("cargo", "cargo"),
+        ("rust-toolchain.toml", "rust-toolchain"),
+        ("a `rust-toolchain`", "rust-toolchain"),
+        ("Rust-Toolchain.TOML", "rust-toolchain"),
+        ("build.rs", "build.rs"),
+        ("src/build.rs.", "build.rs"),
+    ] {
+        assert_eq!(cargo_name_in(text), Some(name), "{text}");
+    }
+    for text in [
+        "env!(\"CARGO_MANIFEST_DIR\")",
+        "CARGO_HOME",
+        "_cargo",
+        "cargos",
+        "cargo1",
+        "a cargo_ship",
+        "rebuild.rs",
+        "build.rsx",
+        "rust-toolchains",
+        "my_rust-toolchain",
+        "the toolchain file",
+        "",
+    ] {
+        assert_eq!(cargo_name_in(text), None, "{text}");
+    }
+}

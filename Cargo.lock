@@ -94,6 +94,10 @@ dependencies = [
 [[package]]
 name = "factory-daemon"
 version = "0.1.0"
+dependencies = [
+ "factory-core",
+ "thiserror",
+]
 
 [[package]]
 name = "factory-git"

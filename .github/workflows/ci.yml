@@ -1,0 +1,99 @@
+# The CI workflow of the factory repository (SPEC DEV-5, DEV-6). One job per
+# architecture runs `cargo xtask check` (DEV-1) in a network namespace that
+# holds only a loopback interface. The ruleset for `main` requires both jobs by
+# name (DEV-8), so a change that renames one changes the ruleset with it.
+
+name: CI
+
+# VAL-6: these three events and nothing else, and no path filter (DEV-5).
+on:
+  pull_request:
+  merge_group:
+  push:
+    branches: [main]
+
+# VAL-6: read the contents and nothing more. The workflow uses no secret.
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: check (${{ matrix.arch }})
+    # The labels are pinned and `ubuntu-latest` is never used: the setup that
+    # bubblewrap needs differs between Ubuntu releases (DEV-5, P-16).
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86-64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    timeout-minutes: 60
+    steps:
+      # The whole history, so that the mutation step finds the merge base of
+      # `HEAD` and `origin/main` (DEV-2a, DEV-6). The token is not left in the
+      # clone's configuration.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      # DEV-6, with the setup that P-16 found for the 24.04 images.
+      - name: Install bubblewrap
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq bubblewrap
+      - name: Lift the AppArmor restriction on unprivileged user namespaces
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
+      # mise at the version of SPEC 19.2 installs the toolchain and the check
+      # tools that mise.toml pins, as the development VM's provisioning does.
+      - name: Install mise
+        run: |
+          curl --fail --silent --show-error --location --output "$RUNNER_TEMP/mise-install.sh" https://mise.run
+          MISE_VERSION=v2026.11.14 MISE_QUIET=1 sh "$RUNNER_TEMP/mise-install.sh"
+      - name: Install the toolchain and the check tools
+        run: ~/.local/bin/mise install --yes
+
+      # Everything the check reads from the network, while the job still has
+      # it (DEV-14). A fetch that fails fails the job.
+      - name: Fetch the dependencies and the advisory database
+        run: ~/.local/bin/mise exec -- cargo xtask fetch
+
+      # A network namespace that holds only `lo`, entered as the runner's user,
+      # as P-16 entered it. `offline` runs a command there with an environment
+      # of its own.
+      - name: Create a network namespace without network access
+        run: |
+          sudo ip netns add offline
+          sudo ip netns exec offline ip link set lo up
+          cat > "$RUNNER_TEMP/offline" <<EOF
+          #!/bin/sh
+          exec sudo ip netns exec offline \\
+            setpriv --reuid=$(id -u) --regid=$(id -g) --init-groups -- \\
+            env -i \\
+              HOME="$HOME" USER="$USER" PATH="$PATH" \\
+              CARGO_HOME="${CARGO_HOME:-$HOME/.cargo}" \\
+              RUSTUP_HOME="${RUSTUP_HOME:-$HOME/.rustup}" \\
+              CARGO_TERM_COLOR=always \\
+              "\$@"
+          EOF
+          chmod +x "$RUNNER_TEMP/offline"
+          echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
+
+      - name: Show that the namespace reaches no host outside it
+        run: |
+          set -u
+          links=$(offline ip -o link show | cut -d: -f2 | tr -d ' ')
+          echo "interfaces in the namespace: $links"
+          test "$links" = lo
+          for url in https://github.com https://1.1.1.1; do
+            if offline curl --silent --show-error --max-time 10 --output /dev/null "$url"; then
+              echo "::error::the namespace reached $url"
+              exit 1
+            fi
+            echo "$url: not reached, as it must not be"
+          done
+
+      - name: cargo xtask check
+        run: offline ~/.local/bin/mise exec -- cargo xtask check

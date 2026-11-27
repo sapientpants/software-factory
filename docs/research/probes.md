@@ -2711,7 +2711,7 @@ No code point of Bidi_Control, Join_Control or Variation_Selector lacks the prop
 
 ### Still open
 
-- **An App's token.** Everything was written and read with the operator's token.
+- **An App's token.** Everything was written and read with the operator's token. Since 2026-11-27 the answer stands without one (D-52): it is about what the page hides of a text, and not about what an identity may do or may read, which is the rule of D-38.
 - **The page in a browser.** The page was read as `bodyHTML`, `bodyText` and `titleHTML`, as the answer of `POST /markdown`, and for a file as the HTML of the contents API. No browser showed it, and what a script of the page does with that HTML was not observed. The math of text 58 is rendered by one.
 - **The rest of GitHub's dialect.** Alerts, task lists, diagrams in a fenced block and the references that GitHub makes links of were not tried.
 - **Who minimised a comment.** Each of the six comments was minimised by its author. A comment minimised by another account was not tried.

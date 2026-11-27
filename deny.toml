@@ -1,0 +1,16 @@
+# The configuration of `cargo deny`, its one file in this repository (SPEC
+# DEV-2b). `cargo xtask check` runs `cargo deny --locked --offline check`
+# (DEV-2a), and `cargo xtask fetch` fetches the advisory database that it reads
+# (DEV-14). The database lies where `cargo deny` looks by default, under
+# `$CARGO_HOME/advisory-dbs`, so this file names no `db-path`.
+
+[advisories]
+# A database whose last fetch is older than this fails the check (DEV-2a). The
+# tool's own default is 90 days. *(tunable)*
+maximum-db-staleness = "P7D"
+
+[licenses]
+# The licences that the crates of the dependency graph carry today. A crate
+# under another one fails the check, and the change that brings it in adds it
+# here.
+allow = ["MIT", "Apache-2.0"]

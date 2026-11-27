@@ -6,6 +6,7 @@
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output, Stdio};
+use std::time::{Duration, Instant};
 
 use serde_json::Value;
 
@@ -168,8 +169,8 @@ fn the_check_does_not_see_the_repository_git_is_committing_to() {
 }
 
 /// The one command `.claude/settings.json` runs on `event`, for the tool
-/// `matcher` where the event has one.
-fn session_hook(event: &str, matcher: Option<&str>) -> String {
+/// `matcher` where the event has one, that holds `naming`.
+fn session_hook(event: &str, matcher: Option<&str>, naming: &str) -> String {
     let settings = std::fs::read_to_string(root().join(".claude/settings.json"))
         .expect("read .claude/settings.json");
     let settings: Value = serde_json::from_str(&settings).expect(".claude/settings.json is JSON");
@@ -180,9 +181,27 @@ fn session_hook(event: &str, matcher: Option<&str>) -> String {
         .filter(|group| group["matcher"].as_str() == matcher)
         .flat_map(|group| group["hooks"].as_array().expect("hooks of the group"))
         .map(|hook| hook["command"].as_str().expect("command of the hook"))
+        .filter(|command| command.contains(naming))
         .collect();
-    assert_eq!(commands.len(), 1, "{event}: {commands:?}");
+    assert_eq!(commands.len(), 1, "{event}, {naming}: {commands:?}");
     commands[0].to_owned()
+}
+
+/// What the stand-in `cargo` recorded under `name`, once a command that runs
+/// in the background has written it, or `None` after ten seconds.
+fn trace_when_written(scratch: &Scratch, name: &str) -> Option<String> {
+    let deadline = Instant::now() + Duration::from_secs(10);
+    while Instant::now() < deadline {
+        // `environment` is the stand-in's last file, so `name` is complete.
+        if scratch
+            .trace("environment")
+            .is_some_and(|text| !text.is_empty())
+        {
+            return scratch.trace(name);
+        }
+        std::thread::sleep(Duration::from_millis(50));
+    }
+    None
 }
 
 /// Runs a hook command of the settings file as Claude Code does: through the
@@ -215,7 +234,7 @@ fn bash_event(command: &str) -> String {
 fn a_session_start_points_git_at_the_committed_hooks() {
     let scratch = Scratch::new("session-start");
     let repository = scratch.repository();
-    let command = session_hook("SessionStart", None);
+    let command = session_hook("SessionStart", None, "core.hooksPath");
 
     let output = run_session_hook(&scratch, &command, &repository, "{}", "0");
 
@@ -228,13 +247,53 @@ fn a_session_start_points_git_at_the_committed_hooks() {
     assert_eq!(String::from_utf8_lossy(&hooks_path.stdout), ".githooks\n");
 }
 
+/// The fetch of DEV-14 runs at the start of a session, in the project, and in
+/// the background, so that a session does not wait for the development VM.
+#[test]
+fn a_session_start_runs_the_fetch_task_in_the_project() {
+    let scratch = Scratch::new("session-start-fetch");
+    let project = scratch.repository();
+    let command = session_hook("SessionStart", None, "xtask fetch");
+
+    let output = run_session_hook(&scratch, &command, &project, "{}", "0");
+
+    assert!(output.status.success(), "{output:?}");
+    assert_eq!(
+        trace_when_written(&scratch, "arguments").as_deref(),
+        Some("--quiet xtask fetch\n")
+    );
+    let directory = scratch.trace("directory").expect("the task ran");
+    assert_eq!(
+        Path::new(directory.trim_end()),
+        project.canonicalize().expect("the project directory")
+    );
+    assert!(project.join("target/xtask-fetch.log").exists());
+}
+
+/// A fetch that fails, or a project that is not there, stops no session
+/// (DEV-14).
+#[test]
+fn a_fetch_that_fails_at_the_start_of_a_session_stops_no_session() {
+    let scratch = Scratch::new("session-start-fetch-fails");
+    let project = scratch.repository();
+    let command = session_hook("SessionStart", None, "xtask fetch");
+
+    let output = run_session_hook(&scratch, &command, &project, "{}", "1");
+    assert!(output.status.success(), "{output:?}");
+    assert!(trace_when_written(&scratch, "arguments").is_some());
+
+    let nowhere = scratch.path.join("no-such-project");
+    let output = run_session_hook(&scratch, &command, &nowhere, "{}", "0");
+    assert!(output.status.success(), "{output:?}");
+}
+
 /// The wrappers are ones Claude Code's own `if` filter let through in a live
 /// session (probe P-27), which is why the filter is the hook command's own.
 #[test]
 fn a_bash_call_that_names_git_is_put_to_the_task_in_the_project() {
     let scratch = Scratch::new("pre-tool-use");
     let project = scratch.repository();
-    let command = session_hook("PreToolUse", Some("Bash"));
+    let command = session_hook("PreToolUse", Some("Bash"), "pre-tool-use");
 
     for call in [
         "git status",
@@ -267,7 +326,7 @@ fn a_bash_call_that_names_git_is_put_to_the_task_in_the_project() {
 fn a_bash_call_that_does_not_name_git_starts_no_task() {
     let scratch = Scratch::new("pre-tool-use-skipped");
     let project = scratch.repository();
-    let command = session_hook("PreToolUse", Some("Bash"));
+    let command = session_hook("PreToolUse", Some("Bash"), "pre-tool-use");
 
     let output = run_session_hook(&scratch, &command, &project, &bash_event("ls -n"), "2");
 
@@ -281,7 +340,7 @@ fn a_bash_call_that_does_not_name_git_starts_no_task() {
 fn a_bash_call_that_names_git_is_refused_unless_the_task_passes() {
     let scratch = Scratch::new("pre-tool-use-refuses");
     let project = scratch.repository();
-    let command = session_hook("PreToolUse", Some("Bash"));
+    let command = session_hook("PreToolUse", Some("Bash"), "pre-tool-use");
     let event = bash_event("git status");
 
     for task_exit in ["2", "1", "101"] {

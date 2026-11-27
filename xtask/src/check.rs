@@ -12,6 +12,14 @@ use crate::vm::{self, Vm};
 fn steps() -> Vec<Step> {
     vec![
         Step::new("cargo", &["fmt", "--all", "--check"]),
+        // DEV-2a. The advisories read the database that `cargo xtask fetch`
+        // fetched, and fail where it is missing or too old.
+        Step::new("cargo", &["deny", "--locked", "--offline", "check"]).on_failure(
+            "where `cargo deny` says that the advisory database is missing or stale, \
+             run `cargo xtask fetch` and then the check again (DEV-14)",
+        ),
+        // The unused-dependency check (19.2).
+        Step::new("cargo", &["shear", "--locked", "--offline"]),
         Step::new(
             "cargo",
             &[
@@ -80,6 +88,8 @@ pub struct Step {
     arguments: Vec<String>,
     /// Whether macOS runs the step outside the VM too, for its own build.
     outside_the_vm: bool,
+    /// What the failure of the step adds to its message.
+    on_failure: Option<&'static str>,
 }
 
 impl Step {
@@ -91,7 +101,15 @@ impl Step {
                 .map(|&argument| argument.to_owned())
                 .collect(),
             outside_the_vm: false,
+            on_failure: None,
         }
+    }
+
+    /// Gives the failure of the step a sentence of its own, after the exit
+    /// code.
+    fn on_failure(mut self, advice: &'static str) -> Self {
+        self.on_failure = Some(advice);
+        self
     }
 
     /// Marks the step as one that macOS runs outside the VM too (DEV-3).
@@ -121,9 +139,10 @@ pub fn run(steps: &[Step]) -> Result<(), String> {
             .status()
             .map_err(|error| format!("`{step}` could not be started: {error}"))?;
         if !status.success() {
-            return Err(match status.code() {
-                Some(code) => format!("`{step}` failed with exit code {code}"),
-                None => format!("`{step}` was ended by a signal"),
+            let failure = format!("`{step}` {}", vm::ended(status));
+            return Err(match step.on_failure {
+                Some(advice) => format!("{failure}; {advice}"),
+                None => failure,
             });
         }
     }
@@ -199,6 +218,32 @@ mod tests {
                 "cargo test --workspace --locked",
             ]
         );
+    }
+
+    #[test]
+    fn the_set_checks_the_supply_chain_without_the_network() {
+        let steps: Vec<String> = steps().iter().map(ToString::to_string).collect();
+
+        assert!(steps.contains(&"cargo deny --locked --offline check".to_owned()));
+        assert!(steps.contains(&"cargo shear --locked --offline".to_owned()));
+    }
+
+    #[test]
+    fn a_failing_deny_step_names_the_task_that_fetches() {
+        let deny = steps()
+            .into_iter()
+            .find(|step| step.arguments.first().is_some_and(|word| word == "deny"))
+            .expect("the set has the deny step");
+        let failing = Step {
+            program: "sh".to_owned(),
+            arguments: vec!["-c".to_owned(), "exit 1".to_owned()],
+            ..deny
+        };
+
+        let failure = run(&[failing]).expect_err("the check fails");
+
+        assert!(failure.contains("exit code 1"), "{failure}");
+        assert!(failure.contains("`cargo xtask fetch`"), "{failure}");
     }
 
     #[test]

@@ -5,6 +5,8 @@ use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::{Command, ExitStatus, Stdio};
 
+use crate::mutants;
+
 /// The name of the Lima instance.
 pub const NAME: &str = "sf-dev";
 
@@ -69,9 +71,11 @@ impl Vm {
     /// fails. The copy lies at `~/sf/tree` and the build output at
     /// `~/sf/target` in the VM, each below the path of the work tree on the
     /// Mac. The copy is made anew on every run, with the files' times, so that
-    /// cargo builds again only what changed. The build output stays.
-    pub fn check(&self, root: &Path) -> Result<(), String> {
-        self.task(root, "check", "sf", "the check set")
+    /// cargo builds again only what changed. The build output stays. The copy
+    /// holds no history, so the mutation step is given `diff`, which the Mac
+    /// made, at `xtask/mutants.diff` in the build output (DEV-2a).
+    pub fn check(&self, root: &Path, diff: &[u8]) -> Result<(), String> {
+        self.task(root, "check", "sf", "the check set", Some(diff))
     }
 
     /// Runs `cargo xtask fetch` in the VM as [`Vm::check`] runs the check,
@@ -79,14 +83,23 @@ impl Vm {
     /// `~/sf/fetch/target`, so that a fetch that a session started runs beside
     /// a check without taking its copy away (DEV-14).
     pub fn fetch(&self, root: &Path) -> Result<(), String> {
-        self.task(root, "fetch", "sf/fetch", "the fetch")
+        self.task(root, "fetch", "sf/fetch", "the fetch", None)
     }
 
     /// Runs `cargo xtask <task>` in the VM on a copy of the work tree at
     /// `root`, with the copy at `<place>/tree` and the build output at
     /// `<place>/target`, each below the path of the work tree on the Mac.
-    /// `what` names the task in a failure.
-    fn task(&self, root: &Path, task: &str, place: &str, what: &str) -> Result<(), String> {
+    /// `what` names the task in a failure. Where `diff` is given, it is
+    /// written to `xtask/mutants.diff` in the build output, which
+    /// [`mutants::DIFF_VARIABLE`] names to the task.
+    fn task(
+        &self,
+        root: &Path,
+        task: &str,
+        place: &str,
+        what: &str,
+        diff: Option<&[u8]>,
+    ) -> Result<(), String> {
         let guest = root.strip_prefix("/").map_err(|_| {
             self.failure(
                 "shown the work tree",
@@ -97,15 +110,34 @@ impl Vm {
         let target = Path::new(place).join("target").join(guest);
         self.copy(root, &tree)
             .map_err(|error| self.failure("shown the work tree", &error))?;
+        let diff_file = mutants::diff_file(&target);
+        if let Some(diff) = diff {
+            self.give(diff, &diff_file)
+                .map_err(|error| self.failure("given the diff of the mutation step", &error))?;
+        }
         eprintln!(
             "xtask {task}: {what}, in the development VM `{}`",
             self.name
         );
-        self.limactl(&self.shell(
+        // The variable names the diff where one is given, and is unset
+        // where none is, so that none that the environment holds is used.
+        let variable = match diff {
+            Some(_) => format!("{}=\"$HOME/$4\" && export {0}", mutants::DIFF_VARIABLE),
+            None => format!("unset {}", mutants::DIFF_VARIABLE),
+        };
+        let script = format!(
             "cd \"$HOME/$1\" && CARGO_TARGET_DIR=\"$HOME/$2\" && export CARGO_TARGET_DIR \
-             && \"$HOME/.local/bin/mise\" install --yes \
-             && exec \"$HOME/.local/bin/mise\" exec -- cargo xtask \"$3\"",
-            &[&tree.to_string_lossy(), &target.to_string_lossy(), task],
+             && {variable} && \"$HOME/.local/bin/mise\" install --yes \
+             && exec \"$HOME/.local/bin/mise\" exec -- cargo xtask \"$3\""
+        );
+        self.limactl(&self.shell(
+            &script,
+            &[
+                &tree.to_string_lossy(),
+                &target.to_string_lossy(),
+                task,
+                &diff_file.to_string_lossy(),
+            ],
         ))
         .map_err(|error| {
             format!(
@@ -183,6 +215,30 @@ impl Vm {
             return Err(format!("`tar` on the Mac {}", ended(archived)));
         }
         Ok(())
+    }
+
+    /// Writes `contents` to `file`, relative to the home directory in the VM.
+    fn give(&self, contents: &[u8], file: &Path) -> Result<(), String> {
+        let mut writer = Command::new(&self.limactl)
+            .args(self.shell(
+                "cd && mkdir -p -- \"$(dirname -- \"$1\")\" && cat > \"$1\"",
+                &[&file.to_string_lossy()],
+            ))
+            .stdin(Stdio::piped())
+            .spawn()
+            .map_err(|error| format!("`{} shell` could not be started: {error}", self.limactl))?;
+        let written = writer
+            .stdin
+            .take()
+            .ok_or("`limactl shell` has no stdin")?
+            .write_all(contents);
+        let status = writer
+            .wait()
+            .map_err(|error| format!("`{} shell` was lost: {error}", self.limactl))?;
+        if !status.success() {
+            return Err(format!("`{} shell` {}", self.limactl, ended(status)));
+        }
+        written.map_err(|error| format!("the diff was not written: {error}"))
     }
 
     /// Keeps a copy of the configuration that the VM was created from in
@@ -558,7 +614,7 @@ mod tests {
             &mise,
             format!(
                 "#!/bin/sh\n\
-                 echo \"$* in $PWD with $CARGO_TARGET_DIR\" >> '{calls}'\n\
+                 echo \"$* in $PWD with $CARGO_TARGET_DIR and ${{XTASK_MUTANTS_DIFF:-no diff}}\" >> '{calls}'\n\
                  [ \"$1\" = exec ] && exit {exit}\n\
                  exit 0\n",
                 calls = scratch.0.join("mise-calls").display(),
@@ -605,9 +661,14 @@ mod tests {
         std::fs::create_dir_all(&tree).expect("create an earlier copy");
         std::fs::write(tree.join("stale"), "").expect("leave a file of an earlier copy");
 
-        let outcome = vm.check(&root);
+        let outcome = vm.check(&root, b"the diff\n");
 
         assert!(outcome.is_ok(), "{outcome:?}");
+        let diff = target.join("xtask/mutants.diff");
+        assert_eq!(
+            std::fs::read_to_string(&diff).ok().as_deref(),
+            Some("the diff\n")
+        );
         assert_eq!(
             std::fs::read_to_string(tree.join("src/lib.rs"))
                 .ok()
@@ -616,7 +677,12 @@ mod tests {
         );
         assert!(!tree.join("stale").exists(), "the earlier copy was kept");
         let calls = std::fs::read_to_string(scratch.0.join("mise-calls")).expect("mise ran");
-        let with = format!("in {} with {}", tree.display(), target.display());
+        let with = format!(
+            "in {} with {} and {}",
+            tree.display(),
+            target.display(),
+            diff.display()
+        );
         assert_eq!(
             calls.lines().collect::<Vec<_>>(),
             [
@@ -650,7 +716,11 @@ mod tests {
             "the check's copy was taken"
         );
         let calls = std::fs::read_to_string(scratch.0.join("mise-calls")).expect("mise ran");
-        let with = format!("in {} with {}", tree.display(), target.display());
+        let with = format!(
+            "in {} with {} and no diff",
+            tree.display(),
+            target.display()
+        );
         assert_eq!(
             calls.lines().collect::<Vec<_>>(),
             [
@@ -691,7 +761,7 @@ mod tests {
             "sf-test",
         );
 
-        let failure = vm.check(&root).expect_err("the set fails");
+        let failure = vm.check(&root, b"").expect_err("the set fails");
 
         assert!(failure.contains("`sf-test`"), "{failure}");
         assert!(failure.contains("exit code 5"), "{failure}");

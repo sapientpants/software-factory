@@ -4,6 +4,7 @@ mod check;
 mod fetch;
 mod hook_skip;
 mod links;
+mod mutants;
 mod pre_tool_use;
 mod references;
 mod tree;
@@ -16,6 +17,7 @@ fn main() -> ExitCode {
         Some("check") => check::main(),
         Some("fetch") => fetch::main(),
         Some("links") => links::main(),
+        Some("mutants") => mutants::main(),
         Some("pre-tool-use") => pre_tool_use::main(),
         Some("references") => references::main(),
         Some(task) => {
@@ -23,7 +25,9 @@ fn main() -> ExitCode {
             ExitCode::FAILURE
         }
         None => {
-            eprintln!("usage: cargo xtask <check | fetch | links | pre-tool-use | references>");
+            eprintln!(
+                "usage: cargo xtask <check | fetch | links | mutants | pre-tool-use | references>"
+            );
             ExitCode::FAILURE
         }
     }

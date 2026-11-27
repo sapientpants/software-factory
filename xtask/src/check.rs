@@ -1,10 +1,12 @@
 //! `cargo xtask check`: every check of the factory repository behind one
 //! command (SPEC DEV-1).
 
+use std::ffi::OsString;
 use std::fmt;
 use std::path::Path;
 use std::process::{Command, ExitCode};
 
+use crate::mutants;
 use crate::vm::{self, Vm};
 
 /// The checks of SPEC DEV-2 that exist so far. The rest of that set is added
@@ -47,6 +49,12 @@ fn steps() -> Vec<Step> {
         // Warnings denied, the lint of broken intra-doc links among them (DEV-2).
         Step::new("cargo", &["doc", "--workspace", "--no-deps", "--locked"])
             .with_variable("RUSTDOCFLAGS", "-D warnings"),
+        // `cargo mutants --in-diff` on the diff from the base to the work tree
+        // (DEV-2a). The task finds the base and runs the tool, so the version
+        // check asks the tool and not the task.
+        Step::new("cargo", &["xtask", "mutants"]).running("mutants"),
+        // Coverage, reported without a floor (DEV-2).
+        Step::new("cargo", &["llvm-cov", "nextest", "--workspace", "--locked"]),
     ]
 }
 
@@ -67,7 +75,9 @@ pub fn main() -> ExitCode {
         return ExitCode::FAILURE;
     }
     let outcome = if cfg!(target_os = "macos") {
-        in_the_vm(&root).and_then(|()| at_the_pins(&macos_steps()))
+        let vm = Vm::new("limactl", vm::NAME);
+        in_the_vm(&root, &vm, std::env::var_os("SF_BASE_SHA"))
+            .and_then(|()| at_the_pins(&macos_steps()))
     } else {
         at_the_pins(&steps())
     };
@@ -94,13 +104,16 @@ fn at_the_pins(steps: &[Step]) -> Result<(), String> {
 
 /// On macOS, the whole set in the development VM (DEV-3): the VM is created
 /// and started where it has to be, and shown the work tree at `root`.
-fn in_the_vm(root: &Path) -> Result<(), String> {
+/// `sf_base_sha` is the value of `SF_BASE_SHA`, where it is set.
+fn in_the_vm(root: &Path, vm: &Vm, sf_base_sha: Option<OsString>) -> Result<(), String> {
     let root = root
         .canonicalize()
         .map_err(|error| format!("cannot resolve the repository's root: {error}"))?;
-    let vm = Vm::new("limactl", vm::NAME);
+    // The copy in the VM holds no history, so the Mac finds the base of the
+    // mutation step and gives the VM the diff (DEV-2a).
+    let diff = mutants::diff_of_the_work_tree(&root, sf_base_sha)?;
     vm.ensure(&root.join("lima.yaml"))?;
-    vm.check(&root)
+    vm.check(&root, &diff)
 }
 
 /// The tools that `mise.toml` pins, each with its version: the lines
@@ -127,14 +140,17 @@ fn pins(text: &str) -> Vec<(String, String)> {
 /// `$CARGO_HOME/bin` before `PATH`, `mise exec` or not.
 pub fn check_versions(steps: &[Step], pins: &[(String, String)]) -> Result<(), String> {
     for step in steps {
-        let Some(subcommand) = step.arguments.first() else {
+        let Some(subcommand) = step.tool.as_ref().or(step.arguments.first()) else {
             continue;
         };
         let tool = format!("cargo-{subcommand}");
-        let Some((_, pinned)) = pins
-            .iter()
-            .find(|(name, _)| *name == tool || name.ends_with(&format!("/{tool}")))
-        else {
+        let Some((_, pinned)) = pins.iter().find(|(name, _)| {
+            // A name of mise's registry, or one with a backend: `cargo:`,
+            // or `github:` and `aqua:` with the repository's owner.
+            *name == tool
+                || name.ends_with(&format!("/{tool}"))
+                || name.ends_with(&format!(":{tool}"))
+        }) else {
             continue;
         };
         let query = format!("{} {subcommand} --version", step.program);
@@ -166,6 +182,9 @@ pub struct Step {
     outside_the_vm: bool,
     /// What the failure of the step adds to its message.
     on_failure: Option<&'static str>,
+    /// The cargo subcommand whose version the step is checked for, where it
+    /// is not the first argument: a task of `xtask` that runs a check tool.
+    tool: Option<String>,
 }
 
 impl Step {
@@ -179,6 +198,7 @@ impl Step {
             variables: Vec::new(),
             outside_the_vm: false,
             on_failure: None,
+            tool: None,
         }
     }
 
@@ -192,6 +212,13 @@ impl Step {
     /// code.
     fn on_failure(mut self, advice: &'static str) -> Self {
         self.on_failure = Some(advice);
+        self
+    }
+
+    /// Names `subcommand` as the cargo subcommand that the step runs, for the
+    /// version check (DEV-2).
+    fn running(mut self, subcommand: &str) -> Self {
+        self.tool = Some(subcommand.to_owned());
         self
     }
 
@@ -467,6 +494,63 @@ mod tests {
         assert!(outcome.is_ok(), "{outcome:?}");
         let runs = std::fs::read_to_string(scratch.0.join("runs")).expect("cargo ran");
         assert_eq!(runs, "shear --version\n");
+    }
+
+    #[test]
+    fn the_set_mutates_the_diff_and_reports_coverage_in_the_vm_alone() {
+        let steps: Vec<String> = steps().iter().map(ToString::to_string).collect();
+        let on_the_mac: Vec<String> = macos_steps().iter().map(ToString::to_string).collect();
+        let (mutation, coverage) = (
+            "cargo xtask mutants".to_owned(),
+            "cargo llvm-cov nextest --workspace --locked".to_owned(),
+        );
+
+        assert!(steps.contains(&mutation), "{steps:?}");
+        assert!(steps.contains(&coverage), "{steps:?}");
+        // `cargo mutants` on the Mac misses every mutant of Linux-only code
+        // (DEV-3, P-38).
+        assert!(!on_the_mac.contains(&mutation) && !on_the_mac.contains(&coverage));
+    }
+
+    #[test]
+    fn the_mutation_task_is_checked_for_the_version_of_cargo_mutants() {
+        let scratch = Scratch::new("version-mutants");
+        let cargo = cargo_that_reports(&scratch, "27.1.0");
+        let pins = [
+            ("cargo:cargo-mutants".to_owned(), "27.1.0".to_owned()),
+            ("aqua:taiki-e/cargo-llvm-cov".to_owned(), "0.9.2".to_owned()),
+        ];
+        let steps = [
+            Step::new(&cargo, &["xtask", "mutants"]).running("mutants"),
+            Step::new(&cargo, &["llvm-cov", "nextest"]),
+        ];
+
+        let outcome = check_versions(&steps, &pins);
+
+        let failure = outcome.expect_err("llvm-cov is not at its pin");
+        assert!(failure.contains("cargo-llvm-cov 0.9.2"), "{failure}");
+        let runs = std::fs::read_to_string(scratch.0.join("runs")).expect("cargo ran");
+        assert_eq!(runs, "mutants --version\nllvm-cov --version\n");
+    }
+
+    #[test]
+    fn on_the_mac_a_work_tree_without_a_base_fails_before_the_vm_runs() {
+        let scratch = Scratch::new("no-base");
+        let status = Command::new("git")
+            .args(["init", "--quiet"])
+            .current_dir(&scratch.0)
+            .env_remove("GIT_DIR")
+            .env_remove("GIT_INDEX_FILE")
+            .env_remove("GIT_WORK_TREE")
+            .status()
+            .expect("run git");
+        assert!(status.success());
+        let vm = Vm::new("xtask-no-such-limactl", "sf-test");
+
+        let failure = in_the_vm(&scratch.0, &vm, None).expect_err("there is no base");
+
+        assert!(failure.contains("mutation step"), "{failure}");
+        assert!(!failure.contains("sf-test"), "the VM was asked: {failure}");
     }
 
     #[test]

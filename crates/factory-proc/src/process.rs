@@ -114,7 +114,7 @@ impl Process {
         mut child: Box<dyn ChildWrapper>,
         leader: Pid,
         group: Pid,
-        max_line_length: usize,
+        codec: LineCodec,
         sink: Pin<Box<dyn AsyncWrite + Send>>,
         supervisor: Option<PipeWriter>,
     ) -> Self {
@@ -125,7 +125,7 @@ impl Process {
             stdout: child
                 .stdout()
                 .take()
-                .map(|stdout| Lines::new(stdout, max_line_length)),
+                .map(|stdout| Lines::new(stdout, codec)),
             stderr: child.stderr().take(),
             child,
             sink,
@@ -153,6 +153,13 @@ impl Process {
     /// The pipe on stdin, where the command was given one and it is open.
     pub fn stdin(&mut self) -> Option<&mut ChildStdin> {
         self.stdin.as_mut()
+    }
+
+    /// Takes the pipe on stdin, where the command was given one and it is
+    /// open, so that it can be written while stdout is read. Dropping it
+    /// closes stdin.
+    pub fn take_stdin(&mut self) -> Option<ChildStdin> {
+        self.stdin.take()
     }
 
     /// Closes stdin.
@@ -385,10 +392,10 @@ struct Lines {
 }
 
 impl Lines {
-    fn new(reader: ChildStdout, max_line_length: usize) -> Self {
+    fn new(reader: ChildStdout, codec: LineCodec) -> Self {
         Self {
             reader,
-            codec: LineCodec::new(max_line_length),
+            codec,
             buffer: BytesMut::new(),
             eof: false,
         }

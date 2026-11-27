@@ -7,13 +7,17 @@
 //! its working directory, so each works under `safe.bareRepository =
 //! explicit` (WS-15).
 
+mod capture;
 mod cli;
+mod dotgit;
 mod names;
+mod tree;
 
 use std::future::Future;
 use std::path::{Path, PathBuf};
 use std::process::ExitStatus;
 
+pub use capture::{Candidate, CaptureDirs, Captured, Identity, Limits, Rejection, TreePath, Trees};
 pub use cli::GitCli;
 pub use names::{Branch, Oid, Remote};
 
@@ -81,6 +85,59 @@ pub trait Git: Send + Sync {
         commit: &Oid,
         workspace: &Path,
     ) -> impl Future<Output = Result<(), Error>> + Send;
+
+    /// The tree of `commit` in the bare repository `repository`.
+    fn tree_of(
+        &self,
+        repository: &Path,
+        commit: &Oid,
+    ) -> impl Future<Output = Result<Oid, Error>> + Send;
+
+    /// Builds a candidate's tree from the workspace by steps 1 to 3 of 9.4:
+    /// the scan, the staging in a `quarantine/` made anew, and the ingest of
+    /// its pack into `host.git` through `ingest/`. The change set is counted
+    /// from `trees.previous`, and WS-12 and WS-13 read `trees.base`. A
+    /// rejection leaves `host.git` as it was; a staging step over
+    /// `limits.staging` is [`Error::TimedOut`].
+    fn capture(
+        &self,
+        dirs: CaptureDirs<'_>,
+        trees: Trees<'_>,
+        limits: Limits,
+    ) -> impl Future<Output = Result<Captured, Error>> + Send;
+
+    /// Step 3 of 9.4 alone: indexes `pack` into `ingest` with `host_git`'s
+    /// objects behind it, walks the tree that `tree` names, and moves the
+    /// pack into `host_git` where nothing is rejected. `tree` and `pack` are
+    /// what a staging step handed back, and nothing in them is trusted.
+    fn ingest(
+        &self,
+        host_git: &Path,
+        ingest: &Path,
+        trees: Trees<'_>,
+        tree: &[u8],
+        pack: &[u8],
+        limits: Limits,
+    ) -> impl Future<Output = Result<Captured, Error>> + Send;
+
+    /// Step 4 of 9.4: commits a candidate's tree in `host_git` with
+    /// `commit-tree`, and returns the commit. The same candidate gives the
+    /// same commit.
+    fn commit_candidate(
+        &self,
+        host_git: &Path,
+        candidate: &Candidate<'_>,
+    ) -> impl Future<Output = Result<Oid, Error>> + Send;
+
+    /// The export of 9.4: checks `candidate` of `host_git` out into
+    /// `export`, which this creates and which must not exist, with no filter
+    /// and no attribute applied (WS-11, WS-14).
+    fn export(
+        &self,
+        host_git: &Path,
+        candidate: &Oid,
+        export: &Path,
+    ) -> impl Future<Output = Result<(), Error>> + Send;
 }
 
 /// What a git operation failed at.
@@ -116,6 +173,19 @@ pub enum Error {
     /// Text that is no branch name.
     #[error("{0:?} is no branch name")]
     Branch(String),
+    /// A file or directory of the host could not be made, read or removed.
+    #[error(transparent)]
+    Io(#[from] std::io::Error),
+    /// The staging step took longer than its limit: an abandoned activity
+    /// (9.4, 8.6).
+    #[error("the staging step took more than {0:?}")]
+    TimedOut(std::time::Duration),
+    /// An identity with a name or an address that git would not keep as
+    /// given.
+    #[error(
+        "an identity with an empty name or address, or one that holds <, > or a control character"
+    )]
+    Identity,
     /// Text that is no remote.
     #[error("{0:?} is no https URL")]
     Remote(String),

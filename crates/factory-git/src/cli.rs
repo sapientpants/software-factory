@@ -7,16 +7,21 @@ use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex, PoisonError};
 
 use factory_proc::{Command, Line};
-use tokio::io::{AsyncRead, AsyncReadExt as _};
+use std::process::ExitStatus;
 
+use tokio::io::{AsyncRead, AsyncReadExt as _, AsyncWriteExt as _};
+
+use crate::capture::{Candidate, CaptureDirs, Captured, Limits, Rejection, Trees};
 use crate::names::{Branch, Oid, Remote, absolute};
 use crate::{Error, Git};
 
 /// The empty tree, the attribute source of every command that moves content
 /// between a tree and a directory (WS-11).
-const EMPTY_TREE: &str = "4b825dc642cb6eb9a060e54bf8d69288fbee4904";
+pub(crate) const EMPTY_TREE: &str = "4b825dc642cb6eb9a060e54bf8d69288fbee4904";
 
-/// The environment of every git command, and no other variable (AG-11): no
+/// The environment of every git command (AG-11), beside which a command of
+/// capture, ingest, the commit or the export sets only the variables of P-7
+/// that name its index, object directories and identity: no
 /// system or global configuration and no system attributes, no prompt, no
 /// optional lock, no replace object and no lazy fetch (P-7).
 const ENVIRONMENT: [(&str, &str); 10] = [
@@ -70,7 +75,7 @@ impl GitCli {
 
     /// Runs `git` with `args` after the common settings, and returns the
     /// lines of its stdout.
-    async fn run(&self, args: &[&OsStr]) -> Result<Vec<String>, Error> {
+    pub(crate) async fn run(&self, args: &[&OsStr]) -> Result<Vec<String>, Error> {
         let mut command = Command::new(&self.program);
         for setting in SETTINGS {
             command.arg("-c").arg(setting);
@@ -92,7 +97,9 @@ impl GitCli {
                 match line {
                     Line::Text(text) => lines.push(text),
                     Line::TooLong => unreadable = Some("a line longer than the cap"),
-                    Line::NotUtf8 => unreadable = Some("a line that is no UTF-8"),
+                    Line::NotUtf8 | Line::Bytes(_) => {
+                        unreadable = Some("a line that is no UTF-8");
+                    }
                 }
             }
             let status = process.wait().await?;
@@ -117,11 +124,84 @@ impl GitCli {
     }
 
     /// Runs `git --git-dir=<repository>` with `args`.
-    async fn run_in(&self, repository: &Path, args: &[&OsStr]) -> Result<Vec<String>, Error> {
+    pub(crate) async fn run_in(
+        &self,
+        repository: &Path,
+        args: &[&OsStr],
+    ) -> Result<Vec<String>, Error> {
         let dir = option("--git-dir=", absolute(repository)?);
         let mut all = vec![dir.as_os_str()];
         all.extend_from_slice(args);
         self.run(&all).await
+    }
+
+    /// Runs `git` with `args` after the common settings, with the variables
+    /// of `env` beside those of every command, `stdin` written to its stdin,
+    /// and its stdout read as bytes, at most `cap` of them. It fails only
+    /// where the process cannot be started or read: the caller reads the
+    /// status.
+    pub(crate) async fn raw(
+        &self,
+        args: &[&OsStr],
+        env: &[(&str, &OsStr)],
+        stdin: Option<&[u8]>,
+        cap: usize,
+    ) -> Result<Output, Error> {
+        let mut command = Command::new(&self.program);
+        for setting in SETTINGS {
+            command.arg("-c").arg(setting);
+        }
+        command.args(args).current_dir("/").raw_stdout();
+        for (key, value) in ENVIRONMENT {
+            command.env(key, value);
+        }
+        for (key, value) in env {
+            command.env(key, value);
+        }
+        if stdin.is_some() {
+            command.stdin_piped();
+        }
+        let name = describe(args);
+        let (reader, writer) = tokio::io::duplex(8192);
+        let output = async move {
+            let mut process = command.spawn(writer).await?;
+            let pipe = process.take_stdin();
+            let feed = async move {
+                if let (Some(mut pipe), Some(bytes)) = (pipe, stdin) {
+                    // A command may exit before it reads all of stdin: its
+                    // status says what came of it.
+                    let _ = pipe.write_all(bytes).await;
+                }
+            };
+            let read = async {
+                let mut stdout = Vec::new();
+                let mut overflow = false;
+                while let Some(line) = process.next_line().await? {
+                    if let Line::Bytes(chunk) = line {
+                        // The first `cap` bytes are kept, and the rest read
+                        // and discarded.
+                        let room = cap.saturating_sub(stdout.len());
+                        if chunk.len() > room {
+                            overflow = true;
+                        }
+                        stdout.extend_from_slice(chunk.get(..room).unwrap_or(&chunk));
+                    }
+                }
+                let status = process.wait().await?;
+                Ok::<_, Error>((stdout, overflow, status))
+            };
+            let ((), read) = tokio::join!(feed, read);
+            read
+        };
+        let (output, stderr) = tokio::join!(output, capture(reader));
+        let (stdout, overflow, status) = output?;
+        Ok(Output {
+            command: name,
+            status,
+            stdout,
+            overflow,
+            stderr,
+        })
     }
 }
 
@@ -259,6 +339,43 @@ impl Git for GitCli {
         deleted?;
         self.delete_ref(&workspace.join(".git"), &full).await
     }
+
+    async fn tree_of(&self, repository: &Path, commit: &Oid) -> Result<Oid, Error> {
+        GitCli::tree_of(self, repository, commit).await
+    }
+
+    async fn capture(
+        &self,
+        dirs: CaptureDirs<'_>,
+        trees: Trees<'_>,
+        limits: Limits,
+    ) -> Result<Captured, Error> {
+        GitCli::capture(self, dirs, trees, limits).await
+    }
+
+    async fn ingest(
+        &self,
+        host_git: &Path,
+        ingest: &Path,
+        trees: Trees<'_>,
+        tree: &[u8],
+        pack: &[u8],
+        limits: Limits,
+    ) -> Result<Captured, Error> {
+        GitCli::ingest(self, host_git, ingest, trees, tree, pack, limits).await
+    }
+
+    async fn commit_candidate(
+        &self,
+        host_git: &Path,
+        candidate: &Candidate<'_>,
+    ) -> Result<Oid, Error> {
+        GitCli::commit_candidate(self, host_git, candidate).await
+    }
+
+    async fn export(&self, host_git: &Path, candidate: &Oid, export: &Path) -> Result<(), Error> {
+        GitCli::export(self, host_git, candidate, export).await
+    }
 }
 
 impl GitCli {
@@ -317,8 +434,59 @@ impl GitCli {
     }
 }
 
+/// What a command of [`GitCli::raw`] left.
+#[derive(Debug)]
+pub(crate) struct Output {
+    /// The command, by its subcommand.
+    pub(crate) command: String,
+    pub(crate) status: ExitStatus,
+    /// Its stdout, up to the cap.
+    pub(crate) stdout: Vec<u8>,
+    /// Whether stdout held more than the cap, of which it keeps the first.
+    pub(crate) overflow: bool,
+    /// The start of its stderr.
+    pub(crate) stderr: String,
+}
+
+impl Output {
+    /// The output of a command that succeeded, or its failure as an error.
+    pub(crate) fn checked(self) -> Result<Self, Error> {
+        if self.status.success() && !self.overflow {
+            Ok(self)
+        } else if self.overflow {
+            Err(Error::Output {
+                command: self.command,
+                reason: "more than the cap".to_owned(),
+            })
+        } else {
+            Err(Error::Failed {
+                command: self.command,
+                status: self.status,
+                stderr: self.stderr,
+            })
+        }
+    }
+
+    /// The output of a command of the staging git that succeeded, or its
+    /// failure as a rejection (9.4 step 2).
+    pub(crate) fn staged(self) -> Result<Self, Rejection> {
+        if self.status.success() && !self.overflow {
+            Ok(self)
+        } else {
+            Err(Rejection::Staging {
+                command: self.command,
+                stderr: if self.overflow {
+                    "more than the cap".to_owned()
+                } else {
+                    self.stderr
+                },
+            })
+        }
+    }
+}
+
 /// The one object name of a command's output.
-fn one_oid(command: &str, lines: &[String]) -> Result<Oid, Error> {
+pub(crate) fn one_oid(command: &str, lines: &[String]) -> Result<Oid, Error> {
     match lines {
         [line] => Oid::parse(line),
         _ => Err(Error::Output {
@@ -329,7 +497,7 @@ fn one_oid(command: &str, lines: &[String]) -> Result<Oid, Error> {
 }
 
 /// `<name><value>`, as one argument.
-fn option(name: &str, value: impl AsRef<OsStr>) -> OsString {
+pub(crate) fn option(name: &str, value: impl AsRef<OsStr>) -> OsString {
     let mut arg = OsString::from(name);
     arg.push(value);
     arg
@@ -461,6 +629,29 @@ mod tests {
             // The cap is 16 KiB.
             assert_eq!(stderr.len(), 16_384);
             assert!(stderr.ends_with("xxxx"), "{}", &stderr[..80]);
+        });
+    }
+
+    #[test]
+    fn raw_output_keeps_the_bytes_up_to_its_cap() {
+        within(async {
+            let args: [&OsStr; 4] = [
+                "-c".as_ref(),
+                "x.y=abc".as_ref(),
+                "config".as_ref(),
+                "x.y".as_ref(),
+            ];
+            let at_cap = cli().raw(&args, &[], None, 4).await.unwrap();
+            assert_eq!(at_cap.stdout, b"abc\n");
+            assert!(!at_cap.overflow);
+            assert!(at_cap.checked().is_ok());
+            let over = cli().raw(&args, &[], None, 3).await.unwrap();
+            assert_eq!(over.stdout, b"abc");
+            assert!(over.overflow);
+            // A command that succeeded with more than the cap is no output to
+            // read.
+            assert!(over.status.success());
+            assert!(matches!(over.checked(), Err(Error::Output { .. })));
         });
     }
 

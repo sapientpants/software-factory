@@ -11,6 +11,7 @@ use tokio::io::AsyncWrite;
 use nix::unistd::Pid;
 
 use crate::Error;
+use crate::codec::LineCodec;
 use crate::process::Process;
 use crate::supervise::{Pipes, reported_group};
 
@@ -28,6 +29,7 @@ pub struct Command {
     env: Vec<(OsString, OsString)>,
     current_dir: Option<PathBuf>,
     stdin: bool,
+    raw_stdout: bool,
     max_line_length: usize,
     supervisor: Option<Supervisor>,
 }
@@ -64,6 +66,7 @@ impl Command {
             env: Vec::new(),
             current_dir: None,
             stdin: false,
+            raw_stdout: false,
             max_line_length: MAX_LINE_LENGTH,
             supervisor: None,
         }
@@ -99,6 +102,14 @@ impl Command {
     /// writes to. Without it, stdin is `/dev/null`.
     pub fn stdin_piped(&mut self) -> &mut Self {
         self.stdin = true;
+        self
+    }
+
+    /// Passes stdout on as the bytes it holds, in [`crate::Line::Bytes`],
+    /// and not as lines: for output that is binary or NUL-delimited. The cap
+    /// of a line does not apply to it.
+    pub fn raw_stdout(&mut self) -> &mut Self {
+        self.raw_stdout = true;
         self
     }
 
@@ -186,7 +197,11 @@ impl Command {
             child,
             leader,
             group,
-            self.max_line_length,
+            if self.raw_stdout {
+                LineCodec::Raw
+            } else {
+                LineCodec::new(self.max_line_length)
+            },
             Box::pin(stderr),
             held,
         ))

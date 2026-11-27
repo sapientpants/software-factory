@@ -14,17 +14,32 @@ pub enum Line {
     /// A line that is no UTF-8. Its bytes were discarded, and reading goes on
     /// after it.
     NotUtf8,
+    /// Bytes of stdout as they were read, of a command whose stdout is raw
+    /// ([`crate::Command::raw_stdout`]): no line, and no cap.
+    Bytes(Vec<u8>),
 }
 
 /// `LinesCodec` with the cap, whose two errors of a line are lines here: the
 /// stream that reads it does not end at the first of them, as it would end
-/// at an error of the decoder.
+/// at an error of the decoder. A raw codec passes on what it is given.
 #[derive(Debug)]
-pub(crate) struct LineCodec(LinesCodec);
+pub(crate) enum LineCodec {
+    Lines(LinesCodec),
+    Raw,
+}
 
 impl LineCodec {
     pub(crate) fn new(max_length: usize) -> Self {
-        Self(LinesCodec::new_with_max_length(max_length))
+        Self::Lines(LinesCodec::new_with_max_length(max_length))
+    }
+
+    /// What a raw codec passes on: every byte it holds, where it holds one.
+    fn raw(buf: &mut BytesMut) -> Option<Line> {
+        if buf.is_empty() {
+            None
+        } else {
+            Some(Line::Bytes(buf.split().to_vec()))
+        }
     }
 }
 
@@ -44,10 +59,16 @@ impl Decoder for LineCodec {
     type Error = std::io::Error;
 
     fn decode(&mut self, buf: &mut BytesMut) -> Result<Option<Line>, std::io::Error> {
-        Ok(line(self.0.decode(buf)))
+        Ok(match self {
+            Self::Lines(codec) => line(codec.decode(buf)),
+            Self::Raw => Self::raw(buf),
+        })
     }
 
     fn decode_eof(&mut self, buf: &mut BytesMut) -> Result<Option<Line>, std::io::Error> {
-        Ok(line(self.0.decode_eof(buf)))
+        Ok(match self {
+            Self::Lines(codec) => line(codec.decode_eof(buf)),
+            Self::Raw => Self::raw(buf),
+        })
     }
 }

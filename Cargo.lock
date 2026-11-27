@@ -228,6 +228,7 @@ dependencies = [
 name = "factory-git"
 version = "0.1.0"
 dependencies = [
+ "factory-core",
  "factory-proc",
  "thiserror",
  "tokio",

@@ -170,3 +170,53 @@ fn stdin_is_null_unless_it_is_piped() {
         assert_eq!(process.next_line().await.unwrap(), None);
     });
 }
+
+#[test]
+fn raw_stdout_is_read_as_the_bytes_it_holds() {
+    within(async {
+        // A NUL, a byte that is no UTF-8 and a line longer than the cap all
+        // come back as they were written.
+        let mut command = sh(r"printf 'a\000b\377\n%050d' 0");
+        command.raw_stdout().max_line_length(10);
+        let mut bytes = Vec::new();
+        for line in lines(command).await {
+            let Line::Bytes(chunk) = line else {
+                panic!("{line:?}");
+            };
+            bytes.extend(chunk);
+        }
+        let mut expected = b"a\0b\xff\n".to_vec();
+        expected.extend([b'0'; 50]);
+        assert_eq!(bytes, expected);
+    });
+}
+
+#[test]
+fn a_taken_stdin_is_written_while_stdout_is_read() {
+    within(async {
+        let mut command = Command::new("/bin/cat");
+        command.stdin_piped().raw_stdout();
+        let mut process = spawn(&command).await;
+        let mut stdin = process.take_stdin().unwrap_or_else(|| panic!("no stdin"));
+        assert!(process.stdin().is_none());
+        // More than a pipe holds in each direction, so that the write stalls
+        // unless stdout is read beside it.
+        let sent = vec![7u8; 1 << 20];
+        let write = async {
+            stdin.write_all(&sent).await.unwrap();
+            drop(stdin);
+        };
+        let read = async {
+            let mut received = Vec::new();
+            while let Some(line) = process.next_line().await.unwrap() {
+                let Line::Bytes(chunk) = line else {
+                    panic!("{line:?}");
+                };
+                received.extend(chunk);
+            }
+            received
+        };
+        let ((), received) = tokio::join!(write, read);
+        assert_eq!(received, sent);
+    });
+}

@@ -131,6 +131,11 @@ pub struct SandboxPolicy {
     /// the host (SEC-6c, 9.1). [`Sandbox::create`] creates it with mode 0700,
     /// and the worker sees it as `/tmp`. It must not exist yet.
     pub tmp: PathBuf,
+    /// The Unix socket of the egress proxy's listener for the stage
+    /// execution, `exec/<seq>/proxy.sock` on the host (SEC-10b, 9.1). At
+    /// level `process` the sandbox shows it at one fixed path, and the first
+    /// process forwards a loopback port to it (SEC-10a). It must exist.
+    pub proxy: PathBuf,
 }
 
 impl SandboxPolicy {
@@ -140,10 +145,11 @@ impl SandboxPolicy {
     /// # Errors
     ///
     /// [`Error::Policy`] where a path is not absolute, holds `.` or `..`, or
-    /// where a mount would be shown at the root, at or below `/proc`, `/dev`
-    /// or `/tmp`, at `/etc`, or at or below `/etc/claude-code`.
+    /// where a mount would be shown at the root, at or below `/proc`, `/dev`,
+    /// `/tmp` or `/sf`, at `/etc`, or at or below `/etc/claude-code`.
     pub fn check(&self) -> Result<(), Error> {
         plain(&self.tmp, "the temporary directory")?;
+        plain(&self.proxy, "the proxy's socket")?;
         for mount in &self.mounts {
             plain(&mount.host, "a mount's host path")?;
             plain(&mount.sandbox, "a mount's path in the sandbox")?;
@@ -190,6 +196,9 @@ fn refused(sandbox: &Path) -> Option<&'static str> {
     }
     if sandbox.starts_with("/tmp") {
         return Some("/tmp is the temporary directory of the sandbox policy (SEC-6c)");
+    }
+    if sandbox.starts_with("/sf") {
+        return Some("/sf holds the first process and the proxy's socket (SEC-10a)");
     }
     if sandbox == Path::new("/etc") || sandbox.starts_with("/etc/claude-code") {
         return Some("no instance shows /etc/claude-code (SEC-6d)");
@@ -318,6 +327,7 @@ mod tests {
         SandboxPolicy {
             mounts,
             tmp: PathBuf::from("/srv/sf/runs/r/exec/1/tmp"),
+            proxy: PathBuf::from("/srv/sf/runs/r/exec/1/proxy.sock"),
         }
     }
 
@@ -337,6 +347,7 @@ mod tests {
             at("/etc/claude-code-not"),
             at("/tmpfoo"),
             at("/devices"),
+            at("/sfx"),
         ]);
 
         assert!(policy.check().is_ok(), "{:?}", policy.check());
@@ -352,6 +363,8 @@ mod tests {
             "/dev/shm",
             "/tmp",
             "/tmp/x",
+            "/sf",
+            "/sf/sf",
             "/etc",
             "/etc/claude-code",
             "/etc/claude-code/managed-settings.json",
@@ -372,6 +385,8 @@ mod tests {
         dotted.sandbox = PathBuf::from("/srv/../etc/claude-code");
         let mut tmp = policy(Vec::new());
         tmp.tmp = PathBuf::from("/srv/./tmp");
+        let mut proxy = policy(Vec::new());
+        proxy.proxy = PathBuf::from("proxy.sock");
         let mut doubled = at("/srv//x");
         doubled.host = PathBuf::from("/srv/x/");
 
@@ -379,6 +394,7 @@ mod tests {
             policy(vec![relative]),
             policy(vec![dotted]),
             tmp,
+            proxy,
             policy(vec![doubled]),
         ] {
             let outcome = policy.check();

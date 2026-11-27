@@ -253,7 +253,9 @@ impl Supervise {
     }
 }
 
-fn exit_code(status: ExitStatus) -> ExitCode {
+/// The exit code that passes `status` on: its code, or 128 and the number of
+/// the signal that ended the process (AG-16, SEC-10a).
+pub fn exit_code(status: ExitStatus) -> ExitCode {
     let code = status
         .code()
         .or_else(|| status.signal().map(|signal| 128 + signal))

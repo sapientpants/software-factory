@@ -29,6 +29,7 @@ pub struct Command {
     env: Vec<(OsString, OsString)>,
     current_dir: Option<PathBuf>,
     stdin: bool,
+    inherit_stdio: bool,
     raw_stdout: bool,
     max_line_length: usize,
     supervisor: Option<Supervisor>,
@@ -68,6 +69,7 @@ impl Command {
             env: Vec::new(),
             current_dir: None,
             stdin: false,
+            inherit_stdio: false,
             raw_stdout: false,
             max_line_length: MAX_LINE_LENGTH,
             supervisor: None,
@@ -106,6 +108,16 @@ impl Command {
     /// writes to. Without it, stdin is `/dev/null`.
     pub fn stdin_piped(&mut self) -> &mut Self {
         self.stdin = true;
+        self
+    }
+
+    /// Starts the command on the stdin, stdout and stderr of this process,
+    /// in place of pipes: [`Process::next_line`] then reads no line, the sink
+    /// of [`Command::spawn`] is given nothing, and [`Command::stdin_piped`]
+    /// has no effect. For the first process of a sandbox, which reads and
+    /// writes none of the three (SEC-10a).
+    pub fn inherit_stdio(&mut self) -> &mut Self {
+        self.inherit_stdio = true;
         self
     }
 
@@ -176,14 +188,22 @@ impl Command {
         command
             .args(&args)
             .env_clear()
-            .envs(self.env.iter().map(|(key, value)| (key, value)))
-            .stdin(if self.stdin {
-                Stdio::piped()
-            } else {
-                Stdio::null()
-            })
-            .stdout(Stdio::piped())
-            .stderr(Stdio::piped());
+            .envs(self.env.iter().map(|(key, value)| (key, value)));
+        if self.inherit_stdio {
+            command
+                .stdin(Stdio::inherit())
+                .stdout(Stdio::inherit())
+                .stderr(Stdio::inherit());
+        } else {
+            command
+                .stdin(if self.stdin {
+                    Stdio::piped()
+                } else {
+                    Stdio::null()
+                })
+                .stdout(Stdio::piped())
+                .stderr(Stdio::piped());
+        }
         if let Some(dir) = &self.current_dir {
             command.current_dir(dir);
         }

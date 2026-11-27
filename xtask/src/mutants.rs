@@ -12,7 +12,10 @@ use crate::{check, vm};
 /// The files whose code the sandbox tests of 19.4 test, and the plain test
 /// run does not: in a worker's sandbox, where those tests do not run (DEV-11),
 /// the step does not mutate them.
-pub const SANDBOX_CODE: &[&str] = &["crates/factory-sandbox/src/bubblewrap.rs"];
+pub const SANDBOX_CODE: &[&str] = &[
+    "crates/factory-sandbox/src/bubblewrap.rs",
+    "crates/factory-sandbox/src/bubblewrap/init.rs",
+];
 
 /// The variable through which the development VM is given the diff that the
 /// Mac wrote: the copy of the work tree in the VM holds no `.git` (DEV-3).
@@ -507,7 +510,8 @@ mod tests {
             Some(
                 format!(
                     "mutants --in-diff {} --test-tool=nextest --cargo-arg=--locked --output {} \
-                     --exclude=crates/factory-sandbox/src/bubblewrap.rs with SF_SANDBOX_TESTS=\n",
+                     --exclude=crates/factory-sandbox/src/bubblewrap.rs \
+                     --exclude=crates/factory-sandbox/src/bubblewrap/init.rs with SF_SANDBOX_TESTS=\n",
                     file.display(),
                     target.display()
                 )

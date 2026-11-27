@@ -172,6 +172,55 @@ fn stdin_is_null_unless_it_is_piped() {
 }
 
 #[test]
+fn a_command_on_inherited_stdio_uses_the_three_of_this_process() {
+    use nix::unistd::{dup, dup2_stderr, dup2_stdin, dup2_stdout};
+
+    // nextest runs each test in a process of its own, so this one may put
+    // files in place of its own stdio for the while.
+    let dir = std::env::temp_dir().join(format!("sf-proc-inherit-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    std::fs::write(dir.join("in"), "given\n").unwrap();
+    let file = |name: &str| std::fs::File::create(dir.join(name)).unwrap();
+    let (out, err) = (file("out"), file("err"));
+    let saved = [
+        dup(std::io::stdin()).unwrap(),
+        dup(std::io::stdout()).unwrap(),
+        dup(std::io::stderr()).unwrap(),
+    ];
+    dup2_stdin(std::fs::File::open(dir.join("in")).unwrap()).unwrap();
+    dup2_stdout(&out).unwrap();
+    dup2_stderr(&err).unwrap();
+
+    let runtime = tokio::runtime::Runtime::new().unwrap();
+    let ran = runtime.block_on(async {
+        tokio::time::timeout(common::LIMIT, async {
+            let mut command = sh("read -r line; echo \"$line out\"; echo \"$line err\" >&2");
+            command.inherit_stdio().stdin_piped();
+            let mut process = command.spawn(tokio::io::sink()).await?;
+            let piped = process.stdin().is_some();
+            let line = process.next_line().await?;
+            Ok::<_, factory_proc::Error>((process.wait().await?.code(), line, piped))
+        })
+        .await
+    });
+    let [stdin, stdout, stderr] = saved;
+    dup2_stdin(stdin).unwrap();
+    dup2_stdout(stdout).unwrap();
+    dup2_stderr(stderr).unwrap();
+
+    let read = |name: &str| std::fs::read_to_string(dir.join(name)).unwrap();
+    let (out, err) = (read("out"), read("err"));
+    std::fs::remove_dir_all(&dir).unwrap();
+    let (code, line, piped) = ran.unwrap().unwrap();
+    assert_eq!(code, Some(0));
+    // Nothing reached a pipe: no stdin to write, no line, and the sink got
+    // nothing.
+    assert!(!piped);
+    assert_eq!(line, None);
+    assert_eq!((out.as_str(), err.as_str()), ("given out\n", "given err\n"));
+}
+
+#[test]
 fn raw_stdout_is_read_as_the_bytes_it_holds() {
     within(async {
         // A NUL, a byte that is no UTF-8 and a line longer than the cap all

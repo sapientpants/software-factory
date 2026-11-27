@@ -71,29 +71,45 @@ impl Vm {
     /// Mac. The copy is made anew on every run, with the files' times, so that
     /// cargo builds again only what changed. The build output stays.
     pub fn check(&self, root: &Path) -> Result<(), String> {
+        self.task(root, "check", "sf", "the check set")
+    }
+
+    /// Runs `cargo xtask fetch` in the VM as [`Vm::check`] runs the check,
+    /// on a copy of its own at `~/sf/fetch/tree` with its build output at
+    /// `~/sf/fetch/target`, so that a fetch that a session started runs beside
+    /// a check without taking its copy away (DEV-14).
+    pub fn fetch(&self, root: &Path) -> Result<(), String> {
+        self.task(root, "fetch", "sf/fetch", "the fetch")
+    }
+
+    /// Runs `cargo xtask <task>` in the VM on a copy of the work tree at
+    /// `root`, with the copy at `<place>/tree` and the build output at
+    /// `<place>/target`, each below the path of the work tree on the Mac.
+    /// `what` names the task in a failure.
+    fn task(&self, root: &Path, task: &str, place: &str, what: &str) -> Result<(), String> {
         let guest = root.strip_prefix("/").map_err(|_| {
             self.failure(
                 "shown the work tree",
                 &format!("{} is no absolute path", root.display()),
             )
         })?;
-        let tree = Path::new("sf/tree").join(guest);
-        let target = Path::new("sf/target").join(guest);
+        let tree = Path::new(place).join("tree").join(guest);
+        let target = Path::new(place).join("target").join(guest);
         self.copy(root, &tree)
             .map_err(|error| self.failure("shown the work tree", &error))?;
         eprintln!(
-            "xtask check: the set, in the development VM `{}`",
+            "xtask {task}: {what}, in the development VM `{}`",
             self.name
         );
         self.limactl(&self.shell(
             "cd \"$HOME/$1\" && CARGO_TARGET_DIR=\"$HOME/$2\" && export CARGO_TARGET_DIR \
              && \"$HOME/.local/bin/mise\" install --yes \
-             && exec \"$HOME/.local/bin/mise\" exec -- cargo xtask check",
-            &[&tree.to_string_lossy(), &target.to_string_lossy()],
+             && exec \"$HOME/.local/bin/mise\" exec -- cargo xtask \"$3\"",
+            &[&tree.to_string_lossy(), &target.to_string_lossy(), task],
         ))
         .map_err(|error| {
             format!(
-                "the check set in the development VM `{}` failed: {error}",
+                "{what} in the development VM `{}` failed: {error}",
                 self.name
             )
         })
@@ -291,7 +307,7 @@ struct Instance {
     directory: PathBuf,
 }
 
-fn ended(status: ExitStatus) -> String {
+pub fn ended(status: ExitStatus) -> String {
     match status.code() {
         Some(code) => format!("failed with exit code {code}"),
         None => "was ended by a signal".to_owned(),
@@ -608,6 +624,60 @@ mod tests {
                 format!("exec -- cargo xtask check {with}")
             ]
         );
+    }
+
+    #[test]
+    fn the_fetch_runs_in_the_vm_on_a_copy_of_its_own() {
+        let scratch = Scratch::new("fetch");
+        let (root, home) = (scratch.0.join("work"), scratch.0.join("home"));
+        std::fs::create_dir_all(&root).expect("create the work tree");
+        std::fs::write(root.join("Cargo.lock"), "lock\n").expect("write a file");
+        git(&root, &["init", "--quiet"]);
+        let vm = Vm::new(&local_limactl(&scratch, &home, 0), "sf-test");
+        let guest = root.strip_prefix("/").expect("an absolute path");
+        let check_copy = home.join("sf/tree").join(guest);
+        std::fs::create_dir_all(&check_copy).expect("create the check's copy");
+        std::fs::write(check_copy.join("kept"), "").expect("leave a file of the check");
+
+        let outcome = vm.fetch(&root);
+
+        assert!(outcome.is_ok(), "{outcome:?}");
+        let tree = home.join("sf/fetch/tree").join(guest);
+        let target = home.join("sf/fetch/target").join(guest);
+        assert!(tree.join("Cargo.lock").exists());
+        assert!(
+            check_copy.join("kept").exists(),
+            "the check's copy was taken"
+        );
+        let calls = std::fs::read_to_string(scratch.0.join("mise-calls")).expect("mise ran");
+        let with = format!("in {} with {}", tree.display(), target.display());
+        assert_eq!(
+            calls.lines().collect::<Vec<_>>(),
+            [
+                format!("install --yes {with}"),
+                format!("exec -- cargo xtask fetch {with}")
+            ]
+        );
+    }
+
+    #[test]
+    fn a_fetch_that_fails_in_the_vm_fails_by_name() {
+        let scratch = Scratch::new("fetch-fails");
+        let root = scratch.0.join("work");
+        std::fs::create_dir_all(&root).expect("create the work tree");
+        git(&root, &["init", "--quiet"]);
+        let vm = Vm::new(
+            &local_limactl(&scratch, &scratch.0.join("home"), 6),
+            "sf-test",
+        );
+
+        let failure = vm.fetch(&root).expect_err("the fetch fails");
+
+        assert!(
+            failure.contains("the fetch in the development VM `sf-test`"),
+            "{failure}"
+        );
+        assert!(failure.contains("exit code 6"), "{failure}");
     }
 
     #[test]

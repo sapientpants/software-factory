@@ -6,6 +6,10 @@
           {
             "type": "command",
             "command": "git -C \"$CLAUDE_PROJECT_DIR\" config core.hooksPath .githooks"
+          },
+          {
+            "type": "command",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && mkdir -p target && nohup cargo --quiet xtask fetch > target/xtask-fetch.log 2>&1 < /dev/null &"
           }
         ]
       }

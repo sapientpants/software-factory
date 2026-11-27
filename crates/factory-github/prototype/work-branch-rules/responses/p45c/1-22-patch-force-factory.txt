@@ -1,0 +1,17 @@
+HTTP/2 200 
+date: Fri, 27 Nov 2026 05:34:01 GMT
+x-accepted-github-permissions: contents=write; contents=write,workflows=write
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: FC31:131996:67D883A:9B45958:6B091649
+
+{
+  "ref": "refs/heads/factory/issue-7900",
+  "node_id": "REF_kwDOVzkiD71yZWZzL2hlYWRzL2ZhY3RvcnkvaXNzdWUtNzkwMA",
+  "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/refs/heads/factory/issue-7900",
+  "object": {
+    "sha": "198d8568f5c4d7cabf12d667381e79b7b6fa55e5",
+    "type": "commit",
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/198d8568f5c4d7cabf12d667381e79b7b6fa55e5"
+  }
+}
+

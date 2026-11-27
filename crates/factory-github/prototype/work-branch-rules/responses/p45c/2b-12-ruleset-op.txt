@@ -1,0 +1,54 @@
+HTTP/2 200 
+date: Fri, 27 Nov 2026 05:34:26 GMT
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: FDF0:38AF0C:6B063BF:9FDA114:6B091662
+
+{
+  "id": 28214359,
+  "name": "probe-p45-operator-read-b",
+  "target": "branch",
+  "source_type": "Repository",
+  "source": "sapientpants/sf-scratch",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "exclude": [
+
+      ],
+      "include": [
+        "refs/heads/factory/**"
+      ]
+    }
+  },
+  "rules": [
+    {
+      "type": "creation"
+    },
+    {
+      "type": "non_fast_forward"
+    },
+    {
+      "type": "deletion"
+    }
+  ],
+  "node_id": "RRS_lACqUmVwb3NpdG9yec5XOSIPzgGuhFc",
+  "created_at": "2026-11-27T06:34:21.079+01:00",
+  "updated_at": "2026-11-27T06:34:21.118+01:00",
+  "bypass_actors": [
+    {
+      "actor_id": 5,
+      "actor_type": "RepositoryRole",
+      "bypass_mode": "always"
+    }
+  ],
+  "current_user_can_bypass": "always",
+  "_links": {
+    "self": {
+      "href": "https://api.github.com/repos/sapientpants/sf-scratch/rulesets/28214359"
+    },
+    "html": {
+      "href": "https://github.com/sapientpants/sf-scratch/rules/28214359"
+    }
+  }
+}
+

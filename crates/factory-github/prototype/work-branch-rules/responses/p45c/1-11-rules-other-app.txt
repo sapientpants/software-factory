@@ -1,0 +1,27 @@
+HTTP/2 200 
+date: Fri, 27 Nov 2026 05:33:56 GMT
+x-accepted-github-permissions: metadata=read
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: FBC5:39F7B8:68E313F:9CFC73B:6B091644
+
+[
+  {
+    "type": "creation",
+    "ruleset_source_type": "Repository",
+    "ruleset_source": "sapientpants/sf-scratch",
+    "ruleset_id": 28214352
+  },
+  {
+    "type": "non_fast_forward",
+    "ruleset_source_type": "Repository",
+    "ruleset_source": "sapientpants/sf-scratch",
+    "ruleset_id": 28214352
+  },
+  {
+    "type": "deletion",
+    "ruleset_source_type": "Repository",
+    "ruleset_source": "sapientpants/sf-scratch",
+    "ruleset_id": 28214352
+  }
+]
+

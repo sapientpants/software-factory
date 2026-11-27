@@ -1,0 +1,42 @@
+00a-main                                 app  200 
+00b-base-commit                          app  200 Probe P-28: restore the tree
+base=17d8464cd28fd71ba3cb0333f13f34d622816867 before=198d8568f5c4d7cabf12d667381e79b7b6fa55e5
+1-01-rule                                op   201 
+1-10-rules-factory-app                   app  200 
+  the App, a name under factory/: []
+1-11-rules-other-app                     app  200 
+  the App, a name outside it: [{"type":"creation","ruleset_id":28214352},{"type":"non_fast_forward","ruleset_id":28214352},{"type":"deletion","ruleset_id":28214352}]
+1-12-rules-main-app                      app  200 
+  the App, main: [{"type":"creation","ruleset_id":28214352},{"type":"non_fast_forward","ruleset_id":28214352},{"type":"deletion","ruleset_id":28214352}]
+1-20-create-factory                      app  201 
+1-21-create-outside                      app  422 Reference update failed
+1-22-patch-force-factory                 app  200 
+1-23-delete-factory                      app  204 
+1-24-read-factory                        app  404 Not Found
+1-25-read-outside                        app  404 Not Found
+1-80-delete-rule                         op   204 
+2a-01-rule                               op   201 
+2a-10-rules-app                          app  200 
+  the App: [{"type":"creation","ruleset_id":28214357},{"type":"non_fast_forward","ruleset_id":28214357},{"type":"deletion","ruleset_id":28214357}]
+2a-11-rules-op                           op   200 
+  the operator: [{"type":"creation","ruleset_id":28214357},{"type":"non_fast_forward","ruleset_id":28214357},{"type":"deletion","ruleset_id":28214357}]
+  the two bodies are the same
+2a-12-ruleset-op                         op   200 
+  the operator reads of the ruleset: {"bypass_actors":[],"current_user_can_bypass":"never"}
+2a-80-delete-rule                        op   204 
+2b-01-rule                               op   201 
+2b-10-rules-app                          app  200 
+  the App: [{"type":"creation","ruleset_id":28214359},{"type":"non_fast_forward","ruleset_id":28214359},{"type":"deletion","ruleset_id":28214359}]
+2b-11-rules-op                           op   200 
+  the operator: [{"type":"creation","ruleset_id":28214359},{"type":"non_fast_forward","ruleset_id":28214359},{"type":"deletion","ruleset_id":28214359}]
+  the two bodies are the same
+2b-12-ruleset-op                         op   200 
+  the operator reads of the ruleset: {"bypass_actors":[{"actor_id":5,"actor_type":"RepositoryRole","bypass_mode":"always"}],"current_user_can_bypass":"always"}
+2b-80-delete-rule                        op   204 
+90-read-factory_issue-7900               app  404 Not Found
+90-read-probe_p-45-c-outside             app  404 Not Found
+99a-rulesets                             op   200 
+rulesets after: []
+99c-matching-factory                     app  200 
+refs under factory after: []
+token revoked: 204

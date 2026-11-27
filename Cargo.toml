@@ -19,6 +19,13 @@ pulldown-cmark = { version = "=0.13.6", default-features = false }
 # Exact pins, for the fold of VAL-5d (SPEC 19.2).
 icu_casemap = "=2.4.0"
 icu_normalizer = { version = "=2.4.0", default-features = false, features = ["compiled_data"] }
+# The config row (SPEC 19.2): toml without `display`, since nothing here
+# writes TOML.
+serde = { version = "1", features = ["derive"] }
+toml = { version = "1", default-features = false, features = ["parse", "serde", "std"] }
+schemars = "1"
+# The errors row (SPEC 19.2).
+thiserror = "2"
 # The testing row gives no version (SPEC 19.2). Without the default features,
 # which fork and time out tests and read regular expressions.
 proptest = { version = "1", default-features = false, features = ["std"] }

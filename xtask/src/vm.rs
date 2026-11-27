@@ -52,7 +52,7 @@ impl Vm {
                 Ok(())
             }
             Some(instance) => {
-                self.compare(config, &instance.directory)?;
+                self.compare(config, &instance.directory);
                 if instance.status == "Running" {
                     return Ok(());
                 }
@@ -85,26 +85,35 @@ impl Vm {
             "xtask check: the set, in the development VM `{}`",
             self.name
         );
-        self.limactl(&[
-            "shell",
-            "--workdir=/",
-            &self.name,
-            "--",
-            "sh",
-            "-c",
+        self.limactl(&self.shell(
             "cd \"$HOME/$1\" && CARGO_TARGET_DIR=\"$HOME/$2\" && export CARGO_TARGET_DIR \
              && \"$HOME/.local/bin/mise\" install --yes \
              && exec \"$HOME/.local/bin/mise\" exec -- cargo xtask check",
-            "sh",
-            &tree.to_string_lossy(),
-            &target.to_string_lossy(),
-        ])
+            &[&tree.to_string_lossy(), &target.to_string_lossy()],
+        ))
         .map_err(|error| {
             format!(
                 "the check set in the development VM `{}` failed: {error}",
                 self.name
             )
         })
+    }
+
+    /// The arguments of `limactl` that run `script` with `sh` in the VM, from
+    /// its root, with `arguments` as `$1` and on.
+    fn shell<'a>(&'a self, script: &'a str, arguments: &[&'a str]) -> Vec<&'a str> {
+        let mut call = vec![
+            "shell",
+            "--workdir=/",
+            &self.name,
+            "--",
+            "sh",
+            "-c",
+            script,
+            "sh",
+        ];
+        call.extend_from_slice(arguments);
+        call
     }
 
     /// Replaces the directory `tree`, relative to the home directory in the
@@ -135,17 +144,10 @@ impl Vm {
         });
         let stdout = archive.stdout.take().ok_or("`tar` has no stdout")?;
         let extract = Command::new(&self.limactl)
-            .args([
-                "shell",
-                "--workdir=/",
-                &self.name,
-                "--",
-                "sh",
-                "-c",
+            .args(self.shell(
                 "cd && rm -rf -- \"$1\" && mkdir -p -- \"$1\" && tar -xf - -C \"$1\"",
-                "sh",
-                &tree.to_string_lossy(),
-            ])
+                &[&tree.to_string_lossy()],
+            ))
             .stdin(stdout)
             .status()
             .map_err(|error| format!("`{} shell` could not be started: {error}", self.limactl))?;
@@ -156,11 +158,13 @@ impl Vm {
             .wait()
             .map_err(|error| format!("`tar` was lost: {error}"))?;
         listed.map_err(|error| format!("the list of files was not written: {error}"))?;
-        if !archived.success() {
-            return Err(format!("`tar` on the Mac {}", ended(archived)));
-        }
+        // Where the VM's side ends first, the Mac's `tar` loses its reader and
+        // ends too, so the VM's failure is the one to name.
         if !extract.success() {
             return Err(format!("`tar` in the VM {}", ended(extract)));
+        }
+        if !archived.success() {
+            return Err(format!("`tar` on the Mac {}", ended(archived)));
         }
         Ok(())
     }
@@ -179,24 +183,22 @@ impl Vm {
             })
     }
 
-    /// Fails where the VM was created from another configuration than
-    /// `config`. The VM is not deleted: it holds what DEV-4 puts in it.
-    fn compare(&self, config: &Path, directory: &Path) -> Result<(), String> {
-        let current = std::fs::read(config).map_err(|error| {
-            self.failure(
-                "looked up",
-                &format!("cannot read {}: {error}", config.display()),
-            )
-        })?;
-        if std::fs::read(directory.join(RECORD)).ok() == Some(current) {
-            return Ok(());
+    /// Warns where the VM was created from another configuration than
+    /// `config`, and goes on: every work tree shares the one VM, so a branch
+    /// that changes `lima.yaml` would otherwise stop the check on every other.
+    /// The VM is not deleted: it holds what DEV-4 puts in it.
+    fn compare(&self, config: &Path, directory: &Path) {
+        let current = std::fs::read(config).ok();
+        if current.is_some() && std::fs::read(directory.join(RECORD)).ok() == current {
+            return;
         }
-        Err(format!(
-            "the development VM `{name}` was not created from the {config} of this work tree. \
-             Delete it with `limactl delete --force {name}`, and the next check creates it anew",
+        eprintln!(
+            "xtask check: warning: the development VM `{name}` was not created from the {config} \
+             of this work tree. Delete it with `limactl delete --force {name}` where the check \
+             needs what that file gives it, and the next check creates it anew",
             name = self.name,
             config = config.display(),
-        ))
+        );
     }
 
     fn instance(&self) -> Result<Option<Instance>, String> {
@@ -261,7 +263,6 @@ pub fn work_tree_files(root: &Path) -> Result<Vec<String>, String> {
             "--cached",
             "--others",
             "--exclude-standard",
-            "--deduplicate",
         ])
         .current_dir(root)
         .stderr(Stdio::inherit())
@@ -463,7 +464,7 @@ mod tests {
     }
 
     #[test]
-    fn a_vm_made_from_another_configuration_fails_by_name_and_is_kept() {
+    fn a_vm_made_from_another_configuration_is_used_as_it_is_and_kept() {
         let scratch = Scratch::new("changed");
         let config = scratch.config();
         let vm = Vm::new(
@@ -474,13 +475,9 @@ mod tests {
             .expect("record the configuration");
         std::fs::write(&config, "vmType: qemu\n").expect("change the configuration");
 
-        let failure = vm.ensure(&config).expect_err("the VM is out of date");
+        let outcome = vm.ensure(&config);
 
-        assert!(failure.contains("`sf-test`"), "{failure}");
-        assert!(
-            failure.contains("limactl delete --force sf-test"),
-            "{failure}"
-        );
+        assert!(outcome.is_ok(), "{outcome:?}");
         assert_eq!(scratch.calls(), ["list"], "the VM was changed");
     }
 

@@ -94,6 +94,7 @@ impl Step {
         }
     }
 
+    /// Marks the step as one that macOS runs outside the VM too (DEV-3).
     fn also_outside_the_vm(mut self) -> Self {
         self.outside_the_vm = true;
         self

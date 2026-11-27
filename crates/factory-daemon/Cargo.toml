@@ -9,6 +9,7 @@ license.workspace = true
 
 [dependencies]
 factory-core = { path = "../factory-core" }
+factory-proc = { path = "../factory-proc" }
 thiserror.workspace = true
 
 [lints]

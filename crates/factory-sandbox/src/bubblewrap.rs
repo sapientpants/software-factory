@@ -4,20 +4,27 @@
 //! An instance is a set of arguments of `bwrap`: the namespaces of level
 //! `process`, the OS baseline, the temporary directory as `/tmp` and the
 //! mounts of the sandbox policy, over a root that is read-only (SEC-6, SEC-6a to
-//! SEC-6d). [`SandboxInstance::command`] gives a [`Command`] that the
+//! SEC-6d), under the seccomp filter of SEC-6e, which the instance compiles
+//! when it is created and hands to `bwrap` as descriptors of its own.
+//! [`SandboxInstance::command`] gives a [`Command`] that the
 //! supervisor shim starts (AG-16): the shim starts `bwrap`, and `bwrap`
 //! starts the command. The instance starts nothing itself. It knows its
 //! processes on the host by the temporary directory in their arguments, which
 //! is its own, and kills them by that, also after a daemon restart.
 
 use std::ffi::{OsStr, OsString};
+use std::io::Write as _;
+use std::os::fd::{OwnedFd, RawFd};
 use std::os::unix::ffi::OsStrExt as _;
 use std::os::unix::fs::{DirBuilderExt as _, PermissionsExt as _};
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 use std::time::Duration;
 
 use factory_core::engine::RunId;
 use factory_proc::{Command, Supervisor};
+use nix::fcntl::{FcntlArg, SealFlag, fcntl};
+use nix::sys::memfd::{MFdFlags, memfd_create};
 use nix::sys::signal::{Signal, kill};
 use nix::unistd::Pid;
 use tokio::time::Instant;
@@ -123,10 +130,21 @@ pub fn baseline(host: impl Fn(&Path) -> OnHost) -> Vec<OsString> {
     arguments
 }
 
-/// Every argument of `bwrap` for `spec` in an instance of the sandbox policy `policy`, with the
-/// baseline `baseline`.
-pub fn arguments(policy: &SandboxPolicy, baseline: &[OsString], spec: &ExecSpec) -> Vec<OsString> {
+/// Every argument of `bwrap` for `spec` in an instance of the sandbox
+/// policy `policy`, with the baseline `baseline` and the programs of the
+/// filter at the descriptors `filter`.
+pub fn arguments(
+    policy: &SandboxPolicy,
+    baseline: &[OsString],
+    filter: &[RawFd],
+    spec: &ExecSpec,
+) -> Vec<OsString> {
     let mut arguments: Vec<OsString> = NAMESPACES.iter().map(OsString::from).collect();
+    // bubblewrap applies each as its last step before the command starts
+    // (SEC-6e).
+    for fd in filter {
+        arguments.extend(["--add-seccomp-fd".into(), fd.to_string().into()]);
+    }
     arguments.extend(baseline.iter().cloned());
     arguments.extend([
         "--bind".into(),
@@ -206,6 +224,7 @@ impl crate::Sandbox for Bubblewrap {
                 what: format!("find bubblewrap at {}", self.program.display()),
                 source,
             })?;
+            let filter = filter()?;
             let tmp_error = |source| Error::Host {
                 what: format!("create the temporary directory {}", policy.tmp.display()),
                 source,
@@ -221,6 +240,7 @@ impl crate::Sandbox for Bubblewrap {
                 program: self.program.clone(),
                 supervisor: self.supervisor.clone(),
                 baseline: baseline(on_this_host),
+                filter,
                 record: SandboxRecord {
                     run,
                     level: Level::Process,
@@ -245,6 +265,8 @@ struct Instance {
     program: PathBuf,
     supervisor: Supervisor,
     baseline: Vec<OsString>,
+    /// The programs of the filter, each in a sealed file of memory.
+    filter: Vec<Arc<OwnedFd>>,
     record: SandboxRecord,
     policy: SandboxPolicy,
 }
@@ -256,7 +278,12 @@ impl SandboxInstance for Instance {
 
     fn command(&self, spec: &ExecSpec) -> Result<Command, Error> {
         let mut command = Command::new(&self.program);
-        command.args(arguments(&self.policy, &self.baseline, spec));
+        let filter: Vec<RawFd> = self
+            .filter
+            .iter()
+            .map(|program| command.pass_file(Arc::clone(program)))
+            .collect();
+        command.args(arguments(&self.policy, &self.baseline, &filter, spec));
         for (key, value) in &spec.env {
             command.env(key, value);
         }
@@ -279,6 +306,40 @@ impl SandboxInstance for Instance {
             remove(&self.record.tmp)
         })
     }
+}
+
+/// A file of memory for a program of the filter: closed on exec, so that no
+/// other program that the daemon starts inherits it, and open to seals.
+const MEMFD: MFdFlags = MFdFlags::MFD_CLOEXEC.union(MFdFlags::MFD_ALLOW_SEALING);
+
+/// The seals of that file once written: it neither changes nor takes
+/// another seal.
+const SEALS: SealFlag = SealFlag::F_SEAL_SEAL
+    .union(SealFlag::F_SEAL_SHRINK)
+    .union(SealFlag::F_SEAL_GROW)
+    .union(SealFlag::F_SEAL_WRITE);
+
+/// The filter of SEC-6e for the architecture of this build, compiled, each
+/// program in a file of memory that is sealed once written, so that nothing
+/// changes it before bubblewrap reads it.
+fn filter() -> Result<Vec<Arc<OwnedFd>>, Error> {
+    let arch = crate::seccomp::Arch::THIS
+        .ok_or_else(|| Error::Filter(format!("no filter for {}", std::env::consts::ARCH)))?;
+    let programs = crate::seccomp::compile(arch).map_err(Error::Filter)?;
+    let host = |source| Error::Host {
+        what: "hold the seccomp filter in memory".to_owned(),
+        source,
+    };
+    programs
+        .iter()
+        .map(|program| {
+            let fd = memfd_create(c"sf-seccomp", MEMFD).map_err(|errno| host(errno.into()))?;
+            let mut file = std::fs::File::from(fd);
+            file.write_all(program).map_err(host)?;
+            fcntl(&file, FcntlArg::F_ADD_SEALS(SEALS)).map_err(|errno| host(errno.into()))?;
+            Ok(Arc::new(OwnedFd::from(file)))
+        })
+        .collect()
 }
 
 /// A process of the host, as `/proc` shows it.
@@ -579,7 +640,7 @@ mod tests {
         let spec = ExecSpec::new("/bin/sh", ["-c", "echo"], "/srv/run/workspace");
 
         assert_eq!(
-            words(&arguments(&policy, &baseline, &spec)),
+            words(&arguments(&policy, &baseline, &[7, 9], &spec)),
             [
                 "--unshare-user",
                 "--unshare-pid",
@@ -594,6 +655,10 @@ mod tests {
                 "/proc",
                 "--dev",
                 "/dev",
+                "--add-seccomp-fd",
+                "7",
+                "--add-seccomp-fd",
+                "9",
                 "--ro-bind",
                 "/usr",
                 "/usr",
@@ -630,6 +695,36 @@ mod tests {
         assert!(caps.fs_isolation && caps.process_isolation);
         assert!(!caps.egress_filtering && !caps.vm_boundary);
         assert!(!caps.provides(Level::Process));
+    }
+
+    #[test]
+    fn each_program_of_the_filter_is_sealed_and_closed_on_exec() {
+        use nix::fcntl::FdFlag;
+
+        let programs = filter().unwrap();
+        let expected = match crate::seccomp::Arch::THIS {
+            Some(crate::seccomp::Arch::X86_64) => 4,
+            _ => 3,
+        };
+
+        assert_eq!(programs.len(), expected);
+        for program in &programs {
+            let seals = fcntl(program.as_ref(), FcntlArg::F_GET_SEALS).unwrap();
+            assert_eq!(SealFlag::from_bits_truncate(seals), SEALS);
+            for seal in [
+                SealFlag::F_SEAL_SEAL,
+                SealFlag::F_SEAL_SHRINK,
+                SealFlag::F_SEAL_GROW,
+                SealFlag::F_SEAL_WRITE,
+            ] {
+                assert!(SEALS.contains(seal), "{seal:?}");
+            }
+            let flags = fcntl(program.as_ref(), FcntlArg::F_GETFD).unwrap();
+            assert!(FdFlag::from_bits_truncate(flags).contains(FdFlag::FD_CLOEXEC));
+            // Nothing writes to it any more.
+            let mut file = std::fs::File::from(program.try_clone().unwrap());
+            assert!(file.write_all(b"x").is_err());
+        }
     }
 
     #[test]

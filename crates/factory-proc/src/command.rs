@@ -32,6 +32,8 @@ pub struct Command {
     raw_stdout: bool,
     max_line_length: usize,
     supervisor: Option<Supervisor>,
+    #[cfg(target_os = "linux")]
+    files: Vec<std::sync::Arc<std::os::fd::OwnedFd>>,
 }
 
 /// The supervisor shim that a command is started through (AG-16): a program
@@ -69,6 +71,8 @@ impl Command {
             raw_stdout: false,
             max_line_length: MAX_LINE_LENGTH,
             supervisor: None,
+            #[cfg(target_os = "linux")]
+            files: Vec::new(),
         }
     }
 
@@ -125,6 +129,21 @@ impl Command {
         self
     }
 
+    /// Gives the program the open file `file`, at the number of its
+    /// descriptor, which this returns: through the shim too, where there is
+    /// one. Each process started from the command gets a description of the
+    /// file of its own, opened again for reading, so that each reads it from
+    /// its start; `file` itself stays closed on exec, and no other program
+    /// started meanwhile inherits it.
+    #[cfg(target_os = "linux")]
+    pub fn pass_file(&mut self, file: std::sync::Arc<std::os::fd::OwnedFd>) -> std::os::fd::RawFd {
+        use std::os::fd::AsRawFd as _;
+
+        let fd = file.as_raw_fd();
+        self.files.push(file);
+        fd
+    }
+
     /// Starts the command. Its stderr is written to `stderr` while stdout is
     /// read (AG-13).
     ///
@@ -171,6 +190,8 @@ impl Command {
         if let Some(pipes) = &pipes {
             pipes.inherit(&mut command);
         }
+        #[cfg(target_os = "linux")]
+        pass_files(&mut command, &self.files);
         let mut wrap = CommandWrap::from(command);
         wrap.wrap(ProcessGroup::leader()).wrap(KillOnDrop);
         let spawn_error = |source| Error::Spawn {
@@ -205,5 +226,52 @@ impl Command {
             Box::pin(stderr),
             held,
         ))
+    }
+}
+
+/// Opens each of `files` again in the child, between its fork and its exec,
+/// and puts the new description at the number of the old one, where the
+/// exec does not close it.
+#[cfg(target_os = "linux")]
+fn pass_files(
+    command: &mut tokio::process::Command,
+    files: &[std::sync::Arc<std::os::fd::OwnedFd>],
+) {
+    use std::ffi::CString;
+    use std::os::fd::{AsRawFd as _, IntoRawFd as _};
+
+    use nix::fcntl::{OFlag, open};
+    use nix::sys::stat::Mode;
+
+    if files.is_empty() {
+        return;
+    }
+    // Made before the fork: the child allocates nothing.
+    let paths: Vec<(CString, std::os::fd::RawFd)> = files
+        .iter()
+        .map(|file| {
+            let fd = file.as_raw_fd();
+            let path =
+                CString::new(format!("/proc/self/fd/{fd}")).unwrap_or_else(|_| CString::default());
+            (path, fd)
+        })
+        .collect();
+    let reopen = move || {
+        for (path, fd) in &paths {
+            // Closed when it is dropped below, before the exec.
+            let fresh = open(path.as_c_str(), OFlag::O_RDONLY, Mode::empty())?;
+            // SAFETY: `fd` is a descriptor of the parent's that the child
+            // inherited and that nothing in the child owns; `dup2` replaces
+            // it, and the exec that follows is what uses it.
+            let placed = unsafe { nix::unistd::dup2_raw(&fresh, *fd) }?;
+            let _ = placed.into_raw_fd();
+        }
+        Ok(())
+    };
+    // SAFETY: the closure runs in the child before its exec, where it makes
+    // calls of open(2), dup2(2) and close(2), each async-signal-safe, and
+    // allocates nothing: the paths were made before the fork.
+    unsafe {
+        command.pre_exec(reopen);
     }
 }

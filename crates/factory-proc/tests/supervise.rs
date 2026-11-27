@@ -205,7 +205,52 @@ fn the_arguments_of_the_protocol() {
     }
 }
 
+/// A file passed to a command through the shim: each command started from
+/// it reads the whole file at the descriptor it was given, and a command
+/// that was not given it has no such descriptor.
+#[cfg(target_os = "linux")]
+fn a_passed_file_reaches_the_command_from_its_start_each_time() {
+    use std::os::fd::{AsRawFd as _, OwnedFd};
+    use std::sync::Arc;
+
+    within(async {
+        let path = std::env::temp_dir().join(format!("sf-proc-passed-{}", std::process::id()));
+        std::fs::write(&path, "passed\n").unwrap();
+        let file = Arc::new(OwnedFd::from(std::fs::File::open(&path).unwrap()));
+        std::fs::remove_file(&path).unwrap();
+        let fd = file.as_raw_fd();
+        // dash reads no descriptor above 9.
+        let script = format!("cat <&{fd} 2>/dev/null || echo none");
+        let bash = |script: &str| {
+            let mut command = Command::new("/bin/bash");
+            command
+                .args(["-c", script])
+                .supervised_by(Supervisor::new(
+                    std::env::current_exe().unwrap(),
+                    Vec::<OsString>::new(),
+                ))
+                .env(ROLE, "shim");
+            command
+        };
+        let mut given = bash(&script);
+        assert_eq!(given.pass_file(Arc::clone(&file)), fd);
+
+        for _ in 0..2 {
+            let mut process = spawn(&given).await;
+            assert_eq!(text(&mut process).await, "passed");
+            assert_eq!(process.wait().await.unwrap().code(), Some(0));
+        }
+        let mut process = spawn(&bash(&script)).await;
+        assert_eq!(text(&mut process).await, "none");
+    });
+}
+
 const TESTS: &[(&str, fn())] = &[
+    #[cfg(target_os = "linux")]
+    (
+        "a_passed_file_reaches_the_command_from_its_start_each_time",
+        a_passed_file_reaches_the_command_from_its_start_each_time,
+    ),
     (
         "a_killed_parent_leaves_no_process_of_the_tree",
         a_killed_parent_leaves_no_process_of_the_tree,

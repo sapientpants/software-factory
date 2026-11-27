@@ -15,6 +15,7 @@ thiserror.workspace = true
 # The bubblewrap backend is compiled for Linux alone (SPEC 4.4).
 [target.'cfg(target_os = "linux")'.dependencies]
 nix.workspace = true
+seccompiler.workspace = true
 tokio = { workspace = true, features = ["time"] }
 
 [target.'cfg(target_os = "linux")'.dev-dependencies]

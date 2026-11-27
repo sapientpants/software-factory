@@ -4824,3 +4824,46 @@ The unit tests of `factory-sandbox::seccomp` run the compiled programs in an eva
 - **A cold build and an agent session under the filter**, with the exit check of M0 (22) and #138.
 - **The descriptors that a worker inherits** from the process that starts the daemon (above).
 - **The x32 ABI on the runner's kernel.** Whether the kernel has the ABI, so that the filter and not the kernel gave the `ENOSYS`, was not looked at.
+
+## P-37, in part: the first process and the signals
+
+Answered 2026-11-28 for #133 by the sandbox tests of 19.4 for the first process of SEC-10a, run against the backend of `factory-sandbox` as this pull request builds it, with `sf __sandbox-init` as PID 1 of each instance. It is the first time that the first process ran on a kernel. The proxy of SEC-10b is #134; a listener on a Unix socket of the host stood in for it.
+
+**Answer.**
+
+- **The first process is PID 1.** With `--as-pid-1`, the program that bubblewrap started was PID 1 of the sandbox, the one child of `bwrap` on the host, and its command was PID 2. bubblewrap put no process of its own in the namespace.
+- **It binds the port before the command.** A command whose first act was to connect to `127.0.0.1:3128` connected, sent a line and read one back.
+- **A connection reaches the proxy's socket and nothing else.** The line reached the listener of the host that stood in for the proxy, through the socket that the sandbox showed at `/sf/proxy.sock`, and that listener's answer reached the command. It accepted one connection and no other. A connection to port 3129 in the sandbox was refused, and one to a listener of the host on its loopback interface reached nothing.
+- **A SIGINT and a SIGTERM reach the command's group.** Sent from the host to the pid of the first process, each reached the shell of the command, which trapped both and exited with 7 on the SIGTERM. `bwrap` lived on until then, and the 7 came back through `bwrap` and the supervisor shim.
+- **A SIGKILL leaves no process of the sandbox.** After a SIGKILL to the first process, `bwrap` and the shim exited with 137, and `bwrap`, the first process, the shell and its two children were each gone within 5 s. One of the two children ran in a session of its own, which no signal to the command's group reaches.
+- **The first process reaps what is left to it.** A process whose parent had ended had PID 1 as its parent, and once it had ended it was gone, and no zombie.
+- **PID 1 holds no path of the host.** Its arguments read `/sf/sf __sandbox-init /bin/sh -c <script>`, and the scratch directory of the host appeared nowhere in them. That answers the point that the part of P-37 above left for the first process. Whether a worker sees the arguments of `bwrap` anywhere else was not looked at.
+- **The 17 earlier sandbox tests passed with the first process,** under the filter of SEC-6e. A first process on tokio, with a listener, three signal handlers and a set of tasks, made no call that the filter refuses.
+
+### Method
+
+The test binary `crates/factory-sandbox/tests/sandbox.rs`, with `SF_SANDBOX_TESTS=process`, which is the sandbox step of `cargo xtask check` (DEV-2a). Run as `<binary> __sandbox-init <program> [<arg>...]` the binary is the first process, which the backend shows read-only at `/sf/sf` in place of `sf`. The tests find the first process on the host as the one child of the `bwrap` that the shim reports, and check its arguments. Each command is a shell script; the tests of the signals have it trap SIGINT and SIGTERM and print a line for each. The tests ran eight times in a row, and each passed every time.
+
+| | |
+|---|---|
+| Where | The development VM `sf-dev` of DEV-3, as in the parts of P-37 above: Debian 13, kernel `6.12.115+deb13.1-cloud-arm64`, aarch64, bubblewrap 0.12.0 |
+| When | 2026-11-28, by the session, in `cargo xtask check` and on its own |
+| The hosted runners | Not yet run: the jobs of the CI workflow on this pull request, with the 0.9.0 that apt installs there, are its checks |
+
+### Found on the way
+
+- **PID 1 drops a signal it has no handler for.** The kernel delivers to the init of a namespace no signal from outside it for which the process has no handler, SIGKILL and SIGSTOP aside. The first process therefore installs its handlers before it binds the port or starts the command, and SEC-10a now says so.
+- **A leading `--` does not reach the subcommand.** The argument parser of `sf` takes a `--` right after the subcommand for its own and drops it, so the protocol of `sf __sandbox-init` is the program and its arguments, with no `--` before them.
+
+### What changed in the spec
+
+1. SEC-10a: the order of what the first process does, with its signal handlers first; the fixed paths `/sf/sf` and `/sf/proxy.sock`; how it reaps; and what was observed, in place of what nobody observed.
+2. SEC-6f: a policy that shows a path at or below `/sf` is refused.
+3. SEC-6g: what a worker reads through PID 1 now.
+4. The row of this probe in 23.2.
+
+### Still open
+
+- **The pid of `--json-status-fd`.** The backend does not yet read it, and the stop sequence of `factory-proc` still signals the group that the shim reports, which is that of `bwrap`. How the traits of 13.3 carry the first process's pid is left open by SEC-10a.
+- **The hosted runners,** with bubblewrap 0.9.0, until the CI workflow has run on this pull request.
+- **The proxy itself** (#134, #135), and a cold build and an agent session behind it (#135, #138).

@@ -1,8 +1,11 @@
 //! The sandbox tests of SPEC 19.4 for the bubblewrap backend, at level
-//! `process`: those that need no proxy of SEC-10b.
+//! `process`: those that need no proxy of SEC-10b, which a listener on a Unix
+//! socket stands in for.
 //!
 //! The binary has a harness of its own. Run as `<binary> __supervise ...` it
-//! is the supervisor shim of AG-16 that the backend starts, and runs no test.
+//! is the supervisor shim of AG-16 that the backend starts, and runs no test;
+//! run as `<binary> __sandbox-init ...` it is the first process of SEC-10a,
+//! which the backend shows as the `sf` binary.
 //! Run as `<binary> __call <calls>` it makes the calls of the table of SEC-6e
 //! and prints what each returned, which the tests of the filter have it do
 //! inside an instance.
@@ -32,6 +35,7 @@ mod linux {
     use factory_core::engine::RunId;
     use factory_proc::supervise::{FAILED, Supervise};
     use factory_proc::{Command, Line, Process, Supervisor};
+    use factory_sandbox::bubblewrap::init::{self, Init};
     use factory_sandbox::bubblewrap::{Bubblewrap, parse_stat};
     use factory_sandbox::{
         Access, Error, ExecSpec, Mount, Sandbox as _, SandboxInstance, SandboxPolicy,
@@ -45,6 +49,20 @@ mod linux {
 
     /// The longest that a test may take.
     const LIMIT: Duration = Duration::from_secs(30);
+
+    /// The first argument that makes this binary the first process.
+    pub const INIT: &str = init::SUBCOMMAND;
+
+    /// The first process's part.
+    pub fn first_process() -> ExitCode {
+        match Init::parse(std::env::args_os().skip(2)) {
+            Ok(init) => init.run(),
+            Err(message) => {
+                eprintln!("{message}");
+                ExitCode::from(FAILED)
+            }
+        }
+    }
 
     /// The shim's part.
     pub fn shim() -> ExitCode {
@@ -78,18 +96,17 @@ mod linux {
     }
 
     fn backend() -> Bubblewrap {
-        Bubblewrap::new(
-            bwrap(),
-            Supervisor::new(std::env::current_exe().unwrap(), [SHIM]),
-        )
+        let this = std::env::current_exe().unwrap();
+        Bubblewrap::new(bwrap(), Supervisor::new(&this, [SHIM]), this)
     }
 
     /// A fresh directory for one test, with a read-write `work` and a
-    /// read-only `ro`, which the sandbox shows as `/work` and `/ro`, removed
-    /// when the value is dropped. The host's paths are not shown: they lie
-    /// below `/tmp`, where no mount is shown (SEC-6c), and wherever the
-    /// copies of the mutation step lie.
-    struct Scratch(PathBuf);
+    /// read-only `ro`, which the sandbox shows as `/work` and `/ro`, and the
+    /// socket that stands in for the proxy's, removed when the value is
+    /// dropped. The host's paths are not shown: they lie below `/tmp`, where
+    /// no mount is shown (SEC-6c), and wherever the copies of the mutation
+    /// step lie.
+    struct Scratch(PathBuf, Option<std::os::unix::net::UnixListener>);
 
     impl Scratch {
         fn new(test: &str) -> Self {
@@ -100,7 +117,17 @@ mod linux {
                 std::fs::create_dir_all(path.join(dir)).unwrap();
             }
             std::fs::write(path.join("ro/file"), "read-only\n").unwrap();
-            Self(path)
+            let proxy =
+                std::os::unix::net::UnixListener::bind(path.join("exec/proxy.sock")).unwrap();
+            Self(path, Some(proxy))
+        }
+
+        /// The stand-in for the proxy's listener, which no connection
+        /// reaches until it is taken.
+        fn proxy(&mut self) -> tokio::net::UnixListener {
+            let listener = self.1.take().expect("the stand-in is taken once");
+            listener.set_nonblocking(true).unwrap();
+            tokio::net::UnixListener::from_std(listener).unwrap()
         }
 
         fn work(&self) -> PathBuf {
@@ -126,6 +153,7 @@ mod linux {
                     },
                 ],
                 tmp: self.tmp(),
+                proxy: self.0.join("exec/proxy.sock"),
             }
         }
     }
@@ -236,8 +264,8 @@ mod linux {
             instance.destroy().await.unwrap();
 
             assert_eq!(code, Some(0), "{lines:?}");
-            // PID 1 of the namespace is bubblewrap's, and the command the
-            // next process (SEC-6a).
+            // PID 1 of the namespace is the first process, and the command
+            // the next process (SEC-6a, SEC-10a).
             assert_eq!(lines[0], "2");
             assert_eq!(lines[1], WORK);
             // The environment of the spec and of the instance, and nothing of
@@ -314,8 +342,8 @@ mod linux {
             )
             .await;
 
-            // No process of the sandbox holds the marker; it sees bubblewrap's
-            // PID 1, the shell and the commands of the pipe, and nothing of
+            // No process of the sandbox holds the marker; it sees the first
+            // process, the shell and the commands of the pipe, and nothing of
             // the host.
             assert_eq!(lines[0], "0", "{lines:?}");
             assert_eq!(lines.len(), 2, "{lines:?}");
@@ -527,7 +555,7 @@ mod linux {
                 Some(Line::Text("ready".to_owned()))
             );
             let tree = tree(process.group().try_into().unwrap());
-            // bwrap, bwrap's PID 1, the shell and two sleeps.
+            // bwrap, the first process, the shell and two sleeps.
             assert_eq!(tree.len(), 5, "{tree:?}");
 
             instance.kill_all().await.unwrap();
@@ -575,9 +603,11 @@ mod linux {
     fn a_backend_without_bubblewrap_creates_no_instance() {
         within(async {
             let scratch = Scratch::new("no-bwrap");
+            let this = std::env::current_exe().unwrap();
             let backend = Bubblewrap::new(
                 scratch.0.join("no-such-bwrap"),
-                Supervisor::new(std::env::current_exe().unwrap(), [SHIM]),
+                Supervisor::new(&this, [SHIM]),
+                this,
             );
             let refused = backend.create(RunId(1), &scratch.policy()).await.err();
             assert!(matches!(refused, Some(Error::Host { .. })), "{refused:?}");
@@ -604,6 +634,227 @@ mod linux {
             )
             .await;
             assert_eq!(lines, ["locked"]);
+            assert!(!scratch.tmp().exists());
+        });
+    }
+
+    /// The next line of `process`, which is text.
+    async fn text(process: &mut Process) -> String {
+        match process.next_line().await.unwrap() {
+            Some(Line::Text(text)) => text,
+            other => panic!("not a line of text: {other:?}"),
+        }
+    }
+
+    /// The live children of `parent`.
+    fn children(parent: i32) -> Vec<i32> {
+        std::fs::read_dir("/proc")
+            .unwrap()
+            .flatten()
+            .filter_map(|entry| std::fs::read(entry.path().join("stat")).ok())
+            .filter_map(|stat| parse_stat(&stat))
+            .filter(|(_, ppid, zombie)| *ppid == parent && !zombie)
+            .map(|(pid, _, _)| pid)
+            .collect()
+    }
+
+    /// The first process of the sandbox that `process` runs, as the host
+    /// sees it: the one child of its `bwrap`, which is `sf __sandbox-init`.
+    fn first_process_of(process: &Process) -> i32 {
+        let [first] = children(process.group().try_into().unwrap())[..] else {
+            panic!("bwrap has one child");
+        };
+        let cmdline = std::fs::read(format!("/proc/{first}/cmdline")).unwrap();
+        let words: Vec<&[u8]> = cmdline.split(|byte| *byte == 0).take(2).collect();
+        assert_eq!(words, [init::BINARY.as_bytes(), INIT.as_bytes()]);
+        first
+    }
+
+    /// Waits up to 5 s for each of `pids` to end, and fails on any left.
+    async fn all_end(pids: &[i32]) {
+        let deadline = tokio::time::Instant::now() + Duration::from_secs(5);
+        while pids.iter().any(|pid| !ended(*pid)) && tokio::time::Instant::now() < deadline {
+            tokio::time::sleep(Duration::from_millis(20)).await;
+        }
+        let left: Vec<&i32> = pids.iter().filter(|pid| !ended(**pid)).collect();
+        assert!(left.is_empty(), "{left:?} outlived the first process");
+    }
+
+    fn the_first_process_is_pid_1_and_the_binary_is_read_only() {
+        within(async {
+            let scratch = Scratch::new("pid-1");
+            let lines = run(
+                &scratch,
+                r#"
+                tr '\0' '\n' < /proc/1/cmdline | head -n 3
+                grep -c -F "$SCRATCH" /proc/1/cmdline
+                test -x /sf/sf && echo runs
+                test -w /sf/sf || echo read-only
+                test -S /sf/proxy.sock && echo socket
+                ls -A /sf
+                "#,
+                &[("SCRATCH", &scratch.0.to_string_lossy())],
+            )
+            .await;
+
+            // PID 1 holds no path of the host, so a worker reads none of
+            // them there (SEC-6g).
+            assert_eq!(
+                lines,
+                [
+                    "/sf/sf",
+                    "__sandbox-init",
+                    "/bin/sh",
+                    "0",
+                    "runs",
+                    "read-only",
+                    "socket",
+                    "proxy.sock",
+                    "sf"
+                ]
+            );
+        });
+    }
+
+    fn the_first_process_reaps_a_process_left_to_it() {
+        within(async {
+            let scratch = Scratch::new("orphan");
+            // The subshell ends before its sleep does, which is then left to
+            // PID 1 (SEC-10a).
+            let lines = run(
+                &scratch,
+                r#"
+                ( /bin/sleep 0.1 & echo $! > /tmp/orphan )
+                orphan=$(cat /tmp/orphan)
+                cut -d ' ' -f 4 "/proc/$orphan/stat"
+                /bin/sleep 1
+                test -e "/proc/$orphan" && cut -d ' ' -f 3 "/proc/$orphan/stat"
+                echo done
+                "#,
+                &[],
+            )
+            .await;
+
+            assert_eq!(lines, ["1", "done"]);
+        });
+    }
+
+    fn a_connection_to_the_port_reaches_the_proxy_and_no_other() {
+        within(async {
+            let mut scratch = Scratch::new("forward");
+            let proxy = scratch.proxy();
+            let host = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+            let port = host.local_addr().unwrap().port().to_string();
+            let policy = scratch.policy();
+            let instance = backend().create(RunId(1), &policy).await.unwrap();
+            // The connection is the command's first act: the port listens
+            // before the command exists (SEC-10a).
+            let script = r#"
+                bash -c 'exec 3<>/dev/tcp/127.0.0.1/3128 && echo hello >&3 && read -r answer <&3 && echo "$answer"'
+                bash -c "echo hello > /dev/tcp/127.0.0.1/$PORT" 2>/dev/null && echo HOST
+                bash -c 'echo hello > /dev/tcp/127.0.0.1/3129' 2>/dev/null && echo OTHER
+                echo done
+                "#;
+            let process = spawn(instance.as_ref(), &sh(script, &[("PORT", &port)])).await;
+            let stand_in = async {
+                use tokio::io::{AsyncBufReadExt as _, AsyncWriteExt as _};
+
+                let (stream, _) = proxy.accept().await.unwrap();
+                let mut stream = tokio::io::BufReader::new(stream);
+                let mut line = String::new();
+                stream.read_line(&mut line).await.unwrap();
+                stream
+                    .get_mut()
+                    .write_all(b"from the proxy\n")
+                    .await
+                    .unwrap();
+                line
+            };
+            let (heard, (code, lines)) = tokio::join!(stand_in, output(process));
+            instance.destroy().await.unwrap();
+
+            assert_eq!(code, Some(0), "{lines:?}");
+            assert_eq!(heard, "hello\n");
+            assert_eq!(lines, ["from the proxy", "done"]);
+            // One connection reached the stand-in, and none the host.
+            for accepted in [
+                tokio::time::timeout(Duration::from_millis(200), proxy.accept())
+                    .await
+                    .is_ok(),
+                tokio::time::timeout(Duration::from_millis(200), host.accept())
+                    .await
+                    .is_ok(),
+            ] {
+                assert!(!accepted);
+            }
+        });
+    }
+
+    fn a_sigint_and_a_sigterm_to_the_first_process_reach_the_command() {
+        use nix::sys::signal::{Signal, kill};
+        use nix::unistd::Pid;
+
+        within(async {
+            let scratch = Scratch::new("sigterm");
+            let policy = scratch.policy();
+            let instance = backend().create(RunId(1), &policy).await.unwrap();
+            let script = "trap 'echo int' INT; trap 'echo term; exit 7' TERM; \
+                          echo ready; while :; do /bin/sleep 0.1; done";
+            let mut process = spawn(instance.as_ref(), &sh(script, &[])).await;
+            assert_eq!(text(&mut process).await, "ready");
+            let first = Pid::from_raw(first_process_of(&process));
+
+            kill(first, Signal::SIGINT).unwrap();
+            assert_eq!(text(&mut process).await, "int");
+            kill(first, Signal::SIGTERM).unwrap();
+            assert_eq!(text(&mut process).await, "term");
+
+            // The command ended by itself, and the first process and bwrap
+            // with its status.
+            assert_eq!(process.wait().await.unwrap().code(), Some(7));
+            instance.destroy().await.unwrap();
+        });
+    }
+
+    fn after_a_sigkill_to_the_first_process_no_process_of_the_sandbox_is_left() {
+        use nix::sys::signal::{Signal, kill};
+        use nix::unistd::Pid;
+
+        within(async {
+            let scratch = Scratch::new("sigkill");
+            let policy = scratch.policy();
+            let instance = backend().create(RunId(1), &policy).await.unwrap();
+            // A grandchild in a session of its own, which no signal to the
+            // command's group reaches.
+            let script = "/bin/sleep 300 & setsid /bin/sleep 300 & echo ready; wait";
+            let mut process = spawn(instance.as_ref(), &sh(script, &[])).await;
+            assert_eq!(
+                process.next_line().await.unwrap(),
+                Some(Line::Text("ready".to_owned()))
+            );
+            let tree = tree(process.group().try_into().unwrap());
+            // bwrap, the first process, the shell and two sleeps.
+            assert_eq!(tree.len(), 5, "{tree:?}");
+            let first = first_process_of(&process);
+
+            kill(Pid::from_raw(first), Signal::SIGKILL).unwrap();
+
+            all_end(&tree).await;
+            assert_eq!(process.wait().await.unwrap().code(), Some(128 + 9));
+            instance.destroy().await.unwrap();
+        });
+    }
+
+    fn a_proxy_that_is_no_socket_creates_no_instance() {
+        within(async {
+            let scratch = Scratch::new("no-socket");
+            let mut policy = scratch.policy();
+            policy.proxy = scratch.0.join("ro/file");
+            let refused = backend().create(RunId(1), &policy).await.err();
+            assert!(matches!(refused, Some(Error::Policy(_))), "{refused:?}");
+            policy.proxy = scratch.0.join("no-such-socket");
+            let refused = backend().create(RunId(1), &policy).await.err();
+            assert!(matches!(refused, Some(Error::Host { .. })), "{refused:?}");
             assert!(!scratch.tmp().exists());
         });
     }
@@ -1106,6 +1357,30 @@ mod linux {
             "the_worker_inherits_no_descriptor_of_the_filter",
             the_worker_inherits_no_descriptor_of_the_filter,
         ),
+        (
+            "the_first_process_is_pid_1_and_the_binary_is_read_only",
+            the_first_process_is_pid_1_and_the_binary_is_read_only,
+        ),
+        (
+            "the_first_process_reaps_a_process_left_to_it",
+            the_first_process_reaps_a_process_left_to_it,
+        ),
+        (
+            "a_connection_to_the_port_reaches_the_proxy_and_no_other",
+            a_connection_to_the_port_reaches_the_proxy_and_no_other,
+        ),
+        (
+            "a_sigint_and_a_sigterm_to_the_first_process_reach_the_command",
+            a_sigint_and_a_sigterm_to_the_first_process_reach_the_command,
+        ),
+        (
+            "after_a_sigkill_to_the_first_process_no_process_of_the_sandbox_is_left",
+            after_a_sigkill_to_the_first_process_no_process_of_the_sandbox_is_left,
+        ),
+        (
+            "a_proxy_that_is_no_socket_creates_no_instance",
+            a_proxy_that_is_no_socket_creates_no_instance,
+        ),
     ];
 }
 
@@ -1130,6 +1405,10 @@ fn main() -> ExitCode {
     #[cfg(target_os = "linux")]
     if std::env::args().nth(1).as_deref() == Some(linux::SHIM) {
         return linux::shim();
+    }
+    #[cfg(target_os = "linux")]
+    if std::env::args().nth(1).as_deref() == Some(linux::INIT) {
+        return linux::first_process();
     }
     #[cfg(target_os = "linux")]
     if std::env::args().nth(1).as_deref() == Some(linux::CALL) {

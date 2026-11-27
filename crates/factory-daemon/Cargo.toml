@@ -12,5 +12,10 @@ factory-core = { path = "../factory-core" }
 factory-proc = { path = "../factory-proc" }
 thiserror.workspace = true
 
+# The first process of the bubblewrap backend, which is compiled for Linux
+# alone (SPEC 4.4, SEC-10a).
+[target.'cfg(target_os = "linux")'.dependencies]
+factory-sandbox = { path = "../factory-sandbox" }
+
 [lints]
 workspace = true

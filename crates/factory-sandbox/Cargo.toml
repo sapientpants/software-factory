@@ -16,7 +16,8 @@ thiserror.workspace = true
 [target.'cfg(target_os = "linux")'.dependencies]
 nix.workspace = true
 seccompiler.workspace = true
-tokio = { workspace = true, features = ["time"] }
+# The first process forwards with tokio (SPEC 19.2).
+tokio = { workspace = true, features = ["io-util", "macros", "net", "rt", "signal", "time"] }
 
 [target.'cfg(target_os = "linux")'.dev-dependencies]
 tokio = { workspace = true, features = ["io-std", "net", "rt-multi-thread", "time"] }

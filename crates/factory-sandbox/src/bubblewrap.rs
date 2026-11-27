@@ -2,13 +2,15 @@
 //! alone (4.4).
 //!
 //! An instance is a set of arguments of `bwrap`: the namespaces of level
-//! `process`, the OS baseline, the temporary directory as `/tmp` and the
-//! mounts of the sandbox policy, over a root that is read-only (SEC-6, SEC-6a to
+//! `process`, the OS baseline, the temporary directory as `/tmp`, the
+//! mounts of the sandbox policy, and the `sf` binary and the proxy's socket
+//! at the paths of [`init`], over a root that is read-only (SEC-6, SEC-6a to
 //! SEC-6d), under the seccomp filter of SEC-6e, which the instance compiles
 //! when it is created and hands to `bwrap` as descriptors of its own.
 //! [`SandboxInstance::command`] gives a [`Command`] that the
-//! supervisor shim starts (AG-16): the shim starts `bwrap`, and `bwrap`
-//! starts the command. The instance starts nothing itself. It knows its
+//! supervisor shim starts (AG-16): the shim starts `bwrap`, `bwrap` starts
+//! the first process of [`init`] as PID 1 of the sandbox, and the first
+//! process starts the command (SEC-10a). The instance starts nothing itself. It knows its
 //! processes on the host by the temporary directory in their arguments, which
 //! is its own, and kills them by that, also after a daemon restart.
 
@@ -16,7 +18,7 @@ use std::ffi::{OsStr, OsString};
 use std::io::Write as _;
 use std::os::fd::{OwnedFd, RawFd};
 use std::os::unix::ffi::OsStrExt as _;
-use std::os::unix::fs::{DirBuilderExt as _, PermissionsExt as _};
+use std::os::unix::fs::{DirBuilderExt as _, FileTypeExt as _, PermissionsExt as _};
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::time::Duration;
@@ -33,6 +35,8 @@ use crate::{
     Access, BoxFuture, Error, ExecSpec, Level, SandboxCaps, SandboxInstance, SandboxPolicy,
     SandboxRecord,
 };
+
+pub mod init;
 
 /// The OS baseline of SEC-6: the paths of the host's system that every
 /// instance shows read-only, at the same path. A path that the host does not
@@ -70,12 +74,14 @@ pub const BASELINE: &[&str] = &[
 
 /// The options of level `process` that come before the mounts: PID, IPC,
 /// network and user namespaces with a private `/proc` and `/dev` (SEC-6a);
-/// no user namespace of the worker's own (SEC-6b); and no process of the
-/// sandbox that outlives `bwrap` or keeps a controlling terminal (AG-16,
-/// SEC-6e).
+/// no user namespace of the worker's own (SEC-6b); the first process as
+/// PID 1, with no process of bubblewrap's in the sandbox (SEC-10a); and no
+/// process of the sandbox that outlives `bwrap` or keeps a controlling
+/// terminal (AG-16, SEC-6e).
 const NAMESPACES: &[&str] = &[
     "--unshare-user",
     "--unshare-pid",
+    "--as-pid-1",
     "--unshare-ipc",
     "--unshare-net",
     "--unshare-uts",
@@ -131,12 +137,14 @@ pub fn baseline(host: impl Fn(&Path) -> OnHost) -> Vec<OsString> {
 }
 
 /// Every argument of `bwrap` for `spec` in an instance of the sandbox
-/// policy `policy`, with the baseline `baseline` and the programs of the
-/// filter at the descriptors `filter`.
+/// policy `policy`, with the baseline `baseline`, the programs of the
+/// filter at the descriptors `filter`, and the `sf` binary at `sf`, which
+/// the sandbox shows at [`init::BINARY`] and starts as its first process.
 pub fn arguments(
     policy: &SandboxPolicy,
     baseline: &[OsString],
     filter: &[RawFd],
+    sf: &Path,
     spec: &ExecSpec,
 ) -> Vec<OsString> {
     let mut arguments: Vec<OsString> = NAMESPACES.iter().map(OsString::from).collect();
@@ -162,6 +170,15 @@ pub fn arguments(
             mount.sandbox.clone().into_os_string(),
         ]);
     }
+    // After the policy's, which none lies at or below `/sf` (SEC-10a).
+    arguments.extend([
+        "--ro-bind".into(),
+        sf.as_os_str().to_owned(),
+        init::BINARY.into(),
+        "--bind".into(),
+        policy.proxy.clone().into_os_string(),
+        init::PROXY.into(),
+    ]);
     // The root that bubblewrap creates, once every mount point is in it, and
     // the `/dev` of `--dev`: each is a memory-backed file system that the
     // worker's user owns, so a write there would count against the host's
@@ -177,6 +194,8 @@ pub fn arguments(
         "--chdir".into(),
         spec.dir.clone().into_os_string(),
         "--".into(),
+        init::BINARY.into(),
+        init::SUBCOMMAND.into(),
         spec.program.clone().into_os_string(),
     ]);
     arguments.extend(spec.args.iter().cloned());
@@ -188,15 +207,23 @@ pub fn arguments(
 pub struct Bubblewrap {
     program: PathBuf,
     supervisor: Supervisor,
+    sf: PathBuf,
 }
 
 impl Bubblewrap {
     /// The backend that runs `program`, the `bwrap` of the host, through
-    /// `supervisor`, the shim of AG-16.
-    pub fn new(program: impl Into<PathBuf>, supervisor: Supervisor) -> Self {
+    /// `supervisor`, the shim of AG-16, with the binary `sf` as the first
+    /// process of each instance, which runs it as `sf __sandbox-init`
+    /// (SEC-10a).
+    pub fn new(
+        program: impl Into<PathBuf>,
+        supervisor: Supervisor,
+        sf: impl Into<PathBuf>,
+    ) -> Self {
         Self {
             program: program.into(),
             supervisor,
+            sf: sf.into(),
         }
     }
 }
@@ -224,6 +251,16 @@ impl crate::Sandbox for Bubblewrap {
                 what: format!("find bubblewrap at {}", self.program.display()),
                 source,
             })?;
+            let socket = std::fs::metadata(&policy.proxy).map_err(|source| Error::Host {
+                what: format!("find the proxy's socket at {}", policy.proxy.display()),
+                source,
+            })?;
+            if !socket.file_type().is_socket() {
+                return Err(Error::Policy(format!(
+                    "the proxy's socket, {}, is no socket",
+                    policy.proxy.display()
+                )));
+            }
             let filter = filter()?;
             let tmp_error = |source| Error::Host {
                 what: format!("create the temporary directory {}", policy.tmp.display()),
@@ -239,6 +276,7 @@ impl crate::Sandbox for Bubblewrap {
             let instance: Box<dyn SandboxInstance> = Box::new(Instance {
                 program: self.program.clone(),
                 supervisor: self.supervisor.clone(),
+                sf: self.sf.clone(),
                 baseline: baseline(on_this_host),
                 filter,
                 record: SandboxRecord {
@@ -264,6 +302,8 @@ impl crate::Sandbox for Bubblewrap {
 struct Instance {
     program: PathBuf,
     supervisor: Supervisor,
+    /// The `sf` binary, which is the first process.
+    sf: PathBuf,
     baseline: Vec<OsString>,
     /// The programs of the filter, each in a sealed file of memory.
     filter: Vec<Arc<OwnedFd>>,
@@ -283,7 +323,13 @@ impl SandboxInstance for Instance {
             .iter()
             .map(|program| command.pass_file(Arc::clone(program)))
             .collect();
-        command.args(arguments(&self.policy, &self.baseline, &filter, spec));
+        command.args(arguments(
+            &self.policy,
+            &self.baseline,
+            &filter,
+            &self.sf,
+            spec,
+        ));
         for (key, value) in &spec.env {
             command.env(key, value);
         }
@@ -624,11 +670,12 @@ mod tests {
                 Mount::at_its_path("/srv/run/workspace", Access::ReadWrite),
                 Mount {
                     host: "/opt/sf/0.1.0/sf".into(),
-                    sandbox: "/sf".into(),
+                    sandbox: "/srv/sf".into(),
                     access: Access::ReadOnly,
                 },
             ],
             tmp: "/srv/run/exec/1/tmp".into(),
+            proxy: "/srv/run/exec/1/proxy.sock".into(),
         };
         let baseline = baseline(|path| {
             if path == Path::new("/usr") {
@@ -640,10 +687,17 @@ mod tests {
         let spec = ExecSpec::new("/bin/sh", ["-c", "echo"], "/srv/run/workspace");
 
         assert_eq!(
-            words(&arguments(&policy, &baseline, &[7, 9], &spec)),
+            words(&arguments(
+                &policy,
+                &baseline,
+                &[7, 9],
+                Path::new("/opt/sf/0.1.0/sf"),
+                &spec
+            )),
             [
                 "--unshare-user",
                 "--unshare-pid",
+                "--as-pid-1",
                 "--unshare-ipc",
                 "--unshare-net",
                 "--unshare-uts",
@@ -670,7 +724,13 @@ mod tests {
                 "/srv/run/workspace",
                 "--ro-bind",
                 "/opt/sf/0.1.0/sf",
-                "/sf",
+                "/srv/sf",
+                "--ro-bind",
+                "/opt/sf/0.1.0/sf",
+                "/sf/sf",
+                "--bind",
+                "/srv/run/exec/1/proxy.sock",
+                "/sf/proxy.sock",
                 "--remount-ro",
                 "/",
                 "--remount-ro",
@@ -678,6 +738,8 @@ mod tests {
                 "--chdir",
                 "/srv/run/workspace",
                 "--",
+                "/sf/sf",
+                "__sandbox-init",
                 "/bin/sh",
                 "-c",
                 "echo",
@@ -689,7 +751,11 @@ mod tests {
     fn the_backend_does_not_provide_level_process_before_the_proxy() {
         use crate::Sandbox as _;
 
-        let backend = Bubblewrap::new("/usr/bin/bwrap", Supervisor::new("/sf", ["__supervise"]));
+        let backend = Bubblewrap::new(
+            "/usr/bin/bwrap",
+            Supervisor::new("/sf", ["__supervise"]),
+            "/sf",
+        );
         let caps = backend.capabilities();
 
         assert!(caps.fs_isolation && caps.process_isolation);

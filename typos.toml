@@ -1,0 +1,24 @@
+# The one configuration file of typos (SPEC DEV-2b). `cargo xtask check` runs
+# typos over code and documents (DEV-2).
+
+[files]
+# The dot directories hold code too: the workflows, the hooks and the
+# settings of the session hooks. git's own directory is no part of the tree.
+ignore-hidden = false
+extend-exclude = ["/.git/"]
+
+# The records under docs/research/ are left as written. What typos has to
+# accept there is said here, for the records that need it alone. typos matches
+# the glob of a type against the name of a file and not against its path, so
+# the records are named by their file names.
+[type.research]
+extend-glob = ["probes.md", "16-spec-draft-4-review.md"]
+extend-ignore-re = [
+  # A short commit id in backticks, as the records of the probes give them.
+  "`[0-9a-f]{7}`",
+  # The patterns of probe P-28 that match `café` with its accent left out.
+  '\*\*/caf\?+\.md',
+  # A search term quoted in a review: the start of "repository" and of
+  # "repositories" both.
+  '"bare repositor"',
+]

@@ -3,6 +3,7 @@
 mod check;
 mod fetch;
 mod hook_skip;
+mod links;
 mod pre_tool_use;
 mod vm;
 
@@ -12,13 +13,14 @@ fn main() -> ExitCode {
     match std::env::args().nth(1).as_deref() {
         Some("check") => check::main(),
         Some("fetch") => fetch::main(),
+        Some("links") => links::main(),
         Some("pre-tool-use") => pre_tool_use::main(),
         Some(task) => {
             eprintln!("xtask: unknown task `{task}`");
             ExitCode::FAILURE
         }
         None => {
-            eprintln!("usage: cargo xtask <check | fetch | pre-tool-use>");
+            eprintln!("usage: cargo xtask <check | fetch | links | pre-tool-use>");
             ExitCode::FAILURE
         }
     }

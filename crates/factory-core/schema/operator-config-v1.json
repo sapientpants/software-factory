@@ -1,0 +1,439 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Operator configuration, version 1 (SPEC 16.4)",
+  "description": "The operator configuration of version 1, every key of 16.4.\n\nA key that the file may leave out holds what the table of 16.4 says for\nit: `None`, an empty collection or the default of 9.4 and section 14.",
+  "type": "object",
+  "properties": {
+    "agent": {
+      "description": "The agent CLI (10.3).",
+      "$ref": "#/$defs/Agent",
+      "default": {
+        "cli": null
+      }
+    },
+    "credentials": {
+      "description": "The credential mode and the subscription token's file (13.5).",
+      "$ref": "#/$defs/Credentials",
+      "default": {
+        "mode": "subscription",
+        "subscription_token_file": null
+      }
+    },
+    "data_dir": {
+      "description": "The data directory (9.1).",
+      "$ref": "#/$defs/AbsolutePath"
+    },
+    "ecosystem": {
+      "description": "The directories of each ecosystem (WS-7).",
+      "$ref": "#/$defs/Ecosystems",
+      "default": {
+        "rust": {
+          "toolchains_dir": null
+        }
+      }
+    },
+    "egress": {
+      "description": "The names that join the egress list (SEC-11).",
+      "$ref": "#/$defs/Egress",
+      "default": {
+        "extra_hosts": []
+      }
+    },
+    "github": {
+      "description": "The GitHub App that this build authenticates as (5.7). Without it a\ncommand that needs GitHub refuses.",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/GitHubTable"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "limits": {
+      "description": "The session and capture limits (section 14, 9.4).",
+      "$ref": "#/$defs/Limits",
+      "default": {
+        "capture": {
+          "candidate_bytes": 52428800,
+          "file_bytes": 5242880,
+          "timeout_secs": 300
+        },
+        "session": {
+          "implement_usd": 20.0,
+          "minutes": 90,
+          "turns": 200
+        }
+      }
+    },
+    "prices": {
+      "description": "The price table, one row for each model id (BUD-3). A model without a\nrow starts no session.",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/PriceRow"
+      }
+    },
+    "repository": {
+      "description": "The repository allowlist, the table `[[repository]]`. Without an entry\nthe factory works on no repository.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Repository"
+      }
+    },
+    "sandbox": {
+      "description": "The sandbox level (13.3).",
+      "$ref": "#/$defs/Sandbox"
+    },
+    "schema_version": {
+      "description": "The version of the file; this build knows 1 alone (CFG-2).",
+      "$ref": "#/$defs/SchemaVersion"
+    },
+    "tools_dir": {
+      "description": "The tools directory (WS-7a). Without it no check tool is present.",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/AbsolutePath"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "data_dir",
+    "sandbox"
+  ],
+  "$defs": {
+    "AbsolutePath": {
+      "description": "An absolute path; the file expands neither `~` nor a variable",
+      "type": "string",
+      "pattern": "^/"
+    },
+    "Agent": {
+      "description": "`[agent]` (10.3).",
+      "type": "object",
+      "properties": {
+        "cli": {
+          "description": "The executable of the agent CLI. Without it no agent session starts.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AbsolutePath"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "CaptureLimits": {
+      "description": "`[limits.capture]`: the capture limits of 9.4, whose numbers are the\ndefaults.",
+      "type": "object",
+      "properties": {
+        "candidate_bytes": {
+          "description": "New or changed bytes of a candidate.",
+          "$ref": "#/$defs/Limit",
+          "default": 52428800
+        },
+        "file_bytes": {
+          "description": "Bytes of one file.",
+          "$ref": "#/$defs/Limit",
+          "default": 5242880
+        },
+        "timeout_secs": {
+          "description": "Seconds of the sandboxed staging step.",
+          "$ref": "#/$defs/Limit",
+          "default": 300
+        }
+      },
+      "additionalProperties": false
+    },
+    "CredentialMode": {
+      "description": "`[credentials] mode`. Version 1 has one value: the API-key modes of 13.5\nare not scheduled (22).",
+      "oneOf": [
+        {
+          "description": "The agent CLI's subscription login, the default of 13.5.",
+          "type": "string",
+          "const": "subscription"
+        }
+      ]
+    },
+    "Credentials": {
+      "description": "`[credentials]` (13.5).",
+      "type": "object",
+      "properties": {
+        "mode": {
+          "description": "The credential mode; `subscription` where the file leaves it out.",
+          "$ref": "#/$defs/CredentialMode",
+          "default": "subscription"
+        },
+        "subscription_token_file": {
+          "description": "The file that holds the subscription token and nothing else, with mode\n0600. Without it no agent session starts.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AbsolutePath"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "Ecosystems": {
+      "description": "`[ecosystem]`: one table for each ecosystem, of which version 1 knows\n`rust` alone.",
+      "type": "object",
+      "properties": {
+        "rust": {
+          "description": "`[ecosystem.rust]`.",
+          "$ref": "#/$defs/RustEcosystem",
+          "default": {
+            "toolchains_dir": null
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "Egress": {
+      "description": "`[egress]` (SEC-11).",
+      "type": "object",
+      "properties": {
+        "extra_hosts": {
+          "description": "Names that join the list of SEC-11 for every sandbox instance, each\ncompared as SEC-10b says.",
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "GitHubTable": {
+      "description": "`[github]` as the file writes it: both keys or neither (CFG-6).",
+      "type": "object",
+      "properties": {
+        "app_id": {
+          "description": "The id of the GitHub App that this build authenticates as (5.7).",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint64",
+          "minimum": 0
+        },
+        "private_key_file": {
+          "description": "The file of the App's private key, with mode 0600 (13.5).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AbsolutePath"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "dependentRequired": {
+        "app_id": [
+          "private_key_file"
+        ],
+        "private_key_file": [
+          "app_id"
+        ]
+      }
+    },
+    "Limit": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "Limits": {
+      "description": "`[limits]`.",
+      "type": "object",
+      "properties": {
+        "capture": {
+          "description": "`[limits.capture]` (9.4).",
+          "$ref": "#/$defs/CaptureLimits",
+          "default": {
+            "candidate_bytes": 52428800,
+            "file_bytes": 5242880,
+            "timeout_secs": 300
+          }
+        },
+        "session": {
+          "description": "`[limits.session]` (section 14).",
+          "$ref": "#/$defs/SessionLimits",
+          "default": {
+            "implement_usd": 20.0,
+            "minutes": 90,
+            "turns": 200
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "PositiveAmount": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "Price": {
+      "type": "number",
+      "minimum": 0
+    },
+    "PriceRow": {
+      "description": "`[prices.\"<model id>\"]`: one row of the price table (BUD-3).",
+      "type": "object",
+      "properties": {
+        "cache_read": {
+          "description": "Tokens read from the cache.",
+          "$ref": "#/$defs/Price"
+        },
+        "cache_write_1h": {
+          "description": "Tokens written to the cache for one hour.",
+          "$ref": "#/$defs/Price"
+        },
+        "cache_write_5m": {
+          "description": "Tokens written to the cache for five minutes.",
+          "$ref": "#/$defs/Price"
+        },
+        "input": {
+          "description": "Input tokens.",
+          "$ref": "#/$defs/Price"
+        },
+        "output": {
+          "description": "Output tokens.",
+          "$ref": "#/$defs/Price"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "input",
+        "output",
+        "cache_read",
+        "cache_write_5m",
+        "cache_write_1h"
+      ]
+    },
+    "Repository": {
+      "description": "One entry of `[[repository]]`.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The repository, as `owner/repo`.",
+          "type": "string"
+        },
+        "required_checks": {
+          "description": "The required CI checks of the repository (VAL-8).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RequiredCheck"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ]
+    },
+    "RequiredCheck": {
+      "description": "One required CI check (VAL-8).",
+      "type": "object",
+      "properties": {
+        "app_id": {
+          "description": "The App that runs the check.",
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "name": {
+          "description": "The check-run name, as the API returns it.",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "app_id"
+      ]
+    },
+    "RustEcosystem": {
+      "description": "`[ecosystem.rust]` (WS-7).",
+      "type": "object",
+      "properties": {
+        "toolchains_dir": {
+          "description": "The toolchains directory. Without it no toolchain is present.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AbsolutePath"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "Sandbox": {
+      "description": "`[sandbox]` (13.3).",
+      "type": "object",
+      "properties": {
+        "level": {
+          "description": "The level; SEC-7 says which command accepts which.",
+          "$ref": "#/$defs/SandboxLevel"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "level"
+      ]
+    },
+    "SandboxLevel": {
+      "description": "`[sandbox] level`. `none` is no value of the file: a test sets it in code,\nwith the fake agent (SEC-7).",
+      "oneOf": [
+        {
+          "description": "The bubblewrap backend.",
+          "type": "string",
+          "const": "process"
+        },
+        {
+          "description": "The microVM backend (M2).",
+          "type": "string",
+          "const": "hardened"
+        }
+      ]
+    },
+    "SchemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "SessionLimits": {
+      "description": "`[limits.session]`: the session limits of section 14, whose numbers are\nthe defaults (D-22).",
+      "type": "object",
+      "properties": {
+        "implement_usd": {
+          "description": "Dollars of an `implement` session.",
+          "$ref": "#/$defs/PositiveAmount",
+          "default": 20.0
+        },
+        "minutes": {
+          "description": "Minutes of wall clock of a session.",
+          "$ref": "#/$defs/Limit",
+          "default": 90
+        },
+        "turns": {
+          "description": "Turns of a session.",
+          "$ref": "#/$defs/Limit",
+          "default": 200
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

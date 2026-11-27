@@ -10,9 +10,14 @@ license.workspace = true
 [dependencies]
 icu_casemap.workspace = true
 icu_normalizer.workspace = true
+schemars.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+toml.workspace = true
 
 [dev-dependencies]
 proptest.workspace = true
+serde_json.workspace = true
 
 [lints]
 workspace = true

@@ -1,0 +1,6 @@
+HTTP/2 200 
+date: Thu, 26 Nov 2026 21:56:08 GMT
+x-github-request-id: EA60:36343D:343E4C7:4DCC1CA:6B08AAF8
+
+{"data":{"deleteBranchProtectionRule":{"clientMutationId":null}}}
+

@@ -1,0 +1,6 @@
+HTTP/2 200 
+date: Thu, 26 Nov 2026 21:59:33 GMT
+x-github-request-id: F123:1CDFF1:34FEA6C:4ED8B70:6B08ABC5
+
+{"data":{"createBranchProtectionRule":{"branchProtectionRule":{"id":"BPR_kwDOVzkiD84FLwe7","pattern":"factory/*"}}}}
+

@@ -1,0 +1,6 @@
+HTTP/2 200 
+date: Thu, 26 Nov 2026 21:59:41 GMT
+x-github-request-id: ED58:8E832:315F496:49A83B2:6B08ABCC
+
+{"data":{"repository":{"ref":{"name":"factory/issue-7810","branchProtectionRule":null}}},"errors":[{"type":"FORBIDDEN","path":["repository","ref","branchProtectionRule"],"extensions":{"saml_failure":false,"ip_allow_list_failure":false},"locations":[{"line":1,"column":101}],"message":"Resource not accessible by integration"}]}
+

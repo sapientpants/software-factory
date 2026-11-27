@@ -1,0 +1,51 @@
+HTTP/2 200 
+date: Thu, 26 Nov 2026 21:52:25 GMT
+x-accepted-github-permissions: metadata=read
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: EB69:7C1C4:328A591:4B3DFC2:6B08AA18
+
+{
+  "id": 28195589,
+  "name": "probe-p45-status-checks",
+  "target": "branch",
+  "source_type": "Repository",
+  "source": "sapientpants/sf-scratch",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "exclude": [
+
+      ],
+      "include": [
+        "refs/heads/factory/**"
+      ]
+    }
+  },
+  "rules": [
+    {
+      "type": "required_status_checks",
+      "parameters": {
+        "strict_required_status_checks_policy": false,
+        "do_not_enforce_on_create": false,
+        "required_status_checks": [
+          {
+            "context": "probe/p-45"
+          }
+        ]
+      }
+    }
+  ],
+  "node_id": "RRS_lACqUmVwb3NpdG9yec5XOSIPzgGuOwU",
+  "created_at": "2026-11-26T21:52:19.226Z",
+  "updated_at": "2026-11-26T21:52:19.243Z",
+  "current_user_can_bypass": "never",
+  "_links": {
+    "self": {
+      "href": "https://api.github.com/repos/sapientpants/sf-scratch/rulesets/28195589"
+    },
+    "html": {
+      "href": "https://github.com/sapientpants/sf-scratch/rules/28195589"
+    }
+  }
+}
+

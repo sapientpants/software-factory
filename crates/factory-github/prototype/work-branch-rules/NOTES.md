@@ -1,0 +1,14 @@
+# Notes on the scripts and the responses
+
+Probe P-45, for #98: what a rule on `factory/**` does to the writes that the factory makes to a work branch, and what the scratch App reads of the rule beforehand. Throwaway code, run against `sapientpants/sf-scratch` only. The record is in `docs/research/probes.md` on `main`.
+
+- The scripts ran on 2026-11-26 between 21:46 and 22:00 UTC: `p45.sh` with the one variant `control` at 21:46, `p45.sh` with every other variant from 21:46:55 to 21:58:15, and `p45b.sh` from 21:59:14 to 22:00:12. Each was run once.
+- `lib.sh` is the file of `prototype/app-token-probes`, unchanged. Each script signs a JSON Web Token with the scratch App's private key, through `openssl`, asks for one installation token restricted to the scratch repository, keeps it in a shell variable and revokes it when it ends. The key is not in this repository. `00-token*.json` is the response that held the token, with the token taken out.
+- A response file holds the status line, up to four headers, a blank line and the body. A push file holds the commit with its parents, git's output and its exit code. `terminal*.txt` is what each script printed.
+- The operator's token, as `gh` holds it, made these requests and no other: for each variant `03-rule` (the rule's creation) and `80-delete-rule`, and for a classic variant `16-graphql-op`; `00c`, `00d`, `97-*`, `99a` and `99b` of `p45.sh`; in `p45b.sh` the files `1-01`, `1-80`, `2-02`, `2-03`, `2-80`, `3-01`, `3-80`, `99a` and `99b`, and every file whose name ends in `-op`. Every other request and every push is the App's.
+- `p45.sh` ran twice into one directory. The files `00a` to `00e` and `97` to `99` are those of the second run, which overwrote the first's; `00-token-control.json` is the token response of the first. `start.txt` and `end.txt` hold a line for each run.
+- A variant makes two work branches before its rule exists: `e`, created through the REST API at the head of `main`, and `f`, created by a push of one commit. `new` is a third name that no ref has. The numbers are in `p45.sh`.
+- In a `short` variant the script sends the reads and the create alone.
+- Five variants have no rule, because GitHub refused to create it: `deployments` (the environment that the rule names does not exist), `message-pattern` and `branch-name-pattern` (no reason given), `evaluate` (not on this plan) and `classic-creations` (organisation repositories only). Their files end at `03-rule`.
+- `classic-*-15-graphql-app`: the query asked for `branchProtectionRules` and for the ref in one request. GitHub refused the first field and returned `repository: null`, so the file says nothing of the ref. `p45b.sh` asked for the ref alone.
+- The scripts deleted what they made: every ruleset, every classic rule and every ref under `factory/`. The commits that a refused push sent are on no branch of the scratch repository.

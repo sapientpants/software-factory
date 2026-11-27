@@ -1,0 +1,11 @@
+push by app: edd918039c5bb335205c540a30b6324daab2d428 -> refs/heads/factory/issue-7581 
+the commit and its parents: edd918039c5bb335205c540a30b6324daab2d428 17d8464cd28fd71ba3cb0333f13f34d622816867
+
+remote: 
+remote: Create a pull request for 'factory/issue-7581' on GitHub by visiting:        
+remote:      https://github.com/sapientpants/sf-scratch/pull/new/factory/issue-7581        
+remote: 
+To https://github.com/sapientpants/sf-scratch.git
+*	edd918039c5bb335205c540a30b6324daab2d428:refs/heads/factory/issue-7581	[new branch]
+Done
+exit=0

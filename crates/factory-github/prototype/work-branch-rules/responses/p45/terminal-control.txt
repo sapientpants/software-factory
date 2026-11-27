@@ -1,0 +1,53 @@
+base=17d8464cd28fd71ba3cb0333f13f34d622816867 before=198d8568f5c4d7cabf12d667381e79b7b6fa55e5
+00a-base-commit                          app  200 
+the base commit: verified=false reason=unsigned committer=Marc Tremblay
+00b-before-commit                        app  200 
+the commit before it: verified=false reason=unsigned
+00c-repository-id                        op   200 
+00d-rulesets                             op   200 
+rulesets before: [
+
+]
+00e-matching-factory                     app  200 
+refs under factory before: []
+---- control (none, full): {}
+control-01-e-before                      app  201 
+control-02-f-before                      app  exit=0 Create a pull request for 'factory/issue-7501' on GitHub by visiting:        |https://github.com/sapientpants/sf-scratch/pull/new/factory/issue-7501        |*	c7adcf06d3f2a571bc4d5ca1f0a989d15f74cea3:refs/heads/factory/issue-7501	[new branch]|
+control-10-rules-e                       app  200 
+  rules on the existing branch: []
+control-11-rules-new                     app  200 
+  rules on the new branch name: []
+control-12-rules-main                    app  200 
+  rules on main: []
+control-20-create-new                    app  201 
+control-21-push-first                    app  exit=0  	c7adcf06d3f2a571bc4d5ca1f0a989d15f74cea3:refs/heads/factory/issue-7500	17d8464..c7adcf0|
+control-22-push-next                     app  exit=0  	2c945e6cb1999feceaf4a4fa9c96b7872e57c8a3:refs/heads/factory/issue-7501	c7adcf0..2c945e6|
+control-23-f-head                        app  200 
+control-24-push-merge                    app  exit=0  	82f1661c85d13fa369efe5ec40e655f9d40af080:refs/heads/factory/issue-7501	2c945e6..82f1661|
+control-25-f-head                        app  200 
+control-26-push-lease                    app  exit=0 +	ddb1aee3b1adef49952b3b54fd908a10ec7cdacd:refs/heads/factory/issue-7501	82f1661...ddb1aee (forced update)|
+control-27-patch-force                   app  200 
+control-28-delete                        app  204 
+control-30-e-after                       app  404 Not Found
+  e afterwards: 404  (base 17d8464, c1 c7adcf0, before 198d856)
+control-31-f-after                       app  200 
+  f afterwards: 200 ddb1aee (c1 c7adcf0, c2 2c945e6, merge 82f1661, reset ddb1aee)
+control-32-new-after                     app  200 
+  the new ref afterwards: 200
+control-90-read-issue-7500               app  404 Not Found
+control-90-read-issue-7501               app  200 
+control-91-delete-issue-7501             app  204 
+control-90-read-issue-7502               app  200 
+control-91-delete-issue-7502             app  204 
+97-sweep-rulesets                        op   200 
+97-sweep-classic                         op   200 
+98-sweep-list                            app  200 
+99a-rulesets                             op   200 
+rulesets after: [
+
+]
+99b-classic                              op   200 
+classic rules after: []
+99c-matching-factory                     app  200 
+refs under factory after: []
+token revoked: 204

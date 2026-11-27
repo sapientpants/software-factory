@@ -1,0 +1,53 @@
+HTTP/2 201 
+date: Thu, 26 Nov 2026 21:53:00 GMT
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: F319:30B4F1:312989E:4934D8E:6B08AA3C
+
+{
+  "id": 28195613,
+  "name": "probe-p45-status-checks-create",
+  "target": "branch",
+  "source_type": "Repository",
+  "source": "sapientpants/sf-scratch",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "exclude": [
+
+      ],
+      "include": [
+        "refs/heads/factory/**"
+      ]
+    }
+  },
+  "rules": [
+    {
+      "type": "required_status_checks",
+      "parameters": {
+        "strict_required_status_checks_policy": false,
+        "do_not_enforce_on_create": true,
+        "required_status_checks": [
+          {
+            "context": "probe/p-45"
+          }
+        ]
+      }
+    }
+  ],
+  "node_id": "RRS_lACqUmVwb3NpdG9yec5XOSIPzgGuOx0",
+  "created_at": "2026-11-26T22:53:00.503+01:00",
+  "updated_at": "2026-11-26T22:53:00.524+01:00",
+  "bypass_actors": [
+
+  ],
+  "current_user_can_bypass": "never",
+  "_links": {
+    "self": {
+      "href": "https://api.github.com/repos/sapientpants/sf-scratch/rulesets/28195613"
+    },
+    "html": {
+      "href": "https://github.com/sapientpants/sf-scratch/rules/28195613"
+    }
+  }
+}
+

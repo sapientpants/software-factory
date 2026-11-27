@@ -1,0 +1,12 @@
+HTTP/2 422 
+date: Thu, 26 Nov 2026 21:53:24 GMT
+x-accepted-github-permissions: contents=write; contents=write,workflows=write
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: F0D4:261799:31F5D7E:4A5925F:6B08AA54
+
+{
+  "message": "Repository rule violations found\n\nRequired status check \"probe/p-45\" is expected.\n\n",
+  "documentation_url": "https://docs.github.com/rest/git/refs#update-a-reference",
+  "status": "422"
+}
+

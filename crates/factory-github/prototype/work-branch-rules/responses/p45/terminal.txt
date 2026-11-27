@@ -1,0 +1,563 @@
+base=17d8464cd28fd71ba3cb0333f13f34d622816867 before=198d8568f5c4d7cabf12d667381e79b7b6fa55e5
+00a-base-commit                          app  200 
+the base commit: verified=false reason=unsigned committer=Marc Tremblay
+00b-before-commit                        app  200 
+the commit before it: verified=false reason=unsigned
+00c-repository-id                        op   200 
+00d-rulesets                             op   200 
+rulesets before: [
+
+]
+00e-matching-factory                     app  200 
+refs under factory before: []
+---- creation (ruleset, full): {"enforcement":"active","conditions":{"ref_name":{"include":["refs/heads/factory/**"],"exclude":[]}},"rules":[{"type":"creation"}]}
+creation-01-e-before                     app  201 
+creation-02-f-before                     app  exit=0 Create a pull request for 'factory/issue-7511' on GitHub by visiting:        |https://github.com/sapientpants/sf-scratch/pull/new/factory/issue-7511        |*	8187dcb107fb8fc0c62635c0ecb3648f7e23b692:refs/heads/factory/issue-7511	[new branch]|
+creation-03-rule                         op   201 
+creation-10-rules-e                      app  200 
+  rules on the existing branch: [{"type":"creation","ruleset_source_type":"Repository","ruleset_id":28195358}]
+creation-11-rules-new                    app  200 
+  rules on the new branch name: [{"type":"creation","parameters":null}]
+creation-12-rules-main                   app  200 
+  rules on main: []
+creation-13-ruleset-app                  app  200 
+  the App reads of the ruleset: {"enforcement":"active","bypass_actors":null,"current_user_can_bypass":"never","rules":["creation"]}
+creation-14-rulesets-app                 app  200 
+  the App's list of rulesets: [{"name":"probe-p45-creation","enforcement":"active"}]
+creation-20-create-new                   app  422 Reference update failed
+creation-21-push-first                   app  exit=0  	8187dcb107fb8fc0c62635c0ecb3648f7e23b692:refs/heads/factory/issue-7510	17d8464..8187dcb|
+creation-22-push-next                    app  exit=0  	ba463babad9d47aad193102918cc5c694f340c26:refs/heads/factory/issue-7511	8187dcb..ba463ba|
+creation-23-f-head                       app  200 
+creation-24-push-merge                   app  exit=0  	3fabe4bbea33145de24bd19d68a180e124b5a8c8:refs/heads/factory/issue-7511	ba463ba..3fabe4b|
+creation-25-f-head                       app  200 
+creation-26-push-lease                   app  exit=0 +	42e21735831446478595b6942691df3088a42673:refs/heads/factory/issue-7511	3fabe4b...42e2173 (forced update)|
+creation-27-patch-force                  app  200 
+creation-28-delete                       app  204 
+creation-30-e-after                      app  404 Not Found
+  e afterwards: 404  (base 17d8464, c1 8187dcb, before 198d856)
+creation-31-f-after                      app  200 
+  f afterwards: 200 42e2173 (c1 8187dcb, c2 ba463ba, merge 3fabe4b, reset 42e2173)
+creation-32-new-after                    app  404 Not Found
+  the new ref afterwards: 404
+creation-80-delete-rule                  op   204 
+creation-90-read-issue-7510              app  404 Not Found
+creation-90-read-issue-7511              app  200 
+creation-91-delete-issue-7511            app  204 
+creation-90-read-issue-7512              app  404 Not Found
+---- update (ruleset, full): {"enforcement":"active","conditions":{"ref_name":{"include":["refs/heads/factory/**"],"exclude":[]}},"rules":[{"type":"update"}]}
+update-01-e-before                       app  201 
+update-02-f-before                       app  exit=0 Create a pull request for 'factory/issue-7521' on GitHub by visiting:        |https://github.com/sapientpants/sf-scratch/pull/new/factory/issue-7521        |*	95f0801c0bebe4e6c1507f567f95ae7a47385121:refs/heads/factory/issue-7521	[new branch]|
+update-03-rule                           op   201 
+update-10-rules-e                        app  200 
+  rules on the existing branch: [{"type":"update","ruleset_source_type":"Repository","ruleset_id":28195411}]
+update-11-rules-new                      app  200 
+  rules on the new branch name: [{"type":"update","parameters":null}]
+update-12-rules-main                     app  200 
+  rules on main: []
+update-13-ruleset-app                    app  200 
+  the App reads of the ruleset: {"enforcement":"active","bypass_actors":null,"current_user_can_bypass":"never","rules":["update"]}
+update-14-rulesets-app                   app  200 
+  the App's list of rulesets: [{"name":"probe-p45-update","enforcement":"active"}]
+update-20-create-new                     app  201 
+update-21-push-first                     app  exit=1 error: GH013: Repository rule violations found for refs/heads/factory/issue-7520.        |Review all repository rules at https://github.com/sapientpants/sf-scratch/rules?ref=refs%2Fheads%2Ffactory%2Fissue-7520        |- Cannot update this protected ref.        |!	95f0801c0bebe4e6c1507f567f95ae7a47385121:refs/heads/factory/issue-
+update-22-push-next                      app  exit=1 error: GH013: Repository rule violations found for refs/heads/factory/issue-7521.        |Review all repository rules at https://github.com/sapientpants/sf-scratch/rules?ref=refs%2Fheads%2Ffactory%2Fissue-7521        |- Cannot update this protected ref.        |!	12ab0fe4702d607fa159c334157c9f003d3ca627:refs/heads/factory/issue-
+update-23-f-head                         app  200 
+update-24-push-merge                     app  exit=1 error: GH013: Repository rule violations found for refs/heads/factory/issue-7521.        |Review all repository rules at https://github.com/sapientpants/sf-scratch/rules?ref=refs%2Fheads%2Ffactory%2Fissue-7521        |- Cannot update this protected ref.        |!	a4c8e8e26ac90774747bece7a9055a88c2637605:refs/heads/factory/issue-
+update-25-f-head                         app  200 
+update-26-push-lease                     app  exit=1 error: GH013: Repository rule violations found for refs/heads/factory/issue-7521.        |Review all repository rules at https://github.com/sapientpants/sf-scratch/rules?ref=refs%2Fheads%2Ffactory%2Fissue-7521        |- Cannot update this protected ref.        |!	a7b071f5c8d25f8f04e863fad9895de20449354c:refs/heads/factory/issue-
+update-27-patch-force                    app  422 Repository rule violations found
+update-28-delete                         app  204 
+update-30-e-after                        app  404 Not Found
+  e afterwards: 404  (base 17d8464, c1 95f0801, before 198d856)
+update-31-f-after                        app  200 
+  f afterwards: 200 95f0801 (c1 95f0801, c2 12ab0fe, merge a4c8e8e, reset a7b071f)
+update-32-new-after                      app  200 
+  the new ref afterwards: 200
+update-80-delete-rule                    op   204 
+update-90-read-issue-7520                app  404 Not Found
+update-90-read-issue-7521                app  200 
+update-91-delete-issue-7521              app  204 
+update-90-read-issue-7522                app  200 
+update-91-delete-issue-7522              app  204 
+---- deletion (ruleset, full): {"enforcement":"active","conditions":{"ref_name":{"include":["refs/heads/factory/**"],"exclude":[]}},"rules":[{"type":"deletion"}]}
+deletion-01-e-before                     app  201 
+deletion-02-f-before                     app  exit=0 Create a pull request for 'factory/issue-7531' on GitHub by visiting:        |https://github.com/sapientpants/sf-scratch/pull/new/factory/issue-7531        |*	12af31b492d5fec9cd67f9dbb520c037de2f4454:refs/heads/factory/issue-7531	[new branch]|
+deletion-03-rule                         op   201 
+deletion-10-rules-e                      app  200 
+  rules on the existing branch: [{"type":"deletion","ruleset_source_type":"Repository","ruleset_id":28195458}]
+deletion-11-rules-new                    app  200 
+  rules on the new branch name: [{"type":"deletion","parameters":null}]
+deletion-12-rules-main                   app  200 
+  rules on main: []
+deletion-13-ruleset-app                  app  200 
+  the App reads of the ruleset: {"enforcement":"active","bypass_actors":null,"current_user_can_bypass":"never","rules":["deletion"]}
+deletion-14-rulesets-app                 app  200 
+  the App's list of rulesets: [{"name":"probe-p45-deletion","enforcement":"active"}]
+deletion-20-create-new                   app  201 
+deletion-21-push-first                   app  exit=0  	12af31b492d5fec9cd67f9dbb520c037de2f4454:refs/heads/factory/issue-7530	17d8464..12af31b|
+deletion-22-push-next                    app  exit=0  	6fbaf56fd353cb4ad26ae5e99df11a432145f44f:refs/heads/factory/issue-7531	12af31b..6fbaf56|
+deletion-23-f-head                       app  200 
+deletion-24-push-merge                   app  exit=0  	49da558d8976edc70269f27d2fa6ab35583ceb79:refs/heads/factory/issue-7531	6fbaf56..49da558|
+deletion-25-f-head                       app  200 
+deletion-26-push-lease                   app  exit=0 +	2d74df2291d07570312c9bccdee2af8cf4176393:refs/heads/factory/issue-7531	49da558...2d74df2 (forced update)|
+deletion-27-patch-force                  app  200 
+deletion-28-delete                       app  422 Repository rule violations found
+deletion-30-e-after                      app  200 
+  e afterwards: 200 198d856 (base 17d8464, c1 12af31b, before 198d856)
+deletion-31-f-after                      app  200 
+  f afterwards: 200 2d74df2 (c1 12af31b, c2 6fbaf56, merge 49da558, reset 2d74df2)
+deletion-32-new-after                    app  200 
+  the new ref afterwards: 200
+deletion-80-delete-rule                  op   204 
+deletion-90-read-issue-7530              app  200 
+deletion-91-delete-issue-7530            app  204 
+deletion-90-read-issue-7531              app  200 
+deletion-91-delete-issue-7531            app  204 
+deletion-90-read-issue-7532              app  200 
+deletion-91-delete-issue-7532            app  204 
+---- non-fast-forward (ruleset, full): {"enforcement":"active","conditions":{"ref_name":{"include":["refs/heads/factory/**"],"exclude":[]}},"rules":[{"type":"non_fast_forward"}]}
+non-fast-forward-01-e-before             app  201 
+non-fast-forward-02-f-before             app  exit=0 Create a pull request for 'factory/issue-7541' on GitHub by visiting:        |https://github.com/sapientpants/sf-scratch/pull/new/factory/issue-7541        |*	bfe1b97ecde6cf616864d86a2778c247b40f1630:refs/heads/factory/issue-7541	[new branch]|
+non-fast-forward-03-rule                 op   201 
+non-fast-forward-10-rules-e              app  200 
+  rules on the existing branch: [{"type":"non_fast_forward","ruleset_source_type":"Repository","ruleset_id":28195511}]
+non-fast-forward-11-rules-new            app  200 
+  rules on the new branch name: [{"type":"non_fast_forward","parameters":null}]
+non-fast-forward-12-rules-main           app  200 
+  rules on main: []
+non-fast-forward-13-ruleset-app          app  200 
+  the App reads of the ruleset: {"enforcement":"active","bypass_actors":null,"current_user_can_bypass":"never","rules":["non_fast_forward"]}
+non-fast-forward-14-rulesets-app         app  200 
+  the App's list of rulesets: [{"name":"probe-p45-non-fast-forward","enforcement":"active"}]
+non-fast-forward-20-create-new           app  201 
+non-fast-forward-21-push-first           app  exit=0  	bfe1b97ecde6cf616864d86a2778c247b40f1630:refs/heads/factory/issue-7540	17d8464..bfe1b97|
+non-fast-forward-22-push-next            app  exit=0  	88e3c354cb5c75174d70788974a3d3a936379042:refs/heads/factory/issue-7541	bfe1b97..88e3c35|
+non-fast-forward-23-f-head               app  200 
+non-fast-forward-24-push-merge           app  exit=0  	0cf7cc3558b28d523cf9d985f423e9303f3b36d9:refs/heads/factory/issue-7541	88e3c35..0cf7cc3|
+non-fast-forward-25-f-head               app  200 
+non-fast-forward-26-push-lease           app  exit=1 error: GH013: Repository rule violations found for refs/heads/factory/issue-7541.        |Review all repository rules at https://github.com/sapientpants/sf-scratch/rules?ref=refs%2Fheads%2Ffactory%2Fissue-7541        |- Cannot force-push to this branch        |!	bf2dec6df3aaf2c94f11c850056d03f2b2c71ae9:refs/heads/factory/issue-7
+non-fast-forward-27-patch-force          app  422 Repository rule violations found
+non-fast-forward-28-delete               app  204 
+non-fast-forward-30-e-after              app  404 Not Found
+  e afterwards: 404  (base 17d8464, c1 bfe1b97, before 198d856)
+non-fast-forward-31-f-after              app  200 
+  f afterwards: 200 0cf7cc3 (c1 bfe1b97, c2 88e3c35, merge 0cf7cc3, reset bf2dec6)
+non-fast-forward-32-new-after            app  200 
+  the new ref afterwards: 200
+non-fast-forward-80-delete-rule          op   204 
+non-fast-forward-90-read-issue-7540      app  404 Not Found
+non-fast-forward-90-read-issue-7541      app  200 
+non-fast-forward-91-delete-issue-7541    app  204 
+non-fast-forward-90-read-issue-7542      app  200 
+non-fast-forward-91-delete-issue-7542    app  204 
+---- linear-history (ruleset, full): {"enforcement":"active","conditions":{"ref_name":{"include":["refs/heads/factory/**"],"exclude":[]}},"rules":[{"type":"required_linear_history"}]}
+linear-history-01-e-before               app  201 
+linear-history-02-f-before               app  exit=0 Create a pull request for 'factory/issue-7551' on GitHub by visiting:        |https://github.com/sapientpants/sf-scratch/pull/new/factory/issue-7551        |*	4421db37f3af23682dc639b78ac450e61c656359:refs/heads/factory/issue-7551	[new branch]|
+linear-history-03-rule                   op   201 
+linear-history-10-rules-e                app  200 
+  rules on the existing branch: [{"type":"required_linear_history","ruleset_source_type":"Repository","ruleset_id":28195540}]
+linear-history-11-rules-new              app  200 
+  rules on the new branch name: [{"type":"required_linear_history","parameters":null}]
+linear-history-12-rules-main             app  200 
+  rules on main: []
+linear-history-13-ruleset-app            app  200 
+  the App reads of the ruleset: {"enforcement":"active","bypass_actors":null,"current_user_can_bypass":"never","rules":["required_linear_history"]}
+linear-history-14-rulesets-app           app  200 
+  the App's list of rulesets: [{"name":"probe-p45-linear-history","enforcement":"active"}]
+linear-history-20-create-new             app  422 Reference update failed
+linear-history-21-push-first             app  exit=0  	4421db37f3af23682dc639b78ac450e61c656359:refs/heads/factory/issue-7550	17d8464..4421db3|
+linear-history-22-push-next              app  exit=0  	c1bb7b4c73d2f5240e21a38c469670b1c88bf77f:refs/heads/factory/issue-7551	4421db3..c1bb7b4|
+linear-history-23-f-head                 app  200 
+linear-history-24-push-merge             app  exit=1 error: GH013: Repository rule violations found for refs/heads/factory/issue-7551.        |Review all repository rules at https://github.com/sapientpants/sf-scratch/rules?ref=refs%2Fheads%2Ffactory%2Fissue-7551        |- This branch must not contain merge commits.        |Found 1 violation:        |fa1604b810df21435cc28f651d61ba4
+linear-history-25-f-head                 app  200 
+linear-history-26-push-lease             app  exit=0 +	6052e9ddd7eb8891391b3ca86c11a6c93de6e47f:refs/heads/factory/issue-7551	c1bb7b4...6052e9d (forced update)|
+linear-history-27-patch-force            app  200 
+linear-history-28-delete                 app  204 
+linear-history-30-e-after                app  404 Not Found
+  e afterwards: 404  (base 17d8464, c1 4421db3, before 198d856)
+linear-history-31-f-after                app  200 
+  f afterwards: 200 6052e9d (c1 4421db3, c2 c1bb7b4, merge fa1604b, reset 6052e9d)
+linear-history-32-new-after              app  404 Not Found
+  the new ref afterwards: 404
+linear-history-80-delete-rule            op   204 
+linear-history-90-read-issue-7550        app  404 Not Found
+linear-history-90-read-issue-7551        app  200 
+linear-history-91-delete-issue-7551      app  204 
+linear-history-90-read-issue-7552        app  404 Not Found
+---- signatures (ruleset, full): {"enforcement":"active","conditions":{"ref_name":{"include":["refs/heads/factory/**"],"exclude":[]}},"rules":[{"type":"required_signatures"}]}
+signatures-01-e-before                   app  201 
+signatures-02-f-before                   app  exit=0 Create a pull request for 'factory/issue-7561' on GitHub by visiting:        |https://github.com/sapientpants/sf-scratch/pull/new/factory/issue-7561        |*	ea1ce25cd90c60b04a93b6389327ac29e5211871:refs/heads/factory/issue-7561	[new branch]|
+signatures-03-rule                       op   201 
+signatures-10-rules-e                    app  200 
+  rules on the existing branch: [{"type":"required_signatures","ruleset_source_type":"Repository","ruleset_id":28195555}]
+signatures-11-rules-new                  app  200 
+  rules on the new branch name: [{"type":"required_signatures","parameters":null}]
+signatures-12-rules-main                 app  200 
+  rules on main: []
+signatures-13-ruleset-app                app  200 
+  the App reads of the ruleset: {"enforcement":"active","bypass_actors":null,"current_user_can_bypass":"never","rules":["required_signatures"]}
+signatures-14-rulesets-app               app  200 
+  the App's list of rulesets: [{"name":"probe-p45-signatures","enforcement":"active"}]
+signatures-20-create-new                 app  201 
+signatures-21-push-first                 app  exit=1 error: GH013: Repository rule violations found for refs/heads/factory/issue-7560.        |Review all repository rules at https://github.com/sapientpants/sf-scratch/rules?ref=refs%2Fheads%2Ffactory%2Fissue-7560        |- Commits must have verified signatures.        |Found 1 violation:        |ea1ce25cd90c60b04a93b6389327ac29e521
+signatures-22-push-next                  app  exit=1 error: GH013: Repository rule violations found for refs/heads/factory/issue-7561.        |Review all repository rules at https://github.com/sapientpants/sf-scratch/rules?ref=refs%2Fheads%2Ffactory%2Fissue-7561        |- Commits must have verified signatures.        |Found 1 violation:        |4e7293216b2624ff55cc9005de45b262aff0
+signatures-23-f-head                     app  200 
+signatures-24-push-merge                 app  exit=1 error: GH013: Repository rule violations found for refs/heads/factory/issue-7561.        |Review all repository rules at https://github.com/sapientpants/sf-scratch/rules?ref=refs%2Fheads%2Ffactory%2Fissue-7561        |- Commits must have verified signatures.        |Found 2 violations:        |fb013d89d3c99a2b5f3022e25d2e1022f16
+signatures-25-f-head                     app  200 
+signatures-26-push-lease                 app  exit=1 error: GH013: Repository rule violations found for refs/heads/factory/issue-7561.        |Review all repository rules at https://github.com/sapientpants/sf-scratch/rules?ref=refs%2Fheads%2Ffactory%2Fissue-7561        |- Commits must have verified signatures.        |Found 1 violation:        |c862a0b4a5bdda3caa616ff0b6aa73d7d236
+signatures-27-patch-force                app  200 
+signatures-28-delete                     app  204 
+signatures-30-e-after                    app  404 Not Found
+  e afterwards: 404  (base 17d8464, c1 ea1ce25, before 198d856)
+signatures-31-f-after                    app  200 
+  f afterwards: 200 ea1ce25 (c1 ea1ce25, c2 4e72932, merge fb013d8, reset c862a0b)
+signatures-32-new-after                  app  200 
+  the new ref afterwards: 200
+signatures-80-delete-rule                op   204 
+signatures-90-read-issue-7560            app  404 Not Found
+signatures-90-read-issue-7561            app  200 
+signatures-91-delete-issue-7561          app  204 
+signatures-90-read-issue-7562            app  200 
+signatures-91-delete-issue-7562          app  204 
+---- pull-request (ruleset, full): {"enforcement":"active","conditions":{"ref_name":{"include":["refs/heads/factory/**"],"exclude":[]}},"rules":[{"type":"pull_request","parameters":{"required_approving_review_count":0,"dismiss_stale_reviews_on_push":false,"require_code_owner_review":false,"require_last_push_approval":false,"required_review_thread_resolution":false}}]}
+pull-request-01-e-before                 app  201 
+pull-request-02-f-before                 app  exit=0 Create a pull request for 'factory/issue-7571' on GitHub by visiting:        |https://github.com/sapientpants/sf-scratch/pull/new/factory/issue-7571        |*	2005b8a8bae7c10601ae44606a46be3f53c93774:refs/heads/factory/issue-7571	[new branch]|
+pull-request-03-rule                     op   201 
+pull-request-10-rules-e                  app  200 
+  rules on the existing branch: [{"type":"pull_request","ruleset_source_type":"Repository","ruleset_id":28195573}]
+pull-request-11-rules-new                app  200 
+  rules on the new branch name: [{"type":"pull_request","parameters":{"required_approving_review_count":0,"dismiss_stale_reviews_on_push":false,"required_reviewers":[],"require_code_owner_review":false,"require_last_push_approval":false,"required_review_thread_resolution":false,"require_extra_approval_for_unattributed_changes":true,"allowed_merge_methods":["merge","squash","rebase"]}}]
+pull-request-12-rules-main               app  200 
+  rules on main: []
+pull-request-13-ruleset-app              app  200 
+  the App reads of the ruleset: {"enforcement":"active","bypass_actors":null,"current_user_can_bypass":"never","rules":["pull_request"]}
+pull-request-14-rulesets-app             app  200 
+  the App's list of rulesets: [{"name":"probe-p45-pull-request","enforcement":"active"}]
+pull-request-20-create-new               app  201 
+pull-request-21-push-first               app  exit=1 error: GH013: Repository rule violations found for refs/heads/factory/issue-7570.        |Review all repository rules at https://github.com/sapientpants/sf-scratch/rules?ref=refs%2Fheads%2Ffactory%2Fissue-7570        |- Changes must be made through a pull request.        |!	2005b8a8bae7c10601ae44606a46be3f53c93774:refs/heads/fac
+pull-request-22-push-next                app  exit=1 error: GH013: Repository rule violations found for refs/heads/factory/issue-7571.        |Review all repository rules at https://github.com/sapientpants/sf-scratch/rules?ref=refs%2Fheads%2Ffactory%2Fissue-7571        |- Changes must be made through a pull request.        |!	263e6212b9aa53128add8492caf0f29189960c70:refs/heads/fac
+pull-request-23-f-head                   app  200 
+pull-request-24-push-merge               app  exit=1 error: GH013: Repository rule violations found for refs/heads/factory/issue-7571.        |Review all repository rules at https://github.com/sapientpants/sf-scratch/rules?ref=refs%2Fheads%2Ffactory%2Fissue-7571        |- Changes must be made through a pull request.        |!	6e61a1844d51f42cce2bb1fc78906cbbf75af493:refs/heads/fac
+pull-request-25-f-head                   app  200 
+pull-request-26-push-lease               app  exit=1 error: GH013: Repository rule violations found for refs/heads/factory/issue-7571.        |Review all repository rules at https://github.com/sapientpants/sf-scratch/rules?ref=refs%2Fheads%2Ffactory%2Fissue-7571        |- Changes must be made through a pull request.        |!	f903dad74333415692d05efe57ea633c6c387cb3:refs/heads/fac
+pull-request-27-patch-force              app  422 Repository rule violations found
+pull-request-28-delete                   app  204 
+pull-request-30-e-after                  app  404 Not Found
+  e afterwards: 404  (base 17d8464, c1 2005b8a, before 198d856)
+pull-request-31-f-after                  app  200 
+  f afterwards: 200 2005b8a (c1 2005b8a, c2 263e621, merge 6e61a18, reset f903dad)
+pull-request-32-new-after                app  200 
+  the new ref afterwards: 200
+pull-request-80-delete-rule              op   204 
+pull-request-90-read-issue-7570          app  404 Not Found
+pull-request-90-read-issue-7571          app  200 
+pull-request-91-delete-issue-7571        app  204 
+pull-request-90-read-issue-7572          app  200 
+pull-request-91-delete-issue-7572        app  204 
+---- status-checks (ruleset, full): {"enforcement":"active","conditions":{"ref_name":{"include":["refs/heads/factory/**"],"exclude":[]}},"rules":[{"type":"required_status_checks","parameters":{"required_status_checks":[{"context":"probe/p-45"}],"strict_required_status_checks_policy":false}}]}
+status-checks-01-e-before                app  201 
+status-checks-02-f-before                app  exit=0 Create a pull request for 'factory/issue-7581' on GitHub by visiting:        |https://github.com/sapientpants/sf-scratch/pull/new/factory/issue-7581        |*	edd918039c5bb335205c540a30b6324daab2d428:refs/heads/factory/issue-7581	[new branch]|
+status-checks-03-rule                    op   201 
+status-checks-10-rules-e                 app  200 
+  rules on the existing branch: [{"type":"required_status_checks","ruleset_source_type":"Repository","ruleset_id":28195589}]
+status-checks-11-rules-new               app  200 
+  rules on the new branch name: [{"type":"required_status_checks","parameters":{"strict_required_status_checks_policy":false,"do_not_enforce_on_create":false,"required_status_checks":[{"context":"probe/p-45"}]}}]
+status-checks-12-rules-main              app  200 
+  rules on main: []
+status-checks-13-ruleset-app             app  200 
+  the App reads of the ruleset: {"enforcement":"active","bypass_actors":null,"current_user_can_bypass":"never","rules":["required_status_checks"]}
+status-checks-14-rulesets-app            app  200 
+  the App's list of rulesets: [{"name":"probe-p45-status-checks","enforcement":"active"}]
+status-checks-20-create-new              app  422 Reference update failed
+status-checks-21-push-first              app  exit=1 error: GH013: Repository rule violations found for refs/heads/factory/issue-7580.        |Review all repository rules at https://github.com/sapientpants/sf-scratch/rules?ref=refs%2Fheads%2Ffactory%2Fissue-7580        |- Required status check "probe/p-45" is expected.        |!	edd918039c5bb335205c540a30b6324daab2d428:refs/heads/
+status-checks-22-push-next               app  exit=1 error: GH013: Repository rule violations found for refs/heads/factory/issue-7581.        |Review all repository rules at https://github.com/sapientpants/sf-scratch/rules?ref=refs%2Fheads%2Ffactory%2Fissue-7581        |- Required status check "probe/p-45" is expected.        |!	fa46c6ad8549553260eb3677771488c74a02fd93:refs/heads/
+status-checks-23-f-head                  app  200 
+status-checks-24-push-merge              app  exit=1 error: GH013: Repository rule violations found for refs/heads/factory/issue-7581.        |Review all repository rules at https://github.com/sapientpants/sf-scratch/rules?ref=refs%2Fheads%2Ffactory%2Fissue-7581        |- Required status check "probe/p-45" is expected.        |!	47cf542046e92e81d96512c20af8c5358b1d679f:refs/heads/
+status-checks-25-f-head                  app  200 
+status-checks-26-push-lease              app  exit=1 error: GH013: Repository rule violations found for refs/heads/factory/issue-7581.        |Review all repository rules at https://github.com/sapientpants/sf-scratch/rules?ref=refs%2Fheads%2Ffactory%2Fissue-7581        |- Required status check "probe/p-45" is expected.        |!	aa1c059254a754785d4bb6d8726509dfd2de8541:refs/heads/
+status-checks-27-patch-force             app  422 Repository rule violations found
+status-checks-28-delete                  app  204 
+status-checks-30-e-after                 app  404 Not Found
+  e afterwards: 404  (base 17d8464, c1 edd9180, before 198d856)
+status-checks-31-f-after                 app  200 
+  f afterwards: 200 edd9180 (c1 edd9180, c2 fa46c6a, merge 47cf542, reset aa1c059)
+status-checks-32-new-after               app  404 Not Found
+  the new ref afterwards: 404
+status-checks-80-delete-rule             op   204 
+status-checks-90-read-issue-7580         app  404 Not Found
+status-checks-90-read-issue-7581         app  200 
+status-checks-91-delete-issue-7581       app  204 
+status-checks-90-read-issue-7582         app  404 Not Found
+---- status-checks-create (ruleset, full): {"enforcement":"active","conditions":{"ref_name":{"include":["refs/heads/factory/**"],"exclude":[]}},"rules":[{"type":"required_status_checks","parameters":{"required_status_checks":[{"context":"probe/p-45"}],"strict_required_status_checks_policy":false,"do_not_enforce_on_create":true}}]}
+status-checks-create-01-e-before         app  201 
+status-checks-create-02-f-before         app  exit=0 Create a pull request for 'factory/issue-7591' on GitHub by visiting:        |https://github.com/sapientpants/sf-scratch/pull/new/factory/issue-7591        |*	56465e54c267380673d6f2a8959b4e00a4cc5a65:refs/heads/factory/issue-7591	[new branch]|
+status-checks-create-03-rule             op   201 
+status-checks-create-10-rules-e          app  200 
+  rules on the existing branch: [{"type":"required_status_checks","ruleset_source_type":"Repository","ruleset_id":28195613}]
+status-checks-create-11-rules-new        app  200 
+  rules on the new branch name: [{"type":"required_status_checks","parameters":{"strict_required_status_checks_policy":false,"do_not_enforce_on_create":true,"required_status_checks":[{"context":"probe/p-45"}]}}]
+status-checks-create-12-rules-main       app  200 
+  rules on main: []
+status-checks-create-13-ruleset-app      app  200 
+  the App reads of the ruleset: {"enforcement":"active","bypass_actors":null,"current_user_can_bypass":"never","rules":["required_status_checks"]}
+status-checks-create-14-rulesets-app     app  200 
+  the App's list of rulesets: [{"name":"probe-p45-status-checks-create","enforcement":"active"}]
+status-checks-create-20-create-new       app  201 
+status-checks-create-21-push-first       app  exit=1 error: GH013: Repository rule violations found for refs/heads/factory/issue-7590.        |Review all repository rules at https://github.com/sapientpants/sf-scratch/rules?ref=refs%2Fheads%2Ffactory%2Fissue-7590        |- Required status check "probe/p-45" is expected.        |!	56465e54c267380673d6f2a8959b4e00a4cc5a65:refs/heads/
+status-checks-create-22-push-next        app  exit=1 error: GH013: Repository rule violations found for refs/heads/factory/issue-7591.        |Review all repository rules at https://github.com/sapientpants/sf-scratch/rules?ref=refs%2Fheads%2Ffactory%2Fissue-7591        |- Required status check "probe/p-45" is expected.        |!	9e2ca11c891f501a7b405c0c5d2982a220ac25fc:refs/heads/
+status-checks-create-23-f-head           app  200 
+status-checks-create-24-push-merge       app  exit=1 error: GH013: Repository rule violations found for refs/heads/factory/issue-7591.        |Review all repository rules at https://github.com/sapientpants/sf-scratch/rules?ref=refs%2Fheads%2Ffactory%2Fissue-7591        |- Required status check "probe/p-45" is expected.        |!	c8fde9444c4277e4d20d8cad472e4bcd380069c1:refs/heads/
+status-checks-create-25-f-head           app  200 
+status-checks-create-26-push-lease       app  exit=1 error: GH013: Repository rule violations found for refs/heads/factory/issue-7591.        |Review all repository rules at https://github.com/sapientpants/sf-scratch/rules?ref=refs%2Fheads%2Ffactory%2Fissue-7591        |- Required status check "probe/p-45" is expected.        |!	bcec45ed07f9969c227c52f39801d351b28924b9:refs/heads/
+status-checks-create-27-patch-force      app  422 Repository rule violations found
+status-checks-create-28-delete           app  204 
+status-checks-create-30-e-after          app  404 Not Found
+  e afterwards: 404  (base 17d8464, c1 56465e5, before 198d856)
+status-checks-create-31-f-after          app  200 
+  f afterwards: 200 56465e5 (c1 56465e5, c2 9e2ca11, merge c8fde94, reset bcec45e)
+status-checks-create-32-new-after        app  200 
+  the new ref afterwards: 200
+status-checks-create-80-delete-rule      op   204 
+status-checks-create-90-read-issue-7590  app  404 Not Found
+status-checks-create-90-read-issue-7591  app  200 
+status-checks-create-91-delete-issue-7591 app  204 
+status-checks-create-90-read-issue-7592  app  200 
+status-checks-create-91-delete-issue-7592 app  204 
+---- deployments (ruleset, full): {"enforcement":"active","conditions":{"ref_name":{"include":["refs/heads/factory/**"],"exclude":[]}},"rules":[{"type":"required_deployments","parameters":{"required_deployment_environments":["probe-p-45"]}}]}
+deployments-01-e-before                  app  201 
+deployments-02-f-before                  app  exit=0 Create a pull request for 'factory/issue-7601' on GitHub by visiting:        |https://github.com/sapientpants/sf-scratch/pull/new/factory/issue-7601        |*	fb05ae7218e32bbe6e30ddb84289baa2a8e4a0cc:refs/heads/factory/issue-7601	[new branch]|
+deployments-03-rule                      op   422 Validation Failed
+  no rule for variant deployments: {"message":"Validation Failed","errors":["Invalid rule 'required_deployments': Invalid parameter required_deployment_environments: Invalid deployment environments"]}
+deployments-90-read-issue-7600           app  200 
+deployments-91-delete-issue-7600         app  204 
+deployments-90-read-issue-7601           app  200 
+deployments-91-delete-issue-7601         app  204 
+deployments-90-read-issue-7602           app  404 Not Found
+---- message-pattern (ruleset, full): {"enforcement":"active","conditions":{"ref_name":{"include":["refs/heads/factory/**"],"exclude":[]}},"rules":[{"type":"commit_message_pattern","parameters":{"operator":"starts_with","pattern":"zzz"}}]}
+message-pattern-01-e-before              app  201 
+message-pattern-02-f-before              app  exit=0 Create a pull request for 'factory/issue-7611' on GitHub by visiting:        |https://github.com/sapientpants/sf-scratch/pull/new/factory/issue-7611        |*	d3beebb8496cf1afcb9dadc69f05f32720028795:refs/heads/factory/issue-7611	[new branch]|
+message-pattern-03-rule                  op   422 Validation Failed
+  no rule for variant message-pattern: {"message":"Validation Failed","errors":["Invalid rule 'commit_message_pattern': "]}
+message-pattern-90-read-issue-7610       app  200 
+message-pattern-91-delete-issue-7610     app  204 
+message-pattern-90-read-issue-7611       app  200 
+message-pattern-91-delete-issue-7611     app  204 
+message-pattern-90-read-issue-7612       app  404 Not Found
+---- branch-name-pattern (ruleset, short): {"enforcement":"active","conditions":{"ref_name":{"include":["refs/heads/factory/**"],"exclude":[]}},"rules":[{"type":"branch_name_pattern","parameters":{"operator":"starts_with","pattern":"zzz"}}]}
+branch-name-pattern-01-e-before          app  201 
+branch-name-pattern-03-rule              op   422 Validation Failed
+  no rule for variant branch-name-pattern: {"message":"Validation Failed","errors":["Invalid rule 'branch_name_pattern': "]}
+branch-name-pattern-90-read-issue-7620   app  200 
+branch-name-pattern-91-delete-issue-7620 app  204 
+branch-name-pattern-90-read-issue-7621   app  404 Not Found
+branch-name-pattern-90-read-issue-7622   app  404 Not Found
+---- all-branches (ruleset, short): {"enforcement":"active","conditions":{"ref_name":{"include":["~ALL"],"exclude":[]}},"rules":[{"type":"creation"}]}
+all-branches-01-e-before                 app  201 
+all-branches-03-rule                     op   201 
+all-branches-10-rules-e                  app  200 
+  rules on the existing branch: [{"type":"creation","ruleset_source_type":"Repository","ruleset_id":28195666}]
+all-branches-11-rules-new                app  200 
+  rules on the new branch name: [{"type":"creation","parameters":null}]
+all-branches-12-rules-main               app  200 
+  rules on main: ["creation"]
+all-branches-13-ruleset-app              app  200 
+  the App reads of the ruleset: {"enforcement":"active","bypass_actors":null,"current_user_can_bypass":"never","rules":["creation"]}
+all-branches-14-rulesets-app             app  200 
+  the App's list of rulesets: [{"name":"probe-p45-all-branches","enforcement":"active"}]
+all-branches-20-create-new               app  422 Reference update failed
+all-branches-32-new-after                app  404 Not Found
+  the new ref afterwards: 404
+all-branches-80-delete-rule              op   204 
+all-branches-90-read-issue-7630          app  200 
+all-branches-91-delete-issue-7630        app  204 
+all-branches-90-read-issue-7631          app  404 Not Found
+all-branches-90-read-issue-7632          app  404 Not Found
+---- bypass-admin (ruleset, short): {"enforcement":"active","conditions":{"ref_name":{"include":["refs/heads/factory/**"],"exclude":[]}},"rules":[{"type":"creation"}],"bypass_actors":[{"actor_id":5,"actor_type":"RepositoryRole","bypass_mode":"always"}]}
+bypass-admin-01-e-before                 app  201 
+bypass-admin-03-rule                     op   201 
+bypass-admin-10-rules-e                  app  200 
+  rules on the existing branch: [{"type":"creation","ruleset_source_type":"Repository","ruleset_id":28195676}]
+bypass-admin-11-rules-new                app  200 
+  rules on the new branch name: [{"type":"creation","parameters":null}]
+bypass-admin-12-rules-main               app  200 
+  rules on main: []
+bypass-admin-13-ruleset-app              app  200 
+  the App reads of the ruleset: {"enforcement":"active","bypass_actors":null,"current_user_can_bypass":"never","rules":["creation"]}
+bypass-admin-14-rulesets-app             app  200 
+  the App's list of rulesets: [{"name":"probe-p45-bypass-admin","enforcement":"active"}]
+bypass-admin-20-create-new               app  422 Reference update failed
+bypass-admin-32-new-after                app  404 Not Found
+  the new ref afterwards: 404
+bypass-admin-80-delete-rule              op   204 
+bypass-admin-90-read-issue-7640          app  200 
+bypass-admin-91-delete-issue-7640        app  204 
+bypass-admin-90-read-issue-7641          app  404 Not Found
+bypass-admin-90-read-issue-7642          app  404 Not Found
+---- evaluate (ruleset, short): {"enforcement":"evaluate","conditions":{"ref_name":{"include":["refs/heads/factory/**"],"exclude":[]}},"rules":[{"type":"creation"}]}
+evaluate-01-e-before                     app  201 
+evaluate-03-rule                         op   422 Validation Failed
+  no rule for variant evaluate: {"message":"Validation Failed","errors":["Enforcement evaluate option is not supported on this plan. Please upgrade to Enterprise to enable it."]}
+evaluate-90-read-issue-7650              app  200 
+evaluate-91-delete-issue-7650            app  204 
+evaluate-90-read-issue-7651              app  404 Not Found
+evaluate-90-read-issue-7652              app  404 Not Found
+---- disabled (ruleset, short): {"enforcement":"disabled","conditions":{"ref_name":{"include":["refs/heads/factory/**"],"exclude":[]}},"rules":[{"type":"creation"}]}
+disabled-01-e-before                     app  201 
+disabled-03-rule                         op   201 
+disabled-10-rules-e                      app  200 
+  rules on the existing branch: []
+disabled-11-rules-new                    app  200 
+  rules on the new branch name: []
+disabled-12-rules-main                   app  200 
+  rules on main: []
+disabled-13-ruleset-app                  app  200 
+  the App reads of the ruleset: {"enforcement":"disabled","bypass_actors":null,"current_user_can_bypass":"never","rules":["creation"]}
+disabled-14-rulesets-app                 app  200 
+  the App's list of rulesets: [{"name":"probe-p45-disabled","enforcement":"disabled"}]
+disabled-20-create-new                   app  201 
+disabled-32-new-after                    app  200 
+  the new ref afterwards: 200
+disabled-80-delete-rule                  op   204 
+disabled-90-read-issue-7660              app  200 
+disabled-91-delete-issue-7660            app  204 
+disabled-90-read-issue-7661              app  404 Not Found
+disabled-90-read-issue-7662              app  200 
+disabled-91-delete-issue-7662            app  204 
+---- classic-default (classic, full): {"pattern":"factory/*"}
+classic-default-01-e-before              app  201 
+classic-default-02-f-before              app  exit=0 Create a pull request for 'factory/issue-7701' on GitHub by visiting:        |https://github.com/sapientpants/sf-scratch/pull/new/factory/issue-7701        |*	4443a7c3c5739958ee9cb5ef497f3a0e82b0b37a:refs/heads/factory/issue-7701	[new branch]|
+classic-default-03-rule                  op   200 
+classic-default-10-rules-e               app  200 
+  rules on the existing branch: []
+classic-default-11-rules-new             app  200 
+  rules on the new branch name: []
+classic-default-12-rules-main            app  200 
+  rules on main: []
+classic-default-13-branch-app            app  200 
+  the App reads of the branch: {"protected":true,"protection":{"enabled":true,"required_status_checks":{"enforcement_level":"off","contexts":[],"checks":[]}}}
+classic-default-14-protection-app        app  403 Resource not accessible by integration
+classic-default-15-graphql-app           app  200 
+  the App reads over GraphQL: {"rules":null,"ref":null,"errors":["Resource not accessible by integration"]}
+classic-default-16-graphql-op            op   200 
+  the operator reads over GraphQL: {"rules":[{"pattern":"factory/*","allowsDeletions":false,"allowsForcePushes":false,"blocksCreations":false,"lockBranch":false,"requiresApprovingReviews":false,"requiredApprovingReviewCount":null,"requiresCommitSignatures":false,"requiresLinearHistory":false,"requiresStatusChecks":false,"restrictsPushes":false,"isAdminEnforced":false}],"errors":[]}
+classic-default-20-create-new            app  201 
+classic-default-21-push-first            app  exit=0  	4443a7c3c5739958ee9cb5ef497f3a0e82b0b37a:refs/heads/factory/issue-7700	17d8464..4443a7c|
+classic-default-22-push-next             app  exit=0  	596c89402a4d6b5e7bba9039f88203372512fdf0:refs/heads/factory/issue-7701	4443a7c..596c894|
+classic-default-23-f-head                app  200 
+classic-default-24-push-merge            app  exit=0  	856d180b6c556fe164a2e51891370088ce22f39e:refs/heads/factory/issue-7701	596c894..856d180|
+classic-default-25-f-head                app  200 
+classic-default-26-push-lease            app  exit=1 error: GH006: Protected branch update failed for refs/heads/factory/issue-7701.        |- Cannot force-push to this branch        |!	39fff4d35931efe72bd7835e41397641c463adba:refs/heads/factory/issue-7701	[remote rejected] (protected branch hook declined)|
+classic-default-27-patch-force           app  422 Cannot force-push to this branch
+classic-default-28-delete                app  422 Cannot delete this branch
+classic-default-30-e-after               app  200 
+  e afterwards: 200 4443a7c (base 17d8464, c1 4443a7c, before 198d856)
+classic-default-31-f-after               app  200 
+  f afterwards: 200 856d180 (c1 4443a7c, c2 596c894, merge 856d180, reset 39fff4d)
+classic-default-32-new-after             app  200 
+  the new ref afterwards: 200
+classic-default-80-delete-rule           op   200 
+classic-default-90-read-issue-7700       app  200 
+classic-default-91-delete-issue-7700     app  204 
+classic-default-90-read-issue-7701       app  200 
+classic-default-91-delete-issue-7701     app  204 
+classic-default-90-read-issue-7702       app  200 
+classic-default-91-delete-issue-7702     app  204 
+---- classic-reviews (classic, full): {"pattern":"factory/*","requiresApprovingReviews":true,"requiredApprovingReviewCount":1}
+classic-reviews-01-e-before              app  201 
+classic-reviews-02-f-before              app  exit=0 Create a pull request for 'factory/issue-7711' on GitHub by visiting:        |https://github.com/sapientpants/sf-scratch/pull/new/factory/issue-7711        |*	c6db219ea88aecd7ab783b06f3445a51e28f21f7:refs/heads/factory/issue-7711	[new branch]|
+classic-reviews-03-rule                  op   200 
+classic-reviews-10-rules-e               app  200 
+  rules on the existing branch: []
+classic-reviews-11-rules-new             app  200 
+  rules on the new branch name: []
+classic-reviews-12-rules-main            app  200 
+  rules on main: []
+classic-reviews-13-branch-app            app  200 
+  the App reads of the branch: {"protected":true,"protection":{"enabled":true,"required_status_checks":{"enforcement_level":"off","contexts":[],"checks":[]}}}
+classic-reviews-14-protection-app        app  403 Resource not accessible by integration
+classic-reviews-15-graphql-app           app  200 
+  the App reads over GraphQL: {"rules":null,"ref":null,"errors":["Resource not accessible by integration"]}
+classic-reviews-16-graphql-op            op   200 
+  the operator reads over GraphQL: {"rules":[{"pattern":"factory/*","allowsDeletions":false,"allowsForcePushes":false,"blocksCreations":false,"lockBranch":false,"requiresApprovingReviews":true,"requiredApprovingReviewCount":1,"requiresCommitSignatures":false,"requiresLinearHistory":false,"requiresStatusChecks":false,"restrictsPushes":false,"isAdminEnforced":false}],"errors":[]}
+classic-reviews-20-create-new            app  201 
+classic-reviews-21-push-first            app  exit=1 error: GH006: Protected branch update failed for refs/heads/factory/issue-7710.        |- Changes must be made through a pull request.        |!	c6db219ea88aecd7ab783b06f3445a51e28f21f7:refs/heads/factory/issue-7710	[remote rejected] (protected branch hook declined)|
+classic-reviews-22-push-next             app  exit=1 error: GH006: Protected branch update failed for refs/heads/factory/issue-7711.        |- Changes must be made through a pull request.        |!	ac1e97da36c20c57bf5f18ae77db40ef078b49e9:refs/heads/factory/issue-7711	[remote rejected] (protected branch hook declined)|
+classic-reviews-23-f-head                app  200 
+classic-reviews-24-push-merge            app  exit=1 error: GH006: Protected branch update failed for refs/heads/factory/issue-7711.        |- Changes must be made through a pull request.        |!	37f737d4473fe54c0912d3caf49ced3358114dd3:refs/heads/factory/issue-7711	[remote rejected] (protected branch hook declined)|
+classic-reviews-25-f-head                app  200 
+classic-reviews-26-push-lease            app  exit=1 error: GH006: Protected branch update failed for refs/heads/factory/issue-7711.        |- Changes must be made through a pull request.        |- Cannot force-push to this branch        |!	db7f97fa5d369fe09f641c76de5b6f6ca8e1cce7:refs/heads/factory/issue-7711	[remote rejected] (protected branch hook declined)|
+classic-reviews-27-patch-force           app  422 Changes must be made through a pull request. Cannot force-push to this branch
+classic-reviews-28-delete                app  422 Cannot delete this branch
+classic-reviews-30-e-after               app  200 
+  e afterwards: 200 17d8464 (base 17d8464, c1 c6db219, before 198d856)
+classic-reviews-31-f-after               app  200 
+  f afterwards: 200 c6db219 (c1 c6db219, c2 ac1e97d, merge 37f737d, reset db7f97f)
+classic-reviews-32-new-after             app  200 
+  the new ref afterwards: 200
+classic-reviews-80-delete-rule           op   200 
+classic-reviews-90-read-issue-7710       app  200 
+classic-reviews-91-delete-issue-7710     app  204 
+classic-reviews-90-read-issue-7711       app  200 
+classic-reviews-91-delete-issue-7711     app  204 
+classic-reviews-90-read-issue-7712       app  200 
+classic-reviews-91-delete-issue-7712     app  204 
+---- classic-lock (classic, full): {"pattern":"factory/*","lockBranch":true}
+classic-lock-01-e-before                 app  201 
+classic-lock-02-f-before                 app  exit=0 Create a pull request for 'factory/issue-7721' on GitHub by visiting:        |https://github.com/sapientpants/sf-scratch/pull/new/factory/issue-7721        |*	8610f06b02dfb59c8b6b505d9d07934be2553feb:refs/heads/factory/issue-7721	[new branch]|
+classic-lock-03-rule                     op   200 
+classic-lock-10-rules-e                  app  200 
+  rules on the existing branch: []
+classic-lock-11-rules-new                app  200 
+  rules on the new branch name: []
+classic-lock-12-rules-main               app  200 
+  rules on main: []
+classic-lock-13-branch-app               app  200 
+  the App reads of the branch: {"protected":true,"protection":{"enabled":true,"required_status_checks":{"enforcement_level":"off","contexts":[],"checks":[]}}}
+classic-lock-14-protection-app           app  403 Resource not accessible by integration
+classic-lock-15-graphql-app              app  200 
+  the App reads over GraphQL: {"rules":null,"ref":null,"errors":["Resource not accessible by integration"]}
+classic-lock-16-graphql-op               op   200 
+  the operator reads over GraphQL: {"rules":[{"pattern":"factory/*","allowsDeletions":false,"allowsForcePushes":false,"blocksCreations":false,"lockBranch":true,"requiresApprovingReviews":false,"requiredApprovingReviewCount":null,"requiresCommitSignatures":false,"requiresLinearHistory":false,"requiresStatusChecks":false,"restrictsPushes":false,"isAdminEnforced":false}],"errors":[]}
+classic-lock-20-create-new               app  201 
+classic-lock-21-push-first               app  exit=1 error: GH006: Protected branch update failed for refs/heads/factory/issue-7720.        |- Cannot change this locked branch        |!	8610f06b02dfb59c8b6b505d9d07934be2553feb:refs/heads/factory/issue-7720	[remote rejected] (protected branch hook declined)|
+classic-lock-22-push-next                app  exit=1 error: GH006: Protected branch update failed for refs/heads/factory/issue-7721.        |- Cannot change this locked branch        |!	7a059a7bc3fdfa22f50dbb2fee907b883a4a0f75:refs/heads/factory/issue-7721	[remote rejected] (protected branch hook declined)|
+classic-lock-23-f-head                   app  200 
+classic-lock-24-push-merge               app  exit=1 error: GH006: Protected branch update failed for refs/heads/factory/issue-7721.        |- Cannot change this locked branch        |!	cfeae25fe2f0029bf54a97bc79e9521dd6451f18:refs/heads/factory/issue-7721	[remote rejected] (protected branch hook declined)|
+classic-lock-25-f-head                   app  200 
+classic-lock-26-push-lease               app  exit=1 error: GH006: Protected branch update failed for refs/heads/factory/issue-7721.        |- Cannot force-push to this branch        |- Cannot change this locked branch        |!	4cf4b68a57e7fde65066eea413827e81026680ef:refs/heads/factory/issue-7721	[remote rejected] (protected branch hook declined)|
+classic-lock-27-patch-force              app  422 Cannot force-push to this branch Cannot change this locked branch
+classic-lock-28-delete                   app  422 Cannot delete this branch Cannot change this locked branch
+classic-lock-30-e-after                  app  200 
+  e afterwards: 200 17d8464 (base 17d8464, c1 8610f06, before 198d856)
+classic-lock-31-f-after                  app  200 
+  f afterwards: 200 8610f06 (c1 8610f06, c2 7a059a7, merge cfeae25, reset 4cf4b68)
+classic-lock-32-new-after                app  200 
+  the new ref afterwards: 200
+classic-lock-80-delete-rule              op   200 
+classic-lock-90-read-issue-7720          app  200 
+classic-lock-91-delete-issue-7720        app  204 
+classic-lock-90-read-issue-7721          app  200 
+classic-lock-91-delete-issue-7721        app  204 
+classic-lock-90-read-issue-7722          app  200 
+classic-lock-91-delete-issue-7722        app  204 
+---- classic-creations (classic, short): {"pattern":"factory/*","restrictsPushes":true,"blocksCreations":true}
+classic-creations-01-e-before            app  201 
+classic-creations-03-rule                op   200 
+  errors: ["Only organization repositories can have users and team restrictions"]
+  no rule for variant classic-creations: {"message":null,"errors":[{"type":"UNPROCESSABLE","path":["createBranchProtectionRule"],"locations":[{"line":1,"column":47}],"message":"Only organization repositories can have users and team restrictions"}]}
+classic-creations-90-read-issue-7730     app  200 
+classic-creations-91-delete-issue-7730   app  204 
+classic-creations-90-read-issue-7731     app  404 Not Found
+classic-creations-90-read-issue-7732     app  404 Not Found
+97-sweep-rulesets                        op   200 
+97-sweep-classic                         op   200 
+98-sweep-list                            app  200 
+99a-rulesets                             op   200 
+rulesets after: [
+
+]
+99b-classic                              op   200 
+classic rules after: []
+99c-matching-factory                     app  200 
+refs under factory after: []
+token revoked: 204

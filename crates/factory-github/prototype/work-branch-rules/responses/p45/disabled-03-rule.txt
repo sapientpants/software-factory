@@ -1,0 +1,44 @@
+HTTP/2 201 
+date: Thu, 26 Nov 2026 21:55:11 GMT
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: F0DA:6EDDC:31956D6:49D0CA2:6B08AABF
+
+{
+  "id": 28195685,
+  "name": "probe-p45-disabled",
+  "target": "branch",
+  "source_type": "Repository",
+  "source": "sapientpants/sf-scratch",
+  "enforcement": "disabled",
+  "conditions": {
+    "ref_name": {
+      "exclude": [
+
+      ],
+      "include": [
+        "refs/heads/factory/**"
+      ]
+    }
+  },
+  "rules": [
+    {
+      "type": "creation"
+    }
+  ],
+  "node_id": "RRS_lACqUmVwb3NpdG9yec5XOSIPzgGuO2U",
+  "created_at": "2026-11-26T22:55:11.785+01:00",
+  "updated_at": "2026-11-26T22:55:11.804+01:00",
+  "bypass_actors": [
+
+  ],
+  "current_user_can_bypass": "never",
+  "_links": {
+    "self": {
+      "href": "https://api.github.com/repos/sapientpants/sf-scratch/rulesets/28195685"
+    },
+    "html": {
+      "href": "https://github.com/sapientpants/sf-scratch/rules/28195685"
+    }
+  }
+}
+

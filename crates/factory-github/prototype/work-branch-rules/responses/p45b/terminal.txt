@@ -1,0 +1,47 @@
+base=17d8464cd28fd71ba3cb0333f13f34d622816867 merges-behind-base=14
+linear=569d9ee402c685bae891c1063756277bbc84d21a merges-behind-linear=0
+1-01-rule                                op   201 
+1-02-create-at-base                      app  422 Reference update failed
+1-03-create-at-linear                    app  201 
+1-04-read-at-base                        app  404 Not Found
+1-05-read-at-linear                      app  200 
+1-80-delete-rule                         op   204 
+2-01-e-before                            app  201 
+2-02-repository-id                       op   200 
+2-03-rule                                op   200 
+2-10-update-rule-existing-app            app  200 
+  app, refUpdateRule of the existing ref: {"ref":{"name":"factory/issue-7810","refUpdateRule":{"pattern":"factory/*","allowsDeletions":false,"allowsForcePushes":false,"blocksCreations":false,"requiredApprovingReviewCount":1,"requiresLinearHistory":false,"requiresSignatures":false,"requiredStatusCheckContexts":[],"viewerCanPush":true}},"errors":[]}
+2-11-update-rule-absent-app              app  200 
+  app, refUpdateRule of a name that no ref has: {"ref":null,"errors":[]}
+2-12-protection-rule-existing-app        app  200 
+  app, branchProtectionRule of the existing ref: {"data":{"repository":{"ref":{"name":"factory/issue-7810","branchProtectionRule":null}}},"errors":[{"path":["repository","ref","branchProtectionRule"],"message":"Resource not accessible by integration"}]}
+2-10-update-rule-existing-op             op   200 
+  op, refUpdateRule of the existing ref: {"ref":{"name":"factory/issue-7810","refUpdateRule":{"pattern":"factory/*","allowsDeletions":false,"allowsForcePushes":false,"blocksCreations":false,"requiredApprovingReviewCount":0,"requiresLinearHistory":false,"requiresSignatures":false,"requiredStatusCheckContexts":[],"viewerCanPush":true}},"errors":[]}
+2-11-update-rule-absent-op               op   200 
+  op, refUpdateRule of a name that no ref has: {"ref":null,"errors":[]}
+2-12-protection-rule-existing-op         op   200 
+  op, branchProtectionRule of the existing ref: {"data":{"repository":{"ref":{"name":"factory/issue-7810","branchProtectionRule":{"pattern":"factory/*","requiresApprovingReviews":true}}}},"errors":[]}
+2-20-branch-existing                     app  200 
+  the App, the branch: {"protected":true,"protection":{"enabled":true,"required_status_checks":{"enforcement_level":"off","contexts":[],"checks":[]}}}
+2-21-branch-absent                       app  404 Branch not found
+2-22-branches-protected                  app  200 
+  the App, the list of protected branches: [{"name":"factory/issue-7801","protected":true},{"name":"factory/issue-7810","protected":true}]
+2-80-delete-rule                         op   200 
+3-01-rule                                op   201 
+3-10-update-rule-existing-app            app  200 
+  app, refUpdateRule of the existing ref under a ruleset: {"ref":{"name":"factory/issue-7810","refUpdateRule":null},"errors":[]}
+3-11-branch-existing                     app  200 
+  the App, the branch under a ruleset: {"protected":true,"protection":{"enabled":false,"required_status_checks":{"enforcement_level":"off","contexts":[],"checks":[]}}}
+3-80-delete-rule                         op   204 
+90-read-issue-7800                       app  404 Not Found
+90-read-issue-7801                       app  200 
+91-delete-issue-7801                     app  204 
+90-read-issue-7810                       app  200 
+91-delete-issue-7810                     app  204 
+99a-rulesets                             op   200 
+rulesets after: []
+99b-classic                              op   200 
+classic rules after: []
+99c-matching-factory                     app  200 
+refs under factory after: []
+token revoked: 204

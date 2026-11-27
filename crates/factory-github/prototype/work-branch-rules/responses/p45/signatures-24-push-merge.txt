@@ -1,0 +1,17 @@
+push by app: fb013d89d3c99a2b5f3022e25d2e1022f16b8c4e -> refs/heads/factory/issue-7561 
+the commit and its parents: fb013d89d3c99a2b5f3022e25d2e1022f16b8c4e ea1ce25cd90c60b04a93b6389327ac29e5211871 0f9cdf59b2e4f8c2cafc8dd6d7c5fd0f85dc7d0e
+
+remote: error: GH013: Repository rule violations found for refs/heads/factory/issue-7561.        
+remote: Review all repository rules at https://github.com/sapientpants/sf-scratch/rules?ref=refs%2Fheads%2Ffactory%2Fissue-7561        
+remote: 
+remote: - Commits must have verified signatures.        
+remote:   Found 2 violations:        
+remote: 
+remote:   fb013d89d3c99a2b5f3022e25d2e1022f16b8c4e        
+remote:   0f9cdf59b2e4f8c2cafc8dd6d7c5fd0f85dc7d0e        
+remote: 
+error: failed to push some refs to 'https://github.com/sapientpants/sf-scratch.git'
+To https://github.com/sapientpants/sf-scratch.git
+!	fb013d89d3c99a2b5f3022e25d2e1022f16b8c4e:refs/heads/factory/issue-7561	[remote rejected] (push declined due to repository rule violations)
+Done
+exit=1

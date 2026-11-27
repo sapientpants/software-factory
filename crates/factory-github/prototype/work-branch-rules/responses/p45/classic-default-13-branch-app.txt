@@ -1,0 +1,110 @@
+HTTP/2 200 
+date: Thu, 26 Nov 2026 21:55:43 GMT
+x-accepted-github-permissions: contents=read
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: FCDE:131996:3180D49:49BC367:6B08AADF
+
+{
+  "name": "factory/issue-7700",
+  "commit": {
+    "sha": "17d8464cd28fd71ba3cb0333f13f34d622816867",
+    "node_id": "C_kwDOVzkiD9oAKDE3ZDg0NjRjZDI4ZmQ3MWJhM2NiMDMzM2YxM2YzNGQ2MjI4MTY4Njc",
+    "commit": {
+      "author": {
+        "name": "Marc Tremblay",
+        "email": "sapientpants@users.noreply.github.com",
+        "date": "2026-11-22T07:53:34Z"
+      },
+      "committer": {
+        "name": "Marc Tremblay",
+        "email": "sapientpants@users.noreply.github.com",
+        "date": "2026-11-22T07:53:34Z"
+      },
+      "message": "Probe P-28: restore the tree",
+      "tree": {
+        "sha": "a05138dabce7fa69ff924842563b19165f64f62f",
+        "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/trees/a05138dabce7fa69ff924842563b19165f64f62f"
+      },
+      "url": "https://api.github.com/repos/sapientpants/sf-scratch/git/commits/17d8464cd28fd71ba3cb0333f13f34d622816867",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/sapientpants/sf-scratch/commits/17d8464cd28fd71ba3cb0333f13f34d622816867",
+    "html_url": "https://github.com/sapientpants/sf-scratch/commit/17d8464cd28fd71ba3cb0333f13f34d622816867",
+    "comments_url": "https://api.github.com/repos/sapientpants/sf-scratch/commits/17d8464cd28fd71ba3cb0333f13f34d622816867/comments",
+    "author": {
+      "login": "sapientpants",
+      "id": 305936,
+      "node_id": "MDQ6VXNlcjMwNTkzNg==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/305936?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/sapientpants",
+      "html_url": "https://github.com/sapientpants",
+      "followers_url": "https://api.github.com/users/sapientpants/followers",
+      "following_url": "https://api.github.com/users/sapientpants/following{/other_user}",
+      "gists_url": "https://api.github.com/users/sapientpants/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/sapientpants/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/sapientpants/subscriptions",
+      "organizations_url": "https://api.github.com/users/sapientpants/orgs",
+      "repos_url": "https://api.github.com/users/sapientpants/repos",
+      "events_url": "https://api.github.com/users/sapientpants/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/sapientpants/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "sapientpants",
+      "id": 305936,
+      "node_id": "MDQ6VXNlcjMwNTkzNg==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/305936?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/sapientpants",
+      "html_url": "https://github.com/sapientpants",
+      "followers_url": "https://api.github.com/users/sapientpants/followers",
+      "following_url": "https://api.github.com/users/sapientpants/following{/other_user}",
+      "gists_url": "https://api.github.com/users/sapientpants/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/sapientpants/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/sapientpants/subscriptions",
+      "organizations_url": "https://api.github.com/users/sapientpants/orgs",
+      "repos_url": "https://api.github.com/users/sapientpants/repos",
+      "events_url": "https://api.github.com/users/sapientpants/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/sapientpants/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "198d8568f5c4d7cabf12d667381e79b7b6fa55e5",
+        "url": "https://api.github.com/repos/sapientpants/sf-scratch/commits/198d8568f5c4d7cabf12d667381e79b7b6fa55e5",
+        "html_url": "https://github.com/sapientpants/sf-scratch/commit/198d8568f5c4d7cabf12d667381e79b7b6fa55e5"
+      }
+    ]
+  },
+  "_links": {
+    "self": "https://api.github.com/repos/sapientpants/sf-scratch/branches/factory/issue-7700",
+    "html": "https://github.com/sapientpants/sf-scratch/tree/factory/issue-7700"
+  },
+  "protected": true,
+  "protection": {
+    "enabled": true,
+    "required_status_checks": {
+      "enforcement_level": "off",
+      "contexts": [
+
+      ],
+      "checks": [
+
+      ]
+    }
+  },
+  "protection_url": "https://api.github.com/repos/sapientpants/sf-scratch/branches/factory/issue-7700/protection"
+}
+

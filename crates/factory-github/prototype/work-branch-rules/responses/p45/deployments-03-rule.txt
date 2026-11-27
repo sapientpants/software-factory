@@ -1,0 +1,14 @@
+HTTP/2 422 
+date: Thu, 26 Nov 2026 21:53:44 GMT
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: FB3B:30B4F1:3143B34:495BA3E:6B08AA68
+
+{
+  "message": "Validation Failed",
+  "errors": [
+    "Invalid rule 'required_deployments': Invalid parameter required_deployment_environments: Invalid deployment environments"
+  ],
+  "documentation_url": "https://docs.github.com/rest/repos/rules#create-a-repository-ruleset",
+  "status": "422"
+}
+

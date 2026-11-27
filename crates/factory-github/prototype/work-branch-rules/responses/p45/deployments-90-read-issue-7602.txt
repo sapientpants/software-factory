@@ -1,0 +1,12 @@
+HTTP/2 404 
+date: Thu, 26 Nov 2026 21:53:54 GMT
+x-accepted-github-permissions: contents=read
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: ED70:39F7B8:31CF9CF:4A3A913:6B08AA71
+
+{
+  "message": "Not Found",
+  "documentation_url": "https://docs.github.com/rest/git/refs#get-a-reference",
+  "status": "404"
+}
+

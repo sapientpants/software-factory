@@ -1,0 +1,12 @@
+HTTP/2 422 
+date: Thu, 26 Nov 2026 21:54:48 GMT
+x-accepted-github-permissions: contents=write; contents=write,workflows=write
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: F557:24FD79:327317D:4AFD6D2:6B08AAA8
+
+{
+  "message": "Reference update failed",
+  "documentation_url": "https://docs.github.com/rest/git/refs#create-a-reference",
+  "status": "422"
+}
+

@@ -1,0 +1,6 @@
+HTTP/2 200 
+date: Thu, 26 Nov 2026 21:59:42 GMT
+x-github-request-id: F7E6:36343D:34C2183:4E91043:6B08ABCE
+
+{"data":{"repository":{"ref":{"name":"factory/issue-7810","refUpdateRule":{"pattern":"factory/*","allowsDeletions":false,"allowsForcePushes":false,"blocksCreations":false,"requiredApprovingReviewCount":0,"requiresLinearHistory":false,"requiresSignatures":false,"requiredStatusCheckContexts":[],"viewerCanPush":true}}}}}
+

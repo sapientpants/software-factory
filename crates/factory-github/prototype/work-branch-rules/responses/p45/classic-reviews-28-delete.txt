@@ -1,0 +1,12 @@
+HTTP/2 422 
+date: Thu, 26 Nov 2026 21:56:54 GMT
+x-accepted-github-permissions: contents=write
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: F038:261799:3272EF2:4B1313D:6B08AB25
+
+{
+  "message": "Cannot delete this branch",
+  "documentation_url": "https://docs.github.com/articles/about-protected-branches",
+  "status": "422"
+}
+

@@ -1,0 +1,44 @@
+HTTP/2 201 
+date: Thu, 26 Nov 2026 21:50:50 GMT
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: F481:8E832:302F1D3:47E2277:6B08A9B9
+
+{
+  "id": 28195555,
+  "name": "probe-p45-signatures",
+  "target": "branch",
+  "source_type": "Repository",
+  "source": "sapientpants/sf-scratch",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "exclude": [
+
+      ],
+      "include": [
+        "refs/heads/factory/**"
+      ]
+    }
+  },
+  "rules": [
+    {
+      "type": "required_signatures"
+    }
+  ],
+  "node_id": "RRS_lACqUmVwb3NpdG9yec5XOSIPzgGuOuM",
+  "created_at": "2026-11-26T22:50:50.158+01:00",
+  "updated_at": "2026-11-26T22:50:50.170+01:00",
+  "bypass_actors": [
+
+  ],
+  "current_user_can_bypass": "never",
+  "_links": {
+    "self": {
+      "href": "https://api.github.com/repos/sapientpants/sf-scratch/rulesets/28195555"
+    },
+    "html": {
+      "href": "https://github.com/sapientpants/sf-scratch/rules/28195555"
+    }
+  }
+}
+

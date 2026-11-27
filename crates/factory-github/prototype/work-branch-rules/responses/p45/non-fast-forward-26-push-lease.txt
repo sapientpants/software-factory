@@ -1,0 +1,13 @@
+push by app: bf2dec6df3aaf2c94f11c850056d03f2b2c71ae9 -> refs/heads/factory/issue-7541 --force-with-lease=refs/heads/factory/issue-7541:0cf7cc3558b28d523cf9d985f423e9303f3b36d9
+the commit and its parents: bf2dec6df3aaf2c94f11c850056d03f2b2c71ae9 17d8464cd28fd71ba3cb0333f13f34d622816867
+
+remote: error: GH013: Repository rule violations found for refs/heads/factory/issue-7541.        
+remote: Review all repository rules at https://github.com/sapientpants/sf-scratch/rules?ref=refs%2Fheads%2Ffactory%2Fissue-7541        
+remote: 
+remote: - Cannot force-push to this branch        
+remote: 
+error: failed to push some refs to 'https://github.com/sapientpants/sf-scratch.git'
+To https://github.com/sapientpants/sf-scratch.git
+!	bf2dec6df3aaf2c94f11c850056d03f2b2c71ae9:refs/heads/factory/issue-7541	[remote rejected] (push declined due to repository rule violations)
+Done
+exit=1

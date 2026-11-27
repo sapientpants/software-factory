@@ -1,0 +1,47 @@
+HTTP/2 201 
+date: Thu, 26 Nov 2026 21:59:53 GMT
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: FDE4:1C4519:31E3B13:4A53029:6B08ABD9
+
+{
+  "id": 28195810,
+  "name": "probe-p45-update-2",
+  "target": "branch",
+  "source_type": "Repository",
+  "source": "sapientpants/sf-scratch",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "exclude": [
+
+      ],
+      "include": [
+        "refs/heads/factory/**"
+      ]
+    }
+  },
+  "rules": [
+    {
+      "type": "update"
+    },
+    {
+      "type": "non_fast_forward"
+    }
+  ],
+  "node_id": "RRS_lACqUmVwb3NpdG9yec5XOSIPzgGuO-I",
+  "created_at": "2026-11-26T22:59:53.407+01:00",
+  "updated_at": "2026-11-26T22:59:53.430+01:00",
+  "bypass_actors": [
+
+  ],
+  "current_user_can_bypass": "never",
+  "_links": {
+    "self": {
+      "href": "https://api.github.com/repos/sapientpants/sf-scratch/rulesets/28195810"
+    },
+    "html": {
+      "href": "https://github.com/sapientpants/sf-scratch/rules/28195810"
+    }
+  }
+}
+

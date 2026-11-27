@@ -1,0 +1,11 @@
+push by app: c6db219ea88aecd7ab783b06f3445a51e28f21f7 -> refs/heads/factory/issue-7710 
+the commit and its parents: c6db219ea88aecd7ab783b06f3445a51e28f21f7 17d8464cd28fd71ba3cb0333f13f34d622816867
+
+remote: error: GH006: Protected branch update failed for refs/heads/factory/issue-7710.        
+remote: 
+remote: - Changes must be made through a pull request.        
+error: failed to push some refs to 'https://github.com/sapientpants/sf-scratch.git'
+To https://github.com/sapientpants/sf-scratch.git
+!	c6db219ea88aecd7ab783b06f3445a51e28f21f7:refs/heads/factory/issue-7710	[remote rejected] (protected branch hook declined)
+Done
+exit=1

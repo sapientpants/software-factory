@@ -1,0 +1,12 @@
+HTTP/2 403 
+date: Thu, 26 Nov 2026 21:57:22 GMT
+x-accepted-github-permissions: administration=read
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: F0EE:1799:2DF113:459AAA:6B08AB41
+
+{
+  "message": "Resource not accessible by integration",
+  "documentation_url": "https://docs.github.com/rest/branches/branch-protection#get-branch-protection",
+  "status": "403"
+}
+

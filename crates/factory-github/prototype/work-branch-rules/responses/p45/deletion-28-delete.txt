@@ -1,0 +1,12 @@
+HTTP/2 422 
+date: Thu, 26 Nov 2026 21:49:03 GMT
+x-accepted-github-permissions: contents=write
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: FBAA:993FB:3300627:4BC2E1A:6B08A94E
+
+{
+  "message": "Repository rule violations found\n\nCannot delete this branch\n\n",
+  "documentation_url": "https://docs.github.com/rest/git/refs#delete-a-reference",
+  "status": "422"
+}
+

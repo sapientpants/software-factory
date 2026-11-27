@@ -1,0 +1,60 @@
+HTTP/2 201 
+date: Thu, 26 Nov 2026 21:51:35 GMT
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: EF54:3DF191:3290C7D:4B40013:6B08A9E6
+
+{
+  "id": 28195573,
+  "name": "probe-p45-pull-request",
+  "target": "branch",
+  "source_type": "Repository",
+  "source": "sapientpants/sf-scratch",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "exclude": [
+
+      ],
+      "include": [
+        "refs/heads/factory/**"
+      ]
+    }
+  },
+  "rules": [
+    {
+      "type": "pull_request",
+      "parameters": {
+        "required_approving_review_count": 0,
+        "dismiss_stale_reviews_on_push": false,
+        "required_reviewers": [
+
+        ],
+        "require_code_owner_review": false,
+        "require_last_push_approval": false,
+        "required_review_thread_resolution": false,
+        "require_extra_approval_for_unattributed_changes": true,
+        "allowed_merge_methods": [
+          "merge",
+          "squash",
+          "rebase"
+        ]
+      }
+    }
+  ],
+  "node_id": "RRS_lACqUmVwb3NpdG9yec5XOSIPzgGuOvU",
+  "created_at": "2026-11-26T22:51:35.137+01:00",
+  "updated_at": "2026-11-26T22:51:35.172+01:00",
+  "bypass_actors": [
+
+  ],
+  "current_user_can_bypass": "never",
+  "_links": {
+    "self": {
+      "href": "https://api.github.com/repos/sapientpants/sf-scratch/rulesets/28195573"
+    },
+    "html": {
+      "href": "https://github.com/sapientpants/sf-scratch/rules/28195573"
+    }
+  }
+}
+

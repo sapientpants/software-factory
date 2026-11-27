@@ -1,0 +1,13 @@
+push by app: 47cf542046e92e81d96512c20af8c5358b1d679f -> refs/heads/factory/issue-7581 
+the commit and its parents: 47cf542046e92e81d96512c20af8c5358b1d679f edd918039c5bb335205c540a30b6324daab2d428 7bb60ad56a789df78e9c33591d79d7d021b797c0
+
+remote: error: GH013: Repository rule violations found for refs/heads/factory/issue-7581.        
+remote: Review all repository rules at https://github.com/sapientpants/sf-scratch/rules?ref=refs%2Fheads%2Ffactory%2Fissue-7581        
+remote: 
+remote: - Required status check "probe/p-45" is expected.        
+remote: 
+error: failed to push some refs to 'https://github.com/sapientpants/sf-scratch.git'
+To https://github.com/sapientpants/sf-scratch.git
+!	47cf542046e92e81d96512c20af8c5358b1d679f:refs/heads/factory/issue-7581	[remote rejected] (push declined due to repository rule violations)
+Done
+exit=1

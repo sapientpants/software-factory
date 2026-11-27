@@ -1,0 +1,12 @@
+HTTP/2 422 
+date: Thu, 26 Nov 2026 21:57:42 GMT
+x-accepted-github-permissions: contents=write; contents=write,workflows=write
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: EC02:1799:2EA7AE:46AB49:6B08AB55
+
+{
+  "message": "Cannot force-push to this branch Cannot change this locked branch",
+  "documentation_url": "https://docs.github.com/articles/about-protected-branches",
+  "status": "422"
+}
+

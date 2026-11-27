@@ -1,0 +1,14 @@
+HTTP/2 422 
+date: Thu, 26 Nov 2026 21:54:12 GMT
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: F478:1CDFF1:3438D3C:4DB1A68:6B08AA83
+
+{
+  "message": "Validation Failed",
+  "errors": [
+    "Invalid rule 'branch_name_pattern': "
+  ],
+  "documentation_url": "https://docs.github.com/rest/repos/rules#create-a-repository-ruleset",
+  "status": "422"
+}
+

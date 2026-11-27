@@ -1,0 +1,7 @@
+push by app: c7adcf06d3f2a571bc4d5ca1f0a989d15f74cea3 -> refs/heads/factory/issue-7500 
+the commit and its parents: c7adcf06d3f2a571bc4d5ca1f0a989d15f74cea3 17d8464cd28fd71ba3cb0333f13f34d622816867
+
+To https://github.com/sapientpants/sf-scratch.git
+ 	c7adcf06d3f2a571bc4d5ca1f0a989d15f74cea3:refs/heads/factory/issue-7500	17d8464..c7adcf0
+Done
+exit=0

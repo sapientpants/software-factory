@@ -1,0 +1,6 @@
+HTTP/2 200 
+date: Thu, 26 Nov 2026 21:58:01 GMT
+x-github-request-id: F3BB:33B5:2BDA8F4:4176A9E:6B08AB68
+
+{"data":{"createBranchProtectionRule":null},"errors":[{"type":"UNPROCESSABLE","path":["createBranchProtectionRule"],"locations":[{"line":1,"column":47}],"message":"Only organization repositories can have users and team restrictions"}]}
+

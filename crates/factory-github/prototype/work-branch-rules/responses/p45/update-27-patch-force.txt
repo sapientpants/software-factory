@@ -1,0 +1,12 @@
+HTTP/2 422 
+date: Thu, 26 Nov 2026 21:48:17 GMT
+x-accepted-github-permissions: contents=write; contents=write,workflows=write
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: FC48:8E832:2FD51AE:475A99E:6B08A920
+
+{
+  "message": "Repository rule violations found\n\nCannot update this protected ref.\n\n",
+  "documentation_url": "https://docs.github.com/rest/git/refs#update-a-reference",
+  "status": "422"
+}
+

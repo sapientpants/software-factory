@@ -1,0 +1,6 @@
+HTTP/2 200 
+date: Thu, 26 Nov 2026 21:58:09 GMT
+x-github-request-id: F297:118B4B:32A6784:4B7093E:6B08AB71
+
+{"data":{"repository":{"branchProtectionRules":{"nodes":[]}}}}
+

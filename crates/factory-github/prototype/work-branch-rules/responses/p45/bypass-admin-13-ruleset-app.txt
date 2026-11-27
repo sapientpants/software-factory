@@ -1,0 +1,42 @@
+HTTP/2 200 
+date: Thu, 26 Nov 2026 21:54:47 GMT
+x-accepted-github-permissions: metadata=read
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: EF67:1768:1718652:226E7F9:6B08AAA7
+
+{
+  "id": 28195676,
+  "name": "probe-p45-bypass-admin",
+  "target": "branch",
+  "source_type": "Repository",
+  "source": "sapientpants/sf-scratch",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "exclude": [
+
+      ],
+      "include": [
+        "refs/heads/factory/**"
+      ]
+    }
+  },
+  "rules": [
+    {
+      "type": "creation"
+    }
+  ],
+  "node_id": "RRS_lACqUmVwb3NpdG9yec5XOSIPzgGuO1w",
+  "created_at": "2026-11-26T21:54:41.771Z",
+  "updated_at": "2026-11-26T21:54:41.807Z",
+  "current_user_can_bypass": "never",
+  "_links": {
+    "self": {
+      "href": "https://api.github.com/repos/sapientpants/sf-scratch/rulesets/28195676"
+    },
+    "html": {
+      "href": "https://github.com/sapientpants/sf-scratch/rules/28195676"
+    }
+  }
+}
+

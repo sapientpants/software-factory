@@ -1,0 +1,6 @@
+HTTP/2 200 
+date: Thu, 26 Nov 2026 21:59:45 GMT
+x-github-request-id: EBD5:3DF191:33B73DB:4CF62C5:6B08ABD1
+
+{"data":{"repository":{"ref":{"name":"factory/issue-7810","branchProtectionRule":{"pattern":"factory/*","requiresApprovingReviews":true}}}}}
+

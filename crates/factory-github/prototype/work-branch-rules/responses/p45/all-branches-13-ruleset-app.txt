@@ -1,0 +1,42 @@
+HTTP/2 200 
+date: Thu, 26 Nov 2026 21:54:28 GMT
+x-accepted-github-permissions: metadata=read
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: FE54:1278A6:3219385:4A6C850:6B08AA94
+
+{
+  "id": 28195666,
+  "name": "probe-p45-all-branches",
+  "target": "branch",
+  "source_type": "Repository",
+  "source": "sapientpants/sf-scratch",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "exclude": [
+
+      ],
+      "include": [
+        "~ALL"
+      ]
+    }
+  },
+  "rules": [
+    {
+      "type": "creation"
+    }
+  ],
+  "node_id": "RRS_lACqUmVwb3NpdG9yec5XOSIPzgGuO1I",
+  "created_at": "2026-11-26T21:54:22.631Z",
+  "updated_at": "2026-11-26T21:54:22.656Z",
+  "current_user_can_bypass": "never",
+  "_links": {
+    "self": {
+      "href": "https://api.github.com/repos/sapientpants/sf-scratch/rulesets/28195666"
+    },
+    "html": {
+      "href": "https://github.com/sapientpants/sf-scratch/rules/28195666"
+    }
+  }
+}
+

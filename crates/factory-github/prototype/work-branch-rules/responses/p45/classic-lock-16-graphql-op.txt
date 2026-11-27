@@ -1,0 +1,6 @@
+HTTP/2 200 
+date: Thu, 26 Nov 2026 21:57:24 GMT
+x-github-request-id: F380:25BA4F:33199A7:4C0C5C4:6B08AB43
+
+{"data":{"repository":{"branchProtectionRules":{"nodes":[{"pattern":"factory/*","allowsDeletions":false,"allowsForcePushes":false,"blocksCreations":false,"lockBranch":true,"requiresApprovingReviews":false,"requiredApprovingReviewCount":null,"requiresCommitSignatures":false,"requiresLinearHistory":false,"requiresStatusChecks":false,"restrictsPushes":false,"isAdminEnforced":false}]},"ref":{"name":"factory/issue-7720","branchProtectionRule":{"pattern":"factory/*"},"refUpdateRule":{"pattern":"factory/*","allowsDeletions":false,"allowsForcePushes":false,"blocksCreations":false,"requiredApprovingReviewCount":0,"requiresLinearHistory":false,"requiresSignatures":false,"requiredStatusCheckContexts":[],"viewerCanPush":true}}}}}
+

@@ -1,0 +1,12 @@
+HTTP/2 404 
+date: Thu, 26 Nov 2026 21:59:47 GMT
+x-accepted-github-permissions: contents=read
+x-github-api-version-selected: 2026-03-10
+x-github-request-id: F254:261799:32D7064:4BA9C9B:6B08ABD3
+
+{
+  "message": "Branch not found",
+  "documentation_url": "https://docs.github.com/rest/branches/branches#get-a-branch",
+  "status": "404"
+}
+

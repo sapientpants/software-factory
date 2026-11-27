@@ -1,0 +1,6 @@
+HTTP/2 200 
+date: Thu, 26 Nov 2026 21:57:22 GMT
+x-github-request-id: E821:36343D:346DC57:4E12C05:6B08AB42
+
+{"data":{"repository":null},"errors":[{"type":"FORBIDDEN","path":["repository","branchProtectionRules"],"extensions":{"saml_failure":false,"ip_allow_list_failure":false},"locations":[{"line":2,"column":3}],"message":"Resource not accessible by integration"}]}
+

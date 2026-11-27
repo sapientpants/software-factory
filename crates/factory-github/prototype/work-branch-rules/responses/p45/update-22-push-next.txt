@@ -1,0 +1,13 @@
+push by app: 12ab0fe4702d607fa159c334157c9f003d3ca627 -> refs/heads/factory/issue-7521 
+the commit and its parents: 12ab0fe4702d607fa159c334157c9f003d3ca627 95f0801c0bebe4e6c1507f567f95ae7a47385121
+
+remote: error: GH013: Repository rule violations found for refs/heads/factory/issue-7521.        
+remote: Review all repository rules at https://github.com/sapientpants/sf-scratch/rules?ref=refs%2Fheads%2Ffactory%2Fissue-7521        
+remote: 
+remote: - Cannot update this protected ref.        
+remote: 
+error: failed to push some refs to 'https://github.com/sapientpants/sf-scratch.git'
+To https://github.com/sapientpants/sf-scratch.git
+!	12ab0fe4702d607fa159c334157c9f003d3ca627:refs/heads/factory/issue-7521	[remote rejected] (push declined due to repository rule violations)
+Done
+exit=1

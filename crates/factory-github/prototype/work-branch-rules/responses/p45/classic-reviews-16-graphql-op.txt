@@ -1,0 +1,6 @@
+HTTP/2 200 
+date: Thu, 26 Nov 2026 21:56:35 GMT
+x-github-request-id: E986:3DF191:3344C57:4C4AE32:6B08AB12
+
+{"data":{"repository":{"branchProtectionRules":{"nodes":[{"pattern":"factory/*","allowsDeletions":false,"allowsForcePushes":false,"blocksCreations":false,"lockBranch":false,"requiresApprovingReviews":true,"requiredApprovingReviewCount":1,"requiresCommitSignatures":false,"requiresLinearHistory":false,"requiresStatusChecks":false,"restrictsPushes":false,"isAdminEnforced":false}]},"ref":{"name":"factory/issue-7710","branchProtectionRule":{"pattern":"factory/*"},"refUpdateRule":{"pattern":"factory/*","allowsDeletions":false,"allowsForcePushes":false,"blocksCreations":false,"requiredApprovingReviewCount":0,"requiresLinearHistory":false,"requiresSignatures":false,"requiredStatusCheckContexts":[],"viewerCanPush":true}}}}}
+

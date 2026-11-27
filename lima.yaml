@@ -1,0 +1,53 @@
+# The development VM (SPEC DEV-3). `cargo xtask check` on macOS creates it
+# from this file as the Lima instance `sf-dev`, starts it, and runs the check
+# set in it. A change to this file reaches the VM only when it is created again:
+# `limactl delete --force sf-dev`, and the next check creates it.
+
+minimumLimaVersion: 2.0.0
+
+# Lima's images of Debian 13, the latest Debian stable, on the Mac's
+# architecture. Its template `debian` names the same images and mounts the
+# home directory too, which this VM does not have (DEV-3, DEV-4).
+base:
+  - template:_images/debian-13
+
+# Nested virtualisation gives the VM a /dev/kvm on an Apple M3 or later with
+# macOS 15 or later (P-36).
+vmType: vz
+nestedVirtualization: true
+
+cpus: 4
+memory: 8GiB
+
+# Nothing of the Mac is mounted. The check copies the work tree into the VM on
+# every run (DEV-3), and the VM reads nothing else of the Mac.
+mounts: []
+
+containerd:
+  system: false
+  user: false
+
+provision:
+  - mode: system
+    script: |
+      #!/bin/sh
+      set -eux
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -qq
+      apt-get install -y -qq bubblewrap build-essential ca-certificates curl git
+      # WS-15: the VM's system configuration of git.
+      git config --system safe.bareRepository explicit
+      # /dev/kvm belongs to group kvm, and the user that Lima creates is no
+      # member of it (P-36).
+      usermod --append --groups kvm "{{.User}}"
+  - mode: user
+    script: |
+      #!/bin/sh
+      set -eux
+      # mise, at the version of SPEC 19.2, installs the toolchain and the check
+      # tools that mise.toml pins; `cargo xtask check` runs `mise install`
+      # before the set.
+      if ! test -x "${HOME}/.local/bin/mise"; then
+        curl --fail --silent --show-error --location --output /tmp/mise-install.sh https://mise.run
+        MISE_VERSION=v2026.11.14 MISE_QUIET=1 sh /tmp/mise-install.sh
+      fi

@@ -5,6 +5,8 @@ use std::fmt;
 use std::path::Path;
 use std::process::{Command, ExitCode};
 
+use crate::vm::{self, Vm};
+
 /// The checks of SPEC DEV-2 that exist so far. The rest of that set is added
 /// here as it is built, and nowhere else (DEV-1).
 fn steps() -> Vec<Step> {
@@ -21,9 +23,20 @@ fn steps() -> Vec<Step> {
                 "-D",
                 "warnings",
             ],
-        ),
-        Step::new("cargo", &["test", "--workspace", "--locked"]),
+        )
+        .also_outside_the_vm(),
+        Step::new("cargo", &["test", "--workspace", "--locked"]).also_outside_the_vm(),
     ]
+}
+
+/// The steps that run on macOS outside the development VM, after the whole set
+/// has run in it: clippy and the tests a second time, for the macOS build
+/// (DEV-3).
+fn macos_steps() -> Vec<Step> {
+    steps()
+        .into_iter()
+        .filter(|step| step.outside_the_vm)
+        .collect()
 }
 
 pub fn main() -> ExitCode {
@@ -32,7 +45,12 @@ pub fn main() -> ExitCode {
         eprintln!("xtask check: cannot enter the repository's root: {error}");
         return ExitCode::FAILURE;
     }
-    match run(&steps()) {
+    let outcome = if cfg!(target_os = "macos") {
+        in_the_vm(&root).and_then(|()| run(&macos_steps()))
+    } else {
+        run(&steps())
+    };
+    match outcome {
         Ok(()) => {
             eprintln!("xtask check: passed");
             ExitCode::SUCCESS
@@ -44,11 +62,24 @@ pub fn main() -> ExitCode {
     }
 }
 
+/// On macOS, the whole set in the development VM (DEV-3): the VM is created
+/// and started where it has to be, and shown the work tree at `root`.
+fn in_the_vm(root: &Path) -> Result<(), String> {
+    let root = root
+        .canonicalize()
+        .map_err(|error| format!("cannot resolve the repository's root: {error}"))?;
+    let vm = Vm::new("limactl", vm::NAME);
+    vm.ensure(&root.join("lima.yaml"))?;
+    vm.check(&root)
+}
+
 /// One check: a program and its arguments, run from the repository's root.
 #[derive(Debug)]
 pub struct Step {
     program: String,
     arguments: Vec<String>,
+    /// Whether macOS runs the step outside the VM too, for its own build.
+    outside_the_vm: bool,
 }
 
 impl Step {
@@ -59,7 +90,13 @@ impl Step {
                 .iter()
                 .map(|&argument| argument.to_owned())
                 .collect(),
+            outside_the_vm: false,
         }
+    }
+
+    fn also_outside_the_vm(mut self) -> Self {
+        self.outside_the_vm = true;
+        self
     }
 }
 
@@ -148,6 +185,19 @@ mod tests {
         assert!(failure.contains("exit code 3"), "{failure}");
         assert!(before.exists());
         assert!(!after.exists(), "a step ran after the failure");
+    }
+
+    #[test]
+    fn outside_the_vm_the_mac_runs_clippy_and_the_tests_alone() {
+        let steps: Vec<String> = macos_steps().iter().map(ToString::to_string).collect();
+
+        assert_eq!(
+            steps,
+            [
+                "cargo clippy --workspace --all-targets --locked -- -D warnings",
+                "cargo test --workspace --locked",
+            ]
+        );
     }
 
     #[test]

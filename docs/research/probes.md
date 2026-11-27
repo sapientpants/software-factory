@@ -4867,3 +4867,26 @@ The test binary `crates/factory-sandbox/tests/sandbox.rs`, with `SF_SANDBOX_TEST
 - **The pid of `--json-status-fd`.** The backend does not yet read it, and the stop sequence of `factory-proc` still signals the group that the shim reports, which is that of `bwrap`. How the traits of 13.3 carry the first process's pid is left open by SEC-10a.
 - **The hosted runners,** with bubblewrap 0.9.0, until the CI workflow has run on this pull request.
 - **The proxy itself** (#134, #135), and a cold build and an agent session behind it (#135, #138).
+
+## P-37, in part: the first process on the hosted runners
+
+Answered 2026-11-28, after #163 merged. The record above was written before the CI workflow had run on that pull request, and it says so. This record adds what the workflow then observed, and adds nothing else.
+
+**Answer.**
+
+- **The 23 sandbox tests passed on the hosted runners of both architectures,** with bubblewrap 0.9.0. Among them are the six tests of the first process: PID 1 and the binary, the forwarding to the port, the signals, the SIGKILL, the reaping, and a proxy path that is no socket. What the record above says of the development VM held there too. No test was changed for it.
+- **The mutation step left no mutant alive** in either job. It tested 22 mutants: 14 were caught and 8 were unviable.
+
+### Method
+
+The CI workflow of DEV-5, on the head of #163.
+
+| | |
+|---|---|
+| Run | [46082262465](https://github.com/sapientpants/software-factory/actions/runs/46082262465), at commit `8c99c62`, the commit that #163 squashed |
+| Jobs | `check (x86-64)` and `check (arm64)`, each with the `bubblewrap` `0.9.0-1ubuntu0.3` that apt installed. The workflow runs `cargo xtask check` in the network namespace of DEV-6 |
+| What ran | In each job the sandbox step, `SF_SANDBOX_TESTS='process' cargo nextest run --locked --package factory-sandbox --test sandbox`, ran 23 tests and each passed. The plain test run passed 325 tests, with 24 skipped |
+
+### Still open
+
+- **The pid of `--json-status-fd`,** and the stop sequence that signals the first process, are now #164.

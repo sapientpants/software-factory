@@ -4688,6 +4688,7 @@ Answered 2026-11-27 for #131, by the sandbox tests of 19.4 that need neither the
 **Answer.**
 
 - **The namespaces and the mounts run a command.** The supervisor shim started `bwrap` with the arguments of the backend, and `bwrap` the command, in the development VM, as the factory's tests start it. The command saw the variables of its spec and of the instance and nothing of the test's environment, the work directory it was given, and PID 2: PID 1 of the namespace is bubblewrap's own, since the backend does not yet pass `--as-pid-1` (SEC-10a).
+- **The hosted runners gave the same,** with bubblewrap 0.9.0, on both architectures and in the network namespace of DEV-6.
 - **Fourteen tests passed,** of which nine are the cases of the row "Sandbox" of 19.4 that need none of the three, and five are of the backend's own kill, reap and refusals. Each case is below.
 - **The root and `/dev` that bubblewrap creates were writable.** `--remount-ro /` and `--remount-ro /dev` after the mounts made both read-only, and `/dev/null` and `/dev/urandom`, which are mounts of their own, stayed writable and readable. That is SEC-6f.
 - **The `/tmp` of SEC-6c met its condition.** `/tmp` showed mode 0700 and the worker's uid, and the root above it mode 0755 and the worker's uid.
@@ -4701,7 +4702,7 @@ The test binary `crates/factory-sandbox/tests/sandbox.rs` of this pull request, 
 |---|---|
 | Where | The development VM `sf-dev` of DEV-3, on the operator's Mac: Debian GNU/Linux 13 (trixie), kernel `6.12.115+deb13.1-cloud-arm64`, aarch64, `kernel.unprivileged_userns_clone` 1. bubblewrap 0.12.0, not setuid. The account that Lima creates, uid 502, with `sudo` without a password; `/usr/bin/sudo`, `/usr/bin/su` and `/usr/bin/mount` are setuid root |
 | When | 2026-11-27, by the session, in `cargo xtask check` and on its own |
-| The hosted runners | Not yet observed when this record was written. The CI run of this pull request, with the bubblewrap 0.9.0 of DEV-6 in the network namespace of DEV-6, is that observation |
+| The hosted runners | Run [46070506092](https://github.com/sapientpants/software-factory/actions/runs/46070506092) of the CI workflow on this pull request, at its first commit, `86d1ef7`: both jobs, `check (x86-64)` on `ubuntu-24.04` and `check (arm64)` on `ubuntu-24.04-arm`, with the `bubblewrap` `0.9.0-1ubuntu0.3` that apt installed and inside the network namespace of DEV-6. In each the sandbox step ran its 14 tests and each passed, the plain test run listed them among its 15 skipped, and the mutation step tested 125 mutants: 100 caught and 25 unviable |
 
 The case of `/dev` was seen first by hand in the VM, with the backend's arguments less the two remounts: `touch /dev/x` and `touch /dev/shm/x` succeeded, and `mount` showed `/dev` as a `tmpfs` with `rw` and `uid=502`. With `--remount-ro /dev` both failed with `Read-only file system`.
 
@@ -4737,7 +4738,6 @@ Without the sandbox tests, `cargo mutants` 27.1.0 missed each of the three viabl
 
 ### Still open
 
-- **The hosted runners,** with bubblewrap 0.9.0: the CI run of this pull request.
 - **The rest of P-37:** the first process and the signals (#133), the filter (#132), the proxy (#134, #135), and the agent CLI with `TMPDIR` at `/tmp` (#138).
 - **A program that needs `/dev/shm`** fails in a worker now. None of the factory's checks was seen to.
 - **The host's paths in `/proc/1/cmdline`.** With `--as-pid-1` the first process takes PID 1, and the `bwrap` that holds the arguments is outside the namespace (SEC-10a). Whether a worker then sees them anywhere else was not looked at.

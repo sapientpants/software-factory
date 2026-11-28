@@ -16,6 +16,16 @@ struct Cli {
 
 #[derive(Debug, Subcommand)]
 enum Command {
+    /// Reports on the installation: the operator configuration, the
+    /// credential files it names, the git and bubblewrap versions,
+    /// unprivileged user namespaces, a sandbox instance at the configured
+    /// level and the agent CLI. Exits with 0 where every check passes
+    /// (CLI-1).
+    Doctor {
+        /// The report as JSON.
+        #[arg(long)]
+        json: bool,
+    },
     /// Sandbox instances outside any run (CLI-6).
     Sandbox {
         #[command(subcommand)]
@@ -117,6 +127,7 @@ fn main() -> ExitCode {
             println!("sf {}", env!("CARGO_PKG_VERSION"));
             ExitCode::SUCCESS
         }
+        Some(Command::Doctor { json }) => factory_daemon::doctor::main(json),
         Some(Command::Sandbox {
             command: SandboxCommand::Exec(exec),
         }) => {
@@ -176,6 +187,20 @@ mod tests {
         ] {
             assert!(request(refused).is_none(), "{refused:?}");
         }
+    }
+
+    #[test]
+    fn doctor_takes_json_and_no_command() {
+        assert!(matches!(
+            parsed(&["sf", "doctor"]),
+            Some(Command::Doctor { json: false })
+        ));
+        assert!(matches!(
+            parsed(&["sf", "doctor", "--json"]),
+            Some(Command::Doctor { json: true })
+        ));
+        assert!(parsed(&["sf", "doctor", "--", "true"]).is_none());
+        assert!(parsed(&["sf", "doctor", "--probe"]).is_none());
     }
 
     #[test]

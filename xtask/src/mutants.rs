@@ -16,6 +16,7 @@ pub const SANDBOX_CODE: &[&str] = &[
     "crates/factory-sandbox/src/bubblewrap.rs",
     "crates/factory-sandbox/src/bubblewrap/init.rs",
     "crates/factory-daemon/src/sandbox_exec.rs",
+    "crates/factory-daemon/src/doctor.rs",
 ];
 
 /// The variable through which the development VM is given the diff that the
@@ -549,7 +550,8 @@ mod tests {
                     "mutants --in-diff {} --test-tool=nextest --cargo-arg=--locked --output {} \
                      --exclude=crates/factory-sandbox/src/bubblewrap.rs \
                      --exclude=crates/factory-sandbox/src/bubblewrap/init.rs \
-                     --exclude=crates/factory-daemon/src/sandbox_exec.rs with SF_SANDBOX_TESTS=\n",
+                     --exclude=crates/factory-daemon/src/sandbox_exec.rs \
+                     --exclude=crates/factory-daemon/src/doctor.rs with SF_SANDBOX_TESTS=\n",
                     file.display(),
                     target.display()
                 )

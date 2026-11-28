@@ -2,27 +2,37 @@
 //! directory (SPEC AG-11).
 
 use std::ffi::{OsStr, OsString};
+use std::io::{PipeReader, PipeWriter};
+use std::os::fd::{AsRawFd as _, BorrowedFd, OwnedFd, RawFd};
 use std::path::{Path, PathBuf};
-use std::process::Stdio;
+use std::process::{ExitStatus, Stdio};
 
-use process_wrap::tokio::{CommandWrap, KillOnDrop, ProcessGroup};
-use tokio::io::AsyncWrite;
-
-use nix::unistd::Pid;
+use nix::fcntl::{FcntlArg, FdFlag, fcntl};
+use nix::unistd::{Pid, getpid};
+use process_wrap::tokio::{ChildWrapper, CommandWrap, KillOnDrop, ProcessGroup};
+use tokio::io::{AsyncReadExt as _, AsyncWrite};
+use tokio::net::unix::pipe::Receiver;
 
 use crate::Error;
 use crate::codec::LineCodec;
-use crate::process::Process;
+use crate::process::{Process, Signalled, Started};
 use crate::supervise::{Pipes, reported_group};
 
 /// The cap of a line of stdout where the caller sets none, in bytes
 /// *(tunable)*.
 pub const MAX_LINE_LENGTH: usize = 1 << 20;
 
+/// The longest report of [`Command::signal_reported`], in bytes, its line
+/// break among them *(tunable)*. bubblewrap's is about 200.
+const MAX_REPORT_LENGTH: usize = 4096;
+
 /// A command that [`Command::spawn`] starts as the leader of a process group
 /// of its own, with a cleared environment that holds the variables set with
 /// [`Command::env`] and no other (AG-11).
-#[derive(Debug, Clone)]
+///
+/// A command is started once where it holds a descriptor of its own, which
+/// [`Command::signal_reported`] gives it; otherwise it may be started again.
+#[derive(Debug)]
 pub struct Command {
     program: OsString,
     args: Vec<OsString>,
@@ -35,6 +45,22 @@ pub struct Command {
     supervisor: Option<Supervisor>,
     #[cfg(target_os = "linux")]
     files: Vec<std::sync::Arc<std::os::fd::OwnedFd>>,
+    report: Report,
+}
+
+/// Whether the program reports the process that the stop sequence signals.
+#[derive(Debug)]
+enum Report {
+    /// It does not: the stop sequence signals the command's group.
+    None,
+    /// On the writing end of this pipe, as a line that `parse` reads.
+    Pending {
+        reader: PipeReader,
+        writer: PipeWriter,
+        parse: fn(&[u8]) -> Option<u32>,
+    },
+    /// The command was started, and its pipe went with it.
+    Spent,
 }
 
 /// The supervisor shim that a command is started through (AG-16): a program
@@ -75,6 +101,7 @@ impl Command {
             supervisor: None,
             #[cfg(target_os = "linux")]
             files: Vec::new(),
+            report: Report::None,
         }
     }
 
@@ -156,15 +183,67 @@ impl Command {
         fd
     }
 
+    /// Has the stop sequence signal one process in place of the command's
+    /// group (AG-12): the one that the program names on the descriptor whose
+    /// number this returns, which the caller puts in the program's arguments.
+    /// The program gets the writing end of a pipe there, through the shim
+    /// too, which hands it on unread. Once the program has started,
+    /// [`Command::spawn`] reads the first line of the pipe, and `parse` gives
+    /// the pid from it: `factory-proc` knows nothing of what the line holds.
+    /// The pipe stays open while the [`Process`] lives, so that a program
+    /// that writes more there is not ended by SIGPIPE. For the first process
+    /// of a sandbox at level `process`, which passes SIGINT and SIGTERM on to
+    /// the command's group (SEC-10a).
+    ///
+    /// # Errors
+    ///
+    /// Where the pipe cannot be made.
+    pub fn signal_reported(&mut self, parse: fn(&[u8]) -> Option<u32>) -> std::io::Result<RawFd> {
+        let (reader, writer) = std::io::pipe()?;
+        let fd = writer.as_raw_fd();
+        self.report = Report::Pending {
+            reader,
+            writer,
+            parse,
+        };
+        Ok(fd)
+    }
+
     /// Starts the command. Its stderr is written to `stderr` while stdout is
     /// read (AG-13).
     ///
     /// # Errors
     ///
-    /// [`Error::Spawn`] where the program does not start, or the shim
-    /// reports no command, and [`Error::Pipe`] where the shim's pipes cannot
-    /// be made.
-    pub async fn spawn(&self, stderr: impl AsyncWrite + Send + 'static) -> Result<Process, Error> {
+    /// [`Error::Spawn`] where the program does not start, the shim reports
+    /// no command, the program reports no process that may be signalled
+    /// ([`Command::signal_reported`]), or the command, which holds a
+    /// descriptor of its own, was started already; and [`Error::Pipe`] where
+    /// the shim's pipes cannot be made.
+    pub async fn spawn(
+        &mut self,
+        stderr: impl AsyncWrite + Send + 'static,
+    ) -> Result<Process, Error> {
+        let spawn_error = |program: &OsStr, source| Error::Spawn {
+            program: program.to_string_lossy().into_owned(),
+            source,
+        };
+        let report = match std::mem::replace(&mut self.report, Report::Spent) {
+            Report::None => {
+                self.report = Report::None;
+                None
+            }
+            Report::Pending {
+                reader,
+                writer,
+                parse,
+            } => Some((reader, writer, parse)),
+            Report::Spent => {
+                return Err(spawn_error(
+                    &self.program,
+                    std::io::Error::other("the command was started already"),
+                ));
+            }
+        };
         let (program, args, pipes) = match &self.supervisor {
             None => (self.program.clone(), self.args.clone(), None),
             Some(supervisor) => {
@@ -212,13 +291,13 @@ impl Command {
         }
         #[cfg(target_os = "linux")]
         pass_files(&mut command, &self.files);
+        if let Some((_, writer, _)) = &report {
+            inherit(&mut command, writer.as_raw_fd());
+        }
         let mut wrap = CommandWrap::from(command);
         wrap.wrap(ProcessGroup::leader()).wrap(KillOnDrop);
-        let spawn_error = |source| Error::Spawn {
-            program: program.to_string_lossy().into_owned(),
-            source,
-        };
-        let child = wrap.spawn().map_err(spawn_error)?;
+        let spawn_error = |source| spawn_error(&program, source);
+        let mut child = wrap.spawn().map_err(spawn_error)?;
         let leader = child
             .id()
             .and_then(|id| i32::try_from(id).ok())
@@ -234,10 +313,26 @@ impl Command {
                 (group, Some(ends.held))
             }
         };
+        let (signalled, status, report) = match report {
+            None => (Signalled::Group(group.as_raw().unsigned_abs()), None, None),
+            Some((reader, writer, parse)) => {
+                // The program holds its copy now, and the pipe ends once
+                // each holder of one has closed it.
+                drop(writer);
+                reported(child.as_mut(), group, reader, parse)
+                    .await
+                    .map_err(spawn_error)?
+            }
+        };
         Ok(Process::new(
-            child,
-            leader,
-            group,
+            Started {
+                child,
+                leader,
+                group,
+                signalled,
+                status,
+                report,
+            },
             if self.raw_stdout {
                 LineCodec::Raw
             } else {
@@ -246,6 +341,85 @@ impl Command {
             Box::pin(stderr),
             held,
         ))
+    }
+}
+
+/// Makes the descriptor `fd` inheritable in the child alone, between its
+/// fork and its exec.
+fn inherit(command: &mut tokio::process::Command, fd: RawFd) {
+    let inherit = move || {
+        // SAFETY: the descriptor is the writing end of a pipe that the
+        // command holds open until the child has started.
+        let end = unsafe { BorrowedFd::borrow_raw(fd) };
+        fcntl(end, FcntlArg::F_SETFD(FdFlag::empty()))?;
+        Ok(())
+    };
+    // SAFETY: the closure runs in the child before its exec, where it makes
+    // one call of fcntl(2), which is async-signal-safe, and allocates nothing.
+    unsafe {
+        command.pre_exec(inherit);
+    }
+}
+
+/// What the stop sequence of a started program signals, which it reports on
+/// `reader` (`Command::signal_reported`), with the leader's status where the
+/// leader exited first, and the pipe, which the process keeps open. A
+/// program that ends without a report has ended by itself, and its group is
+/// what is left to signal.
+async fn reported(
+    child: &mut dyn ChildWrapper,
+    group: Pid,
+    reader: PipeReader,
+    parse: fn(&[u8]) -> Option<u32>,
+) -> std::io::Result<(Signalled, Option<ExitStatus>, Option<Receiver>)> {
+    let mut receiver = Receiver::from_owned_fd(OwnedFd::from(reader))?;
+    let own = getpid().as_raw().unsigned_abs();
+    let ended = |status| {
+        Ok((
+            Signalled::Group(group.as_raw().unsigned_abs()),
+            Some(status),
+            None,
+        ))
+    };
+    tokio::select! {
+        biased;
+        line = first_line(&mut receiver) => match line? {
+            Some(line) => match parse(&line) {
+                // Never this process, nor init or a pid that is none, so
+                // that no single fault signals the whole host.
+                Some(pid) if pid > 1 && pid != own && i32::try_from(pid).is_ok() => {
+                    Ok((Signalled::Process(pid), None, Some(receiver)))
+                }
+                _ => Err(std::io::Error::other(format!(
+                    "the program reported no process to signal: {:?}",
+                    String::from_utf8_lossy(&line)
+                ))),
+            },
+            None => ended(child.wait().await?),
+        },
+        status = child.wait() => ended(status?),
+    }
+}
+
+/// The first line of `receiver`, without its line break, or `None` where it
+/// ends before one. It reads at most [`MAX_REPORT_LENGTH`] bytes.
+async fn first_line(receiver: &mut Receiver) -> std::io::Result<Option<Vec<u8>>> {
+    let mut line = Vec::new();
+    let mut buffer = [0; 256];
+    loop {
+        if let Some(end) = line.iter().position(|byte| *byte == b'\n') {
+            line.truncate(end);
+            return Ok(Some(line));
+        }
+        if line.len() >= MAX_REPORT_LENGTH {
+            return Err(std::io::Error::other(format!(
+                "the program's report is longer than {MAX_REPORT_LENGTH} bytes"
+            )));
+        }
+        match receiver.read(&mut buffer).await? {
+            0 => return Ok(None),
+            n => line.extend_from_slice(buffer.get(..n).unwrap_or_default()),
+        }
     }
 }
 

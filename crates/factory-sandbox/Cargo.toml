@@ -16,6 +16,8 @@ thiserror.workspace = true
 [target.'cfg(target_os = "linux")'.dependencies]
 nix.workspace = true
 seccompiler.workspace = true
+# The status line of `bwrap --json-status-fd` (SEC-10a).
+serde_json.workspace = true
 # The first process forwards with tokio (SPEC 19.2).
 tokio = { workspace = true, features = ["io-util", "macros", "net", "rt", "signal", "time"] }
 

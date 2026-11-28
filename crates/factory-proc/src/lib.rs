@@ -14,7 +14,7 @@ pub mod supervise;
 
 pub use codec::Line;
 pub use command::{Command, MAX_LINE_LENGTH, Supervisor};
-pub use process::{DRAIN, Process, StopTimes, Stopped, StoppedBy};
+pub use process::{DRAIN, Process, Signalled, StopTimes, Stopped, StoppedBy};
 
 /// What starting, reading or stopping a process failed at.
 #[derive(Debug, thiserror::Error)]

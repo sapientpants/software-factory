@@ -138,16 +138,21 @@ pub fn baseline(host: impl Fn(&Path) -> OnHost) -> Vec<OsString> {
 
 /// Every argument of `bwrap` for `spec` in an instance of the sandbox
 /// policy `policy`, with the baseline `baseline`, the programs of the
-/// filter at the descriptors `filter`, and the `sf` binary at `sf`, which
-/// the sandbox shows at [`init::BINARY`] and starts as its first process.
+/// filter at the descriptors `filter`, the pipe of `--json-status-fd` at the
+/// descriptor `status`, and the `sf` binary at `sf`, which the sandbox shows
+/// at [`init::BINARY`] and starts as its first process.
 pub fn arguments(
     policy: &SandboxPolicy,
     baseline: &[OsString],
     filter: &[RawFd],
+    status: RawFd,
     sf: &Path,
     spec: &ExecSpec,
 ) -> Vec<OsString> {
     let mut arguments: Vec<OsString> = NAMESPACES.iter().map(OsString::from).collect();
+    // Where bubblewrap writes the pid of the first process, as the host
+    // sees it, which the stop sequence signals (SEC-10a).
+    arguments.extend(["--json-status-fd".into(), status.to_string().into()]);
     // bubblewrap applies each as its last step before the command starts
     // (SEC-6e).
     for fd in filter {
@@ -321,10 +326,19 @@ impl SandboxInstance for Instance {
             .iter()
             .map(|program| command.pass_file(Arc::clone(program)))
             .collect();
+        // The stop sequence signals the first process, which passes SIGINT
+        // and SIGTERM on to the command's group, and not `bwrap` (SEC-10a).
+        let status = command
+            .signal_reported(first_process)
+            .map_err(|source| Error::Host {
+                what: "make the pipe of --json-status-fd".to_owned(),
+                source,
+            })?;
         command.args(arguments(
             &self.policy,
             &self.baseline,
             &filter,
+            status,
             &self.sf,
             spec,
         ));
@@ -350,6 +364,15 @@ impl SandboxInstance for Instance {
             remove(&self.record.tmp)
         })
     }
+}
+
+/// The pid of the first process, as the host sees it, from the first line
+/// that bubblewrap writes to `--json-status-fd`: an object whose member
+/// `child-pid` holds it (SEC-10a). bubblewrap writes that line once the
+/// first process exists, and the line `exit-code` once it has ended.
+pub fn first_process(line: &[u8]) -> Option<u32> {
+    let status: serde_json::Value = serde_json::from_slice(line).ok()?;
+    u32::try_from(status.get("child-pid")?.as_u64()?).ok()
 }
 
 /// A file of memory for a program of the filter: closed on exec, so that no
@@ -689,6 +712,7 @@ mod tests {
                 &policy,
                 &baseline,
                 &[7, 9],
+                11,
                 Path::new("/opt/sf/0.1.0/sf"),
                 &spec
             )),
@@ -707,6 +731,8 @@ mod tests {
                 "/proc",
                 "--dev",
                 "/dev",
+                "--json-status-fd",
+                "11",
                 "--add-seccomp-fd",
                 "7",
                 "--add-seccomp-fd",
@@ -743,6 +769,33 @@ mod tests {
                 "echo",
             ]
         );
+    }
+
+    #[test]
+    fn the_status_line_names_the_first_process_by_its_child_pid() {
+        // The line that bubblewrap 0.12.0 wrote in the development VM (P-37).
+        let observed = br#"{ "child-pid": 2808799, "cgroup-namespace": 4026532304, "ipc-namespace": 4026532302, "mnt-namespace": 4026532300, "net-namespace": 4026532305, "pid-namespace": 4026532303, "uts-namespace": 4026532301 }"#;
+
+        assert_eq!(first_process(observed), Some(2_808_799));
+        assert_eq!(first_process(br#"{"child-pid":42}"#), Some(42));
+        for line in [
+            &br#"{ "exit-code": 0 }"#[..],
+            br#"{ "child-pid": "42" }"#,
+            br#"{ "child-pid": -42 }"#,
+            br#"{ "child-pid": 4294967296 }"#,
+            br#"{ "child-pid": 4.2 }"#,
+            br#"[42]"#,
+            b"42",
+            b"",
+            b"\xff",
+        ] {
+            assert_eq!(
+                first_process(line),
+                None,
+                "{}",
+                String::from_utf8_lossy(line)
+            );
+        }
     }
 
     #[test]

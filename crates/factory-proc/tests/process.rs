@@ -11,7 +11,7 @@ use tokio::io::AsyncWriteExt as _;
 use tokio::time::Instant;
 
 /// The lines of stdout until the output ends.
-async fn lines(command: Command) -> Vec<Line> {
+async fn lines(mut command: Command) -> Vec<Line> {
     let mut process = command
         .spawn(tokio::io::sink())
         .await
@@ -88,7 +88,7 @@ fn stderr_is_written_to_its_sink_beside_stdout() {
         let file = tokio::fs::File::create(&path).await.unwrap();
         // More than a pipe holds, so that stdout would stall if stderr were not
         // drained meanwhile.
-        let command = sh(
+        let mut command = sh(
             "i=0; while [ $i -lt 4000 ]; do echo 'a line of stderr' >&2; i=$((i+1)); done; echo out",
         );
         let mut process = command.spawn(file).await.unwrap();
@@ -141,7 +141,7 @@ fn stdin_is_written_until_it_is_closed() {
     within(async {
         let mut command = Command::new("/bin/cat");
         command.stdin_piped();
-        let mut process = spawn(&command).await;
+        let mut process = spawn(&mut command).await;
         let stdin = process.stdin().unwrap_or_else(|| panic!("no stdin"));
         stdin.write_all(b"to cat\n").await.unwrap();
         assert_eq!(read_text(&mut process).await, "to cat");
@@ -156,7 +156,7 @@ fn stdin_is_written_until_it_is_closed() {
 #[test]
 fn the_status_is_that_of_the_leader() {
     within(async {
-        let mut process = spawn(&sh("exit 4")).await;
+        let mut process = spawn(&mut sh("exit 4")).await;
         assert_eq!(process.wait().await.unwrap().code(), Some(4));
         assert_eq!(process.status().and_then(|status| status.code()), Some(4));
     });
@@ -165,7 +165,7 @@ fn the_status_is_that_of_the_leader() {
 #[test]
 fn stdin_is_null_unless_it_is_piped() {
     within(async {
-        let mut process = spawn(&Command::new("/bin/cat")).await;
+        let mut process = spawn(&mut Command::new("/bin/cat")).await;
         assert!(process.stdin().is_none());
         assert_eq!(process.next_line().await.unwrap(), None);
     });
@@ -245,7 +245,7 @@ fn a_taken_stdin_is_written_while_stdout_is_read() {
     within(async {
         let mut command = Command::new("/bin/cat");
         command.stdin_piped().raw_stdout();
-        let mut process = spawn(&command).await;
+        let mut process = spawn(&mut command).await;
         let mut stdin = process.take_stdin().unwrap_or_else(|| panic!("no stdin"));
         assert!(process.stdin().is_none());
         // More than a pipe holds in each direction, so that the write stalls

@@ -465,7 +465,12 @@ mod linux {
                     work.to_str().unwrap(),
                     "/bin/sh",
                     "-c",
-                    "echo started; sleep 60",
+                    // The trap, and not the SIGINT's default action, ends
+                    // the shell: a SIGINT that comes while the shell starts
+                    // `sleep`, between its fork and the exec, is lost to the
+                    // child, which then sleeps on. The SIGINT reaches the
+                    // command through the first process (SEC-10a).
+                    "trap 'exit 130' INT; echo started; while :; do sleep 0.1; done",
                 ],
             )
             .await;

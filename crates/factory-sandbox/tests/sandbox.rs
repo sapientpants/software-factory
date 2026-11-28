@@ -34,7 +34,7 @@ mod linux {
 
     use factory_core::engine::RunId;
     use factory_proc::supervise::{FAILED, Supervise};
-    use factory_proc::{Command, Line, Process, Supervisor};
+    use factory_proc::{Command, Line, Process, Signalled, StopTimes, StoppedBy, Supervisor};
     use factory_sandbox::bubblewrap::init::{self, Init};
     use factory_sandbox::bubblewrap::{Bubblewrap, parse_stat};
     use factory_sandbox::{
@@ -845,6 +845,95 @@ mod linux {
         });
     }
 
+    /// The pipe of `--json-status-fd`, as `/proc` names it on the host
+    /// (`pipe:[<inode>]`), from the descriptor that the arguments of `bwrap`
+    /// give it.
+    fn status_pipe(bwrap: i32) -> PathBuf {
+        let cmdline = std::fs::read(format!("/proc/{bwrap}/cmdline")).unwrap();
+        let words: Vec<&[u8]> = cmdline.split(|byte| *byte == 0).collect();
+        let fd = words
+            .windows(2)
+            .find(|pair| pair[0] == b"--json-status-fd")
+            .map(|pair| String::from_utf8(pair[1].to_vec()).unwrap())
+            .expect("bwrap is given --json-status-fd");
+        std::fs::read_link(format!("/proc/{bwrap}/fd/{fd}")).unwrap()
+    }
+
+    /// What each descriptor of the process `pid` names.
+    fn descriptors(pid: i32) -> Vec<PathBuf> {
+        std::fs::read_dir(format!("/proc/{pid}/fd"))
+            .unwrap()
+            .flatten()
+            .filter_map(|entry| std::fs::read_link(entry.path()).ok())
+            .collect()
+    }
+
+    /// Checks that the stop sequence of `process` signals the first process,
+    /// and that no process of the sandbox holds the pipe that named it.
+    fn signalled_first_process(process: &Process) {
+        let first = first_process_of(process);
+        assert_eq!(
+            process.signalled(),
+            Signalled::Process(first.try_into().unwrap())
+        );
+        let pipe = status_pipe(process.group().try_into().unwrap());
+        assert!(pipe.to_string_lossy().starts_with("pipe:"), "{pipe:?}");
+        for pid in tree(first) {
+            assert!(!descriptors(pid).contains(&pipe), "{pid} holds {pipe:?}");
+        }
+    }
+
+    fn a_stop_sequence_interrupts_a_command_in_the_instance() {
+        within(async {
+            let scratch = Scratch::new("stop-int");
+            let policy = scratch.policy();
+            let instance = backend().create(RunId(1), &policy).await.unwrap();
+            let script = "trap 'echo int; exit 5' INT; echo ready; \
+                          while :; do /bin/sleep 0.1; done";
+            let mut process = spawn(instance.as_ref(), &sh(script, &[])).await;
+            assert_eq!(text(&mut process).await, "ready");
+            signalled_first_process(&process);
+
+            let stopped = process.stop(StopTimes::AG_12, |_| false).await.unwrap();
+
+            // The SIGINT reached the command, which ended by itself, and its
+            // status came back through the first process, bwrap and the shim.
+            assert_eq!(stopped.by, StoppedBy::Interrupt);
+            assert_eq!(stopped.lines, [Line::Text("int".to_owned())]);
+            assert_eq!(stopped.status.code(), Some(5));
+            instance.destroy().await.unwrap();
+        });
+    }
+
+    fn a_command_that_ignores_sigint_and_sigterm_is_killed_and_leaves_nothing() {
+        within(async {
+            let scratch = Scratch::new("stop-kill");
+            let policy = scratch.policy();
+            let instance = backend().create(RunId(1), &policy).await.unwrap();
+            // A grandchild in a session of its own, which no signal to the
+            // command's group reaches.
+            let script = "trap '' INT TERM; /bin/sleep 300 & setsid /bin/sleep 300 & \
+                          echo ready; wait";
+            let mut process = spawn(instance.as_ref(), &sh(script, &[])).await;
+            assert_eq!(text(&mut process).await, "ready");
+            let tree = tree(process.group().try_into().unwrap());
+            // bwrap, the first process, the shell and two sleeps.
+            assert_eq!(tree.len(), 5, "{tree:?}");
+            signalled_first_process(&process);
+            let times = StopTimes::AG_12;
+            let started = tokio::time::Instant::now();
+
+            let stopped = process.stop(times, |_| false).await.unwrap();
+
+            let elapsed = started.elapsed();
+            assert_eq!(stopped.by, StoppedBy::Kill);
+            assert!(elapsed >= times.interrupt + times.terminate, "{elapsed:?}");
+            assert_eq!(stopped.status.code(), Some(128 + 9));
+            all_end(&tree).await;
+            instance.destroy().await.unwrap();
+        });
+    }
+
     fn a_proxy_that_is_no_socket_creates_no_instance() {
         within(async {
             let scratch = Scratch::new("no-socket");
@@ -1376,6 +1465,14 @@ mod linux {
         (
             "after_a_sigkill_to_the_first_process_no_process_of_the_sandbox_is_left",
             after_a_sigkill_to_the_first_process_no_process_of_the_sandbox_is_left,
+        ),
+        (
+            "a_stop_sequence_interrupts_a_command_in_the_instance",
+            a_stop_sequence_interrupts_a_command_in_the_instance,
+        ),
+        (
+            "a_command_that_ignores_sigint_and_sigterm_is_killed_and_leaves_nothing",
+            a_command_that_ignores_sigint_and_sigterm_is_killed_and_leaves_nothing,
         ),
         (
             "a_proxy_that_is_no_socket_creates_no_instance",

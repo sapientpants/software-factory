@@ -33,7 +33,9 @@ mod linux {
     use factory_core::config::OperatorConfig;
     use factory_core::ecosystem::{HostTriple, Rust};
     use factory_daemon::process::Supervisor;
-    use factory_daemon::sandbox_exec::{self, DIRECTORY, Host, Report, Request};
+    use factory_daemon::sandbox_exec::{
+        self, DIRECTORY, Ended, Form, Host, Report, Request, Session,
+    };
     use factory_net::proxy::Reason;
     use factory_sandbox::bubblewrap::Bubblewrap;
     use tokio::io::{AsyncBufReadExt as _, AsyncWriteExt as _};
@@ -58,8 +60,10 @@ mod linux {
             dir: dir.into(),
             target: None,
             tools: Vec::new(),
-            program,
-            args: args.collect(),
+            form: Form::Command {
+                program,
+                args: args.collect(),
+            },
         };
         sandbox_exec::main(&request, json)
     }
@@ -128,8 +132,10 @@ mod linux {
                 dir: self.0.join("work"),
                 target: None,
                 tools: Vec::new(),
-                program: "/bin/bash".into(),
-                args: vec!["-c".into(), script.into()],
+                form: Form::Command {
+                    program: "/bin/bash".into(),
+                    args: vec!["-c".into(), script.into()],
+                },
             }
         }
 
@@ -140,6 +146,15 @@ mod linux {
                 .flatten()
                 .map(|entry| entry.file_name())
                 .collect()
+        }
+    }
+
+    /// A directory that is removed when the value is dropped.
+    struct Removed(PathBuf);
+
+    impl Drop for Removed {
+        fn drop(&mut self) {
+            let _ = std::fs::remove_dir_all(&self.0);
         }
     }
 
@@ -506,6 +521,96 @@ mod linux {
         });
     }
 
+    /// The agent form with a stand-in for the agent CLI, which the sandbox
+    /// shows at its path: what the session sees of the files of AG-4 and
+    /// AG-8, its token and its message, and that the host ends it at its
+    /// `result` line. The stand-in lies in a directory of its own below
+    /// `HOME`: no mount is shown below `/tmp` (SEC-6f), where the mutation
+    /// step copies the tree and its build.
+    fn the_agent_form_runs_a_session_with_its_configuration_read_only() {
+        within(async {
+            let scratch = Scratch::new("agent");
+            let cli_dir = Removed(
+                Path::new(&std::env::var_os("HOME").expect("HOME is set"))
+                    .join(format!(".sf-exec-sandbox-{}-agent", std::process::id())),
+            );
+            let _ = std::fs::remove_dir_all(&cli_dir.0);
+            std::fs::create_dir_all(&cli_dir.0).unwrap();
+            let cli = cli_dir.0.join("claude");
+            std::fs::write(
+                &cli,
+                r#"#!/bin/sh
+trap 'exit 0' INT
+IFS= read -r line
+echo "message: $line"
+touch /agent/x 2>/dev/null && echo agent-writable || echo agent-read-only
+{ echo x >> "$HOME/.claude/settings.json"; } 2>/dev/null && echo settings-writable || echo settings-read-only
+mkdir "$HOME/.claude/skills/s" 2>/dev/null && echo skills-writable || echo skills-read-only
+touch "$HOME/.claude/.claude.json" && echo transcripts-writable
+echo "settings: $(cat /agent/settings.json)"
+echo "token: ${#CLAUDE_CODE_OAUTH_TOKEN}"
+echo '{"type":"assistant","message":{"content":[{"type":"tool_use","id":"t1","name":"Bash"}]}}'
+echo '{"type":"result","subtype":"success"}'
+while :; do sleep 0.1; done
+"#,
+            )
+            .unwrap();
+            std::fs::set_permissions(&cli, std::os::unix::fs::PermissionsExt::from_mode(0o755))
+                .unwrap();
+            let token = scratch.0.join("token");
+            std::fs::write(&token, format!("{}\n", "t".repeat(40))).unwrap();
+            let config = OperatorConfig::parse(
+                format!(
+                    "schema_version = 1\ndata_dir = {:?}\n[credentials]\nsubscription_token_file = {token:?}\n[agent]\ncli = {cli:?}\n[sandbox]\nlevel = \"process\"\n",
+                    scratch.0.join("data")
+                )
+                .as_bytes(),
+            )
+            .unwrap();
+            let request = Request {
+                dir: scratch.0.join("work"),
+                target: None,
+                tools: Vec::new(),
+                form: Form::Agent {
+                    model: "m".to_owned(),
+                    prompt: "hello".to_owned(),
+                },
+            };
+
+            let (report, lines) = exec(&config, &request, 0).await;
+            drop(cli_dir);
+
+            assert_eq!(
+                report.ended,
+                Ended::Session(Session {
+                    result: Some("success".to_owned()),
+                    bash_uses: 1
+                }),
+                "{lines:?}"
+            );
+            assert_eq!(report.code(), 0);
+            let message = lines
+                .first()
+                .and_then(|line| line.strip_prefix("message: "))
+                .unwrap_or_else(|| panic!("{lines:?}"));
+            let message: serde_json::Value = serde_json::from_str(message).unwrap();
+            assert_eq!(message["message"]["content"][0]["text"], "hello");
+            assert_eq!(
+                lines[1..7],
+                [
+                    "agent-read-only",
+                    "settings-read-only",
+                    "skills-read-only",
+                    "transcripts-writable",
+                    r#"settings: {"sandbox":{"enabled":false}}"#,
+                    "token: 40",
+                ]
+            );
+            assert!(report.denials.is_empty());
+            assert!(scratch.left().is_empty(), "{:?}", scratch.left());
+        });
+    }
+
     /// The tests, each with its name.
     pub const TESTS: &[(&str, fn())] = &[
         (
@@ -527,6 +632,10 @@ mod linux {
         (
             "a_sigint_to_sf_stops_the_command_and_leaves_nothing_behind",
             a_sigint_to_sf_stops_the_command_and_leaves_nothing_behind,
+        ),
+        (
+            "the_agent_form_runs_a_session_with_its_configuration_read_only",
+            the_agent_form_runs_a_session_with_its_configuration_read_only,
         ),
     ];
 }

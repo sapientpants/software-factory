@@ -1,5 +1,13 @@
-//! `sf sandbox exec`, the command form (CLI-6): one command line in one
+//! `sf sandbox exec` (CLI-6): one command line, or one agent session, in one
 //! sandbox instance at the configured level, outside any run.
+//!
+//! In the agent form the host first reads the subscription token and finds
+//! the agent CLI (13.5, 16.4), and creates nothing where either is missing.
+//! Below the directory of the command it then also creates the configuration
+//! directory of AG-4 in the home and the host's files of AG-1 and AG-8, which
+//! the sandbox shows read-only, and it starts the CLI with the invocation of
+//! AG-1. It writes the one message, reads the stream as far as the first
+//! `result` line and ends the session there by the stop sequence (AG-12).
 //!
 //! The host reads the toolchain file from the directory, as data, and looks up
 //! the toolchain that it names and each check tool that the request names
@@ -25,6 +33,8 @@ use std::process::{ExitCode, ExitStatus};
 use std::sync::{Arc, Mutex, PoisonError};
 use std::time::{Duration, SystemTime};
 
+use factory_agent::session::{self, Invocation, SessionId, Token};
+use factory_agent::stream::{self, Stream};
 pub use factory_core::check_tool::CheckTool;
 use factory_core::config::{CredentialMode, OperatorConfig, SandboxLevel};
 use factory_core::ecosystem::{Ecosystem, HostTriple, Rust, ToolchainFileError};
@@ -75,7 +85,30 @@ pub const DIRECTORY: &str = "sandbox-exec";
 /// exits with the same where it starts no command.
 pub const FAILED: u8 = factory_proc::supervise::FAILED;
 
-/// The command line that the operator asked for.
+/// Where the sandbox shows the host's files of an agent session, read-only:
+/// the `--settings` file and the MCP file (AG-1, AG-4).
+pub const AGENT: &str = "/agent";
+
+/// The tools of the agent form's session: the Bash tool and no other, which
+/// is all the exit check asks of it (CLI-6, BOOT-3).
+pub const AGENT_TOOLS: &[&str] = &[stream::BASH];
+
+/// The permission mode of the agent form's session, the one that the
+/// sessions of probe P-6 ran with on the server (CLI-6).
+pub const PERMISSION_MODE: &str = "dontAsk";
+
+/// The CLI's own cap of turns in the agent form *(tunable)* (CLI-6).
+pub const MAX_TURNS: u32 = 10;
+
+/// The CLI's own cap of dollars in the agent form *(tunable)* (CLI-6).
+pub const MAX_BUDGET_USD: f64 = 1.0;
+
+/// The longest line of the stream that is read, in bytes, the cap of AG-6.
+/// A longer line is passed over here: failing the session for it is a limit
+/// of the driver, which arrives in M1a (CLI-6).
+pub const MAX_LINE: usize = 10 << 20;
+
+/// What the operator asked for: a command line or an agent session.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Request {
     /// The directory that the instance shows read-write as the working
@@ -86,11 +119,29 @@ pub struct Request {
     pub target: Option<PathBuf>,
     /// The check tools that the command is given (WS-7a).
     pub tools: Vec<CheckTool>,
-    /// The program, as the worker sees it: a path, or a name that the worker
-    /// `PATH` finds.
-    pub program: OsString,
-    /// Its arguments.
-    pub args: Vec<OsString>,
+    /// The form of the command.
+    pub form: Form,
+}
+
+/// The two forms of `sf sandbox exec` (CLI-6).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Form {
+    /// A command line, run as a setup or a verify command is run, with no
+    /// model credential.
+    Command {
+        /// The program, as the worker sees it: a path, or a name that the
+        /// worker `PATH` finds.
+        program: OsString,
+        /// Its arguments.
+        args: Vec<OsString>,
+    },
+    /// One agent session, given the prompt as its one message.
+    Agent {
+        /// The model.
+        model: String,
+        /// The one message.
+        prompt: String,
+    },
 }
 
 /// Reads `<name>=<version>`, the value of `--tool` (WS-7a).
@@ -271,6 +322,9 @@ pub struct Layout {
     pub new_target: bool,
     /// The proxy's socket (SEC-10b).
     pub proxy: PathBuf,
+    /// The host's files of an agent session, which the sandbox shows
+    /// read-only at [`AGENT`]; the agent form alone creates it.
+    pub agent: PathBuf,
 }
 
 impl Layout {
@@ -285,6 +339,7 @@ impl Layout {
             target: target.map_or_else(|| root.join("target"), Path::to_owned),
             new_target: target.is_none(),
             proxy: root.join("proxy.sock"),
+            agent: root.join("agent"),
             root,
         }
     }
@@ -429,6 +484,138 @@ pub fn policy(dir: &Path, layout: &Layout, given: &Given) -> SandboxPolicy {
     }
 }
 
+/// The agent CLI that the operator configuration names (16.4).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AgentCli {
+    /// The path that the configuration names, at which the sandbox shows
+    /// the CLI and starts it.
+    pub path: PathBuf,
+    /// The file that the path leads to on the host.
+    pub file: PathBuf,
+}
+
+/// The form of a request, with what the host found for an agent session.
+enum Resolved<'a> {
+    Command {
+        program: &'a OsString,
+        args: &'a [OsString],
+    },
+    Agent {
+        agent: AgentHost,
+        model: &'a str,
+        prompt: &'a str,
+    },
+}
+
+/// What an agent session needs of the host before anything is created: the
+/// token, read once (SEC-13), and the CLI.
+struct AgentHost {
+    token: Token,
+    cli: AgentCli,
+}
+
+/// Reads the token and finds the CLI that `config` names. Without either no
+/// agent session starts (16.4).
+fn agent_host(config: &OperatorConfig) -> Result<AgentHost, Error> {
+    let file = config
+        .credentials
+        .subscription_token_file
+        .as_ref()
+        .ok_or_else(|| {
+            Error::Agent(
+                "the operator configuration names no `[credentials] subscription_token_file`, so no agent session starts (16.4)"
+                    .to_owned(),
+            )
+        })?;
+    let token = Token::read(file.as_path()).map_err(|error| Error::Agent(error.to_string()))?;
+    let path = config.agent.cli.as_ref().ok_or_else(|| {
+        Error::Agent(
+            "the operator configuration names no `[agent] cli`, so no agent session starts (16.4)"
+                .to_owned(),
+        )
+    })?;
+    let path = path.as_path().to_owned();
+    let refused =
+        |problem: String| Error::Agent(format!("the agent CLI {}, {problem}", path.display()));
+    let file = std::fs::canonicalize(&path)
+        .map_err(|error| refused(format!("cannot be found: {error}")))?;
+    if !file.is_file() {
+        return Err(refused("is no file".to_owned()));
+    }
+    Ok(AgentHost {
+        token,
+        cli: AgentCli { path, file },
+    })
+}
+
+/// Creates the configuration directory of AG-4 in the layout's home and the
+/// host's files of AG-1 and AG-8, and gives the paths of the configuration,
+/// relative to the home, that the sandbox shows read-only.
+fn prepare_session(layout: &Layout) -> Result<Vec<PathBuf>, Error> {
+    let host = |what: &str, path: &Path| {
+        let what = format!("create {what} {}", path.display());
+        move |source| Error::Host { what, source }
+    };
+    std::fs::create_dir(&layout.agent).map_err(host("the directory", &layout.agent))?;
+    session::write_host_files(&layout.agent)
+        .map_err(host("the host's files of the session in", &layout.agent))?;
+    session::create_config_dir(&layout.home)
+        .map_err(host("the configuration directory in", &layout.home))
+}
+
+/// The mounts of an agent session, after those of [`policy`]: each entry of
+/// `configuration`, a path relative to the home, read-only over the
+/// writable home (AG-4); the host's files at [`AGENT`]; and the CLI at the
+/// path that the configuration names.
+#[must_use]
+pub fn agent_mounts(layout: &Layout, configuration: &[PathBuf], cli: &AgentCli) -> Vec<Mount> {
+    let mut mounts: Vec<Mount> = configuration
+        .iter()
+        .map(|entry| Mount {
+            host: layout.home.join(entry),
+            sandbox: Path::new(HOME).join(entry),
+            access: Access::ReadOnly,
+        })
+        .collect();
+    mounts.push(Mount {
+        host: layout.agent.clone(),
+        sandbox: AGENT.into(),
+        access: Access::ReadOnly,
+    });
+    mounts.push(Mount {
+        host: cli.file.clone(),
+        sandbox: cli.path.clone(),
+        access: Access::ReadOnly,
+    });
+    mounts
+}
+
+/// The arguments of the agent form's session: the invocation of AG-1 without
+/// a result schema and without a system prompt file, with the values that
+/// CLI-6 gives in place of those of a role and a policy.
+fn agent_args(config: &OperatorConfig, model: &str) -> Result<Vec<OsString>, Error> {
+    let session_id = SessionId::random().map_err(|source| Error::Host {
+        what: "create a session id".to_owned(),
+        source,
+    })?;
+    let settings = Path::new(AGENT).join(session::SETTINGS_FILE);
+    let mcp_config = Path::new(AGENT).join(session::MCP_FILE);
+    Ok(Invocation {
+        mode: config.credentials.mode,
+        session_id,
+        model,
+        permission_mode: PERMISSION_MODE,
+        tools: AGENT_TOOLS,
+        settings: &settings,
+        mcp_config: &mcp_config,
+        json_schema: None,
+        max_turns: MAX_TURNS,
+        max_budget_usd: MAX_BUDGET_USD,
+        system_prompt_file: None,
+    }
+    .args())
+}
+
 /// The size of the files below `dir`, in bytes: each regular file once,
 /// however many hard links it has, and no symbolic link followed. An entry
 /// that cannot be read counts for nothing.
@@ -500,26 +687,63 @@ pub struct Report {
     /// The listed hosts that the proxy could not reach, which are no denial
     /// (SEC-10b).
     pub failures: Vec<Failure>,
-    /// The exit status of the command line.
-    pub status: ExitStatus,
+    /// How the command ended.
+    pub ended: Ended,
+}
+
+/// How the command of a [`Report`] ended.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Ended {
+    /// The command line exited with this status.
+    Command(ExitStatus),
+    /// The agent session's stream ended so. The exit status of the CLI,
+    /// which the host stops, is not reported (CLI-6).
+    Session(Session),
+}
+
+/// What the agent form reads of the stream (CLI-6).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Session {
+    /// The subtype of the `result` line that ended the stream, or `None`
+    /// where there was none.
+    pub result: Option<String>,
+    /// How many uses of the Bash tool the stream holds, as far as that line.
+    pub bash_uses: usize,
+}
+
+impl Session {
+    /// Whether the stream ended in a `result` line of subtype `success`.
+    #[must_use]
+    pub fn success(&self) -> bool {
+        self.result.as_deref() == Some("success")
+    }
 }
 
 impl Report {
     /// The exit code of the command line, or 128 and the number of the
-    /// signal that ended it.
+    /// signal that ended it; of a session, 0 where it ended in `success` and
+    /// 1 otherwise.
     #[must_use]
     pub fn code(&self) -> i32 {
         use std::os::unix::process::ExitStatusExt as _;
 
-        self.status
-            .code()
-            .or_else(|| self.status.signal().map(|signal| 128 + signal))
-            .unwrap_or(i32::from(FAILED))
+        match &self.ended {
+            Ended::Command(status) => status
+                .code()
+                .or_else(|| status.signal().map(|signal| 128 + signal))
+                .unwrap_or(i32::from(FAILED)),
+            Ended::Session(session) => i32::from(!session.success()),
+        }
     }
 
-    /// What `sf sandbox exec` exits with: the status of the command line.
+    /// What `sf sandbox exec` exits with: the status of the command line, or
+    /// 0 only where the session ended in `success`.
     pub fn exit_code(&self) -> ExitCode {
-        factory_proc::supervise::exit_code(self.status)
+        match &self.ended {
+            Ended::Command(status) => factory_proc::supervise::exit_code(*status),
+            Ended::Session(session) if session.success() => ExitCode::SUCCESS,
+            Ended::Session(_) => ExitCode::FAILURE,
+        }
     }
 
     /// When `time` lay after the start, in seconds.
@@ -533,9 +757,26 @@ impl Report {
     /// escaped, as data (INV-9).
     #[must_use]
     pub fn text(&self) -> String {
-        let mut text = format!(
-            "sf sandbox exec: the command exited with {}\n  wall-clock time: {:.3} s\n  target directory: {} bytes\n",
-            self.code(),
+        let mut text = match &self.ended {
+            Ended::Command(_) => {
+                format!("sf sandbox exec: the command exited with {}\n", self.code())
+            }
+            Ended::Session(session) => {
+                let ended = match &session.result {
+                    Some(subtype) => {
+                        format!("the session ended in a result of subtype {subtype:?}")
+                    }
+                    None => "the stream ended without a result line".to_owned(),
+                };
+                format!(
+                    "sf sandbox exec: {ended}\n  uses of the Bash tool: {}\n",
+                    session.bash_uses
+                )
+            }
+        };
+        let _ = write!(
+            text,
+            "  wall-clock time: {:.3} s\n  target directory: {} bytes\n",
             self.wall.as_secs_f64(),
             self.target_bytes
         );
@@ -592,14 +833,20 @@ impl Report {
                 })
             })
             .collect();
-        serde_json::json!({
-            "exit_status": self.code(),
+        let mut json = serde_json::json!({
             "wall_clock_secs": self.wall.as_secs_f64(),
             "target_bytes": self.target_bytes,
             "denied_requests": denials,
             "unreachable": failures,
-        })
-        .to_string()
+        });
+        match &self.ended {
+            Ended::Command(_) => json["exit_status"] = self.code().into(),
+            Ended::Session(session) => {
+                json["result_subtype"] = session.result.clone().into();
+                json["bash_uses"] = session.bash_uses.into();
+            }
+        }
+        json.to_string()
     }
 }
 
@@ -615,6 +862,10 @@ pub enum Error {
     /// What the request names is no directory.
     #[error("{0}")]
     Request(String),
+    /// The token or the agent CLI of the agent form is missing (13.5,
+    /// 16.4). The message holds no token.
+    #[error("{0}")]
+    Agent(String),
     /// The host lacks the toolchain, a part of it or a check tool (WS-7,
     /// WS-7a).
     #[error("{}", missing(.0))]
@@ -708,6 +959,15 @@ pub async fn run<C: Connect>(
     stderr: impl AsyncWrite + Send + 'static,
     stop: impl Future<Output = ()> + Send,
 ) -> Result<Report, Error> {
+    // The token is read before anything else (SEC-13).
+    let form = match &request.form {
+        Form::Command { program, args } => Resolved::Command { program, args },
+        Form::Agent { model, prompt } => Resolved::Agent {
+            agent: agent_host(config)?,
+            model,
+            prompt,
+        },
+    };
     let level = level(config);
     if !host.sandbox.capabilities().provides(level) {
         return Err(Error::Level(format!(
@@ -739,9 +999,44 @@ pub async fn run<C: Connect>(
     )
     .map_err(Error::Missing)?;
     let list = allowlist(host.ecosystem, config)?;
-    let env = environment(host.ecosystem, &given)?;
+    let mut env = environment(host.ecosystem, &given)?;
+    let (program, args, prompt) = match &form {
+        Resolved::Command { program, args } => (PathBuf::from(program), args.to_vec(), None),
+        Resolved::Agent {
+            agent,
+            model,
+            prompt,
+        } => {
+            env.extend(session::environment(&agent.token));
+            (
+                agent.cli.path.clone(),
+                agent_args(config, model)?,
+                Some(*prompt),
+            )
+        }
+    };
+    let spec = ExecSpec {
+        program,
+        args,
+        env,
+        dir: WORK.into(),
+    };
 
     let layout = Layout::create(config.data_dir.as_path(), target.as_deref())?;
+    let mut policy = policy(&dir, &layout, &given);
+    if let Resolved::Agent { agent, .. } = &form {
+        match prepare_session(&layout) {
+            Ok(configuration) => {
+                policy
+                    .mounts
+                    .extend(agent_mounts(&layout, &configuration, &agent.cli))
+            }
+            Err(error) => {
+                let _ = layout.remove();
+                return Err(error);
+            }
+        }
+    }
     let records = Arc::new(Records::default());
     let outcome = in_the_instance(
         &layout,
@@ -751,13 +1046,9 @@ pub async fn run<C: Connect>(
             Arc::clone(&records) as Arc<dyn proxy::Log>,
         ),
         host.sandbox,
-        &policy(&dir, &layout, &given),
-        &ExecSpec {
-            program: request.program.clone().into(),
-            args: request.args.clone(),
-            env,
-            dir: WORK.into(),
-        },
+        &policy,
+        &spec,
+        prompt,
         stdout,
         stderr,
         stop,
@@ -765,7 +1056,7 @@ pub async fn run<C: Connect>(
     .await;
     let target_bytes = size(&layout.target);
     let removed = layout.remove();
-    let (started, wall, status) = outcome?;
+    let (started, wall, ended) = outcome?;
     removed?;
     let (denials, failures) = records.take();
     Ok(Report {
@@ -774,7 +1065,7 @@ pub async fn run<C: Connect>(
         target_bytes,
         denials,
         failures,
-        status,
+        ended,
     })
 }
 
@@ -791,16 +1082,20 @@ async fn in_the_instance<C: Connect>(
     sandbox: &dyn Sandbox,
     policy: &SandboxPolicy,
     spec: &ExecSpec,
+    prompt: Option<&str>,
     stdout: &mut (impl AsyncWrite + Unpin + Send),
     stderr: impl AsyncWrite + Send + 'static,
     stop: impl Future<Output = ()> + Send,
-) -> Result<(SystemTime, Duration, ExitStatus), Error> {
+) -> Result<(SystemTime, Duration, Ended), Error> {
     let bound = proxy.bind(&layout.proxy)?;
     let live = CancellationToken::new();
     // The command has no run; the id of the run is none of the store's.
     let instance = sandbox.create(RunId(0), policy).await?;
     let command = async {
-        let outcome = command(instance.as_ref(), spec, stdout, stderr, stop).await;
+        let outcome = match prompt {
+            None => command(instance.as_ref(), spec, stdout, stderr, stop).await,
+            Some(prompt) => session(instance.as_ref(), spec, prompt, stdout, stderr, stop).await,
+        };
         let destroyed = instance.destroy().await;
         live.cancel();
         outcome.and_then(|outcome| destroyed.map(|()| outcome).map_err(Error::from))
@@ -817,7 +1112,7 @@ async fn command(
     stdout: &mut (impl AsyncWrite + Unpin + Send),
     stderr: impl AsyncWrite + Send + 'static,
     stop: impl Future<Output = ()> + Send,
-) -> Result<(SystemTime, Duration, ExitStatus), Error> {
+) -> Result<(SystemTime, Duration, Ended), Error> {
     let mut command = instance.command(spec)?;
     // The bytes as they come, for a terminal: no line is cut or dropped.
     command.raw_stdout();
@@ -840,7 +1135,88 @@ async fn command(
         }
     };
     stdout.flush().await.map_err(Error::Output)?;
-    Ok((started, clock.elapsed(), status))
+    Ok((started, clock.elapsed(), Ended::Command(status)))
+}
+
+/// Starts the agent session of `spec` in `instance`, writes `prompt` as its
+/// one message, and copies the lines of its stream to `stdout` as far as the
+/// first `result` line, where it ends the session by the stop sequence
+/// (AG-12), as it does where `stop` ends first. Stdin stays open until the
+/// sequence closes it: with stream-JSON input the CLI waits for a further
+/// message after a result (P-26).
+async fn session(
+    instance: &dyn SandboxInstance,
+    spec: &ExecSpec,
+    prompt: &str,
+    stdout: &mut (impl AsyncWrite + Unpin + Send),
+    stderr: impl AsyncWrite + Send + 'static,
+    stop: impl Future<Output = ()> + Send,
+) -> Result<(SystemTime, Duration, Ended), Error> {
+    let mut command = instance.command(spec)?;
+    command.stdin_piped().max_line_length(MAX_LINE);
+    let (started, clock) = (SystemTime::now(), Instant::now());
+    let mut process = command.spawn(stderr).await?;
+    if let Some(stdin) = process.stdin() {
+        let message = stream::user_message(prompt);
+        // A message that cannot be written, to a CLI that has closed its
+        // stdin or ended, leaves the session without one; the stream then
+        // says how it ended, as for any other session.
+        let _ = async {
+            stdin.write_all(message.as_bytes()).await?;
+            stdin.flush().await
+        }
+        .await;
+    }
+    let mut read = Stream::default();
+    let result = |line: &Line| matches!(line, Line::Text(text) if stream::is_result(text));
+    let mut stop = std::pin::pin!(stop);
+    // Whether the CLI ended by itself, before a `result` line and a stop.
+    let exited = loop {
+        tokio::select! {
+            line = process.next_line() => match line? {
+                Some(line) => {
+                    if record(&mut read, stdout, &line).await? {
+                        break false;
+                    }
+                }
+                None => break true,
+            },
+            () = &mut stop => break false,
+        }
+    };
+    if exited {
+        process.wait().await?;
+    } else {
+        let stopped = process.stop(StopTimes::AG_12, result).await?;
+        for line in &stopped.lines {
+            record(&mut read, stdout, line).await?;
+        }
+    }
+    stdout.flush().await.map_err(Error::Output)?;
+    let session = Session {
+        result: read.result().map(str::to_owned),
+        bash_uses: read.bash_uses(),
+    };
+    Ok((started, clock.elapsed(), Ended::Session(session)))
+}
+
+/// Writes a line of the stream to `stdout`, with its line break, and reads
+/// it. Whether it is the first `result` line.
+async fn record(
+    read: &mut Stream,
+    stdout: &mut (impl AsyncWrite + Unpin),
+    line: &Line,
+) -> Result<bool, Error> {
+    let Line::Text(text) = line else {
+        // A line over the cap or of no UTF-8 is passed over: failing the
+        // session for it is a limit of the driver (AG-6, CLI-6).
+        return Ok(false);
+    };
+    stdout
+        .write_all(format!("{text}\n").as_bytes())
+        .await
+        .map_err(Error::Output)?;
+    Ok(read.read(text).is_some())
 }
 
 /// Writes the bytes of `line` to `stdout`.

@@ -1,4 +1,4 @@
-//! `sf sandbox exec`, the command form (SPEC CLI-6), without a sandbox: a
+//! `sf sandbox exec`, both forms (SPEC CLI-6), without a sandbox: a
 //! backend of the test's own runs the command on the host, in the directory
 //! that the sandbox would show as the working directory, so that what the
 //! host does around an instance is tested on every host. What the bubblewrap
@@ -21,7 +21,8 @@ use factory_core::config::OperatorConfig;
 use factory_core::ecosystem::{Ecosystem as _, HostTriple, Rust};
 use factory_daemon::host::{Directories, Missing};
 use factory_daemon::sandbox_exec::{
-    self, Error, Given, HOME, Host, Layout, Report, Request, TARGET, WORK, given, parse_tool,
+    self, AGENT, Ended, Error, Form, Given, HOME, Host, Layout, Report, Request, Session, TARGET,
+    WORK, given, parse_tool,
 };
 use factory_net::proxy::{Denial, Failure, Reason, Sent};
 use factory_sandbox::{
@@ -91,8 +92,10 @@ fn request(dir: &Path, script: &str) -> Request {
         dir: dir.to_owned(),
         target: None,
         tools: Vec::new(),
-        program: "/bin/sh".into(),
-        args: vec!["-c".into(), script.into()],
+        form: Form::Command {
+            program: "/bin/sh".into(),
+            args: vec!["-c".into(), script.into()],
+        },
     }
 }
 
@@ -218,6 +221,9 @@ async fn nowhere(name: String) -> std::io::Result<tokio::net::TcpStream> {
     )))
 }
 
+/// The longest that one command of a test may take.
+const LIMIT: Duration = Duration::from_secs(15);
+
 /// Runs `request` on `backend` with `config`, and the command's stdout.
 fn exec(
     config: &OperatorConfig,
@@ -240,8 +246,15 @@ fn exec(
                 None => std::future::pending().await,
             }
         };
-        let outcome =
-            sandbox_exec::run(config, request, host, &mut stdout, tokio::io::sink(), stop).await;
+        // Less than the timeout that the mutation step gives a mutant's
+        // tests, so that a mutant under which a session never ends fails
+        // the test and is caught.
+        let outcome = tokio::time::timeout(
+            LIMIT,
+            sandbox_exec::run(config, request, host, &mut stdout, tokio::io::sink(), stop),
+        )
+        .await
+        .unwrap_or_else(|_| panic!("the command took more than {LIMIT:?}"));
         (outcome, String::from_utf8(stdout).unwrap())
     })
 }
@@ -402,15 +415,18 @@ fn a_new_target_directory_is_measured_and_then_removed() {
     let data = scratch.data();
     // The id of the directory is not known before the run, so the script
     // finds the one directory below `sandbox-exec`.
-    request.args = vec![
-        "-c".into(),
-        format!(
-            "for d in {}/sandbox-exec/*/target; do {script}; done",
-            data.display()
-        )
-        .replace("$0", "$d")
-        .into(),
-    ];
+    request.form = Form::Command {
+        program: "/bin/sh".into(),
+        args: vec![
+            "-c".into(),
+            format!(
+                "for d in {}/sandbox-exec/*/target; do {script}; done",
+                data.display()
+            )
+            .replace("$0", "$d")
+            .into(),
+        ],
+    };
 
     let (report, _) = exec(&config, &request, &backend, None);
 
@@ -665,6 +681,10 @@ fn the_layout_lies_below_the_data_directory() {
         layout.proxy,
         Path::new("/srv/sf/data/sandbox-exec/7-1/proxy.sock")
     );
+    assert_eq!(
+        layout.agent,
+        Path::new("/srv/sf/data/sandbox-exec/7-1/agent")
+    );
     assert!(layout.new_target);
     let named = Layout::new(Path::new("/srv/sf/data"), "7-1", Some(Path::new("/t")));
     assert_eq!(named.target, Path::new("/t"));
@@ -703,7 +723,7 @@ fn the_report_gives_the_time_the_size_the_denials_and_the_status() {
             name: "index.crates.io".to_owned(),
             error: "no answer".to_owned(),
         }],
-        status: std::process::ExitStatus::from_raw(9),
+        ended: Ended::Command(std::process::ExitStatus::from_raw(9)),
     };
 
     assert_eq!(report.code(), 137);
@@ -729,7 +749,7 @@ fn the_report_gives_the_time_the_size_the_denials_and_the_status() {
     let clean = Report {
         denials: Vec::new(),
         failures: Vec::new(),
-        status: std::process::ExitStatus::from_raw(0),
+        ended: Ended::Command(std::process::ExitStatus::from_raw(0)),
         ..report
     };
     assert!(clean.text().contains("  denied requests: none\n"));
@@ -811,4 +831,403 @@ fn a_root_that_cannot_be_created_fails_by_name() {
         error.starts_with("cannot create the directory of the command "),
         "{error}"
     );
+}
+
+/// A token of the length that SEC-13 asks, which is no real one.
+const TOKEN: &str = "sf-test-token-0123456789abcdefghijklmnop";
+
+/// The stand-in for the agent CLI: it keeps its arguments, its environment
+/// and the line it is given, replays `stream`, and then waits for a further
+/// message as the CLI does after a result (P-26), until the stop sequence
+/// interrupts it. Where `then_exit` holds it exits after the stream instead.
+fn agent_cli(scratch: &Scratch, stream: &[&str], then_exit: bool) -> PathBuf {
+    let replay = scratch.0.join("stream.jsonl");
+    fs::write(&replay, stream.join("\n") + "\n").unwrap();
+    let kept = scratch.0.join("kept");
+    fs::create_dir_all(&kept).unwrap();
+    let data = scratch.data();
+    // The trap is set first, so that an interrupt that comes while the
+    // stream is replayed is not lost.
+    let (trap, tail) = if then_exit {
+        ("", "exit 0")
+    } else {
+        (
+            "trap 'echo interrupted > \"$kept/stopped\"; exit 0' INT\n",
+            "while :; do sleep 0.05; done",
+        )
+    };
+    let script = format!(
+        "#!/bin/sh\nkept={kept:?}\n{trap}printf '%s\\n' \"$@\" > \"$kept/args\"\nenv > \"$kept/env\"\n\
+         IFS= read -r line; printf '%s\\n' \"$line\" > \"$kept/message\"\n\
+         ls {data:?}/sandbox-exec/*/agent {data:?}/sandbox-exec/*/home/.claude > \"$kept/listing\"\n\
+         echo to-stderr >&2\ncat {replay:?}\n{tail}\n"
+    );
+    let cli = scratch.0.join("claude");
+    fs::write(&cli, script).unwrap();
+    fs::set_permissions(&cli, fs::Permissions::from_mode(0o755)).unwrap();
+    cli
+}
+
+/// The operator configuration with the agent CLI `cli` and a token file.
+fn agent_config(scratch: &Scratch, cli: &Path) -> OperatorConfig {
+    let token = scratch.0.join("token");
+    fs::write(&token, format!("{TOKEN}\n")).unwrap();
+    scratch.config(&format!(
+        "[credentials]\nsubscription_token_file = {token:?}\n[agent]\ncli = {cli:?}\n"
+    ))
+}
+
+fn agent_request(dir: &Path) -> Request {
+    Request {
+        dir: dir.to_owned(),
+        target: None,
+        tools: Vec::new(),
+        form: Form::Agent {
+            model: "claude-opus-5-5".to_owned(),
+            prompt: "Run `uname -a` and report its output.".to_owned(),
+        },
+    }
+}
+
+fn kept(scratch: &Scratch, name: &str) -> String {
+    fs::read_to_string(scratch.0.join("kept").join(name)).unwrap_or_default()
+}
+
+const BASH_USE: &str = r#"{"type":"assistant","message":{"id":"m1","content":[{"type":"tool_use","id":"toolu_1","name":"Bash","input":{"command":"uname -a"}}]}}"#;
+const SECOND_BASH_USE: &str = r#"{"type":"assistant","message":{"id":"m2","content":[{"type":"tool_use","id":"toolu_2","name":"Bash","input":{"command":"id"}}]}}"#;
+
+#[test]
+fn a_session_that_ends_in_success_reports_it_and_its_uses_of_the_bash_tool() {
+    let scratch = Scratch::new("agent-success");
+    let cli = agent_cli(
+        &scratch,
+        &[
+            r#"{"type":"system","subtype":"init","tools":["Bash"]}"#,
+            BASH_USE,
+            SECOND_BASH_USE,
+            r#"{"type":"result","subtype":"success","is_error":false}"#,
+        ],
+        false,
+    );
+    let backend = OnTheHost::new();
+
+    let (report, stdout) = exec(
+        &agent_config(&scratch, &cli),
+        &agent_request(&scratch.work()),
+        &backend,
+        None,
+    );
+    let report = report.unwrap();
+
+    assert_eq!(
+        report.ended,
+        Ended::Session(Session {
+            result: Some("success".to_owned()),
+            bash_uses: 2
+        })
+    );
+    assert_eq!(report.code(), 0);
+    assert_eq!(report.exit_code(), std::process::ExitCode::SUCCESS);
+    // The stream goes to the standard output, line by line.
+    assert!(stdout.starts_with(r#"{"type":"system""#), "{stdout}");
+    assert!(stdout.ends_with("\"is_error\":false}\n"), "{stdout}");
+    // The host ended the session by the stop sequence (AG-12).
+    assert_eq!(kept(&scratch, "stopped"), "interrupted\n");
+    // The one message.
+    let message: serde_json::Value = serde_json::from_str(&kept(&scratch, "message")).unwrap();
+    assert_eq!(message["type"], "user");
+    assert_eq!(
+        message["message"]["content"][0]["text"],
+        "Run `uname -a` and report its output."
+    );
+    // The files of AG-4 and AG-8 stood where the policy shows them.
+    let listing = kept(&scratch, "listing");
+    for name in [
+        "mcp.json",
+        "settings.json",
+        "CLAUDE.md",
+        "agents",
+        "commands",
+        "rules",
+        "skills",
+    ] {
+        assert!(
+            listing.lines().any(|line| line == name),
+            "{name}: {listing}"
+        );
+    }
+    assert_eq!(scratch.left(), Some(Vec::new()));
+}
+
+#[test]
+fn the_session_is_given_the_invocation_and_the_environment_of_cli_6() {
+    let scratch = Scratch::new("agent-invocation");
+    let cli = agent_cli(
+        &scratch,
+        &[r#"{"type":"result","subtype":"success"}"#],
+        false,
+    );
+    let backend = OnTheHost::new();
+
+    let (report, _) = exec(
+        &agent_config(&scratch, &cli),
+        &agent_request(&scratch.work()),
+        &backend,
+        None,
+    );
+    report.unwrap();
+
+    let args = kept(&scratch, "args");
+    let args: Vec<&str> = args.lines().collect();
+    let after = |flag: &str| {
+        let at = args.iter().position(|arg| *arg == flag).unwrap();
+        args[at + 1]
+    };
+    assert_eq!(args[0], "-p");
+    assert!(!args.contains(&"--bare"), "AG-3a");
+    assert!(!args.contains(&"--json-schema"), "CLI-6");
+    assert!(!args.contains(&"--append-system-prompt-file"), "CLI-6");
+    assert_eq!(after("--model"), "claude-opus-5-5");
+    assert_eq!(after("--tools"), "Bash");
+    assert_eq!(after("--allowedTools"), "Bash");
+    assert_eq!(after("--permission-mode"), "dontAsk");
+    assert_eq!(after("--max-turns"), "10");
+    assert_eq!(after("--max-budget-usd"), "1");
+    assert_eq!(after("--settings"), format!("{AGENT}/settings.json"));
+    assert_eq!(after("--mcp-config"), format!("{AGENT}/mcp.json"));
+    assert_eq!(after("--input-format"), "stream-json");
+
+    let asked = backend.asked.lock().unwrap();
+    let spec = &asked.specs[0];
+    assert_eq!(spec.program, cli);
+    assert_eq!(spec.dir, Path::new(WORK));
+    let env: Vec<(&str, &str)> = spec
+        .env
+        .iter()
+        .map(|(key, value)| (key.to_str().unwrap(), value.to_str().unwrap()))
+        .collect();
+    assert!(env.contains(&("CLAUDE_CODE_OAUTH_TOKEN", TOKEN)), "{env:?}");
+    assert!(env.contains(&("CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC", "1")));
+    assert!(env.contains(&("CLAUDE_CODE_DISABLE_BACKGROUND_TASKS", "1")));
+    assert!(env.contains(&("HOME", HOME)));
+    assert!(env.contains(&("HTTPS_PROXY", "http://127.0.0.1:3128")));
+
+    // The configuration of AG-4, the host's files and the CLI are shown
+    // read-only, over the writable home.
+    let policy = &asked.policies[0];
+    let root = policy.tmp.parent().unwrap();
+    let read_only: Vec<&Mount> = policy.mounts[3..].iter().collect();
+    let mut expected: Vec<Mount> = [
+        "settings.json",
+        "CLAUDE.md",
+        "skills",
+        "rules",
+        "commands",
+        "agents",
+    ]
+    .iter()
+    .map(|name| Mount {
+        host: root.join("home/.claude").join(name),
+        sandbox: Path::new(HOME).join(".claude").join(name),
+        access: Access::ReadOnly,
+    })
+    .collect();
+    expected.push(Mount {
+        host: root.join("agent"),
+        sandbox: AGENT.into(),
+        access: Access::ReadOnly,
+    });
+    expected.push(Mount {
+        host: cli.canonicalize().unwrap(),
+        sandbox: cli.clone(),
+        access: Access::ReadOnly,
+    });
+    assert_eq!(read_only, expected.iter().collect::<Vec<_>>());
+}
+
+#[test]
+fn a_session_that_ends_in_another_subtype_fails() {
+    let scratch = Scratch::new("agent-turns");
+    let cli = agent_cli(
+        &scratch,
+        &[
+            BASH_USE,
+            r#"{"type":"result","subtype":"error_max_turns","is_error":true}"#,
+            // A line after the result is not read.
+            SECOND_BASH_USE,
+        ],
+        false,
+    );
+
+    let (report, _) = exec(
+        &agent_config(&scratch, &cli),
+        &agent_request(&scratch.work()),
+        &OnTheHost::new(),
+        None,
+    );
+    let report = report.unwrap();
+
+    assert_eq!(
+        report.ended,
+        Ended::Session(Session {
+            result: Some("error_max_turns".to_owned()),
+            bash_uses: 1
+        })
+    );
+    assert_eq!(report.code(), 1);
+    assert_eq!(report.exit_code(), std::process::ExitCode::FAILURE);
+    assert!(
+        report
+            .text()
+            .starts_with("sf sandbox exec: the session ended in a result of subtype \"error_max_turns\"\n  uses of the Bash tool: 1\n"),
+        "{}",
+        report.text()
+    );
+    let json: serde_json::Value = serde_json::from_str(&report.json()).unwrap();
+    assert_eq!(json["result_subtype"], "error_max_turns");
+    assert_eq!(json["bash_uses"], 1);
+    assert!(json.get("exit_status").is_none(), "{json}");
+    assert_eq!(scratch.left(), Some(Vec::new()));
+}
+
+#[test]
+fn a_stream_without_a_result_line_fails() {
+    let scratch = Scratch::new("agent-none");
+    let cli = agent_cli(&scratch, &[BASH_USE, "not json"], true);
+
+    let (report, stdout) = exec(
+        &agent_config(&scratch, &cli),
+        &agent_request(&scratch.work()),
+        &OnTheHost::new(),
+        None,
+    );
+    let report = report.unwrap();
+
+    assert_eq!(
+        report.ended,
+        Ended::Session(Session {
+            result: None,
+            bash_uses: 1
+        })
+    );
+    assert_eq!(report.code(), 1);
+    assert!(stdout.ends_with("not json\n"), "{stdout}");
+    assert!(
+        report
+            .text()
+            .starts_with("sf sandbox exec: the stream ended without a result line\n"),
+        "{}",
+        report.text()
+    );
+    let json: serde_json::Value = serde_json::from_str(&report.json()).unwrap();
+    assert_eq!(json["result_subtype"], serde_json::Value::Null);
+    // No stop sequence was needed.
+    assert_eq!(kept(&scratch, "stopped"), "");
+}
+
+#[test]
+fn a_stop_before_the_result_ends_the_session_without_one() {
+    let scratch = Scratch::new("agent-stop");
+    // No result: the stand-in waits once it has replayed the stream.
+    let cli = agent_cli(&scratch, &[BASH_USE], false);
+
+    let (report, _) = exec(
+        &agent_config(&scratch, &cli),
+        &agent_request(&scratch.work()),
+        &OnTheHost::new(),
+        Some(Duration::from_millis(500)),
+    );
+
+    assert_eq!(
+        report.unwrap().ended,
+        Ended::Session(Session {
+            result: None,
+            bash_uses: 1
+        })
+    );
+    assert_eq!(kept(&scratch, "stopped"), "interrupted\n");
+    assert_eq!(scratch.left(), Some(Vec::new()));
+}
+
+#[test]
+fn without_an_agent_cli_or_a_token_no_session_starts_and_nothing_is_created() {
+    let scratch = Scratch::new("agent-missing");
+    let cli = agent_cli(&scratch, &[], true);
+    let token = scratch.0.join("token");
+    let short = scratch.0.join("short");
+    fs::write(&token, TOKEN).unwrap();
+    fs::write(&short, format!("{}\n", &TOKEN[..31])).unwrap();
+    let cases = [
+        (
+            format!("[agent]\ncli = {cli:?}\n"),
+            "subscription_token_file",
+        ),
+        (
+            format!("[credentials]\nsubscription_token_file = {token:?}\n"),
+            "[agent] cli",
+        ),
+        (
+            format!("[credentials]\nsubscription_token_file = {short:?}\n[agent]\ncli = {cli:?}\n"),
+            "shorter than 32 bytes",
+        ),
+        (
+            format!(
+                "[credentials]\nsubscription_token_file = {token:?}\n[agent]\ncli = {:?}\n",
+                scratch.0.join("absent")
+            ),
+            "the agent CLI",
+        ),
+    ];
+
+    for (extra, expected) in cases {
+        let backend = OnTheHost::new();
+        let (report, _) = exec(
+            &scratch.config(&extra),
+            &agent_request(&scratch.work()),
+            &backend,
+            None,
+        );
+        match report {
+            Err(error @ Error::Agent(_)) => {
+                let text = error.to_string();
+                assert!(text.contains(expected), "{text}");
+                assert!(!text.contains(&TOKEN[..31]), "{text}");
+            }
+            other => panic!("{other:?}"),
+        }
+        assert!(backend.asked.lock().unwrap().policies.is_empty());
+    }
+    assert_eq!(scratch.left(), None);
+}
+
+#[test]
+fn a_cli_that_takes_no_message_ends_the_session_without_a_result() {
+    let scratch = Scratch::new("agent-closed");
+    // It closes its stdin at once and ends a moment later, so that a message
+    // larger than a pipe holds cannot be written whole.
+    let cli = scratch.0.join("claude");
+    fs::write(&cli, "#!/bin/sh\nexec 0<&-\nsleep 0.3\necho closed\n").unwrap();
+    fs::set_permissions(&cli, fs::Permissions::from_mode(0o755)).unwrap();
+    let mut request = agent_request(&scratch.work());
+    request.form = Form::Agent {
+        model: "m".to_owned(),
+        prompt: "x".repeat(1 << 20),
+    };
+
+    let (report, stdout) = exec(
+        &agent_config(&scratch, &cli),
+        &request,
+        &OnTheHost::new(),
+        None,
+    );
+
+    assert_eq!(
+        report.unwrap().ended,
+        Ended::Session(Session {
+            result: None,
+            bash_uses: 0
+        })
+    );
+    assert_eq!(stdout, "closed\n");
+    assert_eq!(scratch.left(), Some(Vec::new()));
 }

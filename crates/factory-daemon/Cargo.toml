@@ -8,6 +8,8 @@ publish.workspace = true
 license.workspace = true
 
 [dependencies]
+# The session of the agent form of `sf sandbox exec` (CLI-6).
+factory-agent = { path = "../factory-agent" }
 factory-core = { path = "../factory-core" }
 factory-net = { path = "../factory-net" }
 factory-proc = { path = "../factory-proc" }

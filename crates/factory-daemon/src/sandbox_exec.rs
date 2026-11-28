@@ -920,7 +920,7 @@ pub struct Host<'a, C> {
 
 /// The level that `config` asks for: `process` or `hardened`, and never
 /// `none` (SEC-7).
-fn level(config: &OperatorConfig) -> Level {
+pub(crate) fn level(config: &OperatorConfig) -> Level {
     match config.sandbox.level {
         SandboxLevel::Process => Level::Process,
         SandboxLevel::Hardened => Level::Hardened,
@@ -1228,19 +1228,29 @@ async fn write(stdout: &mut (impl AsyncWrite + Unpin), line: &Line) -> Result<()
     }
 }
 
-/// The operator configuration of the user that `sf` runs as,
+/// The path of the operator configuration of the user that `sf` runs as,
 /// `~/.config/sf/config.toml` (16.1, CFG-4).
 ///
 /// # Errors
 ///
-/// Where `HOME` is not set, or the file cannot be read or is invalid.
-pub fn operator_config() -> Result<OperatorConfig, Error> {
+/// Where `HOME` is not set.
+pub fn config_path() -> Result<PathBuf, Error> {
     let home = std::env::var_os("HOME")
         .filter(|home| !home.is_empty())
         .ok_or_else(|| {
             Error::Config("HOME is not set, so no operator configuration is found".to_owned())
         })?;
-    let path = Path::new(&home).join(".config/sf/config.toml");
+    Ok(Path::new(&home).join(".config/sf/config.toml"))
+}
+
+/// The operator configuration of the user that `sf` runs as, at
+/// [`config_path`].
+///
+/// # Errors
+///
+/// Where `HOME` is not set, or the file cannot be read or is invalid.
+pub fn operator_config() -> Result<OperatorConfig, Error> {
+    let path = config_path()?;
     let bytes = std::fs::read(&path).map_err(|error| {
         Error::Config(format!(
             "cannot read the operator configuration {}: {error}",
@@ -1256,7 +1266,7 @@ pub fn operator_config() -> Result<OperatorConfig, Error> {
 }
 
 /// The program `name` on the `PATH` of this process.
-fn on_the_path(name: &str) -> Option<PathBuf> {
+pub(crate) fn on_the_path(name: &str) -> Option<PathBuf> {
     std::env::var_os("PATH")
         .iter()
         .flat_map(std::env::split_paths)
@@ -1268,7 +1278,7 @@ fn on_the_path(name: &str) -> Option<PathBuf> {
 /// finds, with this binary as the supervisor shim and the first process. Off
 /// Linux there is none (4.4). One function for both, so that the mutation
 /// step mutates the code that the build holds (DEV-2a).
-fn backend(level: Level) -> Result<Box<dyn Sandbox>, Error> {
+pub(crate) fn backend(level: Level) -> Result<Box<dyn Sandbox>, Error> {
     if level != Level::Process {
         return Err(Error::Level(format!(
             "the sandbox level `{}` has no backend in this build (SEC-7)",
@@ -1292,7 +1302,6 @@ fn backend(level: Level) -> Result<Box<dyn Sandbox>, Error> {
     }
     #[cfg(not(target_os = "linux"))]
     {
-        let _ = on_the_path;
         Err(Error::Level(format!(
             "the sandbox level `{}` has no backend off Linux (4.4)",
             level.as_str()
@@ -1304,11 +1313,11 @@ fn backend(level: Level) -> Result<Box<dyn Sandbox>, Error> {
 /// so that a signal that comes before the command starts ends no `sf` that
 /// has left the directory of a command behind: the command then starts and
 /// is stopped at once, and the directory is removed.
-struct Interrupts(Option<(tokio::signal::unix::Signal, tokio::signal::unix::Signal)>);
+pub(crate) struct Interrupts(Option<(tokio::signal::unix::Signal, tokio::signal::unix::Signal)>);
 
 impl Interrupts {
     /// Installs the handlers. Where one cannot be installed there are none.
-    fn install() -> Self {
+    pub(crate) fn install() -> Self {
         use tokio::signal::unix::{SignalKind, signal};
 
         Self(
@@ -1320,7 +1329,7 @@ impl Interrupts {
 
     /// Ends at the first SIGINT or SIGTERM since [`Interrupts::install`].
     /// Without handlers it never ends.
-    async fn received(self) {
+    pub(crate) async fn received(self) {
         match self.0 {
             Some((mut interrupt, mut terminate)) => {
                 tokio::select! {

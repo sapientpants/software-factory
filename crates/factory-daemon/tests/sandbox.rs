@@ -11,7 +11,8 @@
 //! each as `sf` runs it; the backend shows the binary as the `sf` binary.
 //! Run as `<binary> __exec [--json] <dir> <program> [<arg>...]` it is
 //! `sf sandbox exec --dir <dir> -- <program> [<arg>...]`, with the operator
-//! configuration that `HOME` holds.
+//! configuration that `HOME` holds, and as `<binary> __doctor` it is
+//! `sf doctor`.
 //! Otherwise its tests are ignored unless [`GATE`] holds `process`, so the
 //! plain test run runs none of them, and the sandbox step of the check and
 //! the mutation step set the variable. A test fails where bubblewrap is
@@ -32,6 +33,7 @@ mod linux {
 
     use factory_core::config::OperatorConfig;
     use factory_core::ecosystem::{HostTriple, Rust};
+    use factory_daemon::doctor;
     use factory_daemon::process::Supervisor;
     use factory_daemon::sandbox_exec::{
         self, DIRECTORY, Ended, Form, Host, Report, Request, Session,
@@ -49,6 +51,9 @@ mod linux {
 
     /// The first argument that makes this binary `sf sandbox exec`.
     pub const EXEC: &str = "__exec";
+
+    /// The first argument that makes this binary `sf doctor`.
+    pub const DOCTOR: &str = "__doctor";
 
     /// `sf sandbox exec` with the arguments that follow [`EXEC`].
     pub fn exec_main() -> std::process::ExitCode {
@@ -611,6 +616,96 @@ while :; do sleep 0.1; done
         });
     }
 
+    /// The sandbox check of `sf doctor` (CLI-1): an instance at the
+    /// configured level starts and runs a command, and its working
+    /// directory is removed; at a level that the backend cannot provide the
+    /// check fails and says which.
+    fn the_sandbox_check_of_sf_doctor_starts_an_instance_at_the_configured_level() {
+        within(async {
+            let scratch = Scratch::new("doctor");
+            let backend = backend();
+            let host = || Host {
+                sandbox: &backend,
+                connect: factory_net::proxy::resolve,
+                ecosystem: &Rust,
+                triple: HostTriple::THIS.unwrap(),
+            };
+
+            let check = doctor::sandbox(&scratch.config(), host(), std::future::pending()).await;
+            assert!(check.ok, "{check:?}");
+            assert!(check.text.contains("`process`"), "{}", check.text);
+            let work = scratch.0.join("data").join(doctor::DIRECTORY);
+            assert_eq!(std::fs::read_dir(&work).unwrap().count(), 0);
+            assert!(scratch.left().is_empty());
+
+            let hardened = OperatorConfig::parse(
+                format!(
+                    "schema_version = 1\ndata_dir = {:?}\n[sandbox]\nlevel = \"hardened\"\n",
+                    scratch.0.join("data")
+                )
+                .as_bytes(),
+            )
+            .unwrap();
+            let check = doctor::sandbox(&hardened, host(), std::future::pending()).await;
+            assert!(!check.ok, "{check:?}");
+            assert!(check.text.contains("`hardened`"), "{}", check.text);
+        });
+    }
+
+    /// This binary as `sf doctor`, with `HOME` at `home`: its exit code and
+    /// its stdout.
+    async fn doctor_main(home: &Path) -> (Option<i32>, String) {
+        let mut command = factory_daemon::process::Command::new(std::env::current_exe().unwrap());
+        command
+            .arg(DOCTOR)
+            .env("HOME", home)
+            .env("PATH", std::env::var_os("PATH").unwrap());
+        let mut process = command.spawn(tokio::io::sink()).await.unwrap();
+        let out = lines(&mut process).await;
+        let code = process.wait().await.unwrap().code();
+        (code, out.join("\n"))
+    }
+
+    /// `sf doctor` as the binary runs it (CLI-1): every check of the M0 row
+    /// passes on this host with a configuration whose files are in order,
+    /// and it fails where a credential file has another mode than 0600. A
+    /// stand-in for the agent CLI prints a version.
+    fn sf_doctor_passes_where_every_check_passes_and_fails_otherwise() {
+        within(async {
+            let scratch = Scratch::new("doctor-main");
+            let cli = scratch.0.join("claude");
+            std::fs::write(&cli, "#!/bin/sh\necho '2.1.3 (Claude Code)'\n").unwrap();
+            std::fs::set_permissions(&cli, std::os::unix::fs::PermissionsExt::from_mode(0o755))
+                .unwrap();
+            let token = scratch.0.join("token");
+            std::fs::write(&token, "t".repeat(40)).unwrap();
+            std::fs::set_permissions(&token, std::os::unix::fs::PermissionsExt::from_mode(0o600))
+                .unwrap();
+            let home = scratch.0.join("home");
+            std::fs::create_dir_all(home.join(".config/sf")).unwrap();
+            std::fs::write(
+                home.join(".config/sf/config.toml"),
+                format!(
+                    "schema_version = 1\ndata_dir = {:?}\n[credentials]\nsubscription_token_file = {token:?}\n[sandbox]\nlevel = \"process\"\n[agent]\ncli = {cli:?}\n",
+                    scratch.0.join("data")
+                ),
+            )
+            .unwrap();
+
+            let (code, out) = doctor_main(&home).await;
+            assert_eq!(code, Some(0), "{out}");
+            assert_eq!(out.lines().count(), 7, "{out}");
+            assert!(out.lines().all(|line| line.starts_with("ok  ")), "{out}");
+
+            std::fs::set_permissions(&token, std::os::unix::fs::PermissionsExt::from_mode(0o644))
+                .unwrap();
+            let (code, out) = doctor_main(&home).await;
+            assert_eq!(code, Some(1), "{out}");
+            assert!(out.contains("has mode 0644, not 0600"), "{out}");
+            assert!(scratch.left().is_empty());
+        });
+    }
+
     /// The tests, each with its name.
     pub const TESTS: &[(&str, fn())] = &[
         (
@@ -636,6 +731,14 @@ while :; do sleep 0.1; done
         (
             "the_agent_form_runs_a_session_with_its_configuration_read_only",
             the_agent_form_runs_a_session_with_its_configuration_read_only,
+        ),
+        (
+            "the_sandbox_check_of_sf_doctor_starts_an_instance_at_the_configured_level",
+            the_sandbox_check_of_sf_doctor_starts_an_instance_at_the_configured_level,
+        ),
+        (
+            "sf_doctor_passes_where_every_check_passes_and_fails_otherwise",
+            sf_doctor_passes_where_every_check_passes_and_fails_otherwise,
         ),
     ];
 }
@@ -665,6 +768,10 @@ fn main() -> ExitCode {
     #[cfg(target_os = "linux")]
     if std::env::args().nth(1).as_deref() == Some(linux::EXEC) {
         return linux::exec_main();
+    }
+    #[cfg(target_os = "linux")]
+    if std::env::args().nth(1).as_deref() == Some(linux::DOCTOR) {
+        return factory_daemon::doctor::main(false);
     }
     #[cfg(target_os = "linux")]
     if std::env::args().nth(1).as_deref() == Some(linux::INIT) {

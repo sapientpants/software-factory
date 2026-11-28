@@ -107,6 +107,12 @@ fn base(root: &Path, sf_base_sha: Option<OsString>) -> Result<String, String> {
 /// The diff from `base` to the work tree at `root`, new files included and
 /// the files that git ignores left out. The repository's index is left as
 /// it is: a copy of it is given every file of the work tree.
+///
+/// Git takes a tracked file whose stat data match its index entry for
+/// unchanged, and the copy's fresh mtime hides the racy entries whose stat
+/// data it would not trust. `--renormalize` adds every tracked file again
+/// from its content, so a file rewritten at the same size within a tick of
+/// the last write of the index is in the diff too (DEV-2a).
 fn diff(root: &Path, base: &str) -> Result<Vec<u8>, String> {
     let index = git(
         root,
@@ -124,22 +130,24 @@ fn diff(root: &Path, base: &str) -> Result<Vec<u8>, String> {
         std::fs::copy(index.trim(), &copy)
             .map_err(|error| format!("cannot copy the index of the repository: {error}"))?;
     }
-    let diff = git(root, &["add", "--all"], Some(&copy)).and_then(|_| {
-        git_bytes(
-            root,
-            &[
-                "diff",
-                "--cached",
-                "--no-color",
-                "--no-ext-diff",
-                "--no-renames",
-                "--src-prefix=a/",
-                "--dst-prefix=b/",
-                base,
-            ],
-            Some(&copy),
-        )
-    });
+    let diff = git(root, &["add", "--all"], Some(&copy))
+        .and_then(|_| git(root, &["add", "--renormalize", "--", ":/"], Some(&copy)))
+        .and_then(|_| {
+            git_bytes(
+                root,
+                &[
+                    "diff",
+                    "--cached",
+                    "--no-color",
+                    "--no-ext-diff",
+                    "--no-renames",
+                    "--src-prefix=a/",
+                    "--dst-prefix=b/",
+                    base,
+                ],
+                Some(&copy),
+            )
+        });
     let _ = std::fs::remove_file(&copy);
     diff
 }
@@ -366,6 +374,34 @@ mod tests {
         );
         assert!(diff.contains("+fn new() {}"), "{diff}");
         assert!(!diff.contains("target/built"), "{diff}");
+    }
+
+    #[test]
+    fn the_diff_holds_a_file_rewritten_with_the_stat_data_of_its_index_entry() {
+        let scratch = Scratch::repository("stat");
+        let base = scratch.head();
+        // Git compares no ctime, and the index records an mtime well before
+        // its own, so the entry is not racy and git trusts its stat data.
+        git_in(&scratch.0, &["config", "core.trustctime", "false"]);
+        let kept = scratch.0.join("kept");
+        let old = std::time::SystemTime::now() - std::time::Duration::from_secs(3600);
+        let set_mtime = || {
+            std::fs::File::options()
+                .write(true)
+                .open(&kept)
+                .and_then(|file| file.set_modified(old))
+                .expect("set the mtime of kept");
+        };
+        set_mtime();
+        git_in(&scratch.0, &["update-index", "--refresh"]);
+        // The same size, the same inode and, set back, the same mtime.
+        scratch.write("kept", "two\n");
+        set_mtime();
+
+        let diff = text(&diff(&scratch.0, &base).expect("the diff"));
+
+        assert!(diff.contains("diff --git a/kept b/kept"), "{diff}");
+        assert!(diff.contains("+two"), "{diff}");
     }
 
     #[test]

@@ -1,6 +1,7 @@
 //! Supervisor, scheduler, reconciler, effect executors and control API (SPEC 19.1).
 
 pub mod host;
+pub mod sandbox_exec;
 pub mod sandbox_init;
 pub mod supervise;
 

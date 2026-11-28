@@ -93,6 +93,21 @@ impl Ecosystem for Rust {
             parts,
         })
     }
+
+    /// `CARGO_HOME` at `.cargo` below the home, where Cargo would put it by
+    /// itself, and `CARGO_TARGET_DIR` at the target directory, which lies
+    /// outside the workspace (9.3).
+    fn build_output(&self, home: &str, target: &str) -> Vec<(&'static str, String)> {
+        vec![
+            ("CARGO_HOME", format!("{home}/.cargo")),
+            ("CARGO_TARGET_DIR", target.to_owned()),
+        ]
+    }
+
+    /// The index and the downloads of crates.io (SEC-11).
+    fn registry_hosts(&self) -> &'static [&'static str] {
+        &["index.crates.io", "static.crates.io"]
+    }
 }
 
 /// The file: the table `[toolchain]` and nothing else.

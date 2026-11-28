@@ -229,15 +229,13 @@ impl Bubblewrap {
 }
 
 impl crate::Sandbox for Bubblewrap {
-    /// The isolation of the filesystem and of the processes. The network is
-    /// denied whole, since the instance holds no interface but the loopback,
-    /// but nothing filters it: until the egress proxy exists (SEC-10b) the
-    /// backend does not provide level `process` (SEC-7).
+    /// The isolation of the filesystem and of the processes, and the
+    /// filtering of egress: the instance holds no interface but the loopback,
+    /// and its one way out is the socket of the sandbox policy, at which the
+    /// host stands the egress proxy (SEC-10, SEC-10b). The backend provides
+    /// level `process`.
     fn capabilities(&self) -> SandboxCaps {
-        SandboxCaps {
-            egress_filtering: false,
-            ..Level::Process.requires()
-        }
+        Level::Process.requires()
     }
 
     fn create<'a>(
@@ -748,7 +746,7 @@ mod tests {
     }
 
     #[test]
-    fn the_backend_does_not_provide_level_process_before_the_proxy() {
+    fn the_backend_provides_level_process_and_not_hardened() {
         use crate::Sandbox as _;
 
         let backend = Bubblewrap::new(
@@ -758,9 +756,10 @@ mod tests {
         );
         let caps = backend.capabilities();
 
-        assert!(caps.fs_isolation && caps.process_isolation);
-        assert!(!caps.egress_filtering && !caps.vm_boundary);
-        assert!(!caps.provides(Level::Process));
+        assert!(caps.fs_isolation && caps.process_isolation && caps.egress_filtering);
+        assert!(!caps.vm_boundary);
+        assert!(caps.provides(Level::Process));
+        assert!(!caps.provides(Level::Hardened));
     }
 
     #[test]

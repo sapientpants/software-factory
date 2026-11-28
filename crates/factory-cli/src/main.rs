@@ -1,9 +1,11 @@
 //! The `sf` binary (SPEC 17, 19.1).
 
 use std::ffi::OsString;
+use std::path::PathBuf;
 use std::process::ExitCode;
 
-use clap::{Parser, Subcommand};
+use clap::{Args, Parser, Subcommand};
+use factory_daemon::sandbox_exec::{self, Request};
 
 #[derive(Debug, Parser)]
 #[command(name = "sf", version)]
@@ -14,6 +16,11 @@ struct Cli {
 
 #[derive(Debug, Subcommand)]
 enum Command {
+    /// Sandbox instances outside any run (CLI-6).
+    Sandbox {
+        #[command(subcommand)]
+        command: SandboxCommand,
+    },
     /// The supervisor shim (AG-16), which the daemon starts every sandboxed
     /// command through.
     #[command(name = "__supervise", hide = true, disable_help_flag = true)]
@@ -32,11 +39,60 @@ enum Command {
     },
 }
 
+#[derive(Debug, Subcommand)]
+enum SandboxCommand {
+    /// Runs one command line in one sandbox instance at the configured level,
+    /// as a setup or a verify command is run, and reports the wall-clock
+    /// time, the size of the target directory, the proxy's denied-request log
+    /// and the exit status, with which it exits (CLI-6).
+    Exec(Exec),
+}
+
+#[derive(Debug, Args)]
+struct Exec {
+    /// The directory that the instance shows read-write as the working
+    /// directory.
+    #[arg(long, value_name = "path")]
+    dir: PathBuf,
+    /// A target directory to use in place of a new, empty one; it is left as
+    /// it is.
+    #[arg(long, value_name = "dir")]
+    target: Option<PathBuf>,
+    /// A check tool to put on the PATH, found in the tools directory (WS-7a).
+    #[arg(long = "tool", value_name = "name>=<version", value_parser = sandbox_exec::parse_tool)]
+    tools: Vec<sandbox_exec::CheckTool>,
+    /// The report as JSON.
+    #[arg(long)]
+    json: bool,
+    /// The command line: the program and its arguments.
+    #[arg(last = true, required = true, value_name = "command")]
+    command: Vec<OsString>,
+}
+
+impl Exec {
+    fn request(self) -> Request {
+        let mut command = self.command.into_iter();
+        Request {
+            dir: self.dir,
+            target: self.target,
+            tools: self.tools,
+            program: command.next().unwrap_or_default(),
+            args: command.collect(),
+        }
+    }
+}
+
 fn main() -> ExitCode {
     match Cli::parse().command {
         None => {
             println!("sf {}", env!("CARGO_PKG_VERSION"));
             ExitCode::SUCCESS
+        }
+        Some(Command::Sandbox {
+            command: SandboxCommand::Exec(exec),
+        }) => {
+            let json = exec.json;
+            sandbox_exec::main(&exec.request(), json)
         }
         Some(Command::Supervise { args }) => factory_daemon::supervise::run(args),
         Some(Command::SandboxInit { args }) => factory_daemon::sandbox_init::run(args),

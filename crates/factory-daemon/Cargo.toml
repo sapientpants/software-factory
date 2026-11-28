@@ -9,13 +9,27 @@ license.workspace = true
 
 [dependencies]
 factory-core = { path = "../factory-core" }
+factory-net = { path = "../factory-net" }
 factory-proc = { path = "../factory-proc" }
-thiserror.workspace = true
-
-# The first process of the bubblewrap backend, which is compiled for Linux
-# alone (SPEC 4.4, SEC-10a).
-[target.'cfg(target_os = "linux")'.dependencies]
+# The traits and the sandbox policy on every target; the bubblewrap backend
+# and its first process are compiled for Linux alone (SPEC 4.4, SEC-10a).
 factory-sandbox = { path = "../factory-sandbox" }
+# The report of `sf sandbox exec --json` (SPEC 17, CLI-6).
+serde_json.workspace = true
+thiserror.workspace = true
+tokio = { workspace = true, features = ["io-std", "io-util", "macros", "rt-multi-thread", "signal", "time"] }
+tokio-util.workspace = true
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["net"] }
 
 [lints]
 workspace = true
+
+# The sandbox tests of SPEC 19.4 that join the sandbox and the egress proxy
+# in `sf sandbox exec`, at level `process`. A harness of its own, as that of
+# `factory-sandbox` (DEV-2a): the binary is also the supervisor shim and the
+# first process that its tests start.
+[[test]]
+name = "sandbox"
+harness = false

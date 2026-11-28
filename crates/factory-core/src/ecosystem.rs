@@ -5,8 +5,9 @@
 //! Each function is pure: it is given bytes that another crate read and
 //! returns data. Where the answer lies on the host's disk, as for the
 //! toolchain, it returns what to look for, and `factory-daemon` looks (WS-7,
-//! 19.1). What this build holds of the interface is the toolchain; the other
-//! concerns of 9.5 join it in the change that builds each.
+//! 19.1). What this build holds of the interface is the toolchain, the
+//! environment for build output and the registry's hosts; the other concerns of 9.5 join it in the
+//! change that builds each.
 
 mod rust;
 
@@ -32,6 +33,16 @@ pub trait Ecosystem {
         file: &[u8],
         host: HostTriple,
     ) -> Result<ToolchainLookup, ToolchainFileError>;
+
+    /// The variables of the environment for build output and caches (9.3),
+    /// for a command whose home is `home` and whose target directory is
+    /// `target`, both as the worker sees them. The caches lie below the home,
+    /// so a new home is new caches too.
+    fn build_output(&self, home: &str, target: &str) -> Vec<(&'static str, String)>;
+
+    /// The hosts of the package registry, which join the egress allowlist
+    /// of every sandbox instance (SEC-11).
+    fn registry_hosts(&self) -> &'static [&'static str];
 }
 
 /// The host triple of the architecture that `sf` was built for (WS-7, 4.4).
@@ -44,6 +55,17 @@ pub enum HostTriple {
 }
 
 impl HostTriple {
+    /// The triple of this build, where it is one of a Linux host (4.4).
+    pub const THIS: Option<Self> = if cfg!(not(target_os = "linux")) {
+        None
+    } else if cfg!(target_arch = "x86_64") {
+        Some(Self::X86_64UnknownLinuxGnu)
+    } else if cfg!(target_arch = "aarch64") {
+        Some(Self::Aarch64UnknownLinuxGnu)
+    } else {
+        None
+    };
+
     /// The triple as it is written.
     #[must_use]
     pub const fn as_str(self) -> &'static str {

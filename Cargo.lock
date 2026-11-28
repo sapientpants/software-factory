@@ -204,6 +204,7 @@ dependencies = [
  "clap",
  "factory-daemon",
  "nix",
+ "serde_json",
  "tokio",
 ]
 
@@ -226,9 +227,13 @@ name = "factory-daemon"
 version = "0.1.0"
 dependencies = [
  "factory-core",
+ "factory-net",
  "factory-proc",
  "factory-sandbox",
+ "serde_json",
  "thiserror",
+ "tokio",
+ "tokio-util",
 ]
 
 [[package]]

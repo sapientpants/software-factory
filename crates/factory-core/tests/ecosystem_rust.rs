@@ -30,6 +30,25 @@ fn a_full_version_names_rustups_directory_for_the_host() {
 }
 
 #[test]
+fn cargo_keeps_its_home_below_the_home_and_builds_into_the_target_directory() {
+    assert_eq!(
+        Rust.build_output("/home/worker", "/target"),
+        [
+            ("CARGO_HOME", "/home/worker/.cargo".to_owned()),
+            ("CARGO_TARGET_DIR", "/target".to_owned()),
+        ]
+    );
+}
+
+#[test]
+fn the_registry_is_crates_io() {
+    assert_eq!(
+        Rust.registry_hosts(),
+        ["index.crates.io", "static.crates.io"]
+    );
+}
+
+#[test]
 fn the_file_is_rust_toolchain_toml_at_the_root() {
     assert_eq!(Rust.toolchain_file(), "rust-toolchain.toml");
 }

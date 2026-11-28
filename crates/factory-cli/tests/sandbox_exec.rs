@@ -171,3 +171,29 @@ fn level_hardened_has_no_backend_yet() {
     );
     assert!(!home.0.join("data").exists());
 }
+
+#[test]
+fn the_agent_form_without_an_agent_cli_starts_no_session() {
+    let home = Home::new("agent");
+    home.config(&format!(
+        "schema_version = 1\ndata_dir = {:?}\n[sandbox]\nlevel = \"process\"\n",
+        home.0.join("data")
+    ));
+
+    let (code, stderr) = sf(
+        &home.0,
+        &[
+            "sandbox", "exec", "--dir", "/", "--model", "m", "--agent", "p",
+        ],
+    );
+
+    assert_eq!(code, Some(125));
+    // Off Linux there is no backend, which is found before the agent CLI.
+    let expected = if cfg!(target_os = "linux") {
+        "sf sandbox exec: the operator configuration names no `[credentials] subscription_token_file`"
+    } else {
+        "sf sandbox exec: the sandbox level `process` has no backend off Linux"
+    };
+    assert!(stderr.starts_with(expected), "{stderr}");
+    assert!(!home.0.join("data").exists());
+}

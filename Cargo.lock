@@ -196,6 +196,11 @@ dependencies = [
 [[package]]
 name = "factory-agent"
 version = "0.1.0"
+dependencies = [
+ "factory-core",
+ "serde_json",
+ "thiserror",
+]
 
 [[package]]
 name = "factory-cli"
@@ -226,6 +231,7 @@ dependencies = [
 name = "factory-daemon"
 version = "0.1.0"
 dependencies = [
+ "factory-agent",
  "factory-core",
  "factory-net",
  "factory-proc",

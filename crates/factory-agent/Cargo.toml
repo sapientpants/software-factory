@@ -7,5 +7,12 @@ rust-version.workspace = true
 publish.workspace = true
 license.workspace = true
 
+[dependencies]
+# The credential mode of the invocation (AG-1, AG-3a).
+factory-core = { path = "../factory-core" }
+# The stream-JSON lines of the CLI and the host-written files (AG-1, AG-8).
+serde_json.workspace = true
+thiserror.workspace = true
+
 [lints]
 workspace = true

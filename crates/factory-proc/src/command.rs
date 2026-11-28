@@ -381,7 +381,10 @@ async fn reported(
             None,
         ))
     };
-    tokio::select! {
+    // A wait closes the child's stdin as soon as it is polled, even where
+    // the report comes first, so the pipe is held aside meanwhile.
+    let stdin = child.stdin().take();
+    let outcome = tokio::select! {
         biased;
         line = first_line(&mut receiver) => match line? {
             Some(line) => match parse(&line) {
@@ -398,7 +401,9 @@ async fn reported(
             None => ended(child.wait().await?),
         },
         status = child.wait() => ended(status?),
-    }
+    };
+    *child.stdin() = stdin;
+    outcome
 }
 
 /// The first line of `receiver`, without its line break, or `None` where it

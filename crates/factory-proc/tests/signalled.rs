@@ -126,3 +126,27 @@ fn a_command_with_a_report_starts_once() {
         assert!(command.spawn(tokio::io::sink()).await.is_err());
     });
 }
+
+#[test]
+fn a_command_with_a_report_keeps_its_stdin() {
+    within(async {
+        // The wait for the report must not close stdin, as a wait for the
+        // leader does: the agent form of `sf sandbox exec` writes its
+        // message there after the start (CLI-6).
+        let mut command = reporting(
+            "/bin/sleep 30 & echo $! > /dev/fd/$1; read -r line; echo \"got $line\"; kill $!",
+        );
+        command.stdin_piped();
+        let mut process = command
+            .spawn(tokio::io::sink())
+            .await
+            .unwrap_or_else(|error| panic!("{error}"));
+
+        let stdin = process.stdin().expect("stdin is open");
+        tokio::io::AsyncWriteExt::write_all(stdin, b"message\n")
+            .await
+            .unwrap();
+
+        assert_eq!(text(&mut process).await, "got message");
+    });
+}

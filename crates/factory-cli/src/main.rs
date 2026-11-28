@@ -5,7 +5,7 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::{Args, Parser, Subcommand};
-use factory_daemon::sandbox_exec::{self, Request};
+use factory_daemon::sandbox_exec::{self, Form, Request};
 
 #[derive(Debug, Parser)]
 #[command(name = "sf", version)]
@@ -44,7 +44,11 @@ enum SandboxCommand {
     /// Runs one command line in one sandbox instance at the configured level,
     /// as a setup or a verify command is run, and reports the wall-clock
     /// time, the size of the target directory, the proxy's denied-request log
-    /// and the exit status, with which it exits (CLI-6).
+    /// and the exit status, with which it exits. With `--model` and
+    /// `--agent` it runs one agent session instead, given the prompt as its
+    /// one message, and reports the subtype of the stream's `result` line and
+    /// the uses of the Bash tool; it exits with 0 only where that subtype is
+    /// `success` (CLI-6).
     Exec(Exec),
 }
 
@@ -56,28 +60,53 @@ struct Exec {
     dir: PathBuf,
     /// A target directory to use in place of a new, empty one; it is left as
     /// it is.
-    #[arg(long, value_name = "dir")]
+    #[arg(long, value_name = "dir", conflicts_with = "agent")]
     target: Option<PathBuf>,
     /// A check tool to put on the PATH, found in the tools directory (WS-7a).
-    #[arg(long = "tool", value_name = "name>=<version", value_parser = sandbox_exec::parse_tool)]
+    #[arg(
+        long = "tool",
+        value_name = "name>=<version",
+        value_parser = sandbox_exec::parse_tool,
+        conflicts_with = "agent"
+    )]
     tools: Vec<sandbox_exec::CheckTool>,
+    /// The model of the agent session.
+    #[arg(long, value_name = "id", requires = "agent")]
+    model: Option<String>,
+    /// Runs one agent session, given this prompt as its one message, in
+    /// place of a command line.
+    #[arg(
+        long,
+        value_name = "prompt",
+        requires = "model",
+        conflicts_with = "command"
+    )]
+    agent: Option<String>,
     /// The report as JSON.
     #[arg(long)]
     json: bool,
     /// The command line: the program and its arguments.
-    #[arg(last = true, required = true, value_name = "command")]
+    #[arg(last = true, required_unless_present = "agent", value_name = "command")]
     command: Vec<OsString>,
 }
 
 impl Exec {
     fn request(self) -> Request {
-        let mut command = self.command.into_iter();
+        let form = match (self.model, self.agent) {
+            (Some(model), Some(prompt)) => Form::Agent { model, prompt },
+            _ => {
+                let mut command = self.command.into_iter();
+                Form::Command {
+                    program: command.next().unwrap_or_default(),
+                    args: command.collect(),
+                }
+            }
+        };
         Request {
             dir: self.dir,
             target: self.target,
             tools: self.tools,
-            program: command.next().unwrap_or_default(),
-            args: command.collect(),
+            form,
         }
     }
 }
@@ -105,6 +134,48 @@ mod tests {
 
     fn parsed(words: &[&str]) -> Option<Command> {
         Cli::try_parse_from(words).ok().and_then(|cli| cli.command)
+    }
+
+    fn request(words: &[&str]) -> Option<Request> {
+        match parsed(&[&["sf", "sandbox", "exec", "--dir", "/w"][..], words].concat()) {
+            Some(Command::Sandbox {
+                command: SandboxCommand::Exec(exec),
+            }) => Some(exec.request()),
+            _ => None,
+        }
+    }
+
+    #[test]
+    fn the_agent_form_takes_a_model_and_a_prompt_and_no_command_line() {
+        let agent = request(&["--model", "claude-opus-5-5", "--agent", "run uname"]).unwrap();
+        assert_eq!(
+            agent.form,
+            Form::Agent {
+                model: "claude-opus-5-5".to_owned(),
+                prompt: "run uname".to_owned()
+            }
+        );
+        assert_eq!(agent.dir, PathBuf::from("/w"));
+
+        let command = request(&["--", "make", "all"]).unwrap();
+        assert_eq!(
+            command.form,
+            Form::Command {
+                program: "make".into(),
+                args: vec!["all".into()]
+            }
+        );
+
+        for refused in [
+            &["--agent", "p"][..],
+            &["--model", "m"],
+            &["--model", "m", "--agent", "p", "--", "true"],
+            &["--model", "m", "--agent", "p", "--target", "/t"],
+            &["--model", "m", "--agent", "p", "--tool", "deny=0.22.1"],
+            &[],
+        ] {
+            assert!(request(refused).is_none(), "{refused:?}");
+        }
     }
 
     #[test]

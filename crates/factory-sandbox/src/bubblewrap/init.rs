@@ -33,7 +33,7 @@ pub const SUBCOMMAND: &str = "__sandbox-init";
 
 /// The port of the loopback interface that the first process forwards to
 /// the proxy, one number for every instance (SEC-10a).
-pub const PORT: u16 = 3128;
+pub const PORT: u16 = crate::PROXY_PORT;
 
 /// Where the sandbox shows the `sf` binary, which is the first process
 /// (SEC-6, SEC-10a).

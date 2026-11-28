@@ -10,11 +10,12 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use crate::{check, vm};
 
 /// The files whose code the sandbox tests of 19.4 test, and the plain test
-/// run does not: in a worker's sandbox, where those tests do not run (DEV-11),
+/// run does not, or only in part: in a worker's sandbox, where those tests do not run (DEV-11),
 /// the step does not mutate them.
 pub const SANDBOX_CODE: &[&str] = &[
     "crates/factory-sandbox/src/bubblewrap.rs",
     "crates/factory-sandbox/src/bubblewrap/init.rs",
+    "crates/factory-daemon/src/sandbox_exec.rs",
 ];
 
 /// The variable through which the development VM is given the diff that the
@@ -511,7 +512,8 @@ mod tests {
                 format!(
                     "mutants --in-diff {} --test-tool=nextest --cargo-arg=--locked --output {} \
                      --exclude=crates/factory-sandbox/src/bubblewrap.rs \
-                     --exclude=crates/factory-sandbox/src/bubblewrap/init.rs with SF_SANDBOX_TESTS=\n",
+                     --exclude=crates/factory-sandbox/src/bubblewrap/init.rs \
+                     --exclude=crates/factory-daemon/src/sandbox_exec.rs with SF_SANDBOX_TESTS=\n",
                     file.display(),
                     target.display()
                 )

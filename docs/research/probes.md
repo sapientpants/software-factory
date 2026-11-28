@@ -4890,3 +4890,50 @@ The CI workflow of DEV-5, on the head of #163.
 ### Still open
 
 - **The pid of `--json-status-fd`,** and the stop sequence that signals the first process, are now #164.
+
+## P-37, in part: the proxy, and a cold build behind it
+
+Answered 2026-11-28 for #135, by `sf sandbox exec` in the command form (CLI-6) as this pull request builds it, in the development VM, and by the sandbox tests of 19.4 that it adds in `crates/factory-daemon/tests/sandbox.rs`. It is the first time that the bubblewrap backend, its first process, its filter and the egress proxy of SEC-10b ran together, and the first build of the factory repository in the factory's own sandbox. Steps 5 and 6 of M0's exit check (BOOT-3) were run in the VM in the form that the server will run them, with a development build in place of `v0.1.0`. What they report on the server is P-13; the numbers below are the VM's.
+
+**Answer.**
+
+- **`cargo` fetches through the proxy where no name resolves.** The instance held no `/etc/resolv.conf`, and `getent hosts index.crates.io` exited with 2 in it; `localhost` resolved from `/etc/hosts`. With `HTTPS_PROXY` and `https_proxy` at `http://127.0.0.1:3128` and a new, empty `CARGO_HOME`, the cold build updated the index of crates.io, downloaded 113 crates and compiled 124, and exited with 0. The proxy's denied-request log was empty and it logged no failure.
+- **The seeded build passes.** The same command in a second clone, on the target directory that the cold build left, exited with 0 with the log empty. It downloaded the 113 crates again, since its `CARGO_HOME` was new, and compiled 12 crates: those of the workspace, whose files the clone had written anew.
+- **The filter refused `clone3`, and nothing else of the build.** Under `strace -f` the cold build made 351 calls of `clone3`, each of which got `ENOSYS` from the filter: the kernel has the call, and nothing outside the sandbox runs under the filter. The C library then fell back to `clone`, as the source of Flatpak says that it would, and the build passed. No call of another row of SEC-6e failed with the code of its row. The table did not change.
+- **A worker reaches no host that is not listed.** In the sandbox test, against a listener on the loopback interface that stood in for a listed name: a `CONNECT` to that name on port 443 got `200` and carried a line each way; one to a name that is not listed got `403` with the reason `host`, and one to the listed name on port 80 `403` with `port`, each with one record in the log; one to a listed name that the proxy could not reach got `502` and a failure, and no record; and a connection from the sandbox to the listener's own port reached nothing.
+- **The command leaves nothing behind.** After each run the directory `sandbox-exec` below the data directory was empty, and the target directory that `--target` named was left as it was. A SIGINT to `sf` stopped the command by the stop sequence, and the report followed.
+
+### Method
+
+`sf sandbox exec --dir <clone> --target <directory> -- cargo build --workspace --all-targets --locked`, as the operator of the VM, with a home of its own whose `~/.config/sf/config.toml` named a data directory, level `process` and `[ecosystem.rust] toolchains_dir` at the toolchains of rustup's home in the VM. Each clone is a `git clone` of `https://github.com/sapientpants/software-factory.git`, made without a credential, at `44580cd`; the target directory was new and empty before the cold build. `sf` was a debug build of this branch. For the trace, the session installed `strace` 6.13 from Debian in the VM, ran the cold build once more under `strace -f -qq -Z` in a third clone, listed the calls of the table that failed with the code of their row, and removed `strace` again. The sandbox tests ran with `SF_SANDBOX_TESTS=process`, the sandbox step of `cargo xtask check` (DEV-2a).
+
+| | |
+|---|---|
+| Where | The development VM `sf-dev` of DEV-3, as in the parts of P-37 above: Debian 13, kernel `6.12.115+deb13.1-cloud-arm64`, aarch64, bubblewrap 0.12.0 |
+| Toolchain | `1.100.0-aarch64-unknown-linux-gnu` from rustup's home in the VM, with the components that `rust-toolchain.toml` names, shown read-only at its own path |
+| When | 2026-11-28, by the session |
+| Cold build | Exit 0; 18.120 s of wall-clock time; 2,167,385,122 bytes in the target directory; no denied request |
+| Seeded build | Exit 0; 6.182 s; 2,157,581,738 bytes; no denied request |
+| Under `strace` | Exit 0; 165.908 s; 351 calls of `clone3` refused with `ENOSYS` |
+| The hosted runners | Not yet run: the jobs of the CI workflow on this pull request, with the 0.9.0 that apt installs there, are its checks |
+
+### Found on the way
+
+- **Where the sandbox shows the directories.** A first run on two copies of the work tree, made with `cp -a`, compiled nothing in the seeded build: the copies kept the times of their files, and the sandbox showed each at `/work`. CLI-6 now says that the sandbox shows `--dir`, the home and the target directory at fixed paths, so that a seeded build sees its target directory at the path where it was built. Each at its own path would have put a clone below `/tmp` out of reach, since SEC-6f shows no mount there, and the path of a Unix socket below the macOS temporary directory was too long for the socket of the proxy (SEC-10b), so the id of a command's directory is short.
+- **The backend provides level `process`.** Until this change it reported no `egress_filtering` (SEC-6f), and `sf sandbox exec` checks the level against the capabilities of the backend (SEC-7).
+
+### What changed in the spec
+
+1. CLI-6: where the sandbox shows the three directories, where the report goes, what the command does where it runs none, and when it takes a SIGINT.
+2. SEC-6f: the backend reports `egress_filtering`.
+3. SEC-6e: what a cold build did under the filter.
+4. SEC-10b: that `cargo` completes without a resolver.
+5. 9.5: the environment of 9.3 and the hosts of the registry joined `Ecosystem`.
+6. DEV-2a: the sandbox step runs the tests of `factory-daemon` too.
+7. The row of this probe in 23.2.
+
+### Still open
+
+- **An agent session** under the filter and behind the proxy, and the temporary directory of SEC-6c, which are the operator's issue (#138).
+- **The hosted runners,** with bubblewrap 0.9.0, until the CI workflow has run on this pull request.
+- **The cold and the seeded build on the server,** which steps 5 and 6 of BOOT-3 run and P-13 records.

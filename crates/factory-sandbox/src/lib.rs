@@ -19,6 +19,11 @@ use factory_core::engine::RunId;
 pub mod bubblewrap;
 pub mod seccomp;
 
+/// The port of the loopback interface at which a worker at level `process`
+/// reaches the egress proxy, one number for every instance (SEC-10a). The
+/// host names it in the proxy variables of the environment (SEC-10b).
+pub const PROXY_PORT: u16 = 3128;
+
 /// A future that a trait method of this crate returns: the traits are used
 /// as objects, which a method declared `async` cannot be.
 pub type BoxFuture<'a, T> = Pin<Box<dyn Future<Output = T> + Send + 'a>>;

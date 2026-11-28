@@ -45,7 +45,9 @@ fn steps() -> Vec<Step> {
         // The tests and the doc tests, each word for word a verify command of
         // 11.2 (BOOT-6). nextest runs no doc test.
         Step::new("cargo", &["nextest", "run", "--workspace", "--locked"]).also_outside_the_vm(),
-        // The sandbox tests of 19.4 at level `process`, a step of their own.
+        // The sandbox tests of 19.4 at level `process`, a step of their own:
+        // those of the backend, and those of `sf sandbox exec`, which joins
+        // it with the egress proxy (CLI-6).
         // They are ignored unless the variable says the level, so the run
         // above runs none of them (DEV-2a). A check that creates a sandbox
         // does not run in a worker's (SEC-6b), so there the step is not run
@@ -58,6 +60,8 @@ fn steps() -> Vec<Step> {
                 "--locked",
                 "--package",
                 "factory-sandbox",
+                "--package",
+                "factory-daemon",
                 "--test",
                 "sandbox",
             ],
@@ -712,7 +716,7 @@ mod tests {
         assert_eq!(
             sandbox,
             "SF_SANDBOX_TESTS='process' cargo nextest run --locked --package factory-sandbox \
-             --test sandbox"
+             --package factory-daemon --test sandbox"
         );
         assert!(!on_the_mac.contains(&sandbox), "{on_the_mac:?}");
         // The plain test run sets no variable, so it runs none of the

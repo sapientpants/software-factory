@@ -253,12 +253,13 @@ fn find_toolchain(
 /// Tests the directory of each check tool of `tools` below `tools_dir`: a
 /// tool is present when `<name>/<version>/bin` exists and holds at least one
 /// executable file (WS-7a). A symbolic link there is followed as in the
-/// toolchains directory (WS-7).
+/// toolchains directory (WS-7). For a sandbox that is given no toolchain,
+/// which [`resolve`] would refuse (CLI-6).
 ///
 /// # Errors
 ///
 /// Each check tool that is missing, in order of name.
-fn find_check_tools(
+pub fn find_check_tools(
     tools_dir: Option<&Path>,
     tools: &[CheckTool],
 ) -> Result<Vec<FoundCheckTool>, Vec<Missing>> {

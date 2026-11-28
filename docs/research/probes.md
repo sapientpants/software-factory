@@ -4937,3 +4937,45 @@ Answered 2026-11-28 for #135, by `sf sandbox exec` in the command form (CLI-6) a
 - **An agent session** under the filter and behind the proxy, and the temporary directory of SEC-6c, which are the operator's issue (#138).
 - **The hosted runners,** with bubblewrap 0.9.0, until the CI workflow has run on this pull request.
 - **The cold and the seeded build on the server,** which steps 5 and 6 of BOOT-3 run and P-13 records.
+
+## P-37, in part: the stop sequence and the first process
+
+Answered 2026-11-28 for #164, by the tests of `factory-proc` and the sandbox tests of 19.4 that this pull request adds, run against the backend of `factory-sandbox` as it builds it, and by `sf sandbox exec` and its test binary in the development VM. It is the first time that the stop sequence of AG-12 signalled the first process of SEC-10a, by the pid that bubblewrap writes to `--json-status-fd`.
+
+**Answer.**
+
+- **bubblewrap names the first process on its first line.** It wrote `{ "child-pid": 2808799, "cgroup-namespace": …, "ipc-namespace": …, "mnt-namespace": …, "net-namespace": …, "pid-namespace": …, "uts-namespace": … }` and a line break once the first process existed, and `{ "exit-code": 0 }` once it had ended. The pid was that of the one child of `bwrap` on the host, the first process, whose arguments read `/sf/sf __sandbox-init`.
+- **No process of the sandbox holds the pipe.** Its descriptor, which the arguments of `bwrap` name, read `pipe:[<inode>]` on the host, and no descriptor of the first process or of any process below it named that pipe. A command run by hand under `bwrap --as-pid-1 --json-status-fd 5` listed descriptors 0 to 3 alone, the last its own listing.
+- **The stop sequence interrupts a command in an instance.** A command that trapped SIGINT and exited with 5 in the trap was stopped by the interrupt of AG-12: the SIGINT went to the first process, which passed it on to the command's group, and the 5 came back through the first process, `bwrap` and the shim.
+- **A command that ignores SIGINT and SIGTERM is killed after the times of AG-12.** It was stopped by the SIGKILL after 10 s and 5 s, with the status 137, and `bwrap`, the first process, the shell and its two children, one of them in a session of its own, were each gone within 5 s.
+- **`bwrap` needs a reader until its end.** Where the reading end of the pipe had been closed after the first line, `bwrap` wrote the line `exit-code` when the first process ended and was ended by SIGPIPE: it exited with 141 where the command had exited with 3. With the reading end held open it exited with 3.
+- **The 28 earlier sandbox tests passed,** with the two of this pull request, in the sandbox step eight times in a row.
+
+### Method
+
+The test binaries `crates/factory-sandbox/tests/sandbox.rs` and `crates/factory-daemon/tests/sandbox.rs`, with `SF_SANDBOX_TESTS=process`, which is the sandbox step of `cargo xtask check` (DEV-2a), on a copy of this branch in the VM. The tests take the descriptor of the pipe from the arguments of `bwrap`, read what it names in `/proc/<pid>/fd` of `bwrap`, and compare it with every descriptor of the first process and the processes below it. The two lines of bubblewrap, the listing of the descriptors and the exit codes with and without a reader were observed by hand, with `bwrap` and `/bin/sh` and the same namespaces as the backend's. `factory-proc` has tests of its own that need no sandbox, on the Mac and in the VM: a program that reports a child of its own on the pipe, which the stop sequence then signals and not the group, through the shim too.
+
+| | |
+|---|---|
+| Where | The development VM `sf-dev` of DEV-3, as in the parts of P-37 above: Debian 13, kernel `6.12.115+deb13.1-cloud-arm64`, aarch64, bubblewrap 0.12.0 |
+| When | 2026-11-28, by the session |
+| The hosted runners | Not yet run: the jobs of the CI workflow on this pull request, with the 0.9.0 that apt installs there, are its checks |
+
+### Found on the way
+
+- **A SIGINT can miss a shell's child.** The test of `sf sandbox exec` that sends `sf` a SIGINT ran `/bin/sh -c 'echo started; sleep 60'` and failed about once in 20 runs: `sf` and the first process each passed the SIGINT on, and the shell and its `sleep` lived on. dash catches SIGINT where it runs a `-c` string, and a SIGINT that came between its fork of `sleep` and the exec reached the child while it still held the shell's handler, which the exec then dropped. The shell waited for a `sleep` that had not seen the signal. Before this change the SIGINT ended `bwrap`, and `--die-with-parent` ended the sandbox, so the window was never met. The stop sequence of AG-12 ends such a command with its SIGTERM, 10 s later, which is longer than the test waits; the test now traps SIGINT in the shell, which then exits after its current `sleep` whatever the child saw. In 150 runs by hand of each command, with the test binary in place of `sf`, the first stuck four times and the second never.
+- **A command with a pipe of its own is started once.** `Command::spawn` of `factory-proc` takes the command mutably, and a second start of one that holds the pipe fails.
+
+### What changed in the spec
+
+1. SEC-10a: how the pid reaches the stop sequence, why the host keeps the pipe open, and what was observed, in place of what was left open.
+2. 13.3: the `Command` of `command` carries what the stop sequence signals.
+3. AG-15 and the table `activities` of ORCH-6: the pid and the group at level `process`.
+4. AG-16: what the stop sequence signals at level `process`.
+5. 19.4: the row "Sandbox" names the stop sequence on a command in an instance.
+6. D-54 in 23.1, and the row of this probe in 23.2.
+
+### Still open
+
+- **The hosted runners,** with bubblewrap 0.9.0, until the CI workflow has run on this pull request.
+- **An agent session** under the stop sequence, which answers the protocol interrupt or SIGINT with its result message (AG-12), with the rest of the operator's issue (#138).

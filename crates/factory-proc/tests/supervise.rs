@@ -17,7 +17,7 @@ use std::ffi::OsString;
 use std::process::ExitCode;
 use std::time::Duration;
 
-use common::{gone, pids, sh, spawn, text, within};
+use common::{gone, pids, plain, sh, spawn, text, within};
 use factory_proc::supervise::{FAILED, Supervise};
 use factory_proc::{Command, StopTimes, StoppedBy, Supervisor};
 use nix::sys::signal::{Signal, kill};
@@ -63,7 +63,7 @@ fn shim() -> ExitCode {
 /// the shim and of the tree, and waits to be killed.
 fn parent() -> ExitCode {
     within(async {
-        let mut shim = spawn(&supervised(TREE)).await;
+        let mut shim = spawn(&mut supervised(TREE)).await;
         let tree = text(&mut shim).await;
         println!("tree {} {tree}", shim.id());
         tokio::time::sleep(Duration::from_secs(300)).await;
@@ -75,7 +75,7 @@ fn a_killed_parent_leaves_no_process_of_the_tree() {
     within(async {
         let mut command = Command::new(std::env::current_exe().unwrap());
         command.env(ROLE, "parent");
-        let mut parent = spawn(&command).await;
+        let mut parent = spawn(&mut command).await;
         let tree = pids(text(&mut parent).await.strip_prefix("tree ").unwrap());
         assert_eq!(tree.len(), 4, "the shim, the shell and two sleeps");
         for pid in &tree {
@@ -94,7 +94,7 @@ fn a_killed_parent_leaves_no_process_of_the_tree() {
 fn the_command_leads_a_group_that_the_shim_is_no_member_of() {
     within(async {
         let script = "/bin/ps -o pgid= -p $$; /bin/ps -o pgid= -p $PPID";
-        let mut process = spawn(&supervised(script)).await;
+        let mut process = spawn(&mut supervised(script)).await;
         let command = text(&mut process).await;
         let shim = text(&mut process).await;
         assert_eq!(command.trim(), process.group().to_string());
@@ -105,7 +105,7 @@ fn the_command_leads_a_group_that_the_shim_is_no_member_of() {
 
 fn the_shim_exits_with_the_status_of_its_command() {
     within(async {
-        let mut process = spawn(&supervised("echo out; exit 7")).await;
+        let mut process = spawn(&mut supervised("echo out; exit 7")).await;
         assert_eq!(text(&mut process).await, "out");
         assert_eq!(process.wait().await.unwrap().code(), Some(7));
     });
@@ -113,7 +113,10 @@ fn the_shim_exits_with_the_status_of_its_command() {
 
 fn sigterm_reaches_the_command_and_the_shim_exits_with_its_signal() {
     within(async {
-        let mut process = spawn(&supervised("trap '' INT; echo ready; exec /bin/sleep 30")).await;
+        let mut process = spawn(&mut supervised(
+            "trap '' INT; echo ready; exec /bin/sleep 30",
+        ))
+        .await;
         assert_eq!(text(&mut process).await, "ready");
         let stopped = process.stop(SHORT, |_| false).await.unwrap();
         assert_eq!(stopped.by, StoppedBy::Terminate);
@@ -123,7 +126,7 @@ fn sigterm_reaches_the_command_and_the_shim_exits_with_its_signal() {
 
 fn the_last_step_of_the_stop_sequence_leaves_no_process_of_the_tree() {
     within(async {
-        let mut process = spawn(&supervised(&format!("trap '' INT TERM; {TREE}"))).await;
+        let mut process = spawn(&mut supervised(&format!("trap '' INT TERM; {TREE}"))).await;
         let tree = pids(&text(&mut process).await);
         let shim = i32::try_from(process.id()).unwrap();
         let stopped = process.stop(SHORT, |_| false).await.unwrap();
@@ -236,16 +239,60 @@ fn a_passed_file_reaches_the_command_from_its_start_each_time() {
         assert_eq!(given.pass_file(Arc::clone(&file)), fd);
 
         for _ in 0..2 {
-            let mut process = spawn(&given).await;
+            let mut process = spawn(&mut given).await;
             assert_eq!(text(&mut process).await, "passed");
             assert_eq!(process.wait().await.unwrap().code(), Some(0));
         }
-        let mut process = spawn(&bash(&script)).await;
+        let mut process = spawn(&mut bash(&script)).await;
         assert_eq!(text(&mut process).await, "none");
     });
 }
 
+fn the_shim_hands_the_report_on_and_the_stop_sequence_signals_the_reported_process() {
+    within(async {
+        // The command reports a child of its own, which prints `named` on
+        // SIGTERM; the command, which leads the group, prints `group` on
+        // SIGTERM, and a SIGINT ends it, so a signal to the group shows.
+        let mut command = Command::new("/bin/sh");
+        let fd = command.signal_reported(plain).unwrap();
+        command
+            .args([
+                "-c",
+                "trap 'echo group' TERM; \
+                 /bin/sh -c 'trap \"\" INT; trap \"echo named; exit 0\" TERM; echo ready; \
+                 while :; do /bin/sleep 0.05; done' & echo $! > /dev/fd/$1; wait",
+                "sh",
+                &fd.to_string(),
+            ])
+            .supervised_by(Supervisor::new(
+                std::env::current_exe().unwrap(),
+                Vec::<OsString>::new(),
+            ))
+            .env(ROLE, "shim");
+        let mut process = spawn(&mut command).await;
+        let factory_proc::Signalled::Process(named) = process.signalled() else {
+            panic!("{:?}", process.signalled());
+        };
+        assert_ne!(named, process.group());
+        assert_ne!(named, process.id());
+        assert_eq!(text(&mut process).await, "ready");
+
+        let stopped = process.stop(SHORT, |_| false).await.unwrap();
+
+        assert_eq!(stopped.by, StoppedBy::Terminate);
+        assert_eq!(
+            stopped.lines,
+            [factory_proc::Line::Text("named".to_owned())]
+        );
+        assert_eq!(stopped.status.code(), Some(0));
+    });
+}
+
 const TESTS: &[(&str, fn())] = &[
+    (
+        "the_shim_hands_the_report_on_and_the_stop_sequence_signals_the_reported_process",
+        the_shim_hands_the_report_on_and_the_stop_sequence_signals_the_reported_process,
+    ),
     #[cfg(target_os = "linux")]
     (
         "a_passed_file_reaches_the_command_from_its_start_each_time",

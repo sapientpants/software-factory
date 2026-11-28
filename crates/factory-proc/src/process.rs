@@ -6,10 +6,11 @@ use std::process::ExitStatus;
 use std::time::Duration;
 
 use nix::errno::Errno;
-use nix::sys::signal::{Signal, killpg};
-use nix::unistd::{Pid, getpgrp};
+use nix::sys::signal::{Signal, kill, killpg};
+use nix::unistd::{Pid, getpgrp, getpid};
 use process_wrap::tokio::ChildWrapper;
 use tokio::io::{AsyncRead, AsyncReadExt as _, AsyncWrite, AsyncWriteExt as _};
+use tokio::net::unix::pipe::Receiver;
 use tokio::process::{ChildStderr, ChildStdin, ChildStdout};
 use tokio::time::{Instant, sleep_until, timeout_at};
 use tokio_util::bytes::BytesMut;
@@ -69,6 +70,37 @@ pub struct Stopped {
     pub lines: Vec<Line>,
 }
 
+/// What the stop sequence of a [`Process`] signals (AG-12).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Signalled {
+    /// The process group of this pid: the command's, which it leads
+    /// (AG-11).
+    Group(u32),
+    /// The one process of this pid, which the program reported
+    /// ([`crate::Command::signal_reported`]): the first process of a sandbox
+    /// at level `process`, which passes SIGINT and SIGTERM on to the
+    /// command's group (SEC-10a).
+    Process(u32),
+}
+
+/// A command that [`crate::Command::spawn`] has started, with what it knows
+/// of its processes.
+pub(crate) struct Started {
+    /// The process that was started.
+    pub(crate) child: Box<dyn ChildWrapper>,
+    /// Its pid.
+    pub(crate) leader: Pid,
+    /// The command's group, or that of what the shim started.
+    pub(crate) group: Pid,
+    /// What the stop sequence signals.
+    pub(crate) signalled: Signalled,
+    /// The leader's status, where it has exited already.
+    pub(crate) status: Option<ExitStatus>,
+    /// The pipe of the program's report, which stays open while the process
+    /// lives.
+    pub(crate) report: Option<Receiver>,
+}
+
 /// What the pump of the output saw.
 enum Event {
     Line(Line),
@@ -91,8 +123,13 @@ pub struct Process {
     /// command, or the shim that started it.
     child: Box<dyn ChildWrapper>,
     leader: Pid,
-    /// The command's group.
+    /// The command's group, or that of what the shim started, which the end
+    /// of the output and a drop kill.
     group: Pid,
+    /// What the stop sequence signals.
+    signalled: Signalled,
+    /// The pipe of the program's report, held open.
+    _report: Option<Receiver>,
     stdin: Option<ChildStdin>,
     stdout: Option<Lines>,
     stderr: Option<ChildStderr>,
@@ -111,16 +148,24 @@ pub struct Process {
 
 impl Process {
     pub(crate) fn new(
-        mut child: Box<dyn ChildWrapper>,
-        leader: Pid,
-        group: Pid,
+        started: Started,
         codec: LineCodec,
         sink: Pin<Box<dyn AsyncWrite + Send>>,
         supervisor: Option<PipeWriter>,
     ) -> Self {
+        let Started {
+            mut child,
+            leader,
+            group,
+            signalled,
+            status,
+            report,
+        } = started;
         Self {
             leader,
             group,
+            signalled,
+            _report: report,
             stdin: child.stdin().take(),
             stdout: child
                 .stdout()
@@ -131,8 +176,8 @@ impl Process {
             sink,
             buffer: vec![0; 8192].into_boxed_slice(),
             pending: Vec::new(),
-            status: None,
-            drain_until: None,
+            status,
+            drain_until: status.map(|_| Instant::now() + DRAIN),
             swept: false,
             supervisor,
         }
@@ -144,10 +189,19 @@ impl Process {
         self.leader.as_raw().unsigned_abs()
     }
 
-    /// The process group that the stop sequence signals: the command's,
-    /// which it leads (AG-11). Without a shim it is [`Process::id`].
+    /// The process group that the shim reports, or [`Process::id`] where
+    /// there is no shim: the command's, which it leads (AG-11). The end of
+    /// the output and a drop kill it. Where the program reported a process
+    /// ([`crate::Command::signal_reported`]), it is the group of what the
+    /// shim started, and not the command's.
     pub fn group(&self) -> u32 {
         self.group.as_raw().unsigned_abs()
+    }
+
+    /// What the stop sequence signals: the group of [`Process::group`], or
+    /// the process that the program reported.
+    pub fn signalled(&self) -> Signalled {
+        self.signalled
     }
 
     /// The pipe on stdin, where the command was given one and it is open.
@@ -202,10 +256,11 @@ impl Process {
             .ok_or_else(|| Error::Wait(std::io::Error::other("the output ended before the leader")))
     }
 
-    /// Stops the command by the sequence of AG-12: SIGINT to the group, and a
+    /// Stops the command by the sequence of AG-12: SIGINT to what
+    /// [`Process::signalled`] names, and a
     /// wait of `times.interrupt` for the leader to exit or for a line that
-    /// `result` accepts; then stdin is closed, SIGTERM goes to the group, and
-    /// after `times.terminate` SIGKILL. The output is read throughout and
+    /// `result` accepts; then stdin is closed, SIGTERM goes to it, and after
+    /// `times.terminate` SIGKILL. The output is read throughout and
     /// drained after the leader exits.
     ///
     /// # Errors
@@ -277,9 +332,34 @@ impl Process {
         }
     }
 
+    /// Sends `signal` to what the stop sequence signals. A process or a group
+    /// that has ended is no error.
+    fn signal(&self, signal: Signal) -> Result<(), Error> {
+        match self.signalled {
+            Signalled::Group(_) => self.kill_group(signal),
+            Signalled::Process(pid) => {
+                let refused = || {
+                    Error::Signal(std::io::Error::other(format!(
+                        "{pid} is no process that a command reported"
+                    )))
+                };
+                let pid = i32::try_from(pid)
+                    .map(Pid::from_raw)
+                    .map_err(|_| refused())?;
+                if !signalable(pid, getpid()) {
+                    return Err(refused());
+                }
+                match kill(pid, signal) {
+                    Ok(()) | Err(Errno::ESRCH) => Ok(()),
+                    Err(errno) => Err(Error::Signal(errno.into())),
+                }
+            }
+        }
+    }
+
     /// Sends `signal` to the group. A group with no process left is no
     /// error.
-    fn signal(&self, signal: Signal) -> Result<(), Error> {
+    fn kill_group(&self, signal: Signal) -> Result<(), Error> {
         if !signalable(self.group, getpgrp()) {
             return Err(Error::Signal(std::io::Error::other(format!(
                 "{} is no group that a command leads",
@@ -360,24 +440,26 @@ impl Process {
             return Ok(());
         }
         self.swept = true;
-        self.signal(Signal::SIGKILL)?;
+        self.kill_group(Signal::SIGKILL)?;
         self.sink.flush().await.map_err(Error::Sink)
     }
 }
 
-/// Whether `group` may be signalled by a process of the group `own`. Group 0
-/// is the caller's own, group 1 is every process that the caller may signal,
-/// and a negative one is no group; the caller's own group is refused too.
-/// This is the second guard behind the report of a shim, which takes no pid
-/// below 2, so that no single fault signals the whole host.
-fn signalable(group: Pid, own: Pid) -> bool {
-    group.as_raw() > 1 && group != own
+/// Whether the group `target` may be signalled by a process of the group
+/// `own`, or the process `target` by the process `own`. Group 0 is the caller's own, group 1
+/// is every process that the caller may signal, and a negative one is no
+/// group; the caller's own group is refused too, and pid 1 and the caller
+/// as a process. This is the second guard behind the report of a shim or of
+/// a program, which takes no pid below 2, so that no single fault signals
+/// the whole host.
+fn signalable(target: Pid, own: Pid) -> bool {
+    target.as_raw() > 1 && target != own
 }
 
 impl Drop for Process {
     fn drop(&mut self) {
         if !self.swept {
-            let _ = self.signal(Signal::SIGKILL);
+            let _ = self.kill_group(Signal::SIGKILL);
         }
     }
 }

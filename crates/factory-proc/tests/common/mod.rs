@@ -33,7 +33,7 @@ pub fn sh(script: &str) -> Command {
 }
 
 /// `command`, started with stderr discarded.
-pub async fn spawn(command: &Command) -> Process {
+pub async fn spawn(command: &mut Command) -> Process {
     command
         .spawn(tokio::io::sink())
         .await
@@ -57,6 +57,12 @@ pub fn pids(line: &str) -> Vec<i32> {
     line.split_whitespace()
         .map(|pid| pid.parse().unwrap_or_else(|error| panic!("{pid}: {error}")))
         .collect()
+}
+
+/// A report of `Command::signal_reported` that holds a pid alone, as the
+/// tests' programs write it.
+pub fn plain(line: &[u8]) -> Option<u32> {
+    std::str::from_utf8(line).ok()?.trim().parse().ok()
 }
 
 /// Whether the process `pid` has gone within 5 s: a process whose parent
